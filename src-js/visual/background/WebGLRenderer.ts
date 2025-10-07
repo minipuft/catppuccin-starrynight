@@ -21,19 +21,18 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus, type EventData } from "@/core/events/EventBus";
+import { unifiedEventBus, type EventData, type UnifiedEventMap } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
 import {
   createGradientTexture,
   DEFAULT_VERTEX_SHADER,
   ShaderLoader,
 } from "@/utils/graphics/ShaderLoader";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
   VisualEffectsCoordinator,
   BackgroundSystemParticipant,
@@ -142,7 +141,7 @@ interface FlowGradientSettings {
 // Using shared visualEffects shader management - no need for duplicate uniform interface
 
 export class WebGLGradientBackgroundSystem
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant, QualityScalingCapable
 {
   private canvas: HTMLCanvasElement | null = null;
@@ -275,8 +274,7 @@ export class WebGLGradientBackgroundSystem
     // Event subscriptions will be set up during initialization
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  protected override async performVisualSystemInitialization(): Promise<void> {
 
     // Initialize CSS coordination first - use globalThis to access Year3000System
     const year3000System = (globalThis as any).year3000System;
@@ -595,7 +593,7 @@ export class WebGLGradientBackgroundSystem
   /**
    * Handle runtime setting changes (implements ISettingsResponsiveSystem pattern)
    */
-  public override applyUpdatedSettings(key: string, value: any): void {
+  public applyUpdatedSettings(key: string, value: any): void {
     Y3KDebug?.debug?.log(
       "WebGLGradientBackgroundSystem",
       `Runtime setting changed: ${key} = ${value}`
@@ -1790,37 +1788,47 @@ export class WebGLGradientBackgroundSystem
     }
   }
 
+  private registerEventSubscription<K extends keyof UnifiedEventMap>(
+    eventName: K,
+    handler: (data: UnifiedEventMap[K]) => void
+  ): void {
+    if (this.services.events) {
+      this.services.events.subscribe(this.systemName, eventName, handler);
+    } else {
+      const subscriptionId = unifiedEventBus.subscribe(
+        eventName,
+        handler,
+        "WebGLGradientBackgroundSystem"
+      );
+      this.eventSubscriptionIds.push(subscriptionId);
+    }
+  }
+
   private subscribeToEvents(): void {
-    // Subscribe to color harmonization events
-    const colorHarmonizedSub = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "colors:harmonized",
-      this.handleColorHarmonized.bind(this),
-      "WebGLGradientBackgroundSystem"
+      this.handleColorHarmonized.bind(this)
     );
-    this.eventSubscriptionIds.push(colorHarmonizedSub);
 
-    // Subscribe to color application events for coordination
-    const colorAppliedSub = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "colors:applied",
-      this.handleColorApplied.bind(this),
-      "WebGLGradientBackgroundSystem"
+      this.handleColorApplied.bind(this)
     );
-    this.eventSubscriptionIds.push(colorAppliedSub);
 
-    // Subscribe to performance tier changes for quality scaling (High Priority Fix)
-    const performanceTierSub = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "performance:tier-changed",
-      this.handlePerformanceTierChanged.bind(this),
-      "WebGLGradientBackgroundSystem"
+      this.handlePerformanceTierChanged.bind(this)
     );
-    this.eventSubscriptionIds.push(performanceTierSub);
 
     Y3KDebug?.debug?.log(
       "WebGLGradientBackgroundSystem",
-      "Subscribed to unified events",
+      "Subscribed to visual coordination events",
       {
-        subscriptionCount: this.eventSubscriptionIds.length,
-        events: ["colors:harmonized", "colors:applied", "performance:tier-changed"],
+        events: [
+          "colors:harmonized",
+          "colors:applied",
+          "performance:tier-changed",
+        ],
       }
     );
   }
@@ -2429,8 +2437,7 @@ export class WebGLGradientBackgroundSystem
     }
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
 
     // Unregister from visualEffects choreographer
     if (this.visualEffectsChoreographer) {
@@ -2565,7 +2572,7 @@ export class WebGLGradientBackgroundSystem
     settings: FlowGradientSettings;
   } {
     return {
-      fps: this.performanceMonitor?.getMedianFPS?.() || 0,
+      fps: this.performanceAnalyzer?.getMedianFPS?.() || 0,
       compileErrors: 0, // TODO: Track compilation errors
       isActive: this.isActive,
       settings: { ...this.settings },
@@ -2670,25 +2677,42 @@ export class WebGLGradientBackgroundSystem
   /**
    * IManagedSystem health check - returns health status using standard interface
    */
-  public override async healthCheck(): Promise<HealthCheckResult> {
-    const isHealthy = this.webglReady && this.initialized && this.isActive;
-    
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const healthy = this.webglReady && this.initialized && this.isActive;
+    const issues: string[] = [];
+
+    if (!this.webglReady) {
+      issues.push("WebGL not ready");
+    }
+
+    if (!this.initialized) {
+      issues.push("System not initialized");
+    }
+
+    if (!this.isActive) {
+      issues.push("System not active");
+    }
+
+    if (this.contextLost) {
+      issues.push("WebGL context lost");
+    }
+
     return {
-      system: 'WebGLGradientBackgroundSystem',
-      healthy: isHealthy,
+      healthy,
+      details: "WebGLGradientBackgroundSystem health snapshot",
+      issues,
       metrics: {
         webglReady: this.webglReady,
         initialized: this.initialized,
         active: this.isActive,
         contextLost: this.contextLost,
-        canvasExists: !!this.canvas
+        canvasExists: Boolean(this.canvas),
       },
-      issues: isHealthy ? [] : [
-        ...(this.webglReady ? [] : ['WebGL not ready']),
-        ...(this.initialized ? [] : ['System not initialized']),
-        ...(this.isActive ? [] : ['System not active']),
-        ...(this.contextLost ? ['WebGL context lost'] : [])
-      ]
     };
   }
 

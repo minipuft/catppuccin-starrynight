@@ -69,6 +69,12 @@ import {
   VisualEffectsCoordinator,
   VisualSystemKey,
 } from "@/visual/effects/VisualEffectsCoordinator";
+import {
+  DefaultServiceFactory,
+  DefaultPerformanceProfileService,
+  DefaultMusicSyncLifecycleService,
+  DefaultThemingStateService
+} from "@/core/services/CoreServiceProviders";
 
 // High-energy visual effects imports for integration
 import { RedEnergyBurstSystem } from "@/visual/effects/HighEnergyEffectsController";
@@ -191,6 +197,9 @@ export class SystemIntegrationCoordinator {
   private sharedColorHarmonyEngine: ColorHarmonyEngine | null = null;
   private sharedColorProcessor: any | null = null; // 🔧 PHASE 7: ColorProcessor facade integration - type is ColorProcessor but avoiding circular import
   private sharedSpicetifyColorBridge: SpicetifyColorBridge | null = null;
+  private performanceProfileService: DefaultPerformanceProfileService | null = null;
+  private musicSyncLifecycleService: DefaultMusicSyncLifecycleService | null = null;
+  private themingStateService: DefaultThemingStateService | null = null;
 
   // State management
   private isInitialized = false;
@@ -368,6 +377,24 @@ export class SystemIntegrationCoordinator {
       );
       await this.performanceCoordinator.initialize();
 
+      // Initialize shared services backed by the simplified performance system
+      this.performanceProfileService = new DefaultPerformanceProfileService(
+        this.config,
+        this.performanceCoordinator as any
+      );
+      this.performanceProfileService.setDependencies(
+        this.config,
+        this.performanceCoordinator as any
+      );
+      this.musicSyncLifecycleService = new DefaultMusicSyncLifecycleService();
+      this.themingStateService = new DefaultThemingStateService();
+
+      DefaultServiceFactory.registerOverrides({
+        performanceProfile: this.performanceProfileService,
+        musicSyncLifecycle: this.musicSyncLifecycleService,
+        themingState: this.themingStateService
+      });
+
       // Initialize shared CSS variable controller with simplified performance features
       try {
         // Use the new simplified performance coordinator for CSS controller
@@ -397,6 +424,7 @@ export class SystemIntegrationCoordinator {
 
       this.sharedMusicSyncService = new MusicSyncService();
       await this.sharedMusicSyncService.initialize();
+      this.musicSyncLifecycleService?.attach(this.sharedMusicSyncService);
 
       // NOTE: ColorHarmonyEngine initialization moved to initializeColorHarmonyEngine()
       // to ensure SpicetifyColorBridge is available for dependency injection
@@ -1540,6 +1568,14 @@ export class SystemIntegrationCoordinator {
       this.sharedMusicSyncService.destroy();
       this.sharedMusicSyncService = null;
     }
+
+    if (this.performanceProfileService) {
+      this.performanceProfileService.destroy();
+      this.performanceProfileService = null;
+    }
+
+    this.musicSyncLifecycleService = null;
+    this.themingStateService = null;
 
     // NOTE: SettingsManager destroy removed - using TypedSettingsManager singleton (no cleanup needed)
 

@@ -16,9 +16,9 @@ import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVar
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { ServiceContainer } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult } from "@/types/systems";
-import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
 // Local interfaces for this system
 interface AudioAnalysisData {
@@ -99,14 +99,14 @@ interface FlowSettings {
  * - Spectral frequency mapping to flow vectors
  * - Performance-optimized event-driven updates
  */
-export class GradientDirectionalFlowSystem extends BaseVisualSystem {
+export class GradientDirectionalFlowSystem extends ServiceVisualSystemBase {
   private flowSettings: FlowSettings;
   private currentFlowVector: FlowDirectionVector;
   private currentRadialFlow: RadialFlowVector;
   private genreFlowPatterns: GenreFlowPatterns;
   private spectralFlowMapping: SpectralFlowMapping;
 
-  private cssVariableController: CSSVariableWriter | null;
+  private cssVariableController: CSSVariableWriter | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -130,8 +130,10 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     super(config, utils, performanceMonitor, musicSyncService);
 
     this.colorHarmonyEngine = null; // Initialize as null, will be set later
-    // Initialize CSS Consciousness Controller if available
-    const cssController = getGlobalCSSVariableWriter();
+    // Initialize CSS Consciousness Controller from services (fallback to global)
+    const cssController =
+      (this.cssConsciousnessController as CSSVariableWriter | null) ||
+      getGlobalCSSVariableWriter();
     if (cssController) {
       this.cssVariableController = cssController;
     } else {
@@ -200,9 +202,25 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
       .map(() => ({ ...this.currentFlowVector }));
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  public override injectServices(services: ServiceContainer): void {
+    super.injectServices(services);
 
+    const cssController =
+      (this.cssConsciousnessController as CSSVariableWriter | null) ||
+      this.cssVariableController ||
+      getGlobalCSSVariableWriter();
+
+    if (cssController) {
+      this.cssVariableController = cssController;
+    } else {
+      Y3KDebug?.debug?.warn(
+        "GradientDirectionalFlowSystem",
+        "CSSVariableWriter not available after service injection"
+      );
+    }
+  }
+
+  protected override async performVisualSystemInitialization(): Promise<void> {
     this.subscribeToMusicEvents();
     this.startFlowUpdates();
 
@@ -213,22 +231,43 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
   }
 
   private subscribeToMusicEvents(): void {
-    // Subscribe to unified music events
+    if (this.services.events) {
+      this.services.events.subscribe(
+        this.systemName,
+        "music:beat",
+        this.handleBeatEvent.bind(this)
+      );
+
+      this.services.events.subscribe(
+        this.systemName,
+        "music:energy",
+        this.handleEnergyChange.bind(this)
+      );
+
+      Y3KDebug?.debug?.log(
+        "GradientDirectionalFlowSystem",
+        "Subscribed to music events via service container"
+      );
+
+      return;
+    }
+
+    // Fallback: subscribe directly to unified event bus when service bridge unavailable
     this.beatSubscriptionId = unifiedEventBus.subscribe(
-      'music:beat',
+      "music:beat",
       this.handleBeatEvent.bind(this),
-      'GradientDirectionalFlowSystem'
+      "GradientDirectionalFlowSystem"
     );
 
     this.energySubscriptionId = unifiedEventBus.subscribe(
-      'music:energy',
+      "music:energy",
       this.handleEnergyChange.bind(this),
-      'GradientDirectionalFlowSystem'
+      "GradientDirectionalFlowSystem"
     );
 
     Y3KDebug?.debug?.log(
-      'GradientDirectionalFlowSystem',
-      'Subscribed to unified music events'
+      "GradientDirectionalFlowSystem",
+      "Subscribed to unified music events (fallback)"
     );
   }
 
@@ -549,7 +588,7 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     return genreModifiers[genreKey] ?? 1.0;
   }
 
-  private updateCSSVariables(): void {
+  protected override updateCSSVariables(): void {
     const currentTime = performance.now();
 
     // Throttle CSS updates to 30 FPS
@@ -692,46 +731,61 @@ export class GradientDirectionalFlowSystem extends BaseVisualSystem {
     this.animateFlowPatterns(deltaTime);
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
-    const isHealthy =
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const healthy =
       this.flowSettings.enabled &&
       this.currentFlowVector.timestamp > 0 &&
       this.musicSyncService !== null;
 
+    const issues: string[] = [];
+
+    if (!this.flowSettings.enabled) {
+      issues.push("System disabled");
+    }
+
+    if (this.currentFlowVector.timestamp <= 0) {
+      issues.push("No flow updates");
+    }
+
+    if (!this.musicSyncService) {
+      issues.push("Music sync disconnected");
+    }
+
     return {
-      system: 'GradientDirectionalFlowSystem',
-      healthy: isHealthy,
+      healthy,
+      details: "GradientDirectionalFlowSystem health check",
+      issues,
       metrics: {
         enabled: this.flowSettings.enabled,
         lastUpdateTime: this.currentFlowVector.timestamp,
-        musicSyncConnected: !!this.musicSyncService,
-        flowIntensity: this.currentFlowVector.intensity
+        musicSyncConnected: Boolean(this.musicSyncService),
+        flowIntensity: this.currentFlowVector.intensity,
       },
-      issues: isHealthy ? [] : [
-        ...(this.flowSettings.enabled ? [] : ['System disabled']),
-        ...(this.currentFlowVector.timestamp > 0 ? [] : ['No flow updates']),
-        ...(this.musicSyncService ? [] : ['Music sync disconnected'])
-      ]
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
+    // Service bridge handles cleanup when available; fallback to manual unsubscribe
+    if (!this.services.events) {
+      if (this.beatSubscriptionId) {
+        unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+        this.beatSubscriptionId = null;
+      }
 
-    // Unsubscribe from unified event bus
-    if (this.beatSubscriptionId) {
-      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
-      this.beatSubscriptionId = null;
-    }
-
-    if (this.energySubscriptionId) {
-      unifiedEventBus.unsubscribe(this.energySubscriptionId);
-      this.energySubscriptionId = null;
+      if (this.energySubscriptionId) {
+        unifiedEventBus.unsubscribe(this.energySubscriptionId);
+        this.energySubscriptionId = null;
+      }
     }
 
     Y3KDebug?.debug?.log(
-      'GradientDirectionalFlowSystem',
-      'Unsubscribed from unified music events'
+      "GradientDirectionalFlowSystem",
+      "Music event subscriptions released"
     );
   }
 

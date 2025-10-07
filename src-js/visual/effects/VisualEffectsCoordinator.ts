@@ -53,6 +53,8 @@ import { IridescentShimmerEffectsSystem } from "@/visual/ui/IridescentShimmerEff
 import { SidebarVisualEffectsSystem } from "@/visual/ui/SidebarVisualEffectsSystem";
 import { UIEffectsController } from "@/visual/effects/UIVisualEffectsController";
 import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 
 // ===================================================================
 // CSS VARIABLE NAMING STANDARDS
@@ -1894,11 +1896,13 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       }
 
       // Create system instance with dependency injection
+      const constructorArgs = this.getBaseConstructorArgs();
       const dependencies = this.resolveDependencies(systemName);
-      const systemInstance = new SystemClass(...dependencies);
+      const systemInstance = new SystemClass(...constructorArgs, ...dependencies);
 
       // Initialize system
       if (systemInstance.initialize) {
+        systemInstance.injectServices?.(DefaultServiceFactory.getServices());
         await systemInstance.initialize();
       }
 
@@ -2090,6 +2094,16 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     }
 
     return resolved;
+  }
+
+  private getBaseConstructorArgs(): any[] {
+    const config = this.config;
+    const utils = this.utils || ThemeUtilities;
+    const performance = this.performanceCoordinator;
+    const musicSync = this.musicSyncService;
+    const year3000 = this.year3000System;
+
+    return [config, utils, performance, musicSync, year3000];
   }
 
   private async transitionToWebGL(config: TransitionConfig): Promise<void> {

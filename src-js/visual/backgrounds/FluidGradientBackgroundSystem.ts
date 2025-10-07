@@ -9,14 +9,13 @@
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus, type EventData } from "@/core/events/EventBus";
+import { unifiedEventBus, type EventData, type UnifiedEventMap } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult } from "@/types/systems";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
 import type {
   VisualEffectsCoordinator,
   BackgroundSystemParticipant,
@@ -423,7 +422,7 @@ interface LiquidVisualEffectsUniforms {
  * - Performance-optimized with CSS fallback
  */
 export class FluidGradientBackgroundSystem
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant, QualityScalingCapable
 {
   private webglGradientSystem: WebGLGradientBackgroundSystem;
@@ -547,8 +546,7 @@ export class FluidGradientBackgroundSystem
     // Event subscriptions will be set up during initialization
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  protected override async performVisualSystemInitialization(): Promise<void> {
 
     // Initialize base WebGL system first
     await this.webglGradientSystem.initialize();
@@ -671,44 +669,53 @@ export class FluidGradientBackgroundSystem
     });
   }
 
+  private registerEventSubscription<K extends keyof UnifiedEventMap>(
+    eventName: K,
+    handler: (data: UnifiedEventMap[K]) => void
+  ): void {
+    if (this.services.events) {
+      this.services.events.subscribe(this.systemName, eventName, handler);
+    } else {
+      const subscriptionId = unifiedEventBus.subscribe(
+        eventName,
+        handler,
+        "FluidGradientBackgroundSystem"
+      );
+      this.eventSubscriptionIds.push(subscriptionId);
+    }
+  }
+
   private subscribeToUnifiedEvents(): void {
-    // Subscribe to music beat events
-    const beatSubscription = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "music:beat",
-      this.handleMusicBeat.bind(this),
-      "FluidGradientBackgroundSystem"
+      this.handleMusicBeat.bind(this)
     );
-    this.eventSubscriptionIds.push(beatSubscription);
 
-    // Subscribe to music energy events
-    const energySubscription = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "music:energy",
-      this.handleMusicEnergy.bind(this),
-      "FluidGradientBackgroundSystem"
+      this.handleMusicEnergy.bind(this)
     );
-    this.eventSubscriptionIds.push(energySubscription);
 
-    // Subscribe to music state changes
-    const stateSubscription = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "music:state-changed",
-      this.handleMusicStateChange.bind(this),
-      "FluidGradientBackgroundSystem"
+      this.handleMusicStateChange.bind(this)
     );
-    this.eventSubscriptionIds.push(stateSubscription);
 
-    // Subscribe to color events for coordination
-    const colorSubscription = unifiedEventBus.subscribe(
+    this.registerEventSubscription(
       "colors:harmonized",
-      this.handleColorHarmonized.bind(this),
-      "FluidGradientBackgroundSystem"
+      this.handleColorHarmonized.bind(this)
     );
-    this.eventSubscriptionIds.push(colorSubscription);
 
     Y3KDebug?.debug?.log(
       "FluidGradientBackgroundSystem",
       "Subscribed to unified events",
       {
-        subscriptionCount: this.eventSubscriptionIds.length,
+        events: [
+          "music:beat",
+          "music:energy",
+          "music:state-changed",
+          "colors:harmonized",
+        ],
       }
     );
   }
@@ -975,22 +982,34 @@ export class FluidGradientBackgroundSystem
     }
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
-    const isHealthy = this.liquidSettings.enabled && this.shaderProgram !== null;
-    
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const healthy = this.liquidSettings.enabled && this.shaderProgram !== null;
+
+    const issues: string[] = [];
+
+    if (!this.liquidSettings.enabled) {
+      issues.push("System disabled");
+    }
+
+    if (!this.shaderProgram) {
+      issues.push("Shader program not initialized");
+    }
+
     return {
-      system: 'FluidGradientBackgroundSystem',
-      healthy: isHealthy,
+      healthy,
+      details: "FluidGradientBackgroundSystem health snapshot",
+      issues,
       metrics: {
         enabled: this.liquidSettings.enabled,
-        hasShaderProgram: !!this.shaderProgram,
+        hasShaderProgram: Boolean(this.shaderProgram),
         initialized: this.initialized,
-        flowIntensity: this.liquidSettings.flowIntensity
+        flowIntensity: this.liquidSettings.flowIntensity,
       },
-      issues: isHealthy ? [] : [
-        ...(this.liquidSettings.enabled ? [] : ['System disabled']),
-        ...(this.shaderProgram ? [] : ['Shader program not initialized'])
-      ]
     };
   }
 
@@ -1136,8 +1155,7 @@ export class FluidGradientBackgroundSystem
     ];
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
 
     // Unregister from visualEffects choreographer
     if (this.visualEffectsChoreographer) {
@@ -1159,15 +1177,18 @@ export class FluidGradientBackgroundSystem
     }
 
     // Clean up unified event subscriptions
-    this.eventSubscriptionIds.forEach((subscriptionId) => {
-      unifiedEventBus.unsubscribe(subscriptionId);
-    });
-    this.eventSubscriptionIds = [];
+    if (!this.services.events) {
+      this.eventSubscriptionIds.forEach((subscriptionId) => {
+        unifiedEventBus.unsubscribe(subscriptionId);
+      });
 
-    Y3KDebug?.debug?.log(
-      "FluidGradientBackgroundSystem",
-      "Unified event subscriptions cleaned up"
-    );
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Unified event subscriptions cleaned up"
+      );
+    }
+
+    this.eventSubscriptionIds = [];
 
     // Clean up liquid visualEffects shader
     if (this.gl && this.shaderProgram) {

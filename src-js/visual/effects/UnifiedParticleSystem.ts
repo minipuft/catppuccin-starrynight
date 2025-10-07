@@ -23,11 +23,10 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult } from "@/types/systems";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
 
 // Import visual effects integration
 import type {
@@ -673,7 +672,7 @@ class VisualParticleRenderer {
  * Consolidates LightweightParticleSystem and ParticleFieldSystem
  */
 export class UnifiedParticleSystem
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant
 {
   // Required BackgroundSystemParticipant implementation
@@ -744,9 +743,7 @@ export class UnifiedParticleSystem
     );
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
-
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       // Initialize particle pool
       this.initializeParticlePool();
@@ -881,21 +878,42 @@ export class UnifiedParticleSystem
    * Subscribe to unified music events
    */
   private subscribeToMusicSync(): void {
+    if (this.services.events) {
+      this.services.events.subscribe(
+        this.systemName,
+        "music:beat",
+        (data: any) => this.handleBeatEvent(data.intensity)
+      );
+
+      this.services.events.subscribe(
+        this.systemName,
+        "music:energy",
+        (data: any) => this.handleEnergyChange(data.energy)
+      );
+
+      Y3KDebug?.debug?.log(
+        "UnifiedParticleSystem",
+        "Subscribed to music events via service container"
+      );
+
+      return;
+    }
+
     this.beatSubscriptionId = unifiedEventBus.subscribe(
-      'music:beat',
+      "music:beat",
       (data) => this.handleBeatEvent(data.intensity),
-      'UnifiedParticleSystem'
+      "UnifiedParticleSystem"
     );
 
     this.energySubscriptionId = unifiedEventBus.subscribe(
-      'music:energy',
+      "music:energy",
       (data) => this.handleEnergyChange(data.energy),
-      'UnifiedParticleSystem'
+      "UnifiedParticleSystem"
     );
 
     Y3KDebug?.debug?.log(
-      'UnifiedParticleSystem',
-      'Subscribed to unified music events'
+      "UnifiedParticleSystem",
+      "Subscribed to unified music events (fallback)"
     );
   }
 
@@ -1637,32 +1655,48 @@ export class UnifiedParticleSystem
     };
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const activeCount = this.activeParticles.length;
     const poolCount = this.particlePool.length;
     const renderQuality = this.performanceConfig.renderQuality;
     const avgFrameTime = this.averageFrameTime;
 
-    const isHealthy =
+    const healthy =
       activeCount >= 0 &&
       poolCount > 0 &&
       avgFrameTime < 25 &&
       this.canvasManager !== null;
 
+    const issues: string[] = [];
+
+    if (poolCount === 0) {
+      issues.push("Particle pool depleted");
+    }
+
+    if (avgFrameTime >= 25) {
+      issues.push("Frame time above threshold");
+    }
+
     return {
-      healthy: isHealthy,
-      ok: isHealthy,
-      details:
-        `Particles: ${activeCount}/${this.performanceConfig.maxParticles}, ` +
-        `Pool: ${poolCount}, Quality: ${renderQuality}, ` +
-        `Avg Frame: ${avgFrameTime.toFixed(1)}ms`,
-      system: "UnifiedParticleSystem",
+      healthy,
+      details: "UnifiedParticleSystem health snapshot",
+      issues,
+      metrics: {
+        activeParticles: activeCount,
+        poolSize: poolCount,
+        maxParticles: this.performanceConfig.maxParticles,
+        renderQuality,
+        averageFrameTime: avgFrameTime,
+      },
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
-
+  protected override performVisualSystemCleanup(): void {
     // Unregister from visual effects coordinator
     if (this.visualEffectsCoordinator) {
       try {
@@ -1683,20 +1717,25 @@ export class UnifiedParticleSystem
     }
 
     // Unsubscribe from unified music events
-    if (this.beatSubscriptionId) {
-      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
-      this.beatSubscriptionId = null;
+    if (!this.services.events) {
+      if (this.beatSubscriptionId) {
+        unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+        this.beatSubscriptionId = null;
+      }
+
+      if (this.energySubscriptionId) {
+        unifiedEventBus.unsubscribe(this.energySubscriptionId);
+        this.energySubscriptionId = null;
+      }
+
+      Y3KDebug?.debug?.log(
+        "UnifiedParticleSystem",
+        "Unsubscribed from unified music events"
+      );
     }
 
-    if (this.energySubscriptionId) {
-      unifiedEventBus.unsubscribe(this.energySubscriptionId);
-      this.energySubscriptionId = null;
-    }
-
-    Y3KDebug?.debug?.log(
-      'UnifiedParticleSystem',
-      'Unsubscribed from unified music events'
-    );
+    this.beatSubscriptionId = null;
+    this.energySubscriptionId = null;
 
     // Clean up particles
     this.activeParticles = [];

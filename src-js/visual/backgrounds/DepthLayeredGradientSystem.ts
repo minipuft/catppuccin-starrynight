@@ -18,11 +18,16 @@ import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVar
 import { unifiedEventBus, type EventData } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import type { HealthCheckResult } from "@/types/systems";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type {
+  MusicSyncLifecycleService,
+  PerformanceProfileService,
+  ServiceContainer,
+  ThemingStateService
+} from "@/core/services/SystemServices";
 import type {
   VisualEffectsCoordinator,
   BackgroundSystemParticipant,
@@ -94,9 +99,20 @@ interface InfiniteSpaceMetrics {
  * - Music-responsive depth animation
  */
 export class DepthLayeredGradientSystem
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant
 {
+  private performanceProfileService: PerformanceProfileService | null = null;
+  private musicSyncLifecycleService: MusicSyncLifecycleService | null = null;
+  private themingStateService: ThemingStateService | null = null;
+
+  public override injectServices(services: ServiceContainer): void {
+    super.injectServices(services);
+    this.performanceProfileService = services.performanceProfile ?? null;
+    this.musicSyncLifecycleService = services.musicSyncLifecycle ?? null;
+    this.themingStateService = services.themingState ?? null;
+  }
+
   private depthSettings: DepthSettings;
   private depthLayers: Map<string, DepthLayer>;
   private visualEffectsLayers: Map<string, HTMLDivElement>;
@@ -327,8 +343,10 @@ export class DepthLayeredGradientSystem
     }
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  protected override async performVisualSystemInitialization(): Promise<void> {
+    // Refresh canvas capabilities using the injected canvas service if available
+    this.canvasCapabilities =
+      this.services.canvas?.getCanvasCapabilities() ?? this.canvasCapabilities;
 
     // Load settings
     this.loadSettings();
@@ -637,9 +655,11 @@ export class DepthLayeredGradientSystem
     }
 
     // Performance check - disable if FPS is too low
-    const currentFPS = (this.performanceMonitor as any)?.averageFPS || 60;
-    const isLowEndDevice = this.performanceMonitor?.getDeviceTier?.() === 'low' || false;
-    const shouldReduceQuality = this.performanceMonitor?.shouldReduceQuality?.() || false;
+    const analyzer = this.performanceAnalyzer as any;
+    const currentFPS = analyzer?.averageFPS ?? analyzer?.currentFPS ?? 60;
+    const deviceTier = analyzer?.getDeviceTier?.() ?? 'medium';
+    const shouldReduceQuality = analyzer?.shouldReduceQuality?.() ?? false;
+    const isLowEndDevice = deviceTier === 'low';
 
     if (currentFPS < 45 || isLowEndDevice || shouldReduceQuality) {
       this.depthSettings.musicalVisualEffects.enabled = false;
@@ -1148,7 +1168,8 @@ export class DepthLayeredGradientSystem
     if (!this.cssVariableController || !this.depthSettings.musicalVisualEffects.enabled) return;
 
     // Runtime performance check - disable if performance degrades
-    const currentFPS = (this.performanceMonitor as any)?.currentFPS || 60;
+    const analyzer = this.performanceAnalyzer as any;
+    const currentFPS = analyzer?.currentFPS ?? analyzer?.averageFPS ?? 60;
     if (currentFPS < 40 && this.depthSettings.musicalVisualEffects.enabled) {
       this.depthSettings.musicalVisualEffects.enabled = false;
       this.destroyVisualEffectsLayers();
@@ -1302,31 +1323,42 @@ export class DepthLayeredGradientSystem
     }
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const isHealthy =
       this.depthSettings.enabled &&
       this.depthLayers.size > 0 &&
       this.backgroundContainer !== null;
 
+    const issues = isHealthy
+      ? []
+      : [
+          ...(this.depthSettings.enabled ? [] : ["System disabled"]),
+          ...(this.depthLayers.size > 0 ? [] : ["No active layers"]),
+          ...(this.backgroundContainer ? [] : ["Missing container element"])
+        ];
+
     return {
-      system: 'DepthLayeredGradientSystem',
       healthy: isHealthy,
+      details: isHealthy
+        ? "Depth-layered gradient system healthy"
+        : "Depth-layered gradient system requires attention",
+      issues,
       metrics: {
         enabled: this.depthSettings.enabled,
         layerCount: this.depthLayers.size,
         hasContainer: !!this.backgroundContainer,
         layerSettings: this.depthSettings.layerCount
-      },
-      issues: isHealthy ? [] : [
-        ...(this.depthSettings.enabled ? [] : ['System disabled']),
-        ...(this.depthLayers.size > 0 ? [] : ['No active layers']),
-        ...(this.backgroundContainer ? [] : ['Missing container element'])
-      ]
+      }
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
+    this.musicSyncLifecycleService?.unsubscribe(this.systemName);
 
     // Unregister from visual effects coordinator
     if (this.visualEffectsCoordinator) {

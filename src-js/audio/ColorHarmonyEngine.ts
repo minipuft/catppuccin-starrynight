@@ -19,7 +19,7 @@ import type {
   IColorProcessor,
 } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type { IManagedSystem } from "@/types/systems";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import {
   EmotionalTemperatureMapper,
@@ -35,8 +35,19 @@ import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { PaletteExtensionManager } from "@/utils/core/PaletteExtensionManager";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
-import { BaseVisualSystem } from "@/visual/base/BaseVisualSystem";
+import { ServiceSystemBase } from "@/core/services/SystemServiceBridge";
+import type {
+  CSSVariableService,
+  EventSubscriptionService,
+  MusicSyncLifecycleService,
+  PerformanceProfileService,
+  PerformanceTrackingService,
+  ServiceContainer,
+  ThemingStateService,
+} from "@/core/services/SystemServices";
+import { getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import {
   MusicEmotionAnalyzer,
   type AudioData,
@@ -146,10 +157,7 @@ interface VibrancyConfig {
  * @class OKLABColorProcessor
  * @implements {IManagedSystem}
  */
-export class OKLABColorProcessor
-  extends BaseVisualSystem
-  implements IManagedSystem
-{
+export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSystem {
   /**
    * Canonical accent CSS custom property names.
    *  – `--sn-accent-hex`  : Hex string (e.g. "#cba6f7")
@@ -238,21 +246,28 @@ export class OKLABColorProcessor
   // Track last applied genre to avoid redundant palette refreshes
   private _lastGenre: string | null = null;
 
+  private readonly utils: typeof ThemeUtilities;
+  private cssService: CSSVariableService | null = null;
+  private eventService: EventSubscriptionService | null = null;
+  private musicSyncLifecycleService: MusicSyncLifecycleService | null = null;
+  private themingStateService: ThemingStateService | null = null;
+  private performanceService: PerformanceTrackingService | null = null;
+  private performanceProfileService: PerformanceProfileService | null = null;
+  private readonly fallbackDomCleanup: Array<() => void> = [];
+
   constructor(
-    config?: Year3000Config,
-    utils?: typeof ThemeUtilities,
+    config: Year3000Config = ADVANCED_SYSTEM_CONFIG,
+    utils: typeof ThemeUtilities = ThemeUtilities,
     performanceMonitor?: SimplePerformanceCoordinator,
     semanticColorManager?: SpicetifyColorBridge
-    // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
   ) {
-    super(
-      config,
-      utils || ThemeUtilities,
-      performanceMonitor!,
-      null // No direct music service dependency
-      // NOTE: settingsManager argument removed - using TypedSettingsManager singleton
-    );
+    super(config);
     this.systemName = "ColorHarmonyEngine";
+    this.utils = utils;
+
+    if (performanceMonitor) {
+      this._legacyPerformanceAnalyzer = performanceMonitor;
+    }
 
     this.paletteExtensionManager = new PaletteExtensionManager(
       this.config,
@@ -280,7 +295,7 @@ export class OKLABColorProcessor
     // preferences are respected as soon as the engine is instantiated.
     // ------------------------------------------------------------------
     // Check for extended config with color harmony intensity
-    const extendedConfig = config as Year3000Config & { colorHarmonyIntensity?: number };
+    const extendedConfig = config as Year3000Config & { colorHarmonyIntensity?: number; colorHarmonyEvolution?: boolean; harmonicEvolution?: boolean };
     if (
       extendedConfig &&
       typeof extendedConfig.colorHarmonyIntensity === "number" &&
@@ -448,11 +463,11 @@ export class OKLABColorProcessor
     }
 
     // Sync evolution flag from config
-    if (config && typeof (config as any).colorHarmonyEvolution === "boolean") {
-      this.evolutionEnabled = (config as any).colorHarmonyEvolution;
-    } else if (config && typeof (config as any).harmonicEvolution === "boolean") {
+    if (config && typeof extendedConfig.colorHarmonyEvolution === "boolean") {
+      this.evolutionEnabled = extendedConfig.colorHarmonyEvolution;
+    } else if (config && typeof extendedConfig.harmonicEvolution === "boolean") {
       // Legacy compatibility
-      this.evolutionEnabled = (config as any).harmonicEvolution;
+      this.evolutionEnabled = extendedConfig.harmonicEvolution;
     }
 
     // Initialize emotional temperature mapper for music-to-emotion integration
@@ -506,20 +521,27 @@ export class OKLABColorProcessor
     // Bind handlers once
     this._boundSettingsChangeHandler = this._handleSettingsChange.bind(this);
     this._boundArtisticModeHandler = this._handleArtisticModeChanged.bind(this);
+  }
 
-    document.addEventListener(
-      "year3000SystemSettingsChanged",
-      this._boundSettingsChangeHandler
-    );
-    document.addEventListener(
-      "year3000ArtisticModeChanged",
-      this._boundArtisticModeHandler
-    );
+  public override injectServices(services: ServiceContainer): void {
+    super.injectServices(services);
 
-    // Start evolution loop if allowed
-    if (this.evolutionEnabled) {
-      this._startEvolutionLoop();
-    }
+    this.cssService = services.cssVariables ?? null;
+    this.eventService = services.events ?? null;
+    this.musicSyncLifecycleService = services.musicSyncLifecycle ?? null;
+    this.themingStateService = services.themingState ?? null;
+    this.performanceService = services.performance ?? null;
+    this.performanceProfileService = services.performanceProfile ?? null;
+  }
+
+  public override getOptionalServices(): (keyof ServiceContainer)[] {
+    return [
+      ...super.getOptionalServices(),
+      "musicSyncLifecycle",
+      "themingState",
+      "performance",
+      "performanceProfile",
+    ];
   }
 
   /**
@@ -564,22 +586,12 @@ export class OKLABColorProcessor
       return (this.catppuccinPalettes as any)[this.currentTheme];
     }
   }
-  // TODO: Legacy interface method - delegates to new onAnimate
-  // Overload signature for IManagedSystem (single-parameter)
-  override updateAnimation(deltaTime: number): void;
-  // Overload signature for BaseVisualSystem (two-parameter)
-  override updateAnimation(timestamp: number, deltaTime: number): void;
-  // Unified implementation
-  override updateAnimation(
-    timestampOrDelta: number,
-    maybeDelta?: number
-  ): void {
-    const delta = maybeDelta ?? timestampOrDelta;
-    this.onAnimate(delta);
+  public updateAnimation(deltaTime: number): void {
+    this.onAnimate(deltaTime);
   }
 
   // TODO: Implement proper onAnimate method for Year 3000 per-frame updates
-  public override onAnimate(deltaMs: number): void {
+  public onAnimate(deltaMs: number): void {
     this._updateCSSVariables(deltaMs);
     this._calculateBeatPulse(deltaMs);
 
@@ -740,32 +752,18 @@ export class OKLABColorProcessor
     return { detected: false, intensity: 0, confidence: 0 };
   }
 
-  public override async initialize(): Promise<void> {
-    await super.initialize();
+  public override async _performSystemSpecificInitialization(): Promise<void> {
+    const cssWriter = getGlobalCSSVariableWriter();
+    await this.semanticColorManager.initialize(cssWriter);
 
-    // Initialize SpicetifyColorBridge with CSSVariableWriter from parent system
-    const cssVisualEffectsController = this.performanceMonitor
-      ? (this.performanceMonitor as any).cssVisualEffectsController
-      : undefined;
-    this.semanticColorManager.initialize(cssVisualEffectsController);
-
-    // 🔧 CRITICAL FIX: Do NOT update semantic colors on initialization as it sets white/gray values
-    // Initial semantic color setup - DISABLED to prevent color override
-    // await this.semanticColorManager.updateSemanticColors();
-
-    // ColorHarmonyEngine focuses on music emotion analysis
-    // Color processing delegated to ColorProcessor
     if (this.config.enableDebug) {
       console.log(
         "🎭 [ColorHarmonyEngine] Initialized for music emotion analysis."
       );
     }
 
-    // Initialize music emotion analyzer for audio-responsive color processing
     try {
       await this.musicEmotionAnalyzer.initialize();
-
-      // Subscribe to emotion updates for audioAnalysis-aware color processing
       this.musicEmotionAnalyzer.onEmotionUpdate((emotion: EmotionalState) => {
         this.handleEmotionUpdate(emotion);
       });
@@ -782,22 +780,60 @@ export class OKLABColorProcessor
       );
     }
 
-    // GenreProfileManager is stateless and doesn't need initialization
-    if (this.config.enableDebug) {
-      console.log(
-        "🎶 [ColorHarmonyEngine] GenreProfileManager ready for genre detection"
+    if (this.eventService) {
+      this.eventService.subscribeToDOM(
+        this.systemName,
+        document,
+        "year3000SystemSettingsChanged",
+        this._boundSettingsChangeHandler
       );
+      this.eventService.subscribeToDOM(
+        this.systemName,
+        document,
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
+    } else {
+      document.addEventListener(
+        "year3000SystemSettingsChanged",
+        this._boundSettingsChangeHandler
+      );
+      document.addEventListener(
+        "year3000ArtisticModeChanged",
+        this._boundArtisticModeHandler
+      );
+      this.fallbackDomCleanup.push(() =>
+        document.removeEventListener(
+          "year3000SystemSettingsChanged",
+          this._boundSettingsChangeHandler
+        )
+      );
+      this.fallbackDomCleanup.push(() =>
+        document.removeEventListener(
+          "year3000ArtisticModeChanged",
+          this._boundArtisticModeHandler
+        )
+      );
+    }
+
+    if (this.musicSyncLifecycleService) {
+      this.musicSyncLifecycleService.subscribe(this.systemName, {
+        initialized: true,
+        updateFromMusicAnalysis: (processed, raw, trackUri) => {
+          this.updateFromMusicAnalysis(processed, raw, trackUri ?? "");
+        },
+      });
+    }
+
+    if (this.evolutionEnabled) {
+      this._startEvolutionLoop();
     }
 
     if (this.config.enableDebug) {
       console.log(
-        "🎨 [ColorHarmonyEngine] Initialized with Year 3000 Quantum Empathy via BaseVisualSystem and SpicetifyColorBridge."
-      );
-      console.log(
         "🎨 [ColorHarmonyEngine] Subscribed to 'colors/extracted' events for strategy pattern processing."
       );
     }
-    this.initialized = true;
   }
 
   /**
@@ -908,22 +944,33 @@ export class OKLABColorProcessor
     }
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
-    if (!this.getCurrentActivePalette()) {
-      return {
-        healthy: false,
-        ok: false,
-        details: `Current theme '${this.currentTheme}' not found in palettes.`,
-        issues: [`Current theme '${this.currentTheme}' not found in palettes.`],
-        system: "ColorHarmonyEngine",
-      };
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const paletteAvailable = Boolean(this.getCurrentActivePalette());
+    const issues: string[] = [];
+
+    if (!paletteAvailable) {
+      issues.push(`Current theme '${this.currentTheme}' not found in palettes.`);
     }
+
+    const details =
+      issues.length === 0
+        ? "Palettes are loaded correctly."
+        : issues[0]!;
+
     return {
-      healthy: true,
-      ok: true,
-      details: "Palettes are loaded correctly.",
-      issues: [],
-      system: "ColorHarmonyEngine",
+      healthy: issues.length === 0,
+      details,
+      issues,
+      metrics: {
+        evolutionEnabled: this.evolutionEnabled,
+        lastEmotionUpdate: this.emotionalState.lastEmotionUpdate,
+        harmonyCalculations: this.harmonyMetrics.totalHarmonyCalculations,
+      },
     };
   }
 
@@ -1601,10 +1648,6 @@ export class OKLABColorProcessor
     extractedColors: { [key: string]: string },
     musicContext: any = null
   ): { [key: string]: string } {
-    this.performanceMonitor?.emitTrace?.(
-      "[ColorHarmonyEngine] Starting blendWithCatppuccin"
-    );
-
     // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION: Map music analysis to emotional states
     let emotionalTemperature: EmotionalTemperatureResult | null = null;
     if (musicContext) {
@@ -1806,10 +1849,6 @@ export class OKLABColorProcessor
     }
 
     this.harmonyMetrics.musicInfluencedAdjustments++;
-
-    this.performanceMonitor?.emitTrace?.(
-      "[ColorHarmonyEngine] Completed blendWithCatppuccin"
-    );
 
     // 🎨 DEBUG: Log final harmonized result
     if (this.config.enableDebug) {
@@ -2097,7 +2136,7 @@ export class OKLABColorProcessor
     };
   }
 
-  public override updateFromMusicAnalysis(
+  public updateFromMusicAnalysis(
     processedMusicData: any,
     rawFeatures: any,
     trackUri: string
@@ -2954,34 +2993,25 @@ export class OKLABColorProcessor
   }
 
   // Clean up listeners when destroyed
-  public override destroy(): void {
+  public override _performSystemSpecificCleanup(): void {
     this._stopEvolutionLoop();
-    document.removeEventListener(
-      "year3000SystemSettingsChanged",
-      this._boundSettingsChangeHandler
-    );
-    document.removeEventListener(
-      "year3000ArtisticModeChanged",
-      this._boundArtisticModeHandler
-    );
 
-    // Clean up SpicetifyColorBridge
-    if (this.semanticColorManager) {
-      this.semanticColorManager.destroy();
+    if (this.eventService) {
+      this.eventService.cleanupSystem(this.systemName);
+    } else {
+      while (this.fallbackDomCleanup.length) {
+        const cleanup = this.fallbackDomCleanup.pop();
+        cleanup?.();
+      }
     }
 
-    // Clean up MusicEmotionAnalyzer
-    if (this.musicEmotionAnalyzer) {
-      this.musicEmotionAnalyzer.destroy();
-    }
+    this.semanticColorManager?.destroy();
+    this.musicEmotionAnalyzer?.destroy();
 
-    // Clear emotional state
     if (this.emotionalState) {
       this.emotionalState.currentEmotion = null;
       this.emotionalState.emotionHistory = [];
     }
-
-    super.destroy?.();
   }
 
   /**

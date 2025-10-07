@@ -2,9 +2,11 @@
 
 **Mission**: Systematically migrate all visual systems from inheritance-based `BaseVisualSystem` to composition-based `ServiceVisualSystemBase`
 
+**Service Adoption Standard (New)**: Every migrated system must consume dependencies through the service container (`injectServices`) rather than `globalThis`/`year3000System` fallbacks. This includes CSS variable batching, event/timer coordination, performance profiling, and music sync lifecycle.
+
 **Created**: 2025-10-06
 **Status**: ✅ Phase 2.2 COMPLETE | 🟡 Phase 2.3 In Progress
-**Overall Progress**: 5/14 systems (36%)
+**Overall Progress**: 12/14 systems (86%)
 
 ---
 
@@ -18,9 +20,9 @@
 ### Current Phase
 - 🟡 **Phase 2.3**: Tier 2 Progressive Migration (Weeks 3-4)
   - Target: 6 medium-risk systems
-  - Progress: 2/6 complete (UIVisualEffectsController ✅, DepthLayerController ✅)
-  - Next: GradientDirectionalFlowSystem
-  - Goal: Complete Tier 2 (64% overall progress)
+  - Progress: 5/6 complete (UIVisualEffectsController ✅, DepthLayerController ✅, GradientDirectionalFlowSystem ✅, TunnelVisualizationSystem ✅, DynamicGradientStrategy ✅)
+  - Next: ThemeColorController (strategy verification only)
+  - Goal: Complete Tier 2 (85% overall progress)
 
 ### Future Phases
 - 🔴 **Phase 2.4**: Tier 3 Critical Systems (Weeks 5-7)
@@ -212,74 +214,72 @@
 4. **Initialization pattern**: _performSystemSpecificInitialization() → performVisualSystemInitialization()
 5. **Consistent velocity maintained**: Fifth consecutive ~1 hour migration
 
-#### 6. GradientDirectionalFlowSystem
-- **Status**: 🔴 Not Started
+#### 6. GradientDirectionalFlowSystem ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: MEDIUM
 - **File**: `src-js/audio/GradientDirectionalFlowSystem.ts`
-- **Estimated Effort**: 5-6 hours
+- **Notes**: Switched to `ServiceVisualSystemBase`, replaced unified bus calls with service events (fallback retained), implemented `performSystemHealthCheck`, and wired CSS updates through service-aware adapter.
 
-#### 7. TunnelVisualizationSystem
-- **Status**: 🔴 Not Started
+#### 7. TunnelVisualizationSystem ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: MEDIUM
 - **File**: `src-js/audio/TunnelVisualizationSystem.ts`
-- **Estimated Effort**: 5-7 hours
+- **Notes**: Migrated lifecycle hooks, routed music events via service container, and added health check tracking lighting state integrity.
 
-#### 8. DynamicCatppuccinBridge
-- **Status**: 🔴 Not Started
-- **Complexity**: MEDIUM
-- **File**: `src-js/visual/effects/DynamicCatppuccinBridge.ts`
-- **Estimated Effort**: 4-5 hours
+#### 8. ThemeColorController (formerly DynamicCatppuccinBridge)
+- **Status**: ℹ️ Not Applicable (Strategy Only)
+- **File**: `src-js/visual/color/ThemeColorController.ts`
+- **Notes**: Renamed to a pure `IColorProcessor` strategy. Does not extend `BaseVisualSystem`; no migration required beyond ensuring documentation references the new name.
 
-#### 9. DynamicGradientStrategy
-- **Status**: 🔴 Not Started
+#### 9. DynamicGradientStrategy ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: MEDIUM-HIGH
 - **File**: `src-js/visual/strategies/DynamicGradientStrategy.ts`
-- **Estimated Effort**: 5-7 hours
+- **Notes**: Adopted service-driven event + DOM subscriptions, added CSS batching helper compatible with service bridge, and implemented `performSystemHealthCheck`.
 
 ---
 
 ### Tier 3: High-Risk Systems (5 systems)
 
-#### 10. UnifiedParticleSystem
-- **Status**: 🔴 Not Started
+#### 10. UnifiedParticleSystem ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: HIGH
 - **File**: `src-js/visual/effects/UnifiedParticleSystem.ts`
 - **Canvas Usage**: Heavy (WebGL)
 - **Risk Level**: HIGH - Particle rendering core
-- **Estimated Effort**: 8-10 hours
+- **Notes**: Service lifecycle now manages initialization/cleanup, music sync hooks routed through event service with fallback, and health checks report particle/canvas metrics.
 
-#### 11. WebGLRenderer
-- **Status**: 🔴 Not Started
+#### 11. WebGLRenderer ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: HIGH
 - **File**: `src-js/visual/background/WebGLRenderer.ts`
 - **Canvas Usage**: Heavy (WebGL core)
 - **Risk Level**: HIGH - Rendering foundation
-- **Estimated Effort**: 8-12 hours
+- **Notes**: Migrated to service lifecycle, centralized event subscription helper (service-first), and added service-compatible health check/metrics reporting.
 
-#### 12. FluidGradientBackgroundSystem
-- **Status**: 🔴 Not Started
+#### 12. FluidGradientBackgroundSystem ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: HIGH
 - **File**: `src-js/visual/backgrounds/FluidGradientBackgroundSystem.ts`
 - **Canvas Usage**: Heavy (WebGL)
 - **Risk Level**: HIGH - Background system
-- **Estimated Effort**: 8-10 hours
+- **Notes**: Leveraged service container for event management, retained WebGL shader pipeline, and introduced targeted health diagnostics for shader readiness.
 
-#### 13. DepthLayeredGradientSystem
-- **Status**: 🔴 Not Started
+#### 13. DepthLayeredGradientSystem ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-06)
 - **Complexity**: HIGH
 - **File**: `src-js/visual/backgrounds/DepthLayeredGradientSystem.ts`
 - **Canvas Usage**: Heavy (WebGL)
 - **Risk Level**: HIGH - Layered rendering
-- **Estimated Effort**: 8-10 hours
+- **Notes**: Completed during Phase 2 foundations; service hooks already active (no action needed this pass).
 
-#### 14. ColorHarmonyEngine
-- **Status**: 🔴 Not Started
+#### 14. ColorHarmonyEngine ✅ COMPLETE
+- **Status**: ✅ Migrated (2025-10-07)
 - **Complexity**: VERY HIGH
 - **File**: `src-js/audio/ColorHarmonyEngine.ts`
 - **Canvas Usage**: None (but critical)
 - **Risk Level**: CRITICAL - Color processing core
-- **Estimated Effort**: 10-15 hours
-- **Notes**: MIGRATE LAST - most complex dependencies
+- **Notes**: Migrated to `ServiceSystemBase`; service-injected CSS/events/music lifecycle with fallbacks, consolidated lifecycle/health checks, and preserved semantic bridge compatibility.
 
 ---
 
@@ -578,19 +578,31 @@ const canvas = await this.createCanvas(id, {
 - [ ] 64% overall completion
 - [ ] Complex dependencies handled
 - [ ] Canvas systems validated
+- [ ] Service container adoption verified for each migrated system
 
 ### Phase 2.4: Tier 3 Critical
 - [ ] 14 systems migrated (All tiers)
 - [ ] 100% migration complete
 - [ ] All high-risk systems validated
-- [ ] ColorHarmonyEngine successfully migrated
+- [x] ColorHarmonyEngine successfully migrated
 
 ### Phase 2.5: Cleanup & Optimization
 - [ ] BaseVisualSystem.ts deleted
 - [ ] Bundle reduction achieved (-20-30KB)
 - [ ] All documentation updated
+- [ ] Service adoption complete (no `globalThis` / `year3000System` fallbacks)
+  - [ ] Every migrated system overrides `injectServices` and consumes injected `cssVariables` / `events` / `performanceProfile` / `musicSyncLifecycle` / `themingState`
+  - [ ] All `getGlobalCSSVariableWriter()` accesses replaced with service calls
+  - [ ] Music sync updates sourced via `MusicSyncLifecycleService`
 - [ ] Performance optimizations applied
 - [ ] Regression test suite passing
+
+### Phase 3.0: Coordinator Modernization
+- [ ] Refactor `SystemIntegrationCoordinator` to become the primary source of shared services and configuration, documenting all exported services.
+- [ ] Refactor `VisualEffectsCoordinator` to consume only service-container dependencies (no `globalThis`/`year3000System` fallbacks).
+- [ ] Establish explicit service channels for cross-system effects (e.g., theming state snapshots, performance tier broadcasts).
+- [ ] Audit visual theming/styling to ensure new pipelines preserve existing CSS tokens and behaviors.
+- [ ] Validate new coordinator flows with targeted visual tests to confirm no styling regressions.
 
 ---
 

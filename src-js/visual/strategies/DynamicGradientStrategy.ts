@@ -11,7 +11,7 @@
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
-import { unifiedEventBus } from "@/core/events/EventBus";
+import { unifiedEventBus, type UnifiedEventMap } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
@@ -25,7 +25,8 @@ import {
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import * as Utils from "@/utils/core/ThemeUtilities";
-import { BaseVisualSystem } from "../base/BaseVisualSystem";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { ServiceContainer } from "@/core/services/SystemServices";
 
 interface DynamicGradientState {
   currentBaseHex: string;
@@ -55,10 +56,10 @@ interface DynamicGradientConfig {
 }
 
 export class DynamicGradientStrategy
-  extends BaseVisualSystem
+  extends ServiceVisualSystemBase
   implements IColorProcessor
 {
-  private cssController: CSSVariableWriter;
+  private cssController: CSSVariableWriter | null = null;
   private oklabProcessor: OKLABColorProcessor;
   private deviceDetector: DeviceCapabilityDetector;
   protected override utils = Utils;
@@ -99,6 +100,8 @@ export class DynamicGradientStrategy
   private gradientCache = new Map<string, string>();
   private cacheValidityMs: number = 5000; // Cache valid for 5 seconds
   private lastCacheCleanup: number = 0;
+  private domEventCleanups: Array<() => void> = [];
+  private busSubscriptionIds: string[] = [];
 
   constructor(
     config = ADVANCED_SYSTEM_CONFIG,
@@ -116,7 +119,19 @@ export class DynamicGradientStrategy
       musicSyncService
     );
 
-    this.cssController = cssController || getGlobalCSSVariableWriter();
+    const resolvedCssController =
+      cssController ||
+      (this.cssConsciousnessController as CSSVariableWriter | null) ||
+      getGlobalCSSVariableWriter();
+
+    if (resolvedCssController) {
+      this.cssController = resolvedCssController;
+    } else {
+      Y3KDebug?.debug?.warn(
+        "DynamicGradientStrategy",
+        "CSSVariableWriter not available; CSS updates will fall back to direct DOM writes"
+      );
+    }
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
     this.deviceDetector = new DeviceCapabilityDetector();
     this.cssAnimationManager = cssAnimationManager;
@@ -139,12 +154,95 @@ export class DynamicGradientStrategy
     );
   }
 
-  /**
-   * BaseVisualSystem lifecycle implementation
-   */
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  public override injectServices(services: ServiceContainer): void {
+    super.injectServices(services);
 
+    if (!this.cssController) {
+      const controller =
+        (this.cssConsciousnessController as CSSVariableWriter | null) ||
+        getGlobalCSSVariableWriter();
+
+      if (controller) {
+        this.cssController = controller;
+      }
+    }
+  }
+
+  private registerBusEvent<K extends keyof UnifiedEventMap>(
+    eventName: K,
+    handler: (data: UnifiedEventMap[K]) => void
+  ): void {
+    if (this.services.events) {
+      this.services.events.subscribe(this.systemName, eventName, handler);
+      return;
+    }
+
+    if (typeof unifiedEventBus !== "undefined") {
+      const subscriptionId = unifiedEventBus.subscribe(
+        eventName,
+        handler,
+        this.systemName
+      );
+
+      if (subscriptionId) {
+        this.busSubscriptionIds.push(subscriptionId);
+      }
+    }
+  }
+
+  private registerDomEvent(
+    eventName: string,
+    handler: EventListener
+  ): void {
+    if (this.services.events) {
+      this.services.events.subscribeToDOM(
+        this.systemName,
+        document,
+        eventName,
+        handler
+      );
+      return;
+    }
+
+    document.addEventListener(eventName, handler);
+    this.domEventCleanups.push(() =>
+      document.removeEventListener(eventName, handler)
+    );
+  }
+
+  private async applyCssVariables(
+    updates: Record<string, string>,
+    options: {
+      priority?: "low" | "normal" | "high" | "critical";
+      source?: string;
+    } = {}
+  ): Promise<void> {
+    if (this.services.cssVariables) {
+      this.services.cssVariables.queueBatchUpdate(updates);
+      this.services.cssVariables.flushUpdates();
+      return;
+    }
+
+    if (this.cssController?.batchSetVariables) {
+      await this.cssController.batchSetVariables(
+        this.systemName,
+        updates,
+        options.priority ?? "normal",
+        options.source ?? "dynamic-gradient"
+      );
+      return;
+    }
+
+    const root = document.documentElement;
+    Object.entries(updates).forEach(([variable, value]) => {
+      root.style.setProperty(variable, value);
+    });
+  }
+
+  /**
+   * ServiceVisualSystemBase lifecycle implementation
+   */
+  protected override async performVisualSystemInitialization(): Promise<void> {
     try {
       // Setup visualEffects event listeners
       this.setupConsciousnessListeners();
@@ -179,41 +277,34 @@ export class DynamicGradientStrategy
    * Phase 2: Migrated from DOM events to UnifiedEventBus for proper facade coordination
    */
   private setupConsciousnessListeners(): void {
-    // Phase 2: Listen for colors:harmonized events via UnifiedEventBus (no more DOM events)
-    // This prevents the infinite loop that was caused by DOM event cascading
-    if (typeof unifiedEventBus !== "undefined") {
-      unifiedEventBus.subscribe(
-        "colors:harmonized",
-        (data: any) => {
-          if (data && data.processedColors) {
-            this.handleHarmonizedColorUpdate(data.processedColors);
-          }
-        },
-        "LivingGradientStrategy"
-      );
-    }
+    const harmonizedHandler = (data: any) => {
+      if (data && data.processedColors) {
+        this.handleHarmonizedColorUpdate(data.processedColors);
+      }
+    };
 
-    // Listen for music state changes
-    document.addEventListener("music-state-change", (event: Event) => {
+    this.registerBusEvent("colors:harmonized", harmonizedHandler);
+
+    const musicStateHandler = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
         this.handleMusicStateChange(customEvent.detail);
       }
-    });
+    };
 
-    // Listen for visualEffects intensity changes
-    document.addEventListener(
-      "visualEffects-intensity-change",
-      (event: Event) => {
-        const customEvent = event as CustomEvent;
-        if (
-          customEvent.detail &&
-          typeof customEvent.detail.intensity === "number"
-        ) {
-          this.updateConsciousnessIntensity(customEvent.detail.intensity);
-        }
+    this.registerDomEvent("music-state-change", musicStateHandler);
+
+    const intensityHandler = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (
+        customEvent.detail &&
+        typeof customEvent.detail.intensity === "number"
+      ) {
+        this.updateConsciousnessIntensity(customEvent.detail.intensity);
       }
-    );
+    };
+
+    this.registerDomEvent("visualEffects-intensity-change", intensityHandler);
 
     Y3KDebug?.debug?.log(
       "DynamicGradientStrategy",
@@ -225,21 +316,23 @@ export class DynamicGradientStrategy
    * Setup WebGL integration listeners
    */
   private setupWebGLIntegrationListeners(): void {
-    // Listen for WebGL system state changes
-    document.addEventListener("webgl-state-change", (event: Event) => {
+    const stateChangeHandler = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
         this.handleWebGLStateChange(customEvent.detail);
       }
-    });
+    };
 
-    // Listen for WebGL gradient updates
-    document.addEventListener("webgl-gradient-update", (event: Event) => {
+    this.registerDomEvent("webgl-state-change", stateChangeHandler);
+
+    const gradientUpdateHandler = (event: Event) => {
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
         this.coordinateWithWebGLGradient(customEvent.detail);
       }
-    });
+    };
+
+    this.registerDomEvent("webgl-gradient-update", gradientUpdateHandler);
 
     Y3KDebug?.debug?.log(
       "DynamicGradientStrategy",
@@ -863,12 +956,10 @@ export class DynamicGradientStrategy
     };
 
     // Apply all visualEffects variables in a coordinated batch
-    await this.cssController.batchSetVariables(
-      "DynamicGradientStrategy",
-      visualEffectsBaseVariables,
-      "high", // High priority for visualEffects animations
-      "living-visualEffects-base"
-    );
+    await this.applyCssVariables(visualEffectsBaseVariables, {
+      priority: "high",
+      source: "living-visualEffects-base",
+    });
 
     Y3KDebug?.debug?.log(
       "DynamicGradientStrategy",
@@ -1035,6 +1126,10 @@ export class DynamicGradientStrategy
     this.triggerConsciousnessBreathing();
   }
 
+  public override updateAnimation(_deltaTime: number): void {
+    this.updateBreathingAnimation();
+  }
+
   /**
    * Start animation animation (Year 3000 CSS-first approach)
    */
@@ -1075,12 +1170,10 @@ export class DynamicGradientStrategy
     };
 
     // Apply WebGL coordination variables
-    await this.cssController.batchSetVariables(
-      "DynamicGradientStrategy",
-      webglIntegrationVariables,
-      "high", // High priority for WebGL coordination
-      "webgl-living-gradient-integration"
-    );
+    await this.applyCssVariables(webglIntegrationVariables, {
+      priority: "high",
+      source: "webgl-living-gradient-integration",
+    });
 
     this.livingBaseState.webglIntegrationActive = true;
 
@@ -1129,20 +1222,16 @@ export class DynamicGradientStrategy
         this.livingBaseState.visualEffectsIntensity.toString(),
     };
 
-    try {
-      this.cssController.batchSetVariables(
-        "DynamicGradientStrategy",
-        musicResponsiveVariables,
-        3 as any, // medium priority
-        "music-responsive"
-      );
-    } catch (error) {
+    this.applyCssVariables(musicResponsiveVariables, {
+      priority: "normal",
+      source: "music-responsive",
+    }).catch((error) => {
       Y3KDebug?.debug?.error(
         "DynamicGradientStrategy",
         "Failed to update music responsive variables:",
         error
       );
-    }
+    });
   }
 
   /**
@@ -1158,20 +1247,16 @@ export class DynamicGradientStrategy
       ).toString(),
     };
 
-    try {
-      this.cssController.batchSetVariables(
-        "DynamicGradientStrategy",
-        visualEffectsVariables,
-        3 as any, // medium priority
-        "visualEffects-vars"
-      );
-    } catch (error) {
+    this.applyCssVariables(visualEffectsVariables, {
+      priority: "normal",
+      source: "visualEffects-vars",
+    }).catch((error) => {
       Y3KDebug?.debug?.error(
         "DynamicGradientStrategy",
         "Failed to update visualEffects variables:",
         error
       );
-    }
+    });
   }
 
   /**
@@ -1190,20 +1275,16 @@ export class DynamicGradientStrategy
           "--visualEffects-css-fallback": "1.0",
         };
 
-    try {
-      this.cssController.batchSetVariables(
-        "DynamicGradientStrategy",
-        webglCoordinationVariables,
-        "high",
-        "webgl-coordination"
-      );
-    } catch (error) {
+    this.applyCssVariables(webglCoordinationVariables, {
+      priority: "high",
+      source: "webgl-coordination",
+    }).catch((error) => {
       Y3KDebug?.debug?.error(
         "DynamicGradientStrategy",
         "Failed to coordinate with WebGL system:",
         error
       );
-    }
+    });
 
     Y3KDebug?.debug?.log(
       "DynamicGradientStrategy",
@@ -1245,20 +1326,16 @@ export class DynamicGradientStrategy
     }
 
     if (Object.keys(flowVariables).length > 0) {
-      try {
-        this.cssController.batchSetVariables(
-          "DynamicGradientStrategy",
-          flowVariables,
-          3 as any, // medium priority
-          "webgl-flow"
-        );
-      } catch (error) {
+      this.applyCssVariables(flowVariables, {
+        priority: "normal",
+        source: "webgl-flow",
+      }).catch((error) => {
         Y3KDebug?.debug?.error(
           "DynamicGradientStrategy",
           "Failed to update WebGL flow state:",
           error
         );
-      }
+      });
     }
   }
 
@@ -1277,17 +1354,26 @@ export class DynamicGradientStrategy
   /**
    * Health check to include both strategy and visual system status
    */
-  public override async healthCheck(): Promise<any> {
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
     const strategyHealth = await this.getStrategyHealthCheck();
-    // Don't call super.healthCheck() as BaseVisualSystem doesn't have it
-    // Instead use our own consolidated health check
+    const issues = [...(strategyHealth.issues || [])];
+
+    if (!this.isActive) {
+      issues.push("Visual system inactive");
+    }
 
     return {
       healthy: strategyHealth.healthy && this.isActive,
-      canProcess: strategyHealth.canProcess,
-      issues: strategyHealth.issues || [],
+      details: "DynamicGradientStrategy health check",
+      issues,
       metrics: {
         ...strategyHealth.metrics,
+        canProcess: strategyHealth.canProcess,
         systemType: "consolidated-living-gradient",
         isVisualSystem: true,
         isColorProcessor: true,
@@ -1351,10 +1437,21 @@ export class DynamicGradientStrategy
   }
 
   /**
-   * Override BaseVisualSystem cleanup method
+   * Cleanup hook for service-based lifecycle
    */
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
+    if (!this.services.events) {
+      for (const subscriptionId of this.busSubscriptionIds) {
+        unifiedEventBus.unsubscribe(subscriptionId);
+      }
+      this.busSubscriptionIds = [];
+
+      for (const cleanup of this.domEventCleanups) {
+        cleanup();
+      }
+    }
+
+    this.domEventCleanups = [];
 
     // CSS-first animation cleanup (no JavaScript animation frame to cancel)
     // Breathing animations are now handled entirely by CSS keyframes

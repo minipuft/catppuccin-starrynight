@@ -9,8 +9,13 @@
  */
 
 import type { HealthCheckResult } from "@/types/systems";
-import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import type {
+  AdvancedSystemConfig,
+  Year3000Config,
+  PerformanceProfile
+} from "@/types/models";
 import type { CanvasResult, CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
+import type { PerformanceMode } from "@/core/performance/PerformanceMonitor";
 
 // =============================================================================
 // SYSTEM LIFECYCLE SERVICE
@@ -248,6 +253,90 @@ export interface CanvasManagementService {
 }
 
 // =============================================================================
+// PERFORMANCE PROFILE SERVICE
+// =============================================================================
+
+export interface PerformanceProfileSnapshot {
+  quality: "low" | "balanced" | "high" | "auto";
+  profile: PerformanceProfile | null;
+  performanceMode: PerformanceMode | null;
+  timestamp: number;
+}
+
+export interface PerformanceProfileService {
+  /**
+   * Get the currently applied performance tier snapshot.
+   */
+  getCurrentSnapshot(): PerformanceProfileSnapshot;
+
+  /**
+   * Subscribe to performance tier changes. Returns an unsubscribe function.
+   */
+  subscribe(listener: (snapshot: PerformanceProfileSnapshot) => void): () => void;
+}
+
+// =============================================================================
+// MUSIC SYNC LIFECYCLE SERVICE
+// =============================================================================
+
+export interface MusicSyncLifecycleService {
+  /**
+   * Subscribe a visual system to music analysis updates.
+   */
+  subscribe(
+    systemName: string,
+    subscriber: {
+      initialized: boolean;
+      updateFromMusicAnalysis(
+        processedData: unknown,
+        rawFeatures: unknown,
+        trackUri: string | null
+      ): void;
+    }
+  ): void;
+
+  /**
+   * Unsubscribe a visual system from music analysis updates.
+   */
+  unsubscribe(systemName: string): void;
+
+  /**
+   * Get the latest processed music snapshot if available.
+   */
+  getLatestProcessedData(): unknown;
+
+  /**
+   * Get the current beat vector used for motion coupling.
+   */
+  getCurrentBeatVector(): { x: number; y: number } | null;
+}
+
+// =============================================================================
+// THEMING STATE SERVICE
+// =============================================================================
+
+export interface KineticThemingState {
+  energy: number;
+  valence: number;
+  bpm: number;
+  tempoMultiplier: number;
+  beatPhase: number;
+  beatPulse: number;
+}
+
+export interface ThemingStateService {
+  /**
+   * Read the current kinetic theming state derived from CSS variables.
+   */
+  getKineticState(): KineticThemingState;
+
+  /**
+   * Read an arbitrary CSS variable value (for advanced theming cases).
+   */
+  getCSSVariable(variable: string): string | null;
+}
+
+// =============================================================================
 // SERVICE INJECTION INTERFACE
 // =============================================================================
 
@@ -257,6 +346,9 @@ export interface ServiceContainer {
   cssVariables?: CSSVariableService;
   events?: EventSubscriptionService;
   canvas?: CanvasManagementService;
+  performanceProfile?: PerformanceProfileService;
+  musicSyncLifecycle?: MusicSyncLifecycleService;
+  themingState?: ThemingStateService;
 }
 
 // =============================================================================

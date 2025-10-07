@@ -16,9 +16,9 @@ import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVar
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { ServiceContainer } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import type { HealthCheckResult } from "@/types/systems";
-import { BaseVisualSystem } from "../visual/base/BaseVisualSystem";
 
 // Interfaces for tunnel visualization system
 interface TunnelVisualizationSettings {
@@ -82,10 +82,10 @@ interface MusicAnalysisData {
  * - Color temperature shifts based on musical mood (valence)
  * - Performance-optimized rendering with quality scaling
  */
-export class TunnelVisualizationSystem extends BaseVisualSystem {
+export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
   private tunnelSettings: TunnelVisualizationSettings;
   private currentLightingState: CorridorLightingState;
-  private cssController: CSSVariableWriter | null;
+  private cssController: CSSVariableWriter | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -108,8 +108,10 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
 
-    // Initialize CSS Consciousness Controller
-    const cssController = getGlobalCSSVariableWriter();
+    // Initialize CSS Consciousness Controller via services (fallback to global)
+    const cssController =
+      (this.cssConsciousnessController as CSSVariableWriter | null) ||
+      getGlobalCSSVariableWriter();
     if (cssController) {
       this.cssController = cssController;
     } else {
@@ -173,9 +175,25 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
       .map(() => ({ ...this.currentLightingState }));
   }
 
-  public override async _performSystemSpecificInitialization(): Promise<void> {
-    await super._performSystemSpecificInitialization();
+  public override injectServices(services: ServiceContainer): void {
+    super.injectServices(services);
 
+    const cssController =
+      (this.cssConsciousnessController as CSSVariableWriter | null) ||
+      this.cssController ||
+      getGlobalCSSVariableWriter();
+
+    if (cssController) {
+      this.cssController = cssController;
+    } else {
+      Y3KDebug?.debug?.warn(
+        "TunnelVisualizationSystem",
+        "CSSVariableWriter not available after service injection"
+      );
+    }
+  }
+
+  protected override async performVisualSystemInitialization(): Promise<void> {
     this.subscribeToMusicEvents();
     this.startTunnelUpdates();
 
@@ -186,22 +204,43 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
   }
 
   private subscribeToMusicEvents(): void {
-    // Subscribe to unified music events
+    if (this.services.events) {
+      this.services.events.subscribe(
+        this.systemName,
+        "music:beat",
+        this.handleBeatEvent.bind(this)
+      );
+
+      this.services.events.subscribe(
+        this.systemName,
+        "music:energy",
+        this.handleEnergyChange.bind(this)
+      );
+
+      Y3KDebug?.debug?.log(
+        "TunnelVisualizationSystem",
+        "Subscribed to music events via service container"
+      );
+
+      return;
+    }
+
+    // Fallback: subscribe directly to unified event bus
     this.beatSubscriptionId = unifiedEventBus.subscribe(
-      'music:beat',
+      "music:beat",
       this.handleBeatEvent.bind(this),
-      'TunnelVisualizationSystem'
+      "TunnelVisualizationSystem"
     );
 
     this.energySubscriptionId = unifiedEventBus.subscribe(
-      'music:energy',
+      "music:energy",
       this.handleEnergyChange.bind(this),
-      'TunnelVisualizationSystem'
+      "TunnelVisualizationSystem"
     );
 
     Y3KDebug?.debug?.log(
-      'TunnelVisualizationSystem',
-      'Subscribed to unified music events'
+      "TunnelVisualizationSystem",
+      "Subscribed to unified music events (fallback)"
     );
   }
 
@@ -330,7 +369,7 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     return smoothed;
   }
 
-  private updateCSSVariables(): void {
+  protected override updateCSSVariables(): void {
     const currentTime = performance.now();
 
     // Throttle CSS updates to 30 FPS
@@ -439,46 +478,60 @@ export class TunnelVisualizationSystem extends BaseVisualSystem {
     }
   }
 
-  public override async healthCheck(): Promise<HealthCheckResult> {
-    const isHealthy =
+  protected override async performSystemHealthCheck(): Promise<{
+    healthy: boolean;
+    details?: string;
+    issues?: string[];
+    metrics?: Record<string, any>;
+  }> {
+    const healthy =
       this.tunnelSettings.enabled &&
       this.currentLightingState.timestamp > 0 &&
       this.musicSyncService !== null;
 
+    const issues: string[] = [];
+
+    if (!this.tunnelSettings.enabled) {
+      issues.push("System disabled");
+    }
+
+    if (this.currentLightingState.timestamp <= 0) {
+      issues.push("No updates received");
+    }
+
+    if (!this.musicSyncService) {
+      issues.push("Music sync disconnected");
+    }
+
     return {
-      system: 'TunnelVisualizationSystem',
-      healthy: isHealthy,
+      healthy,
+      details: "TunnelVisualizationSystem health check",
+      issues,
       metrics: {
         enabled: this.tunnelSettings.enabled,
         lastUpdateTime: this.currentLightingState.timestamp,
-        musicSyncConnected: !!this.musicSyncService,
-        endLightIntensity: this.currentLightingState.endLightIntensity
+        musicSyncConnected: Boolean(this.musicSyncService),
+        endLightIntensity: this.currentLightingState.endLightIntensity,
       },
-      issues: isHealthy ? [] : [
-        ...(this.tunnelSettings.enabled ? [] : ['System disabled']),
-        ...(this.currentLightingState.timestamp > 0 ? [] : ['No updates received']),
-        ...(this.musicSyncService ? [] : ['Music sync disconnected'])
-      ]
     };
   }
 
-  public override _performSystemSpecificCleanup(): void {
-    super._performSystemSpecificCleanup();
+  protected override performVisualSystemCleanup(): void {
+    if (!this.services.events) {
+      if (this.beatSubscriptionId) {
+        unifiedEventBus.unsubscribe(this.beatSubscriptionId);
+        this.beatSubscriptionId = null;
+      }
 
-    // Unsubscribe from unified event bus
-    if (this.beatSubscriptionId) {
-      unifiedEventBus.unsubscribe(this.beatSubscriptionId);
-      this.beatSubscriptionId = null;
-    }
-
-    if (this.energySubscriptionId) {
-      unifiedEventBus.unsubscribe(this.energySubscriptionId);
-      this.energySubscriptionId = null;
+      if (this.energySubscriptionId) {
+        unifiedEventBus.unsubscribe(this.energySubscriptionId);
+        this.energySubscriptionId = null;
+      }
     }
 
     Y3KDebug?.debug?.log(
-      'TunnelVisualizationSystem',
-      'Unsubscribed from unified music events'
+      "TunnelVisualizationSystem",
+      "Music event subscriptions released"
     );
   }
 

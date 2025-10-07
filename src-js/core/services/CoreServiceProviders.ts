@@ -8,9 +8,10 @@
  * @performance Optimized for typical usage patterns
  */
 
-import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config, PerformanceProfile } from "@/types/models";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { createOptimizedCanvas, detectRenderingCapabilities, type CanvasResult, type CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
+import type { PerformanceMode } from "@/core/performance/PerformanceMonitor";
 import type {
   SystemLifecycleService,
   PerformanceTrackingService,
@@ -18,8 +19,16 @@ import type {
   EventSubscriptionService,
   CanvasManagementService,
   CanvasOptions,
-  ServiceContainer
+  ServiceContainer,
+  PerformanceProfileService,
+  PerformanceProfileSnapshot,
+  MusicSyncLifecycleService,
+  ThemingStateService,
+  KineticThemingState
 } from "./SystemServices";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import { MusicSyncService } from "@/audio/MusicSyncService";
+import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
 
 // =============================================================================
 // SYSTEM LIFECYCLE SERVICE IMPLEMENTATION
@@ -512,6 +521,7 @@ export class DefaultCanvasManagementService implements CanvasManagementService {
 
 export class DefaultServiceFactory {
   private static services: ServiceContainer | null = null;
+  private static overrides: Partial<ServiceContainer> = {};
   
   static getServices(): ServiceContainer {
     if (!DefaultServiceFactory.services) {
@@ -520,7 +530,16 @@ export class DefaultServiceFactory {
         performance: new DefaultPerformanceTrackingService(),
         cssVariables: new DefaultCSSVariableService(),
         events: new DefaultEventSubscriptionService(),
-        canvas: new DefaultCanvasManagementService()
+        canvas: new DefaultCanvasManagementService(),
+        performanceProfile: new DefaultPerformanceProfileService(null, null, unifiedEventBus),
+        musicSyncLifecycle: new DefaultMusicSyncLifecycleService(),
+        themingState: new DefaultThemingStateService()
+      };
+    }
+    if (DefaultServiceFactory.overrides) {
+      DefaultServiceFactory.services = {
+        ...DefaultServiceFactory.services,
+        ...DefaultServiceFactory.overrides
       };
     }
     
@@ -529,5 +548,323 @@ export class DefaultServiceFactory {
   
   static resetServices(): void {
     DefaultServiceFactory.services = null;
+  }
+
+  static registerOverrides(overrides: Partial<ServiceContainer>): void {
+    DefaultServiceFactory.overrides = {
+      ...DefaultServiceFactory.overrides,
+      ...overrides
+    };
+
+    if (DefaultServiceFactory.services) {
+      DefaultServiceFactory.services = {
+        ...DefaultServiceFactory.services,
+        ...DefaultServiceFactory.overrides
+      } as ServiceContainer;
+    }
+  }
+}
+
+// =============================================================================
+// PERFORMANCE PROFILE SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultPerformanceProfileService implements PerformanceProfileService {
+  private snapshot: PerformanceProfileSnapshot = {
+    quality: "auto",
+    profile: null,
+    performanceMode: null,
+    timestamp: Date.now()
+  };
+  private listeners = new Set<(snapshot: PerformanceProfileSnapshot) => void>();
+  private tierSubscriptionId: string | null = null;
+  private qualityLevelSubscriptionId: string | null = null;
+
+  constructor(
+    private config: AdvancedSystemConfig | Year3000Config | null = null,
+    private performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceMode } | null = null,
+    private eventBus = unifiedEventBus
+  ) {
+    this.refreshSnapshot();
+    this.bindEventListeners();
+  }
+
+  public setDependencies(
+    config: AdvancedSystemConfig | Year3000Config | null,
+    performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceMode } | null
+  ): void {
+    this.config = config;
+    this.performanceCoordinator = performanceCoordinator;
+    this.refreshSnapshot();
+  }
+
+  public getCurrentSnapshot(): PerformanceProfileSnapshot {
+    return this.snapshot;
+  }
+
+  public subscribe(
+    listener: (snapshot: PerformanceProfileSnapshot) => void
+  ): () => void {
+    this.listeners.add(listener);
+    // Immediately provide the latest snapshot for convenience
+    listener(this.snapshot);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  public updateSnapshot(snapshot: PerformanceProfileSnapshot): void {
+    this.snapshot = { ...snapshot, timestamp: Date.now() };
+    this.emitUpdate();
+  }
+
+  public destroy(): void {
+    if (this.tierSubscriptionId) {
+      this.eventBus.unsubscribe(this.tierSubscriptionId);
+      this.tierSubscriptionId = null;
+    }
+    if (this.qualityLevelSubscriptionId) {
+      this.eventBus.unsubscribe(this.qualityLevelSubscriptionId);
+      this.qualityLevelSubscriptionId = null;
+    }
+    this.listeners.clear();
+  }
+
+  private bindEventListeners(): void {
+    this.tierSubscriptionId = this.eventBus.subscribe(
+      "performance:tier-changed",
+      (data) => {
+        const quality = this.mapTierToQuality(data?.tier);
+        if (quality) {
+          this.applyQualityOverride(quality);
+        } else {
+          this.refreshSnapshot();
+        }
+      },
+      "PerformanceProfileService"
+    );
+
+    this.qualityLevelSubscriptionId = this.eventBus.subscribe(
+      "quality:level-changed",
+      (data) => {
+        // Convert quality level (0-1) into our quality buckets
+        const quality = this.mapQualityLevelToQuality(data?.level);
+        this.applyQualityOverride(quality);
+      },
+      "PerformanceProfileService"
+    );
+  }
+
+  private applyQualityOverride(quality: PerformanceProfileSnapshot["quality"]): void {
+    const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
+    const profile = this.resolveProfile(quality, mode);
+    this.updateSnapshot({
+      quality,
+      profile,
+      performanceMode: mode,
+      timestamp: Date.now()
+    });
+  }
+
+  private refreshSnapshot(): void {
+    const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
+    const quality = this.mapModeToQuality(mode);
+    const profile = this.resolveProfile(quality, mode);
+    this.snapshot = {
+      quality,
+      profile,
+      performanceMode: mode,
+      timestamp: Date.now()
+    };
+    this.emitUpdate();
+  }
+
+  private resolveProfile(
+    quality: PerformanceProfileSnapshot["quality"],
+    mode: PerformanceMode | null
+  ): PerformanceProfile | null {
+    const profiles = (this.config as any)?.performanceProfiles;
+    if (!profiles) return null;
+    const key = quality === "auto" ? this.mapModeToQuality(mode, "balanced") : quality;
+    const selected = selectPerformanceProfile(key, profiles, {
+      trace: (msg) => {
+        if (this.config?.enableDebug) {
+          Y3KDebug?.debug?.log("PerformanceProfileService", msg);
+        }
+      }
+    });
+    return selected ?? null;
+  }
+
+  private mapModeToQuality(
+    mode: PerformanceMode | null,
+    fallback: PerformanceProfileSnapshot["quality"] = "balanced"
+  ): PerformanceProfileSnapshot["quality"] {
+    if (!mode) return fallback;
+    switch (mode.name) {
+      case "battery":
+        return "low";
+      case "performance":
+        return "high";
+      case "auto":
+        return mode.qualityLevel >= 0.75
+          ? "high"
+          : mode.qualityLevel <= 0.4
+          ? "low"
+          : "balanced";
+      default:
+        return mode.qualityLevel <= 0.4
+          ? "low"
+          : mode.qualityLevel >= 0.75
+          ? "high"
+          : "balanced";
+    }
+  }
+
+  private mapTierToQuality(tier: unknown): PerformanceProfileSnapshot["quality"] {
+    switch (tier) {
+      case "low":
+      case "degraded":
+      case "critical":
+        return "low";
+      case "high":
+      case "excellent":
+      case "premium":
+        return "high";
+      case "medium":
+      case "good":
+      default:
+        return "balanced";
+    }
+  }
+
+  private mapQualityLevelToQuality(level: unknown): PerformanceProfileSnapshot["quality"] {
+    if (typeof level !== "number") return "balanced";
+    if (level <= 0.33) return "low";
+    if (level >= 0.66) return "high";
+    return "balanced";
+  }
+
+  private emitUpdate(): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(this.snapshot);
+      } catch (error) {
+        Y3KDebug?.debug?.warn(
+          "PerformanceProfileService",
+          "Listener error",
+          error
+        );
+      }
+    }
+  }
+}
+
+// =============================================================================
+// MUSIC SYNC LIFECYCLE SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultMusicSyncLifecycleService implements MusicSyncLifecycleService {
+  private musicSyncService: MusicSyncService | null = null;
+  private pendingSubscribers = new Map<
+    string,
+    {
+      initialized: boolean;
+      updateFromMusicAnalysis(
+        processedData: unknown,
+        rawFeatures: unknown,
+        trackUri: string | null
+      ): void;
+    }
+  >();
+
+  public attach(service: MusicSyncService): void {
+    this.musicSyncService = service;
+    // Flush pending subscribers
+    for (const [name, subscriber] of this.pendingSubscribers.entries()) {
+      service.subscribe(subscriber as any, name);
+    }
+    this.pendingSubscribers.clear();
+  }
+
+  public subscribe(
+    systemName: string,
+    subscriber: {
+      initialized: boolean;
+      updateFromMusicAnalysis(
+        processedData: unknown,
+        rawFeatures: unknown,
+        trackUri: string | null
+      ): void;
+    }
+  ): void {
+    if (this.musicSyncService) {
+      this.musicSyncService.subscribe(subscriber as any, systemName);
+    } else {
+      this.pendingSubscribers.set(systemName, subscriber);
+    }
+  }
+
+  public unsubscribe(systemName: string): void {
+    this.pendingSubscribers.delete(systemName);
+    this.musicSyncService?.unsubscribe(systemName);
+  }
+
+  public getLatestProcessedData(): unknown {
+    return this.musicSyncService?.getLatestProcessedData?.() ?? null;
+  }
+
+  public getCurrentBeatVector(): { x: number; y: number } | null {
+    return this.musicSyncService
+      ? this.musicSyncService.getCurrentBeatVector()
+      : null;
+  }
+}
+
+// =============================================================================
+// THEMING STATE SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultThemingStateService implements ThemingStateService {
+  private defaultState: KineticThemingState = {
+    energy: 0.5,
+    valence: 0.5,
+    bpm: 120,
+    tempoMultiplier: 1,
+    beatPhase: 0,
+    beatPulse: 0
+  };
+
+  public getKineticState(): KineticThemingState {
+    if (typeof document === "undefined") {
+      return { ...this.defaultState };
+    }
+
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
+    const readNumber = (variable: string, fallback: number) => {
+      const value = parseFloat(style.getPropertyValue(variable));
+      return Number.isFinite(value) ? value : fallback;
+    };
+
+    return {
+      energy: readNumber("--sn-kinetic-energy", this.defaultState.energy),
+      valence: readNumber("--sn-kinetic-valence", this.defaultState.valence),
+      bpm: readNumber("--sn-kinetic-bpm", this.defaultState.bpm),
+      tempoMultiplier: readNumber(
+        "--sn-kinetic-tempo-multiplier",
+        this.defaultState.tempoMultiplier
+      ),
+      beatPhase: readNumber("--sn-kinetic-beat-phase", this.defaultState.beatPhase),
+      beatPulse: readNumber("--sn-kinetic-beat-pulse", this.defaultState.beatPulse)
+    };
+  }
+
+  public getCSSVariable(variable: string): string | null {
+    if (typeof document === "undefined") {
+      return null;
+    }
+    const value = getComputedStyle(document.documentElement).getPropertyValue(variable);
+    return value || null;
   }
 }
