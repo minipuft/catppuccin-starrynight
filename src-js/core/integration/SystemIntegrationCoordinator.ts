@@ -73,7 +73,8 @@ import {
   DefaultServiceFactory,
   DefaultPerformanceProfileService,
   DefaultMusicSyncLifecycleService,
-  DefaultThemingStateService
+  DefaultThemingStateService,
+  DefaultVisualCoordinatorService
 } from "@/core/services/CoreServiceProviders";
 
 // High-energy visual effects imports for integration
@@ -473,6 +474,10 @@ export class SystemIntegrationCoordinator {
         enableEventCoordination:
           this.coordinationConfig.enableCrossFacadeCommunication,
       });
+
+      const services = DefaultServiceFactory.getServices();
+      const visualCoordinatorService = services.visualCoordinator as DefaultVisualCoordinatorService | undefined;
+      visualCoordinatorService?.setCoordinator(this.visualSystemCoordinator);
 
       // Phase 3: Wire VisualSystemCoordinator to WebGLSystemsIntegration for quality scaling
       if (this.sharedWebGLSystemsIntegration) {
@@ -1528,6 +1533,10 @@ export class SystemIntegrationCoordinator {
       await this.visualSystemCoordinator.destroy();
       this.visualSystemCoordinator = null;
     }
+
+    const services = DefaultServiceFactory.getServices();
+    const visualCoordinatorService = services.visualCoordinator as DefaultVisualCoordinatorService | undefined;
+    visualCoordinatorService?.setCoordinator(null);
 
     if (this.infrastructureSystemFacade) {
       await this.infrastructureSystemFacade.destroy();

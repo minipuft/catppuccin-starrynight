@@ -17,7 +17,7 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
-import type { ServiceContainer } from "@/core/services/SystemServices";
+import type { ServiceContainer, CSSVariableService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 // Interfaces for tunnel visualization system
@@ -86,6 +86,7 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
   private tunnelSettings: TunnelVisualizationSettings;
   private currentLightingState: CorridorLightingState;
   private cssController: CSSVariableWriter | null = null;
+  private cssService: CSSVariableService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -175,9 +176,28 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
       .map(() => ({ ...this.currentLightingState }));
   }
 
+  private queueCssUpdate(variable: string, value: string): void {
+    if (this.cssService) {
+      this.cssService.queueUpdate(variable, value);
+    } else if (this.cssController) {
+      this.cssController.queueCSSVariableUpdate(variable, value);
+    }
+  }
+
+  private queueCssBatch(updates: Record<string, string>): void {
+    if (this.cssService) {
+      this.cssService.queueBatchUpdate(updates);
+    } else if (this.cssController) {
+      for (const [variable, value] of Object.entries(updates)) {
+        this.cssController.queueCSSVariableUpdate(variable, value);
+      }
+    }
+  }
+
   public override injectServices(services: ServiceContainer): void {
     super.injectServices(services);
 
+    this.cssService = services.cssVariables ?? null;
     const cssController =
       (this.cssConsciousnessController as CSSVariableWriter | null) ||
       this.cssController ||
@@ -323,12 +343,10 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
     const newTunnelWidth = this.tunnelSettings.tunnelWidth * (1.0 + bassMod);
 
     // Update CSS variables for geometry
-    if (this.cssController) {
-      this.cssController.queueCSSVariableUpdate(
-        "--sn-tunnel-width",
-        newTunnelWidth.toFixed(3)
-      );
-    }
+    this.queueCssUpdate(
+      "--sn-tunnel-width",
+      newTunnelWidth.toFixed(3)
+    );
   }
 
   private updateLightingState(newState: CorridorLightingState): void {
@@ -376,58 +394,22 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
     if (currentTime - this.lastLightingUpdate < this.updateThrottleInterval) return;
     this.lastLightingUpdate = currentTime;
 
-    if (!this.cssController) return;
-
     const lighting = this.currentLightingState;
-
-    // Tunnel tunnel control variables
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-tunnel-enabled",
-      this.tunnelSettings.tunnelEnabled ? "1" : "0"
-    );
-
-    // Lighting variables
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-lighting-intensity",
-      lighting.endLightIntensity.toFixed(3)
-    );
-
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-atmospheric-haze",
-      lighting.atmosphericHaze.toFixed(3)
-    );
-
-    // Wall color
     const [r, g, b] = this.tunnelSettings.wallColor;
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-wall-color-r",
-      r.toFixed(3)
-    );
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-wall-color-g",
-      g.toFixed(3)
-    );
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-wall-color-b",
-      b.toFixed(3)
-    );
 
-    // Color temperature for lighting
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-light-temperature",
-      lighting.colorTemperature.toFixed(3)
-    );
+    const cssUpdates: Record<string, string> = {
+      "--sn-tunnel-enabled": this.tunnelSettings.tunnelEnabled ? "1" : "0",
+      "--sn-lighting-intensity": lighting.endLightIntensity.toFixed(3),
+      "--sn-atmospheric-haze": lighting.atmosphericHaze.toFixed(3),
+      "--sn-wall-color-r": r.toFixed(3),
+      "--sn-wall-color-g": g.toFixed(3),
+      "--sn-wall-color-b": b.toFixed(3),
+      "--sn-light-temperature": lighting.colorTemperature.toFixed(3),
+      "--sn-tunnel-depth": this.tunnelSettings.tunnelDepth.toFixed(3),
+      "--sn-tunnel-count": this.tunnelSettings.tunnelSegmentCount.toString(),
+    };
 
-    // Tunnel geometry
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-tunnel-depth",
-      this.tunnelSettings.tunnelDepth.toFixed(3)
-    );
-
-    this.cssController.queueCSSVariableUpdate(
-      "--sn-tunnel-count",
-      this.tunnelSettings.tunnelSegmentCount.toString()
-    );
+    this.queueCssBatch(cssUpdates);
   }
 
   private startTunnelUpdates(): void {
@@ -440,12 +422,10 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
       const animatedShimmer = this.currentLightingState.surfaceShimmer * 
         (0.9 + Math.sin(shimmerPhase) * 0.1);
 
-      if (this.cssController) {
-        this.cssController.queueCSSVariableUpdate(
-          "--sn-magical-shimmer",
-          animatedShimmer.toFixed(3)
-        );
-      }
+      this.queueCssUpdate(
+        "--sn-magical-shimmer",
+        animatedShimmer.toFixed(3)
+      );
 
       // Continue updates
       setTimeout(updateTunnel, this.updateThrottleInterval);
@@ -470,12 +450,10 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
     const animatedHaze = this.currentLightingState.atmosphericHaze * 
       (0.95 + Math.sin(atmosphericPhase) * 0.05);
 
-    if (this.cssController) {
-      this.cssController.queueCSSVariableUpdate(
-        "--sn-animated-haze",
-        animatedHaze.toFixed(3)
-      );
-    }
+    this.queueCssUpdate(
+      "--sn-animated-haze",
+      animatedHaze.toFixed(3)
+    );
   }
 
   protected override async performSystemHealthCheck(): Promise<{

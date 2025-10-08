@@ -96,7 +96,15 @@ export abstract class ServiceSystemBase
   }
 
   getOptionalServices(): (keyof ServiceContainer)[] {
-    return ["cssVariables", "events", "canvas"];
+    return [
+      "cssVariables",
+      "events",
+      "canvas",
+      "performanceProfile",
+      "musicSyncLifecycle",
+      "themingState",
+      "visualCoordinator",
+    ];
   }
 
   // =============================================================================

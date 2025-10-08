@@ -337,6 +337,32 @@ export interface ThemingStateService {
 }
 
 // =============================================================================
+// VISUAL COORDINATOR SERVICE
+// =============================================================================
+
+export interface VisualCoordinatorService {
+  /**
+   * Fetch or create a visual system instance managed by the coordinator.
+   */
+  getVisualSystem<T = any>(key: string): Promise<T | null>;
+
+  /**
+   * Retrieve a cached instance without triggering creation.
+   */
+  getCachedVisualSystem<T = any>(key: string): T | null;
+
+  /**
+   * Get the current shared visual effects state snapshot.
+   */
+  getCurrentVisualEffectsState(): any | null;
+
+  /**
+   * Access coordinator metrics for diagnostics.
+   */
+  getMetrics(): any;
+}
+
+// =============================================================================
 // SERVICE INJECTION INTERFACE
 // =============================================================================
 
@@ -349,6 +375,7 @@ export interface ServiceContainer {
   performanceProfile?: PerformanceProfileService;
   musicSyncLifecycle?: MusicSyncLifecycleService;
   themingState?: ThemingStateService;
+  visualCoordinator?: VisualCoordinatorService;
 }
 
 // =============================================================================

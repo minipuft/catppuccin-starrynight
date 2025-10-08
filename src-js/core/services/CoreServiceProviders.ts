@@ -24,8 +24,10 @@ import type {
   PerformanceProfileSnapshot,
   MusicSyncLifecycleService,
   ThemingStateService,
-  KineticThemingState
+  KineticThemingState,
+  VisualCoordinatorService
 } from "./SystemServices";
+import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
@@ -533,7 +535,8 @@ export class DefaultServiceFactory {
         canvas: new DefaultCanvasManagementService(),
         performanceProfile: new DefaultPerformanceProfileService(null, null, unifiedEventBus),
         musicSyncLifecycle: new DefaultMusicSyncLifecycleService(),
-        themingState: new DefaultThemingStateService()
+        themingState: new DefaultThemingStateService(),
+        visualCoordinator: new DefaultVisualCoordinatorService()
       };
     }
     if (DefaultServiceFactory.overrides) {
@@ -866,5 +869,56 @@ export class DefaultThemingStateService implements ThemingStateService {
     }
     const value = getComputedStyle(document.documentElement).getPropertyValue(variable);
     return value || null;
+  }
+}
+
+// =============================================================================
+// VISUAL COORDINATOR SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultVisualCoordinatorService implements VisualCoordinatorService {
+  private coordinator: VisualEffectsCoordinator | null;
+
+  constructor(coordinator: VisualEffectsCoordinator | null = null) {
+    this.coordinator = coordinator;
+  }
+
+  public setCoordinator(coordinator: VisualEffectsCoordinator | null): void {
+    this.coordinator = coordinator;
+  }
+
+  private ensureCoordinator(): VisualEffectsCoordinator | null {
+    if (!this.coordinator) {
+      Y3KDebug?.debug?.warn(
+        "VisualCoordinatorService",
+        "VisualEffectsCoordinator not initialized"
+      );
+      return null;
+    }
+    return this.coordinator;
+  }
+
+  public async getVisualSystem<T = any>(key: string): Promise<T | null> {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator) return null;
+    return (await coordinator.getVisualSystem<T>(key)) || null;
+  }
+
+  public getCachedVisualSystem<T = any>(key: string): T | null {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator) return null;
+    return coordinator.getCachedVisualSystem<T>(key);
+  }
+
+  public getCurrentVisualEffectsState(): any | null {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator) return null;
+    return coordinator.getCurrentVisualEffectsState();
+  }
+
+  public getMetrics(): any {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator) return null;
+    return coordinator.getMetrics();
   }
 }

@@ -17,7 +17,7 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
-import type { ServiceContainer } from "@/core/services/SystemServices";
+import type { ServiceContainer, CSSVariableService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 
 // Local interfaces for this system
@@ -107,6 +107,7 @@ export class GradientDirectionalFlowSystem extends ServiceVisualSystemBase {
   private spectralFlowMapping: SpectralFlowMapping;
 
   private cssVariableController: CSSVariableWriter | null = null;
+  private cssService: CSSVariableService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
 
   private lastBeatTime = 0;
@@ -205,6 +206,7 @@ export class GradientDirectionalFlowSystem extends ServiceVisualSystemBase {
   public override injectServices(services: ServiceContainer): void {
     super.injectServices(services);
 
+    this.cssService = services.cssVariables ?? null;
     const cssController =
       (this.cssConsciousnessController as CSSVariableWriter | null) ||
       this.cssVariableController ||
@@ -595,72 +597,36 @@ export class GradientDirectionalFlowSystem extends ServiceVisualSystemBase {
     if (currentTime - this.lastFlowUpdate < this.updateThrottleInterval) return;
     this.lastFlowUpdate = currentTime;
 
-    // Update flow direction CSS variables (if controller is available)
-    if (this.cssVariableController) {
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-direction-x",
-        this.currentFlowVector.x.toFixed(3)
-      );
+    const flowAngle = Math.atan2(
+      this.currentFlowVector.y,
+      this.currentFlowVector.x
+    );
 
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-direction-y",
-        this.currentFlowVector.y.toFixed(3)
-      );
+    const cssUpdates: Record<string, string> = {
+      "--sn-flow-direction-x": this.currentFlowVector.x.toFixed(3),
+      "--sn-flow-direction-y": this.currentFlowVector.y.toFixed(3),
+      "--sn-flow-intensity": this.currentFlowVector.intensity.toFixed(3),
+      "--sn-flow-strength": (this.currentFlowVector.intensity * 0.8).toFixed(3),
+      "--sn-flow-angle": `${((flowAngle * 180) / Math.PI).toFixed(1)}deg`,
+    };
 
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-intensity",
-        this.currentFlowVector.intensity.toFixed(3)
-      );
+    if (this.flowSettings.corridorFlowEnabled) {
+      Object.assign(cssUpdates, {
+        "--sn-corridor-flow-angle": this.currentRadialFlow.angle.toFixed(3),
+        "--sn-corridor-flow-radius": this.currentRadialFlow.radius.toFixed(3),
+        "--sn-corridor-inward-flow": this.currentRadialFlow.inwardFlow.toFixed(3),
+        "--sn-corridor-flow-intensity": this.currentRadialFlow.intensity.toFixed(3),
+        "--sn-corridor-flow-enabled": "1",
+      });
+    } else {
+      cssUpdates["--sn-corridor-flow-enabled"] = "0";
+    }
 
-      // Update flow strength for WebGL systems
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-strength",
-        (this.currentFlowVector.intensity * 0.8).toFixed(3)
-      );
-
-      // Update flow angle for CSS transforms
-      const flowAngle = Math.atan2(
-        this.currentFlowVector.y,
-        this.currentFlowVector.x
-      );
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-angle",
-        `${((flowAngle * 180) / Math.PI).toFixed(1)}deg`
-      );
-
-      // Update corridor-specific flow variables
-      if (this.flowSettings.corridorFlowEnabled) {
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-flow-angle",
-          this.currentRadialFlow.angle.toFixed(3)
-        );
-
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-flow-radius",
-          this.currentRadialFlow.radius.toFixed(3)
-        );
-
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-inward-flow",
-          this.currentRadialFlow.inwardFlow.toFixed(3)
-        );
-
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-flow-intensity",
-          this.currentRadialFlow.intensity.toFixed(3)
-        );
-
-        // Enable corridor flow for WebGL coordination
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-flow-enabled",
-          "1"
-        );
-      } else {
-        // Disable corridor flow
-        this.cssVariableController.queueCSSVariableUpdate(
-          "--sn-corridor-flow-enabled",
-          "0"
-        );
+    if (this.cssService) {
+      this.cssService.queueBatchUpdate(cssUpdates);
+    } else if (this.cssVariableController) {
+      for (const [variable, value] of Object.entries(cssUpdates)) {
+        this.cssVariableController.queueCSSVariableUpdate(variable, value);
       }
     }
   }
@@ -712,17 +678,17 @@ export class GradientDirectionalFlowSystem extends ServiceVisualSystemBase {
     const animatedX = baseX + Math.sin(animationPhase) * 0.05;
     const animatedY = baseY + Math.cos(animationPhase) * 0.05;
 
-    // Update CSS variables with animation (if controller is available)
-    if (this.cssVariableController) {
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-animated-x",
-        animatedX.toFixed(3)
-      );
+    const animatedPayload = {
+      "--sn-flow-animated-x": animatedX.toFixed(3),
+      "--sn-flow-animated-y": animatedY.toFixed(3),
+    };
 
-      this.cssVariableController.queueCSSVariableUpdate(
-        "--sn-flow-animated-y",
-        animatedY.toFixed(3)
-      );
+    if (this.cssService) {
+      this.cssService.queueBatchUpdate(animatedPayload);
+    } else if (this.cssVariableController) {
+      for (const [variable, value] of Object.entries(animatedPayload)) {
+        this.cssVariableController.queueCSSVariableUpdate(variable, value);
+      }
     }
   }
 
