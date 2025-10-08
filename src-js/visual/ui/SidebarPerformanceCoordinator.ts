@@ -11,6 +11,7 @@ import {
   CSSVariableWriter,
   getGlobalCSSVariableWriter,
 } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { MODERN_SELECTORS } from "@/debug/SpotifyDOMSelectors";
@@ -77,9 +78,11 @@ export class SidebarPerformanceManager {
 
     this.performanceAnalyzer = config.performanceAnalyzer || null;
 
-    // Initialize CSS coordination - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System.getGlobalOptimizedCSSController();
+    // Initialize CSS coordination via theme lifecycle services
+    const services = DefaultServiceFactory.getServices();
+    this.cssController =
+      services.themeLifecycle?.getCssController() ||
+      getGlobalCSSVariableWriter();
 
     // Initialize budget manager if performance analyzer is available
     if (this.performanceAnalyzer) {

@@ -22,6 +22,7 @@ import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { VisualCoordinatorService } from "@/core/services/SystemServices";
 import type {
   MusicSyncLifecycleService,
   PerformanceProfileService,
@@ -143,6 +144,7 @@ export class DepthLayeredGradientSystem
   private eventSubscriptionIds: string[] = [];
 
   // Visual effects coordinator integration
+  private visualCoordinatorService: VisualCoordinatorService | null = null;
   private visualEffectsCoordinator: VisualEffectsCoordinator | null =
     null;
   private currentVisualEffectState: VisualEffectState | null = null;
@@ -227,11 +229,14 @@ export class DepthLayeredGradientSystem
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
 
-    this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
+    const themeService = this.services.themeLifecycle;
+    const themeCoordinator = themeService?.getCoordinator();
+    this.colorHarmonyEngine = themeCoordinator?.colorHarmonyEngine || null;
 
-    // Get visual effects coordinator from year3000System if available
+    this.visualCoordinatorService =
+      this.services.visualCoordinator || null;
     this.visualEffectsCoordinator =
-      year3000System?.backgroundConsciousnessChoreographer || null;
+      this.visualCoordinatorService?.getCoordinatorInstance?.() || null;
 
     // CSS Variable Controller will be injected by VisualSystemFacade
     this.cssVariableController = null;
@@ -1361,7 +1366,15 @@ export class DepthLayeredGradientSystem
     this.musicSyncLifecycleService?.unsubscribe(this.systemName);
 
     // Unregister from visual effects coordinator
-    if (this.visualEffectsCoordinator) {
+    if (this.visualCoordinatorService?.unregisterVisualEffectsParticipant) {
+      this.visualCoordinatorService.unregisterVisualEffectsParticipant(
+        this.systemName
+      );
+      Y3KDebug?.debug?.log(
+        "DepthLayeredGradientSystem",
+        "Unregistered from visual effects coordinator via service"
+      );
+    } else if (this.visualEffectsCoordinator) {
       try {
         this.visualEffectsCoordinator.unregisterVisualEffectsParticipant(
           "DepthLayeredGradientSystem"
@@ -1378,6 +1391,8 @@ export class DepthLayeredGradientSystem
         );
       }
     }
+
+    this.visualCoordinatorService = null;
 
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
     // System will automatically stop receiving updateAnimation() calls when destroyed
@@ -1560,6 +1575,20 @@ export class DepthLayeredGradientSystem
    * Register this depth system as a visual effects participant
    */
   private registerWithVisualEffectsCoordinator(): void {
+    this.visualEffectsCoordinator =
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      this.visualEffectsCoordinator;
+
+    if (
+      this.visualCoordinatorService?.registerVisualEffectsParticipant?.(this)
+    ) {
+      Y3KDebug?.debug?.log(
+        "DepthLayeredGradientSystem",
+        "Successfully registered with visual effects coordinator"
+      );
+      return;
+    }
+
     if (!this.visualEffectsCoordinator) {
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",

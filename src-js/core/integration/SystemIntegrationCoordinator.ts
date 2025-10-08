@@ -61,7 +61,7 @@ import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDet
 import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetManager";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { settings } from "@/config";
+import { getSettings } from "@/config";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyColorBridge } from "@/utils/spicetify/SpicetifyColorBridge";
 // 🔧 PHASE 2.2: Migrated from VisualSystemCoordinator to VisualEffectsCoordinator
@@ -73,6 +73,8 @@ import {
   DefaultServiceFactory,
   DefaultPerformanceProfileService,
   DefaultMusicSyncLifecycleService,
+  DefaultSettingsService,
+  DefaultThemeLifecycleService,
   DefaultThemingStateService,
   DefaultVisualCoordinatorService
 } from "@/core/services/CoreServiceProviders";
@@ -201,6 +203,8 @@ export class SystemIntegrationCoordinator {
   private performanceProfileService: DefaultPerformanceProfileService | null = null;
   private musicSyncLifecycleService: DefaultMusicSyncLifecycleService | null = null;
   private themingStateService: DefaultThemingStateService | null = null;
+  private settingsService: DefaultSettingsService | null = null;
+  private themeLifecycleService: DefaultThemeLifecycleService | null = null;
 
   // State management
   private isInitialized = false;
@@ -389,11 +393,19 @@ export class SystemIntegrationCoordinator {
       );
       this.musicSyncLifecycleService = new DefaultMusicSyncLifecycleService();
       this.themingStateService = new DefaultThemingStateService();
+      const typedSettingsManager = getSettings();
+      this.settingsService = new DefaultSettingsService(typedSettingsManager);
+      this.themeLifecycleService = new DefaultThemeLifecycleService(
+        this.year3000System,
+        this
+      );
 
       DefaultServiceFactory.registerOverrides({
         performanceProfile: this.performanceProfileService,
         musicSyncLifecycle: this.musicSyncLifecycleService,
-        themingState: this.themingStateService
+        themingState: this.themingStateService,
+        settings: this.settingsService,
+        themeLifecycle: this.themeLifecycleService
       });
 
       // Initialize shared CSS variable controller with simplified performance features
@@ -1585,6 +1597,8 @@ export class SystemIntegrationCoordinator {
 
     this.musicSyncLifecycleService = null;
     this.themingStateService = null;
+    this.settingsService = null;
+    this.themeLifecycleService = null;
 
     // NOTE: SettingsManager destroy removed - using TypedSettingsManager singleton (no cleanup needed)
 

@@ -19,6 +19,8 @@ import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 
 import type { CanvasResult } from "@/utils/graphics/VisualCanvasFactory";
 import { DefaultServiceFactory } from "./CoreServiceProviders";
+import { unifiedEventBus } from "@/core/events/EventBus";
+import type { UnifiedEventMap } from "@/core/events/EventBus";
 import type {
   CanvasOptions,
   IServiceAwareSystem,
@@ -103,6 +105,8 @@ export abstract class ServiceSystemBase
       "performanceProfile",
       "musicSyncLifecycle",
       "themingState",
+      "settings",
+      "themeLifecycle",
       "visualCoordinator",
     ];
   }
@@ -134,12 +138,9 @@ export abstract class ServiceSystemBase
           this.services.events!.subscribe(this.systemName, eventName, handler);
         },
         emit: (eventName: string, data: any) => {
-          // For emission, we'll use the global event bus if available
-          const globalEventBus = (globalThis as any).unifiedEventBus;
-          if (globalEventBus?.emit) {
-            globalEventBus.emit(eventName, data);
+          if (unifiedEventBus?.emit) {
+            unifiedEventBus.emit(eventName as keyof UnifiedEventMap, data);
           } else {
-            // Fallback to custom events
             const event = new CustomEvent(eventName, { detail: data });
             document.dispatchEvent(event);
           }

@@ -45,6 +45,7 @@ import type {
   ServiceContainer,
   ThemingStateService,
 } from "@/core/services/SystemServices";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
@@ -3021,9 +3022,13 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    */
   public async refreshPalette(): Promise<void> {
     try {
-      const y3kSystem = (globalThis as any).year3000System;
-      if (y3kSystem?.updateColorsFromCurrentTrack) {
-        await y3kSystem.updateColorsFromCurrentTrack();
+      const services = DefaultServiceFactory.getServices();
+      const coordinator =
+        services.themeLifecycle?.getCoordinator() ||
+        null;
+
+      if (coordinator?.updateColorsFromCurrentTrack) {
+        await coordinator.updateColorsFromCurrentTrack();
         return;
       }
 

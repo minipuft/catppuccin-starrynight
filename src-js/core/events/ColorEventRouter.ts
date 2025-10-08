@@ -29,6 +29,7 @@ import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
 import { ColorProcessor, globalColorProcessor } from "@/core/color/ColorProcessor";
 import { EventData, unifiedEventBus } from "./EventBus";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 
 interface ColorProcessingMetrics {
   totalExtractions: number;
@@ -56,7 +57,7 @@ export class ColorEventRouter {
   private colorOrchestrator: ColorProcessor;
   private strategySelector: ColorStrategySelector;
   private strategyRegistry: ColorStrategyRegistry;
-  private performanceAnalyzer: SimplePerformanceCoordinator;
+  private performanceAnalyzer: SimplePerformanceCoordinator | null;
 
   // Unified OKLAB coordination
   private musicalOKLABCoordinator: MusicalOKLABProcessor;
@@ -92,10 +93,18 @@ export class ColorEventRouter {
     // Initialize processing components
     
     // Try to get shared performance coordinator from global system first
-    const globalSystem = (globalThis as any).year3000System;
-    this.performanceAnalyzer = globalSystem?.performanceAnalyzer || 
-                               globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('SimplePerformanceCoordinator') ||
-                               globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer');
+    const services = DefaultServiceFactory.getServices();
+    const themeService = services.themeLifecycle;
+    const performanceFromService =
+      themeService?.getPerformanceCoordinator<SimplePerformanceCoordinator>() ||
+      null;
+    if (!performanceFromService) {
+      Y3KDebug?.debug?.warn(
+        "ColorEventOrchestrator",
+        "Performance coordinator not resolved from services; continuing without analyzer"
+      );
+    }
+    this.performanceAnalyzer = performanceFromService;
     
     this.strategyRegistry = new ColorStrategyRegistry();
     this.strategySelector = new ColorStrategySelector();

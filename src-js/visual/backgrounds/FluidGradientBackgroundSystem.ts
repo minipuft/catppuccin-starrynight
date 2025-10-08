@@ -13,6 +13,7 @@ import { unifiedEventBus, type EventData, type UnifiedEventMap } from "@/core/ev
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { VisualCoordinatorService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { ShaderLoader } from "@/utils/graphics/ShaderLoader";
@@ -437,6 +438,7 @@ export class FluidGradientBackgroundSystem
   private lastMusicUpdate = 0;
 
   // VisualEffects choreographer integration
+  private visualCoordinatorService: VisualCoordinatorService | null = null;
   private visualEffectsChoreographer: VisualEffectsCoordinator | null =
     null;
   private currentVisualEffectsField: VisualEffectState | null = null;
@@ -461,12 +463,14 @@ export class FluidGradientBackgroundSystem
       utils,
       performanceMonitor,
       musicSyncService,
-      year3000System
+      null
     );
 
-    // Get visualEffects choreographer from year3000System if available
+    this.visualCoordinatorService =
+      this.services.visualCoordinator || null;
     this.visualEffectsChoreographer =
-      year3000System?.backgroundVisualEffectsChoreographer || null;
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      null;
 
     // Initialize enhanced liquid visualEffects settings
     this.liquidSettings = {
@@ -683,6 +687,8 @@ export class FluidGradientBackgroundSystem
       );
       this.eventSubscriptionIds.push(subscriptionId);
     }
+
+    this.visualCoordinatorService = null;
   }
 
   private subscribeToUnifiedEvents(): void {
@@ -1158,7 +1164,15 @@ export class FluidGradientBackgroundSystem
   protected override performVisualSystemCleanup(): void {
 
     // Unregister from visualEffects choreographer
-    if (this.visualEffectsChoreographer) {
+    if (this.visualCoordinatorService?.unregisterVisualEffectsParticipant) {
+      this.visualCoordinatorService.unregisterVisualEffectsParticipant(
+        this.systemName
+      );
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Unregistered from visual effects coordinator via service"
+      );
+    } else if (this.visualEffectsChoreographer) {
       try {
         this.visualEffectsChoreographer.unregisterVisualEffectsParticipant(
           "FluidGradientBackgroundSystem"
@@ -1285,6 +1299,20 @@ export class FluidGradientBackgroundSystem
    * Register this liquid system as a visualEffects participant
    */
   private registerWithVisualEffectsChoreographer(): void {
+    this.visualEffectsChoreographer =
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      this.visualEffectsChoreographer;
+
+    if (
+      this.visualCoordinatorService?.registerVisualEffectsParticipant?.(this)
+    ) {
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Successfully registered with visual effects coordinator"
+      );
+      return;
+    }
+
     if (!this.visualEffectsChoreographer) {
       Y3KDebug?.debug?.log(
         "FluidGradientBackgroundSystem",

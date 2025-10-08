@@ -21,6 +21,7 @@ import { colorTransitionManager } from "@/visual/effects/MusicColorTransitionSta
 import type { RGB, MusicEmotion, BeatData, CinematicPalette } from "@/types/colorTypes";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import type { HealthCheckResult } from "@/types/systems";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -197,13 +198,14 @@ export class AnimationEffectsController extends ServiceVisualSystemBase {
     try {
       console.log('[AnimationEffectsController] Initializing animation effects...');
 
-      // Initialize CSS coordination - use globalThis to access Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssVariableController || getGlobalCSSVariableWriter();
+      const services = DefaultServiceFactory.getServices();
+      const themeService = services.themeLifecycle;
 
-      // Get music sync service from Year3000System if not already set
-      if (!this.musicSyncService && year3000System?.musicSyncService) {
-        this.musicSyncService = year3000System.musicSyncService;
+      this.cssController =
+        themeService?.getCssController() || getGlobalCSSVariableWriter();
+
+      if (!this.musicSyncService) {
+        this.musicSyncService = themeService?.getMusicSyncService<MusicSyncService>() || null;
       }
 
       // Create holographic system if not provided in constructor

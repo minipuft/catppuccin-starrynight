@@ -384,17 +384,17 @@ export class AudioVisualController {
 // Convenience initializer – called by theme.entry.ts
 // ---------------------------------------------------------------------------
 
+let audioVisualControllerSingleton: AudioVisualController | null = null;
+
 export function initializeAudioVisualController(
   y3k: ThemeLifecycleCoordinator | null = null
 ): AudioVisualController {
-  // Singleton guard for hot-reloads.
-  const g = globalThis as any;
-  if (g.__SN_audioVisualController)
-    return g.__SN_audioVisualController as AudioVisualController;
+  if (audioVisualControllerSingleton) {
+    return audioVisualControllerSingleton;
+  }
 
-  const instance = new AudioVisualController(y3k);
-  g.__SN_audioVisualController = instance;
-  return instance;
+  audioVisualControllerSingleton = new AudioVisualController(y3k);
+  return audioVisualControllerSingleton;
 }
 
 // Backward compatibility aliases - TODO: Remove in future version

@@ -39,6 +39,7 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
 import { WebGLGradientStrategy } from "@/visual/strategies/WebGLGradientStrategy";
@@ -1496,17 +1497,28 @@ export class ColorProcessor
 // Global instance for backward compatibility during migration
 // Try to get shared dependencies from global system when available
 const getSharedDependencies = () => {
-  const globalSystem = (globalThis as any).year3000System;
+  const services = DefaultServiceFactory.getServices();
+  const themeService = services.themeLifecycle;
+  const performanceFromService =
+    themeService?.getPerformanceCoordinator<SimplePerformanceCoordinator>() ||
+    null;
+
+  if (!performanceFromService) {
+    Y3KDebug?.debug?.warn(
+      'ColorProcessor',
+      'Performance coordinator not available via services; continuing without analyzer'
+    );
+  }
+
   return {
-    // NOTE: settingsManager removed - was dead code in UnifiedColorProcessingEngine
-    performanceAnalyzer: globalSystem?.performanceAnalyzer ||
-                        globalSystem?.facadeCoordinator?.getCachedNonVisualSystem?.('PerformanceAnalyzer')
+    performanceAnalyzer: performanceFromService
   };
 };
 
 const { performanceAnalyzer } = getSharedDependencies();
-export const globalColorProcessor =
-  new ColorProcessor(performanceAnalyzer);
+export const globalColorProcessor = new ColorProcessor(
+  performanceAnalyzer ?? undefined
+);
 
 // Legacy alias for backward compatibility during migration
 export const globalUnifiedColorProcessingEngine = globalColorProcessor;

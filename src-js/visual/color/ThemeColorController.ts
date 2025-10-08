@@ -31,6 +31,7 @@ import {
   getGlobalCSSVariableWriter,
   CSSVariableWriter,
 } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
   ColorContext,
@@ -125,7 +126,14 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
   }
 
   constructor(cssController?: CSSVariableWriter) {
-    this.cssController = cssController || getGlobalCSSVariableWriter();
+    if (cssController) {
+      this.cssController = cssController;
+    } else {
+      const services = DefaultServiceFactory.getServices();
+      this.cssController =
+        services.themeLifecycle?.getCssController() ||
+        getGlobalCSSVariableWriter();
+    }
     this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
 
     // Initialize current state from existing variables

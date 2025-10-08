@@ -35,6 +35,7 @@ import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { VisualCoordinatorService } from "@/core/services/SystemServices";
 import { VisualEffectsCoordinator as BackgroundAnimationCoordinator, type VisualEffectState } from "@/visual/effects/VisualEffectsCoordinator";
 
 // ===================================================================
@@ -226,6 +227,7 @@ export class UIEffectsController
 
   // Infrastructure dependencies
   private cssController!: CSSVariableWriter; // Initialized in initializeCSSConsciousness
+  private visualCoordinatorService: VisualCoordinatorService | null = null;
   private visualEffectsCoordinator: BackgroundAnimationCoordinator | null =
     null;
   private currentVisualField: VisualCoordinationField | null = null;
@@ -450,12 +452,9 @@ export class UIEffectsController
    */
   private async initializeCSSConsciousness(): Promise<void> {
     try {
-      // Access the shared CSS visual effects controller
+      const themeService = this.services.themeLifecycle;
       this.cssController =
-        (globalThis as any).unifiedVisualCSSController || (globalThis as any).unifiedCSSConsciousnessController || null;
-
-      // Initialize CSS variable coordinator with the visual effects controller
-      this.cssController = getGlobalCSSVariableWriter();
+        themeService?.getCssController() || getGlobalCSSVariableWriter();
 
       if (!this.cssController) {
         Y3KDebug?.debug?.warn(
@@ -486,17 +485,14 @@ export class UIEffectsController
    */
   private async initializeConsciousnessIntegration(): Promise<void> {
     try {
-      // Connect to visual effects coordinator if available
+      this.visualCoordinatorService =
+        this.services.visualCoordinator || null;
       this.visualEffectsCoordinator =
-        (globalThis as any).backgroundVisualCoordinator || (globalThis as any).backgroundConsciousnessChoreographer || null;
+        this.visualCoordinatorService?.getCoordinatorInstance?.() || null;
 
-      if (this.visualEffectsCoordinator) {
-        // Register as visual effects participant
-        if (this.visualEffectsCoordinator.registerVisualEffectsParticipant) {
-          this.visualEffectsCoordinator.registerVisualEffectsParticipant(this);
-        } else if (this.visualEffectsCoordinator.registerConsciousnessParticipant) {
-          this.visualEffectsCoordinator.registerConsciousnessParticipant(this); // Legacy fallback
-        }
+      if (
+        this.visualCoordinatorService?.registerVisualEffectsParticipant?.(this)
+      ) {
         Y3KDebug?.debug?.log(
           "UIVisualEffectsController",
           "Registered with visual effects coordinator"
@@ -1584,10 +1580,10 @@ export class UIEffectsController
     // Clean up element references
     this.shimmerElements.clear();
 
-    // Clean up visual effects coordinator registration
-    if (this.visualEffectsCoordinator) {
-      // Note: Would need unregister method on coordinator
-    }
+    this.visualCoordinatorService?.unregisterVisualEffectsParticipant?.(
+      this.systemName
+    );
+    this.visualCoordinatorService = null;
 
     this.initialized = false;
 

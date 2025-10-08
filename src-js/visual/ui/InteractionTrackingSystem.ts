@@ -1,7 +1,7 @@
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
-import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
@@ -151,9 +151,14 @@ export class InteractionTrackingSystem extends ServiceVisualSystemBase {
    * ServiceVisualSystemBase lifecycle method - performs system-specific initialization
    */
   protected override async performVisualSystemInitialization(): Promise<void> {
-    // Initialize CSS coordination - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
+    const themeService = this.services.themeLifecycle;
+    const coordinator = themeService?.getCoordinator();
+    if (coordinator) {
+      this.year3000System = coordinator;
+    }
+
+    this.cssController =
+      themeService?.getCssController() || getGlobalCSSVariableWriter();
 
     this.initializeOptimizedQuantumSpace();
     this.setupModalObserver();
@@ -162,11 +167,11 @@ export class InteractionTrackingSystem extends ServiceVisualSystemBase {
   }
 
   private _registerWithAnimationCoordinator() {
-    if (
-      this.year3000System &&
-      (this.year3000System as any).registerAnimationSystem
-    ) {
-      (this.year3000System as any).registerAnimationSystem(
+    const themeService = this.services.themeLifecycle;
+    const coordinator = themeService?.getCoordinator() || this.year3000System;
+
+    if (coordinator && (coordinator as any).registerAnimationSystem) {
+      (coordinator as any).registerAnimationSystem(
         "InteractionTrackingSystem",
         this,
         "normal",

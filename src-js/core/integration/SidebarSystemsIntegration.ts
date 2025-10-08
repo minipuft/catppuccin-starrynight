@@ -8,6 +8,7 @@ import { SidebarPerformanceManager } from '@/visual/ui/SidebarPerformanceCoordin
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 import type { HealthCheckResult, IManagedSystem } from '@/types/systems';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
+import { DefaultServiceFactory } from '@/core/services/CoreServiceProviders';
 
 // Temporary interfaces for systems that couldn't be created due to build issues
 interface LeftSidebarVisualSystem extends IManagedSystem {
@@ -533,32 +534,31 @@ export class SidebarSystemsIntegration extends ServiceSystemBase {
    * Phase 3: Integrate with TimerConsolidationSystem and MasterAnimationCoordinator
    */
   private integrateWithPerformanceSystems(): void {
-    // Access performance systems from global Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    if (!year3000System) {
+    const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+    if (!themeService) {
       if (this.config.enableDebug) {
-        console.log(`[${this.systemName}] Year3000System not available, skipping performance integration`);
+        console.log(`[${this.systemName}] Theme lifecycle service not available, skipping performance integration`);
       }
       return;
     }
-    
+
     try {
       // Register with TimerConsolidationSystem if available
-      const timerSystem = year3000System.timerConsolidationSystem;
-      if (timerSystem) {
+      const timerSystem = themeService.getTimerConsolidationSystem<any>();
+      if (timerSystem?.registerTimer) {
         // Register sidebar performance monitoring timer
         timerSystem.registerTimer('sidebar-performance-monitor', 1000, () => {
           this.updatePerformanceMetrics();
         });
-        
+
         if (this.config.enableDebug) {
           console.log(`[${this.systemName}] Integrated with TimerConsolidationSystem`);
         }
       }
-      
+
       // Register with AnimationFrameCoordinator if available
-      const animationCoordinator = year3000System.enhancedMasterAnimationCoordinator;
-      if (animationCoordinator) {
+      const animationCoordinator = themeService.getAnimationCoordinator<any>();
+      if (animationCoordinator?.registerFrameCallback) {
         // Register bilateral visual-effects coordination callback
         animationCoordinator.registerFrameCallback(
           (deltaTime: number, timestamp: number) => {
@@ -693,9 +693,10 @@ export class SidebarSystemsIntegration extends ServiceSystemBase {
     this.integrationEnabled = false;
 
     // Unregister from performance systems
-    const year3000System = (globalThis as any).year3000System;
-    if (year3000System?.timerConsolidationSystem) {
-      year3000System.timerConsolidationSystem.unregisterTimer('sidebar-performance-monitor');
+    const timerSystem = DefaultServiceFactory.getServices()
+      .themeLifecycle?.getTimerConsolidationSystem<any>();
+    if (timerSystem?.unregisterTimer) {
+      timerSystem.unregisterTimer('sidebar-performance-monitor');
     }
 
     // Destroy all systems in reverse order

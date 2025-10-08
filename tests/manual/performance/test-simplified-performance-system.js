@@ -595,5 +595,4 @@ console.log('5. Verify no continuous performance monitoring is running');
 
 console.groupEnd();
 
-// Store results for further inspection
-globalThis.simplifiedPerformanceTestResults = testResults;
+// Access latest results via `testResults` within this console session.

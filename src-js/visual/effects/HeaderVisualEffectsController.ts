@@ -10,6 +10,7 @@
 
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -169,9 +170,11 @@ export class HeaderVisualEffectsController extends ServiceVisualSystemBase {
 
   protected override async performVisualSystemInitialization(): Promise<void> {
     try {
-      // Initialize CSS coordination first - use globalThis to access Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssVariableController || getGlobalCSSVariableWriter();
+      const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+      this.cssController =
+        (themeService?.getCoordinator() as any)?.cssVariableController ||
+        themeService?.getCssController() ||
+        getGlobalCSSVariableWriter();
 
       // Check for reduced motion preference
       this.effectsState.preferredMotion = !window.matchMedia(

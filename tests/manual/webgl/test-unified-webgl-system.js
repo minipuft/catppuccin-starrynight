@@ -476,5 +476,4 @@ console.log('5. Reload Spotify and verify visual changes match the settings');
 
 console.groupEnd();
 
-// Store results for further inspection
-globalThis.unifiedWebGLTestResults = testResults;
+// Access latest results via `testResults` within this console session.

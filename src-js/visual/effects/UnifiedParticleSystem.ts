@@ -24,6 +24,7 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { VisualCoordinatorService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
@@ -694,6 +695,7 @@ export class UnifiedParticleSystem
   private visualEffectsConfig: ParticleVisualConfig;
 
   // Visual effects integration
+  private visualCoordinatorService: VisualCoordinatorService | null = null;
   private visualEffectsCoordinator: BackgroundAnimationCoordinator | null =
     null;
   private currentVisualEffectsState: VisualEffectState | null = null;
@@ -715,13 +717,16 @@ export class UnifiedParticleSystem
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
     // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
-    year3000System: any = null
+    _legacyYear3000System: any = null
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
 
     // Get visual effects coordinator from year3000System if available
+    this.visualCoordinatorService =
+      this.services.visualCoordinator || null;
     this.visualEffectsCoordinator =
-      year3000System?.backgroundVisualCoordinator || null;
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      null;
 
     // Initialize shared canvas manager
     this.canvasManager = new SharedCanvasManager();
@@ -1001,6 +1006,20 @@ export class UnifiedParticleSystem
    * Register with visual effects coordinator
    */
   private registerWithVisualCoordinator(): void {
+    this.visualEffectsCoordinator =
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      this.visualEffectsCoordinator;
+
+    if (
+      this.visualCoordinatorService?.registerVisualEffectsParticipant?.(this)
+    ) {
+      Y3KDebug?.debug?.log(
+        "UnifiedParticleSystem",
+        "Successfully registered with visual effects coordinator"
+      );
+      return;
+    }
+
     if (!this.visualEffectsCoordinator) {
       Y3KDebug?.debug?.log(
         "UnifiedParticleSystem",
@@ -1698,7 +1717,15 @@ export class UnifiedParticleSystem
 
   protected override performVisualSystemCleanup(): void {
     // Unregister from visual effects coordinator
-    if (this.visualEffectsCoordinator) {
+    if (this.visualCoordinatorService?.unregisterVisualEffectsParticipant) {
+      this.visualCoordinatorService.unregisterVisualEffectsParticipant(
+        this.systemName
+      );
+      Y3KDebug?.debug?.log(
+        "UnifiedParticleSystem",
+        "Unregistered from visual effects coordinator via service"
+      );
+    } else if (this.visualEffectsCoordinator) {
       try {
         this.visualEffectsCoordinator.unregisterVisualEffectsParticipant(
           "UnifiedParticleSystem"
@@ -1734,6 +1761,7 @@ export class UnifiedParticleSystem
       );
     }
 
+    this.visualCoordinatorService = null;
     this.beatSubscriptionId = null;
     this.energySubscriptionId = null;
 

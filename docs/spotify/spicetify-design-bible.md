@@ -1306,66 +1306,48 @@ _applyAestheticGravity(musicData) {
 }
 ```
 
-### 🌊 BaseVisualSystem: Kinetic Foundation
+### 🌊 ServiceVisualSystemBase: Kinetic Foundation
 
-**Enhanced with cosmic utilities for all visual systems:**
+`ServiceVisualSystemBase` supplies the same kinetic primitives through injected services rather than inheritance magic. Visual systems rely on the service container for music data, CSS batching, and canvas management.
 
-```javascript
-// 🌊 Cosmic Breathing for Visual Elements
-_applyCosmicBreathing(musicData) {
-  const energy = musicData.energy || 0.5;
-  const enhancedBPM = musicData.enhancedBPM || 120;
+```ts
+import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 
-  // Calculate breathing phase synchronized to BPM
-  const breathingSpeed = (enhancedBPM / 120) * 0.02;
-  const breathingPhase = (Date.now() * breathingSpeed) % (Math.PI * 2);
-  const breathingIntensity = 0.8 + Math.sin(breathingPhase) * 0.2 * energy;
+class CosmicBreathingSystem extends ServiceVisualSystemBase {
+  async initialize(): Promise<void> {
+    await super.initialize();
 
-  // Apply to system's canvas automatically
-  const canvas = document.getElementById(`${this.systemName}-canvas`);
-  if (canvas) {
-    canvas.style.opacity = (parseFloat(canvas.style.opacity) || 0.5) * breathingIntensity;
+    // Use injected services instead of global writers
+    const css = this.services.cssVariables;
+    const theming = this.services.themingState;
+
+    const kinetic = theming?.getKineticState() ?? {
+      energy: 0.5,
+      bpm: 120,
+      valence: 0.5,
+      tempoMultiplier: 1,
+      beatPhase: 0,
+      beatPulse: 0,
+    };
+
+    css?.queueBatchUpdate({
+      "--sn-kinetic-energy": kinetic.energy.toFixed(3),
+      "--sn-kinetic-bpm": kinetic.bpm.toString(),
+      "--sn-kinetic-beat-phase": kinetic.beatPhase.toFixed(3),
+      "--sn-kinetic-beat-pulse": kinetic.beatPulse.toFixed(3),
+    });
+
+    // Canvas helpers still arrive via ServiceVisualSystemBase
+    const canvas = await this.createCanvas("cosmic-breathing", {
+      offscreen: false,
+      alpha: true,
+    });
+    canvas.canvas.classList.add("year3000-kinetic-canvas");
   }
 }
-
-// 🌟 Global Kinetic Variables for All Systems
-_updateGlobalKinetics(musicData) {
-  const root = document.documentElement;
-  const energy = musicData.energy || 0.5;
-  const enhancedBPM = musicData.enhancedBPM || 120;
-
-  // Set kinetic variables that all visual systems can use
-  root.style.setProperty('--sn-kinetic-energy', energy.toFixed(3));
-  root.style.setProperty('--sn-kinetic-valence', valence.toFixed(3));
-  root.style.setProperty('--sn-kinetic-bpm', enhancedBPM.toString());
-  root.style.setProperty('--sn-kinetic-tempo-multiplier', (enhancedBPM / 120).toFixed(3));
-
-  // Cosmic timing variables for beat synchronization
-  const beatInterval = 60000 / enhancedBPM;
-  const timeSinceLastBeat = Date.now() % beatInterval;
-  const beatPhase = (timeSinceLastBeat / beatInterval) * Math.PI * 2;
-  const beatPulse = Math.sin(beatPhase);
-
-  root.style.setProperty('--sn-kinetic-beat-phase', beatPhase.toFixed(3));
-  root.style.setProperty('--sn-kinetic-beat-pulse', beatPulse.toFixed(3));
-}
-
-// 🎨 Create Kinetic Canvas with Cosmic Properties
-_createKineticCanvas(id, zIndex = -1, blendMode = "screen", kineticMode = "pulse") {
-  const canvas = this._createCanvasElement(id, zIndex, blendMode);
-
-  // Add kinetic CSS classes and data attributes
-  canvas.classList.add('year3000-kinetic-canvas');
-  canvas.dataset.kineticMode = kineticMode;
-  canvas.dataset.systemName = this.systemName;
-
-  // Apply cosmic CSS animations
-  const kineticStyles = this._getKineticStyles(kineticMode);
-  Object.assign(canvas.style, kineticStyles);
-
-  return canvas;
-}
 ```
+
+> 📄 For architectural background see `docs/visual-service-facade-overview.md`.
 
 ### 🌟 Year 3000 CSS Variables System
 
@@ -1616,7 +1598,9 @@ window.Year3000Debug = {
       enhancedBPM: 140,
     };
 
-    const colorHarmonyEngine = globalThis.year3000System?.colorHarmonyEngine;
+    const colorHarmonyEngine = DefaultServiceFactory
+      .getServices()
+      .themeLifecycle?.getCoordinator()?.colorHarmonyEngine;
     if (
       colorHarmonyEngine &&
       typeof colorHarmonyEngine._applyAestheticGravity === "function"

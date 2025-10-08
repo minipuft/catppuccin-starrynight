@@ -2,6 +2,7 @@ import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 
 interface FocusState {
   isFocusVisible: boolean;
@@ -74,9 +75,16 @@ export class FocusController implements IManagedSystem {
     if (this.initialized) return;
 
     try {
-      // Initialize CSS coordination - use globalThis to access Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssController || this.year3000System?.cssController || getGlobalCSSVariableWriter();
+      const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+      const coordinator = themeService?.getCoordinator();
+      if (coordinator) {
+        this.year3000System = coordinator;
+      }
+
+      this.cssController =
+        themeService?.getCssController() ||
+        this.year3000System?.cssController ||
+        getGlobalCSSVariableWriter();
 
       this.setupEventListeners();
       this.initialized = true;

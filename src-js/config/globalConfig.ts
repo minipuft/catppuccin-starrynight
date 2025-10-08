@@ -8,6 +8,7 @@ import type {
 } from "@/types/models";
 import type { SystemMetrics } from "@/types/systems";
 import { settings } from "@/config";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 
 // Import modular configuration directly to avoid circular imports
 import { COLOR_HARMONY_MODES as MODULAR_COLOR_HARMONY_MODES, HARMONIC_MODES as MODULAR_HARMONIC_MODES, MUSIC_VISUAL_SYNC, ENHANCED_BPM_CONFIG } from "./harmonicModes";
@@ -294,16 +295,8 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
         );
       }
 
-      // TODO: Refactor this dependency. year3000System might not be globally available here.
-      // It should ideally be accessed via a callback, event, or dependency injection.
-      if (
-        typeof globalThis.year3000System !== "undefined" &&
-        (globalThis.year3000System as any).setGradientParameters
-      ) {
-        (globalThis.year3000System as any).setGradientParameters(
-          document.documentElement
-        );
-      }
+      const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+      themeService?.getCoordinator()?.setGradientParameters?.();
       return true;
     }
     console.warn(

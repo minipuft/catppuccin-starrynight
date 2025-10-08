@@ -1,5 +1,7 @@
 # API Reference
 
+> **Archived (2025-10-08)**: This guide reflects the pre-service `BaseVisualSystem` architecture. For the current service-first facade, refer to `docs/visual-service-facade-overview.md`.
+
 > **"With advanced systems, every interface becomes a portal to visual excellence—each method a pathway to transcendent user experience, each parameter a note in the symphony of dynamic visual effects."**
 
 ## Overview

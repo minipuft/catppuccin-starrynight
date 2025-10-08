@@ -25,12 +25,27 @@ import type {
   MusicSyncLifecycleService,
   ThemingStateService,
   KineticThemingState,
-  VisualCoordinatorService
+  VisualCoordinatorService,
+  SettingsService,
+  ThemeLifecycleService
 } from "./SystemServices";
 import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
 import { unifiedEventBus } from "@/core/events/EventBus";
+import type { UnifiedEventMap } from "@/core/events/EventBus";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
+import {
+  getSettings,
+  type TypedSettings,
+  type SettingsChangeEvent,
+  type TypedSettingsManager
+} from "@/config";
+import type { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
+import type { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
+import {
+  getGlobalCSSVariableWriterSafe,
+  type CSSVariableWriter
+} from "@/core/css/CSSVariableWriter";
 
 // =============================================================================
 // SYSTEM LIFECYCLE SERVICE IMPLEMENTATION
@@ -289,11 +304,15 @@ export class DefaultEventSubscriptionService implements EventSubscriptionService
       domUnsubscribers: []
     };
     
-    // Assuming we have access to a global event bus
-    const globalEventBus = (globalThis as any).unifiedEventBus;
-    if (globalEventBus?.subscribe) {
-      const unsubscriber = globalEventBus.subscribe(eventName, handler, systemName);
-      system.eventUnsubscribers.push(() => unsubscriber());
+    if (unifiedEventBus?.subscribe) {
+      const subscriptionId = unifiedEventBus.subscribe(
+        eventName as keyof UnifiedEventMap,
+        handler as any,
+        systemName
+      );
+      system.eventUnsubscribers.push(() =>
+        unifiedEventBus.unsubscribe(subscriptionId)
+      );
     } else {
       // Fallback to custom event on document
       const wrappedHandler = (event: Event) => {
@@ -536,6 +555,8 @@ export class DefaultServiceFactory {
         performanceProfile: new DefaultPerformanceProfileService(null, null, unifiedEventBus),
         musicSyncLifecycle: new DefaultMusicSyncLifecycleService(),
         themingState: new DefaultThemingStateService(),
+        settings: new DefaultSettingsService(),
+        themeLifecycle: new DefaultThemeLifecycleService(),
         visualCoordinator: new DefaultVisualCoordinatorService()
       };
     }
@@ -825,6 +846,154 @@ export class DefaultMusicSyncLifecycleService implements MusicSyncLifecycleServi
 }
 
 // =============================================================================
+// SETTINGS SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultSettingsService implements SettingsService {
+  private manager: TypedSettingsManager | null;
+
+  constructor(manager: TypedSettingsManager | null = null) {
+    this.manager = manager;
+  }
+
+  public setManager(manager: TypedSettingsManager | null): void {
+    this.manager = manager;
+  }
+
+  private resolveManager(): TypedSettingsManager {
+    if (this.manager) {
+      return this.manager;
+    }
+
+    try {
+      const resolved = getSettings();
+      this.manager = resolved;
+      return resolved;
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "SettingsService",
+        "Unable to resolve TypedSettingsManager",
+        error
+      );
+      throw error;
+    }
+  }
+
+  public get<K extends keyof TypedSettings>(key: K): TypedSettings[K] {
+    return this.resolveManager().get(key);
+  }
+
+  public set<K extends keyof TypedSettings>(
+    key: K,
+    value: TypedSettings[K]
+  ): boolean {
+    return this.resolveManager().set(key, value);
+  }
+
+  public reset<K extends keyof TypedSettings>(key: K): boolean {
+    return this.resolveManager().reset(key);
+  }
+
+  public onChange(listener: (event: SettingsChangeEvent) => void): () => void {
+    const manager = this.resolveManager();
+    manager.onChange(listener);
+    return () => manager.offChange(listener);
+  }
+
+  public export(): { [K in keyof TypedSettings]: TypedSettings[K] } {
+    return this.resolveManager().export();
+  }
+
+  public import(settings: Partial<TypedSettings>): {
+    imported: number;
+    failed: Array<{ key: string; error: string }>;
+  } {
+    return this.resolveManager().import(settings);
+  }
+
+  public getManager(): TypedSettingsManager | null {
+    return this.resolveManager();
+  }
+}
+
+// =============================================================================
+// THEME LIFECYCLE SERVICE IMPLEMENTATION
+// =============================================================================
+
+export class DefaultThemeLifecycleService implements ThemeLifecycleService {
+  private coordinator: ThemeLifecycleCoordinator | null;
+  private facade: SystemIntegrationCoordinator | null;
+
+  constructor(
+    coordinator: ThemeLifecycleCoordinator | null = null,
+    facade: SystemIntegrationCoordinator | null = null
+  ) {
+    this.coordinator = coordinator;
+    this.facade = facade ?? coordinator?.facadeCoordinator ?? null;
+  }
+
+  public setCoordinator(
+    coordinator: ThemeLifecycleCoordinator | null
+  ): void {
+    this.coordinator = coordinator;
+    if (coordinator?.facadeCoordinator) {
+      this.facade = coordinator.facadeCoordinator;
+    }
+  }
+
+  public setFacadeCoordinator(
+    facade: SystemIntegrationCoordinator | null
+  ): void {
+    this.facade = facade;
+  }
+
+  public getCoordinator(): ThemeLifecycleCoordinator | null {
+    return this.coordinator;
+  }
+
+  public getFacadeCoordinator(): SystemIntegrationCoordinator | null {
+    return this.facade ?? this.coordinator?.facadeCoordinator ?? null;
+  }
+
+  public getCssController(): CSSVariableWriter | null {
+    return (
+      this.coordinator?.cssVariableController || getGlobalCSSVariableWriterSafe()
+    );
+  }
+
+  public getTimerConsolidationSystem<T = any>(): T | null {
+    return (this.coordinator?.timerConsolidationSystem ?? null) as T | null;
+  }
+
+  public getAnimationCoordinator<T = any>(): T | null {
+    return (
+      this.coordinator?.enhancedMasterAnimationCoordinator ?? null
+    ) as T | null;
+  }
+
+  public getMusicSyncService<T = any>(): T | null {
+    return (this.coordinator?.musicSyncService ?? null) as T | null;
+  }
+
+  public getPerformanceCoordinator<T = any>(): T | null {
+    return (
+      this.coordinator?.simplePerformanceCoordinator ||
+      this.coordinator?.performanceCoordinator ||
+      null
+    ) as T | null;
+  }
+
+  public async applyInitialSettings(
+    trigger?: "flavor" | "brightness" | "accent" | "full"
+  ): Promise<void> {
+    if (!this.coordinator) {
+      return;
+    }
+    await this.coordinator.applyInitialSettings(trigger);
+  }
+}
+
+// =============================================================================
 // THEMING STATE SERVICE IMPLEMENTATION
 // =============================================================================
 
@@ -920,5 +1089,22 @@ export class DefaultVisualCoordinatorService implements VisualCoordinatorService
     const coordinator = this.ensureCoordinator();
     if (!coordinator) return null;
     return coordinator.getMetrics();
+  }
+
+  public getCoordinatorInstance(): VisualEffectsCoordinator | null {
+    return this.ensureCoordinator();
+  }
+
+  public registerVisualEffectsParticipant(participant: any): boolean {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator?.registerVisualEffectsParticipant) return false;
+    const result = coordinator.registerVisualEffectsParticipant(participant);
+    return !!result?.success;
+  }
+
+  public unregisterVisualEffectsParticipant(systemName: string): void {
+    const coordinator = this.ensureCoordinator();
+    if (!coordinator?.unregisterVisualEffectsParticipant) return;
+    coordinator.unregisterVisualEffectsParticipant(systemName);
   }
 }

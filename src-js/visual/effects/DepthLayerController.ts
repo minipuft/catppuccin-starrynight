@@ -10,6 +10,7 @@
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
@@ -127,9 +128,11 @@ export class DepthVisualEffectsController extends ServiceVisualSystemBase {
 
   protected override async performVisualSystemInitialization(): Promise<void> {
     try {
-      // Initialize CSS coordination first - use globalThis to access Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssVisualEffectsController || getGlobalCSSVariableWriter();
+      const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+      this.cssController =
+        (themeService?.getCoordinator() as any)?.cssVisualEffectsController ||
+        themeService?.getCssController() ||
+        getGlobalCSSVariableWriter();
 
       this.detectContentAndChromeAreas();
       this.setupInteractionListeners();

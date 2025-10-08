@@ -26,40 +26,6 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
 // Note: waitForAPI, waitForDOMElement, and waitForCatppuccinTheme are now imported from
 // ProgressiveAPILoader module (Phase 2 refactoring)
 
-// -----------------------------------------------------------------------------
-// React / ReactDOM shim for libraries bundled with CommonJS `require()` calls.
-// Some third-party Spicetify-Creator plugins (e.g. `spcr-settings`) are built
-// assuming `require("react")` or `require("react-dom")` is available. The
-// Spotify environment injects React via `Spicetify.React` and has no Node-style
-// module loader, so we patch a minimal shim **before** such code executes.
-// -----------------------------------------------------------------------------
-
-function patchReactRequire(): void {
-  const g: any = globalThis as any;
-  if (g.__STARLIGHT_REACT_SHIM__) return; // idempotent
-
-  // Helper that hands back Spotify's React exports.
-  const shim = (name: string) => {
-    if (name === "react") return g.Spicetify?.React;
-    if (name === "react-dom") return g.Spicetify?.ReactDOM;
-    throw new Error(`[StarryNight shim] Module '${name}' not available`);
-  };
-
-  if (typeof g.require === "function") {
-    const original = g.require.bind(g);
-    g.require = (name: string) => {
-      if (name === "react" || name === "react-dom") return shim(name);
-      return original(name);
-    };
-  } else {
-    g.require = shim;
-  }
-
-  g.__STARLIGHT_REACT_SHIM__ = true;
-}
-
-patchReactRequire();
-
 (async function catppuccinStarryNight() {
   const startTime = Date.now();
 

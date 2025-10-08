@@ -21,11 +21,13 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { unifiedEventBus, type EventData, type UnifiedEventMap } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator, type QualityLevel, type QualityScalingCapable, type PerformanceMetrics, type QualityCapability } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { VisualCoordinatorService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import { settings } from "@/config";
 import {
@@ -189,6 +191,7 @@ export class WebGLGradientBackgroundSystem
   private prefersReducedMotion = false;
 
   // VisualEffects choreographer integration
+  private visualCoordinatorService: VisualCoordinatorService | null = null;
   private visualEffectsChoreographer: VisualEffectsCoordinator | null =
     null;
   private currentVisualEffectsField: VisualEffectState | null = null;
@@ -244,7 +247,7 @@ export class WebGLGradientBackgroundSystem
     utils: typeof import("@/utils/core/ThemeUtilities"),
     performanceMonitor: SimplePerformanceCoordinator,
     musicSyncService: MusicSyncService | null = null,
-    year3000System: any = null
+    _legacyYear3000System: any = null
   ) {
     super(config, utils, performanceMonitor, musicSyncService);
 
@@ -259,12 +262,15 @@ export class WebGLGradientBackgroundSystem
       );
     }
 
-    // Get ColorHarmonyEngine from year3000System if available
-    this.colorHarmonyEngine = year3000System?.colorHarmonyEngine || null;
+    const services = DefaultServiceFactory.getServices();
+    const themeService = services.themeLifecycle;
+    const coordinator = themeService?.getCoordinator() || null;
 
-    // Get visualEffects choreographer from year3000System if available
+    this.visualCoordinatorService =
+      this.services.visualCoordinator || null;
     this.visualEffectsChoreographer =
-      year3000System?.backgroundVisualEffectsChoreographer || null;
+      this.visualCoordinatorService?.getCoordinatorInstance?.() || null;
+    this.colorHarmonyEngine = coordinator?.colorHarmonyEngine || null;
 
     // Check for reduced motion preference
     this.prefersReducedMotion = window.matchMedia(
@@ -276,9 +282,13 @@ export class WebGLGradientBackgroundSystem
 
   protected override async performVisualSystemInitialization(): Promise<void> {
 
-    // Initialize CSS coordination first - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssVisualEffectsController || getGlobalCSSVariableWriter();
+    const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+    const coordinator = themeService?.getCoordinator();
+
+    this.cssController =
+      (coordinator as any)?.cssVisualEffectsController ||
+      themeService?.getCssController() ||
+      getGlobalCSSVariableWriter();
 
     // Check WebGL2 capability
     this.isWebGLAvailable = this.checkWebGL2Support();
@@ -2439,8 +2449,15 @@ export class WebGLGradientBackgroundSystem
 
   protected override performVisualSystemCleanup(): void {
 
-    // Unregister from visualEffects choreographer
-    if (this.visualEffectsChoreographer) {
+    if (this.visualCoordinatorService?.unregisterVisualEffectsParticipant) {
+      this.visualCoordinatorService.unregisterVisualEffectsParticipant(
+        this.systemName
+      );
+      Y3KDebug?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Unregistered from visual effects coordinator via service"
+      );
+    } else if (this.visualEffectsChoreographer) {
       try {
         this.visualEffectsChoreographer.unregisterVisualEffectsParticipant(
           "WebGLGradientBackgroundSystem"
@@ -2457,6 +2474,8 @@ export class WebGLGradientBackgroundSystem
         );
       }
     }
+
+    this.visualCoordinatorService = null;
 
     // ✅ RAF LOOP CONSOLIDATION: No need to stop animation - coordinator handles this
 
@@ -2736,6 +2755,20 @@ export class WebGLGradientBackgroundSystem
    * Register this WebGL system as a visualEffects participant
    */
   private registerWithVisualEffectsChoreographer(): void {
+    this.visualEffectsChoreographer =
+      this.visualCoordinatorService?.getCoordinatorInstance?.() ||
+      this.visualEffectsChoreographer;
+
+    if (
+      this.visualCoordinatorService?.registerVisualEffectsParticipant?.(this)
+    ) {
+      Y3KDebug?.debug?.log(
+        "WebGLGradientBackgroundSystem",
+        "Successfully registered with visual effects coordinator"
+      );
+      return;
+    }
+
     if (!this.visualEffectsChoreographer) {
       Y3KDebug?.debug?.log(
         "WebGLGradientBackgroundSystem",

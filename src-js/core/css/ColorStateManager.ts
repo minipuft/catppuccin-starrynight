@@ -12,6 +12,7 @@
 import { settings } from '@/config';
 import { unifiedEventBus } from '@/core/events/EventBus';
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from '@/core/css/CSSVariableWriter';
+import { DefaultServiceFactory } from '@/core/services/CoreServiceProviders';
 import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
 import {
   paletteSystemManager,
@@ -118,10 +119,10 @@ export class CSSColorController implements IManagedSystem {
   public async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    // Initialize CSS controller - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController ||
-                        getGlobalCSSVariableWriter();
+    const services = DefaultServiceFactory.getServices();
+    this.cssController =
+      services.themeLifecycle?.getCssController() ||
+      getGlobalCSSVariableWriter();
 
     // Listen for settings changes
     unifiedEventBus.subscribe('settings:changed', this.handleSettingsChange.bind(this), 'ColorStateManager');

@@ -3,17 +3,22 @@ import {
   CSSVariableWriter,
   getGlobalCSSVariableWriter,
 } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { SettingsSection } from "@/ui/components/SettingsSection";
 import { settings } from "@/config";
 import { applyStarryNightSettings } from "@/visual/base/starryNightEffects";
 
 // Helper to get CSS controller for coordination
 function getCSSController(): CSSVariableWriter {
-  const year3000System = (globalThis as any).year3000System;
+  const services = DefaultServiceFactory.getServices();
   return (
-    year3000System?.cssController ||
+    services.themeLifecycle?.getCssController() ||
     getGlobalCSSVariableWriter()
   );
+}
+
+function getThemeService() {
+  return DefaultServiceFactory.getServices().themeLifecycle || null;
 }
 
 /**
@@ -68,14 +73,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
           applyStarryNightSettings(grad as any, grad as any); // Use grad for both params since star density is consolidated
 
           // Trigger the main Year3000System to re-apply accent colors selectively
-          try {
-            (globalThis as any).Y3K?.system?.applyInitialSettings?.("accent");
-          } catch (applyErr) {
-            console.warn(
-              "[StarryNight] Unable to trigger Year3000System colour refresh",
-              applyErr
-            );
-          }
+          void getThemeService()?.applyInitialSettings("accent");
         } catch (err) {
           console.error("[StarryNight] Failed to update accent colour", err);
         }
@@ -154,17 +152,8 @@ export async function initializeStarryNightSettings(): Promise<void> {
         );
 
         // Trigger Year3000System to refresh brightness-dependent systems
-        try {
-          (globalThis as any).Y3K?.system?.applyInitialSettings?.("brightness");
-          console.log(
-            `[StarryNight] Brightness mode changed to: ${newBrightness}`
-          );
-        } catch (applyErr) {
-          console.warn(
-            "[StarryNight] Unable to trigger Year3000System brightness refresh",
-            applyErr
-          );
-        }
+        void getThemeService()?.applyInitialSettings("brightness");
+        console.log(`[StarryNight] Brightness mode changed to: ${newBrightness}`);
       },
     }
   );
@@ -185,14 +174,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         settings.set("catppuccin-flavor", flavourOptions[idx] as any);
         // Trigger selective flavor update instead of full settings reload
-        try {
-          (globalThis as any).Y3K?.system?.applyInitialSettings?.("flavor");
-        } catch (applyErr) {
-          console.warn(
-            "[StarryNight] Unable to trigger flavor refresh",
-            applyErr
-          );
-        }
+        void getThemeService()?.applyInitialSettings("flavor");
       },
     }
   );
@@ -212,14 +194,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         settings.set("sn-palette-system", paletteOptions[idx] as any);
         // Trigger Year3000System to refresh palette coordination
-        try {
-          (globalThis as any).Y3K?.system?.applyInitialSettings?.("palette");
-        } catch (applyErr) {
-          console.warn(
-            "[StarryNight] Unable to trigger palette system refresh",
-            applyErr
-          );
-        }
+        void getThemeService()?.applyInitialSettings();
       },
     }
   );
@@ -264,9 +239,8 @@ export async function initializeStarryNightSettings(): Promise<void> {
         // Forward the change to the live Year3000System instance so that all
         // subsystems (including ColorHarmonyEngine) receive the update via the
         // shared configuration object.
-        (
-          globalThis as any
-        ).year3000System?.ADVANCED_SYSTEM_CONFIG?.safeSetArtisticMode?.(mode);
+        const coordinator = getThemeService()?.getCoordinator();
+        (coordinator as any)?.ADVANCED_SYSTEM_CONFIG?.safeSetArtisticMode?.(mode);
       },
     }
   );
@@ -286,7 +260,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
           const idx = e?.currentTarget?.selectedIndex ?? 0;
           const modeKey = harmonicModes[idx];
           settings.set("sn-current-harmonic-mode", modeKey as any);
-          (globalThis as any).Y3K?.system?.evolveHarmonicSignature?.(modeKey);
+          void getThemeService()?.applyInitialSettings();
         },
       }
     );

@@ -16,6 +16,7 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { settings } from "@/config";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 // IManagedSystem interface (inline definition for now)
 interface IManagedSystem {
   initialized: boolean;
@@ -333,9 +334,9 @@ export class HolographicUISystem
     if (this.initialized) return;
 
     try {
-      // Initialize CSS coordination - use globalThis to access Year3000System
-      const year3000System = (globalThis as any).year3000System;
-      this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
+      const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+      this.cssController =
+        themeService?.getCssController() || getGlobalCSSVariableWriter();
 
       // Create interface container
       await this.createInterfaceContainer();

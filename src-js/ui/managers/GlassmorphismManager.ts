@@ -2,6 +2,7 @@ import { ADVANCED_SYSTEM_CONFIG as Config } from "@/config/globalConfig";
 import { GLASS_LEVEL_KEY } from "@/config/settingKeys";
 // NOTE: GLASS_LEVEL_OLD_KEY has been removed in settings rationalization
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { SimplePerformanceCoordinator, QualityCapability, QualityLevel, QualityScalingCapable, PerformanceMetrics } from "@/core/performance/SimplePerformanceCoordinator";
 import type { HealthCheckResult } from "@/types/systems";
 import { settings } from "@/config";
@@ -114,9 +115,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
 
   // Implement abstract methods from ViewportAwareSystem
   protected async initializeSystem(): Promise<void> {
-    // Initialize CSS coordination - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
+    // Initialize CSS coordination via theme lifecycle services
+    const services = DefaultServiceFactory.getServices();
+    this.cssController =
+      services.themeLifecycle?.getCssController() ||
+      getGlobalCSSVariableWriter();
 
     const initialIntensity = settings.get("sn-glassmorphism-level");
     this.applyGlassmorphismSettings(initialIntensity);

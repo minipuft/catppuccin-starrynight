@@ -8,10 +8,13 @@
 // event overhead.
 // ---------------------------------------------------------------------------
 
-import type { FrameContext, IVisualSystem } from "@/core/animation/AnimationFrameCoordinator";
-import year3000System from "@/core/lifecycle/ThemeLifecycleCoordinator"; // ThemeLifecycleCoordinator singleton
-import { CSSVariableWriter, getGlobalCSSVariableWriter
-} from "@/core/css/CSSVariableWriter";
+import type {
+  FrameContext,
+  IVisualSystem,
+  AnimationFrameCoordinator,
+} from "@/core/animation/AnimationFrameCoordinator";
+import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 
 // Default cycle length in pixels before the ratio loops back to 0.
 // Designers can override at runtime via the CSS variable
@@ -31,9 +34,8 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
   private cssController: CSSVariableWriter;
 
   constructor(private cyclePx = DEFAULT_CYCLE_PX) {
-    // Initialize CSS coordination - use globalThis to access Year3000System
-    const year3000System = (globalThis as any).year3000System;
-    this.cssController = year3000System?.cssController || getGlobalCSSVariableWriter();
+    const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+    this.cssController = themeService?.getCssController() || getGlobalCSSVariableWriter();
 
     // Expose cycle length so SCSS authors can reference it using coordination
     this.cssController.setVariable(
@@ -85,13 +87,18 @@ export class PrismaticScrollSheenSystem implements IVisualSystem {
 export function initializePrismaticScrollSheen(): void {
   try {
     const sys = new PrismaticScrollSheenSystem();
-    (year3000System as any)?.registerVisualSystem?.(sys, "background");
+    const services = DefaultServiceFactory.getServices();
+    const animationCoordinator =
+      services.themeLifecycle?.getAnimationCoordinator<AnimationFrameCoordinator>();
+
+    if (animationCoordinator?.registerVisualSystem) {
+      animationCoordinator.registerVisualSystem(sys, "background");
+    } else if (services.themeLifecycle) {
+      console.warn(
+        "[PrismaticScrollSheen] Animation coordinator unavailable; skipping registration"
+      );
+    }
   } catch (err) {
     console.error("[PrismaticScrollSheen] Failed to init:", err);
   }
-}
-
-// Auto-initialise if Year3000System global already available (hot-reload / tests)
-if ((window as any).Y3K?.system?.registerVisualSystem) {
-  initializePrismaticScrollSheen();
 }

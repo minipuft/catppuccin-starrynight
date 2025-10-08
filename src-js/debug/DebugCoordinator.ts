@@ -11,6 +11,7 @@
  */
 
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import type { HealthCheckResult } from "@/types/systems";
 
 // =========================================================================
@@ -216,53 +217,59 @@ export class DebugCoordinator {
     let totalMemory = 0;
     let frameTimeCount = 0;
 
+    const services = DefaultServiceFactory.getServices();
+    const themeService = services.themeLifecycle;
+    const facadeCoordinator = themeService?.getFacadeCoordinator() || null;
+    const themeCoordinator = themeService?.getCoordinator() || null;
+
+    if (!themeCoordinator) {
+      Y3KDebug?.debug?.warn(
+        "DebugCoordinator",
+        "Theme lifecycle coordinator unavailable during health check"
+      );
+    }
+
     for (const [name, system] of this.registeredSystems) {
       try {
         // Dynamic system access with facade pattern integration
         let actualSystem = null;
         let dynamicInitializedStatus = system.initialized; // fallback to cached value
 
-        // Enhanced facade-aware system resolution
-        const year3000System = (globalThis as any).year3000System;
-        if (year3000System) {
-          // 1. Try facade coordinator first (facade-managed systems)
-          if (year3000System.facadeCoordinator) {
-            // Check non-visual systems via facade
-            try {
-              actualSystem =
-                year3000System.facadeCoordinator.getCachedNonVisualSystem?.(
-                  name
-                ) ||
-                (await year3000System.facadeCoordinator.getNonVisualSystem?.(
-                  name
-                ));
-            } catch (e) {
-              // Ignore facade errors, try other methods
-            }
-
-            // Check visual systems via facade if not found
-            if (!actualSystem) {
-              try {
-                actualSystem =
-                  year3000System.facadeCoordinator.getVisualSystem?.(name);
-              } catch (e) {
-                // Ignore facade errors, try other methods
-              }
-            }
+        // Prefer facade coordinator supplied via services
+        if (facadeCoordinator) {
+          try {
+            actualSystem =
+              facadeCoordinator.getCachedNonVisualSystem?.(name as any) ||
+              (await facadeCoordinator.getNonVisualSystem?.(name as any));
+          } catch (e) {
+            // Ignore and try other paths
           }
 
-          // 2. Try direct property access (legacy systems)
           if (!actualSystem) {
-            // Convert system name to camelCase property (e.g., MusicSyncService -> musicSyncService)
-            const camelCaseName = name.charAt(0).toLowerCase() + name.slice(1);
-            actualSystem =
-              year3000System[camelCaseName] || year3000System[name];
+            try {
+              actualSystem =
+                facadeCoordinator.getVisualSystem &&
+                (await facadeCoordinator.getVisualSystem(name as any));
+            } catch (e) {
+              // Ignore and try other paths
+            }
           }
         }
 
-        // 3. Try global scope as fallback
+        // Legacy fallback: inspect theme coordinator instance if available
+        if (!actualSystem && themeCoordinator) {
+          const camelCaseName = name.charAt(0).toLowerCase() + name.slice(1);
+          const coordinatorAny = themeCoordinator as any;
+          actualSystem =
+            coordinatorAny?.[camelCaseName] || coordinatorAny?.[name] || null;
+        }
+
         if (!actualSystem) {
-          actualSystem = (globalThis as any)[name];
+          Y3KDebug?.debug?.warn(
+            "DebugCoordinator",
+            `Unable to resolve system '${name}' via services; using registered metadata only`
+          );
+          actualSystem = system as unknown;
         }
 
         // Update initialization status dynamically from actual system

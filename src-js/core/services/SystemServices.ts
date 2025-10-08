@@ -16,6 +16,14 @@ import type {
 } from "@/types/models";
 import type { CanvasResult, CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
 import type { PerformanceMode } from "@/core/performance/PerformanceMonitor";
+import type {
+  TypedSettings,
+  SettingsChangeEvent,
+  TypedSettingsManager
+} from "@/config";
+import type { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
+import type { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
+import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 
 // =============================================================================
 // SYSTEM LIFECYCLE SERVICE
@@ -337,6 +345,101 @@ export interface ThemingStateService {
 }
 
 // =============================================================================
+// SETTINGS SERVICE
+// =============================================================================
+
+export interface SettingsService {
+  /**
+   * Read a typed setting value.
+   */
+  get<K extends keyof TypedSettings>(key: K): TypedSettings[K];
+
+  /**
+   * Persist a typed setting value.
+   */
+  set<K extends keyof TypedSettings>(
+    key: K,
+    value: TypedSettings[K]
+  ): boolean;
+
+  /**
+   * Reset a setting to its default value.
+   */
+  reset<K extends keyof TypedSettings>(key: K): boolean;
+
+  /**
+   * Subscribe to settings change events; returns an unsubscribe function.
+   */
+  onChange(listener: (event: SettingsChangeEvent) => void): () => void;
+
+  /**
+   * Export the current settings snapshot.
+   */
+  export(): { [K in keyof TypedSettings]: TypedSettings[K] };
+
+  /**
+   * Import a batch of settings values.
+   */
+  import(settings: Partial<TypedSettings>): {
+    imported: number;
+    failed: Array<{ key: string; error: string }>;
+  };
+
+  /**
+   * Expose the underlying manager for advanced workflows.
+   */
+  getManager(): TypedSettingsManager | null;
+}
+
+// =============================================================================
+// THEME LIFECYCLE SERVICE
+// =============================================================================
+
+export interface ThemeLifecycleService {
+  /**
+   * Access the ThemeLifecycleCoordinator instance if available.
+   */
+  getCoordinator(): ThemeLifecycleCoordinator | null;
+
+  /**
+   * Access the facade coordinator for resolving systems cross-layer.
+   */
+  getFacadeCoordinator(): SystemIntegrationCoordinator | null;
+
+  /**
+   * Access the shared CSS controller backing theming updates.
+   */
+  getCssController(): CSSVariableWriter | null;
+
+  /**
+   * Convenience getter for the timer consolidation system.
+   */
+  getTimerConsolidationSystem<T = any>(): T | null;
+
+  /**
+   * Convenience getter for the master animation coordinator.
+   */
+  getAnimationCoordinator<T = any>(): T | null;
+
+  /**
+   * Access the shared MusicSync service instance.
+   */
+  getMusicSyncService<T = any>(): T | null;
+
+  /**
+   * Access the shared performance coordinator for color/visual pipelines.
+   */
+  getPerformanceCoordinator<T = any>(): T | null;
+
+  /**
+   * Trigger selective or full initial-settings application.
+   */
+  applyInitialSettings(
+    trigger?: "flavor" | "brightness" | "accent" | "full"
+  ): Promise<void>;
+}
+
+// =============================================================================
 // VISUAL COORDINATOR SERVICE
 // =============================================================================
 
@@ -360,6 +463,21 @@ export interface VisualCoordinatorService {
    * Access coordinator metrics for diagnostics.
    */
   getMetrics(): any;
+
+  /**
+   * Access the underlying coordinator instance when direct integration is required.
+   */
+  getCoordinatorInstance?(): any | null;
+
+  /**
+   * Register a visual effects participant with the coordinator.
+   */
+  registerVisualEffectsParticipant?(participant: any): boolean;
+
+  /**
+   * Unregister a visual effects participant.
+   */
+  unregisterVisualEffectsParticipant?(systemName: string): void;
 }
 
 // =============================================================================
@@ -375,6 +493,8 @@ export interface ServiceContainer {
   performanceProfile?: PerformanceProfileService;
   musicSyncLifecycle?: MusicSyncLifecycleService;
   themingState?: ThemingStateService;
+  settings?: SettingsService;
+  themeLifecycle?: ThemeLifecycleService;
   visualCoordinator?: VisualCoordinatorService;
 }
 

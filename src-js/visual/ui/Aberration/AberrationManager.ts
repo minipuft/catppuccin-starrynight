@@ -10,6 +10,7 @@
 
 import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { AberrationCanvas } from "./AberrationCanvas";
 import { AberrationVisualSystem } from "./AberrationVisualSystem";
 import { getScrollNode } from "@/utils/dom/getScrollNode";
@@ -19,8 +20,15 @@ let visualSystem: AberrationVisualSystem | null = null;
 
 // Helper to get CSS coordinator for coordination
 function getCSSController(y3k: ThemeLifecycleCoordinator | null): CSSVariableWriter {
-  const year3000System = y3k || (globalThis as any).year3000System;
-  return year3000System?.cssController || getGlobalCSSVariableWriter();
+  const services = DefaultServiceFactory.getServices();
+  const themeService = services.themeLifecycle;
+  const coordinator = y3k || themeService?.getCoordinator() || null;
+  const coordinatorAny = coordinator as any;
+  return (
+    themeService?.getCssController() ||
+    coordinatorAny?.cssController ||
+    getGlobalCSSVariableWriter()
+  );
 }
 
 // Helper to read current user preference without circular dep
@@ -105,32 +113,37 @@ function setCSSAberrationEnabled(
   );
 }
 
-export function initializeAberrationManager(y3k: ThemeLifecycleCoordinator | null = null) {
+export function initializeAberrationManager(
+  y3k: ThemeLifecycleCoordinator | null = null
+): void {
+  const services = DefaultServiceFactory.getServices();
+  const coordinator = y3k || services.themeLifecycle?.getCoordinator() || null;
+
   // Immediate attempt (first page)
-  attach(y3k);
+  attach(coordinator);
 
   // If attach failed (no instance), disable noise overlay and CSS effects to avoid bright wash
   if (!instance) {
-    setNebulaNoiseEnabled(false, y3k);
-    setCSSAberrationEnabled(false, y3k);
+    setNebulaNoiseEnabled(false, coordinator);
+    setCSSAberrationEnabled(false, coordinator);
   }
 
   // React-Router style – newer Spotify builds
   const history = (window as any).Spicetify?.Platform?.History;
   if (history?.listen) {
-    history.listen(() => setTimeout(() => attach(y3k), 0));
+    history.listen(() => setTimeout(() => attach(coordinator), 0));
   }
 
   // Legacy custom event fired by Spicetify when apps change
-  document.addEventListener("spicetify:appchange", () => attach(y3k));
+  document.addEventListener("spicetify:appchange", () => attach(coordinator));
 
   // First-load fallback – detach once canvas attaches
   const observer = new MutationObserver(() => {
     if (!instance) {
-      attach(y3k);
+      attach(coordinator);
       if (!instance) {
-        setNebulaNoiseEnabled(false, y3k);
-        setCSSAberrationEnabled(false, y3k);
+        setNebulaNoiseEnabled(false, coordinator);
+        setCSSAberrationEnabled(false, coordinator);
       }
     } else {
       observer.disconnect();

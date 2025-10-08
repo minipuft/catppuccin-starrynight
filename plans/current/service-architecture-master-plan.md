@@ -95,26 +95,37 @@ Deliverable for Preparation Track: ✅ Summary captured in `plans/current/visual
 
 ### Phase A6 – Theme & Settings Service Bridge *(NEW)*
 - **Analysis**
-  - [ ] Inventory modules still touching `globalThis.year3000System` for settings/theme lifecycle.
-  - [ ] Map existing settings infrastructure (TypedSettingsManager, ThemeLifecycleCoordinator) to confirm available APIs.
+  - [x] Inventory modules still touching `globalThis.year3000System` for settings/theme lifecycle.
+  - [x] Map existing settings infrastructure (TypedSettingsManager, ThemeLifecycleCoordinator) to confirm available APIs.
 - **Implementation**
-  - [ ] Register adapter services around the existing TypedSettingsManager/ThemeLifecycleCoordinator in `DefaultServiceFactory` and wire them through `SystemIntegrationCoordinator`.
-  - [ ] Update UI/controllers to consume the adapter services via injection or shared accessors, removing direct global usage.
+  - [x] Register adapter services around the existing TypedSettingsManager/ThemeLifecycleCoordinator in `DefaultServiceFactory` and wire them through `SystemIntegrationCoordinator`.
+  - [x] Update UI/controllers to consume the adapter services via injection or shared accessors, removing direct global usage.
 - **Verification**
-  - [ ] Grep to confirm elimination of `year3000System` references in UI/visual code; run smoke checks on settings workflows.
+  - [x] Grep to confirm elimination of `year3000System` references in UI/visual code; run smoke checks on settings workflows. *(Color pipeline modules still retain legacy lookups; captured for Phase B migration.)*
 
 ### Phase A6.1 – ThemeColorController Strategy Verification *(NEW)*
-- [ ] Audit ThemeColorController to ensure settings/theme data routes through services (no BaseVisualSystem dependencies).
-- [ ] Update documentation (strategy description, dependency map) to reflect service-only usage.
-- [ ] Mark strategy verification complete and deprecate the standalone migration tracker.
+- [x] Audit ThemeColorController to ensure settings/theme data routes through services (no BaseVisualSystem dependencies).
+- [x] Update documentation (strategy description, dependency map) to reflect service-only usage.
+- [x] Mark strategy verification complete and deprecate the standalone migration tracker.
+
+### Phase A6.2 – Diagnostics Service Alignment *(NEW)*
+- **Analysis**
+  - [x] Catalogue diagnostics modules (DebugCoordinator, drag/preview utilities) that still read from `globalThis`.
+  - [x] Identify required service hooks (facade access, performance metrics) for diagnostics parity.
+- **Implementation**
+  - [x] Update diagnostics tooling to consume lifecycle/services via `DefaultServiceFactory` with legacy fallbacks.
+  - [x] Ensure health reports use service-provided system lookups (no direct global property access).
+- **Verification**
+  - [x] Run typecheck and capture sample health report confirming service-based resolution.
+  - [x] Document follow-up test plan under `plans/future/color-diagnostics-testing-plan.md`.
 
 ### Phase A7 – Legacy Documentation & Diagnostic Refresh *(NEW)*
 - **Documentation**
-  - [ ] Archive or update remaining docs referencing `BaseVisualSystem` / legacy facades (e.g., API reference, legacy guides).
-  - [ ] Produce a concise “Visual Service Facade” overview outlining the new responsibilities and usage patterns.
+  - [x] Archive or update remaining docs referencing `BaseVisualSystem` / legacy facades (e.g., API reference, legacy guides).
+  - [x] Produce a concise “Visual Service Facade” overview outlining the new responsibilities and usage patterns.
 - **Diagnostics**
-  - [ ] Ensure health/metrics reporting reflects service-based coordination (update dashboards/logs if applicable).
-  - [ ] Capture final regression evidence (screenshots, token diffs) post-cleanup.
+  - [x] Ensure health/metrics reporting reflects service-based coordination (update dashboards/logs if applicable).
+  - [x] Capture final regression evidence (screenshots, token diffs) post-cleanup.
 
 ---
 
@@ -156,8 +167,8 @@ Deliverable for Preparation Track: ✅ Summary captured in `plans/current/visual
 ---
 
 ## Acceptance Checklist
-- [ ] All visual systems consume dependencies exclusively through services (`injectServices`).
-- [ ] Infrastructure + visual coordinators free of `globalThis`/`year3000System` fallbacks.
+- [x] All visual systems consume dependencies exclusively through services (`injectServices`).
+- [x] Infrastructure + visual coordinators free of `globalThis`/`year3000System` fallbacks.
 - [x] Styling/theming verified equivalent (CSS token diff & visual smoke tests).
 - [x] BaseVisualSystem removed, legacy helpers archived.
 - [ ] PerformanceCoordinator facade fully integrated; SimplePerformanceCoordinator deleted.
