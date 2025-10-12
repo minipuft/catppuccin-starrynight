@@ -605,7 +605,17 @@
 
   // Phase 8.5b+: Use consolidated volumetric-shadow mixin (full 3-layer stack)
   @include volumetric-shadow($depth-multiplier: 25px, $glow-multiplier: 1, $stack-type: 'full');
-  
+
+  &[data-visualeffects-enhanced="true"] {
+    background: transparent;
+    background-color: transparent;
+
+    &::before,
+    &::after {
+      content: none;
+    }
+  }
+
   // Phase 4.2e: Depth Visual Enhancement Lens - Content-aware layered enhancement
   &::before {
     content: '';

@@ -73,6 +73,13 @@
   }
 }
 
+.main-view-container[data-visualeffects-enhanced="true"] {
+  .main-view-container__scroll-node::before,
+  .main-view-container__scroll-node::after {
+    content: none;
+  }
+}
+
 // =========================================================================
 // BREATHING ORGANISMS AS PSEUDO-ELEMENTS ON CARDS
 // =========================================================================

@@ -17,6 +17,11 @@
 // Phase Top Bar: Top bar consolidation (_top_bar_enhanced → _top_bar, 331 lines eliminated, glassmorphism + header variables integrated)
 // ████████████████████████████████████████████████████████████████████████████████
 
+// === LAYER 0: CRITICAL DARK THEME (Load Order: FIRST) ===
+// Phase 1: Eliminate white flash with immediate dark theme establishment
+// MUST load before any other styles to prevent white browser defaults
+@use "_critical_dark_theme" as *; // Critical dark theme (Phase 1: White flash elimination)
+
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
 // Single authoritative design token source - all modules depend on these
 @use "../design-tokens/tokens" as *; // Unified design token system (932 lines, all tokens)

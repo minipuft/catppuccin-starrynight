@@ -43,25 +43,37 @@
   --sn-bg-gradient-accent-rgb: var(--sn-dynamic-accent-rgb);
 
   // -------------------------------------------------------------------------
-  // Brightness Mode System (--sn-brightness-*)
+  // Brightness Mode System (--sn-brightness-*) - Phase 2: Dark Mode Default
   // -------------------------------------------------------------------------
-  
+
   // Brightness mode selection (bright/balanced/dark)
   --sn-brightness-mode: "dark"; // Default to dark mode for better UX
-  
-  // Bright mode values (current vibrant settings)
+
+  // === PHASE 2: CURRENT VALUES (DARK MODE DEFAULT) ===
+  // These are the active values used by visual effects
+  // Default to dark mode for subtle, refined appearance
+  --sn-brightness-current-saturation: 1.1;   // Dark mode default
+  --sn-brightness-current-brightness: 1.0;   // Dark mode default
+  --sn-brightness-current-contrast: 1.0;     // Dark mode default
+  --sn-brightness-current-opacity: 0.15;     // Dark mode default
+
+  // === MODE-SPECIFIC VALUES (Reference Only) ===
+  // These define each mode but are NOT used directly
+  // Use --sn-brightness-current-* instead for actual styling
+
+  // Bright mode values (vibrant settings - opt-in via data-brightness-mode="bright")
   --sn-brightness-bright-saturation: 1.6;
   --sn-brightness-bright-brightness: 1.3;
   --sn-brightness-bright-contrast: 1.4;
   --sn-brightness-bright-opacity: 0.28;
-  
-  // Balanced mode values (moderate settings)
+
+  // Balanced mode values (moderate settings - opt-in via data-brightness-mode="balanced")
   --sn-brightness-balanced-saturation: 1.2;
   --sn-brightness-balanced-brightness: 1.1;
   --sn-brightness-balanced-contrast: 1.1;
   --sn-brightness-balanced-opacity: 0.20;
-  
-  // Dark mode values (subtle but refined settings)
+
+  // Dark mode values (subtle refined settings - DEFAULT, no attribute needed)
   --sn-brightness-dark-saturation: 1.1;
   --sn-brightness-dark-brightness: 1.0;
   --sn-brightness-dark-contrast: 1.0;
@@ -510,40 +522,37 @@
 // =============================================================================
 
 // Bright mode (lighter base colors with vibrant effects)
+// PHASE 2: Consolidated brightness mode selectors
 :root[data-sn-brightness="bright"],
+:root[data-brightness-mode="bright"],
 html[style*="--sn-brightness-mode: \"bright\""] {
-  // Use ColorStateManager-provided base colors (will be lighter variants)
-  // These are set by ColorStateManager.applyColorStateToCSSVariables()
-  
-  // Gradient effect modifiers (vibrant)
-  --sn-bg-gradient-saturation: var(--sn-brightness-bright-saturation);
-  --sn-bg-gradient-brightness: var(--sn-brightness-bright-brightness);
-  --sn-bg-gradient-contrast: var(--sn-brightness-bright-contrast);
-  --sn-bg-gradient-opacity: var(--sn-brightness-bright-opacity);
+  // PHASE 2: Use current brightness variables (already set by data-brightness-mode)
+  --sn-bg-gradient-saturation: var(--sn-brightness-current-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-current-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-current-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-current-opacity);
 }
 
-// Balanced mode (standard base colors with moderate effects)
+// PHASE 2: Consolidated brightness mode selectors
 :root[data-sn-brightness="balanced"],
+:root[data-brightness-mode="balanced"],
 html[style*="--sn-brightness-mode: \"balanced\""] {
-  // Use ColorStateManager-provided base colors (standard variants)
-  
-  // Gradient effect modifiers (moderate)
-  --sn-bg-gradient-saturation: var(--sn-brightness-balanced-saturation);
-  --sn-bg-gradient-brightness: var(--sn-brightness-balanced-brightness);
-  --sn-bg-gradient-contrast: var(--sn-brightness-balanced-contrast);
-  --sn-bg-gradient-opacity: var(--sn-brightness-balanced-opacity);
+  // PHASE 2: Use current brightness variables (already set by data-brightness-mode)
+  --sn-bg-gradient-saturation: var(--sn-brightness-current-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-current-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-current-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-current-opacity);
 }
 
-// Dark mode (darker base colors with subtle effects)
+// PHASE 2: Consolidated brightness mode selectors (DEFAULT)
 :root[data-sn-brightness="dark"],
+:root[data-brightness-mode="dark"],
 html[style*="--sn-brightness-mode: \"dark\""] {
-  // Use ColorStateManager-provided base colors (darker variants)
-  
-  // Gradient effect modifiers (subtle)
-  --sn-bg-gradient-saturation: var(--sn-brightness-dark-saturation);
-  --sn-bg-gradient-brightness: var(--sn-brightness-dark-brightness);
-  --sn-bg-gradient-contrast: var(--sn-brightness-dark-contrast);
-  --sn-bg-gradient-opacity: var(--sn-brightness-dark-opacity);
+  // PHASE 2: Use current brightness variables (already set by data-brightness-mode)
+  --sn-bg-gradient-saturation: var(--sn-brightness-current-saturation);
+  --sn-bg-gradient-brightness: var(--sn-brightness-current-brightness);
+  --sn-bg-gradient-contrast: var(--sn-brightness-current-contrast);
+  --sn-bg-gradient-opacity: var(--sn-brightness-current-opacity);
 }
 
 // =============================================================================
@@ -616,3 +625,58 @@ html[style*="--sn-brightness-mode: \"dark\""] {
   --sn-animation-intensity: 1 !important;
   --sn-animation-reduce: 0 !important;
 }
+
+// =============================================================================
+// PHASE 2: BRIGHTNESS MODE CONDITIONAL LOGIC
+// =============================================================================
+// Provides opt-in brightness modes via data-brightness-mode attribute
+// Default: dark mode (no attribute needed)
+// Opt-in: bright mode (data-brightness-mode="bright")
+// Opt-in: balanced mode (data-brightness-mode="balanced")
+
+/**
+ * Bright Mode - Vibrant, high energy appearance
+ * Opt-in via: document.documentElement.setAttribute('data-brightness-mode', 'bright')
+ */
+:root[data-brightness-mode="bright"] {
+  --sn-brightness-current-saturation: var(--sn-brightness-bright-saturation);
+  --sn-brightness-current-brightness: var(--sn-brightness-bright-brightness);
+  --sn-brightness-current-contrast: var(--sn-brightness-bright-contrast);
+  --sn-brightness-current-opacity: var(--sn-brightness-bright-opacity);
+}
+
+/**
+ * Balanced Mode - Moderate, harmonious appearance
+ * Opt-in via: document.documentElement.setAttribute('data-brightness-mode', 'balanced')
+ */
+:root[data-brightness-mode="balanced"] {
+  --sn-brightness-current-saturation: var(--sn-brightness-balanced-saturation);
+  --sn-brightness-current-brightness: var(--sn-brightness-balanced-brightness);
+  --sn-brightness-current-contrast: var(--sn-brightness-balanced-contrast);
+  --sn-brightness-current-opacity: var(--sn-brightness-balanced-opacity);
+}
+
+/**
+ * Dark Mode - Subtle, refined appearance (DEFAULT)
+ * No attribute needed - this is the default state
+ * Explicit setting via: document.documentElement.setAttribute('data-brightness-mode', 'dark')
+ */
+:root[data-brightness-mode="dark"] {
+  --sn-brightness-current-saturation: var(--sn-brightness-dark-saturation);
+  --sn-brightness-current-brightness: var(--sn-brightness-dark-brightness);
+  --sn-brightness-current-contrast: var(--sn-brightness-dark-contrast);
+  --sn-brightness-current-opacity: var(--sn-brightness-dark-opacity);
+}
+
+// =============================================================================
+// ARCHITECTURE INTEGRATION NOTES
+// =============================================================================
+// This conditional system integrates with:
+// 1. ThemeConfigurationManager.ts - JS controller for mode switching
+// 2. Settings UI - User-facing brightness mode selector
+// 3. Visual effects - All effects use --sn-brightness-current-* variables
+// 4. Performance system - Mode selection can be based on device tier
+//
+// Migration Path (for visual effects):
+// OLD: filter: saturate(var(--sn-brightness-bright-saturation))  ❌
+// NEW: filter: saturate(var(--sn-brightness-current-saturation)) ✅

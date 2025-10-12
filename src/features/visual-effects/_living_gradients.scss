@@ -96,7 +96,27 @@ body,
       brightness(var(--sn-bg-gradient-brightness, 1.0))
       hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 0.01))
       contrast(var(--sn-bg-gradient-contrast, 1.0));
+
+    /* Progressive loading state management */
+    /* Hide gradient during loading, fade in once systems ready */
+    html[data-theme-loading] & {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    /* Smooth fade-in transition once loading complete */
+    html:not([data-theme-loading]) & {
+      transition: opacity 600ms ease-out;
+    }
   }
+}
+
+.Root__main-view[data-visualeffects-enhanced="true"] {
+  background: transparent;
+}
+
+.Root__main-view[data-visualeffects-enhanced="true"]::before {
+  content: none;
 }
 
 /* ============================================================================ */
