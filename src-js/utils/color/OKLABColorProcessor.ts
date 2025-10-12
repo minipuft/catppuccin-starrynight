@@ -61,7 +61,12 @@ export class OKLABColorProcessor {
   private debugEnabled: boolean;
 
   // Built-in enhancement presets
-  public static readonly PRESETS: Record<string, EnhancementPreset> = {
+  public static readonly PRESETS: {
+    readonly SUBTLE: EnhancementPreset;
+    readonly STANDARD: EnhancementPreset;
+    readonly VIBRANT: EnhancementPreset;
+    readonly COSMIC: EnhancementPreset;
+  } = {
     SUBTLE: {
       name: "Subtle Enhancement",
       description: "Minimal color enhancement for conservative aesthetics",
@@ -106,7 +111,7 @@ export class OKLABColorProcessor {
    */
   public processColor(
     hexColor: string,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD!!
+    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult {
     const startTime = performance.now();
     let originalRgb: { r: number; g: number; b: number } | null = null;
@@ -220,7 +225,7 @@ export class OKLABColorProcessor {
    */
   public processColorPalette(
     colors: Record<string, string>,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD!!
+    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
   ): Record<string, OKLABProcessingResult> {
     const results: Record<string, OKLABProcessingResult> = {};
 
@@ -283,7 +288,7 @@ export class OKLABColorProcessor {
     color1Hex: string,
     color2Hex: string,
     factor: number,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD!
+    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult {
     const rgb1 = this.utils.hexToRgb(color1Hex);
     const rgb2 = this.utils.hexToRgb(color2Hex);
@@ -325,7 +330,7 @@ export class OKLABColorProcessor {
     startHex: string,
     endHex: string,
     stopCount: number = 5,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD!
+    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult[] {
     const gradientStops: OKLABProcessingResult[] = [];
 
@@ -490,8 +495,8 @@ export class OKLABColorProcessor {
    */
   public static getPreset(name: string): EnhancementPreset {
     return (
-      OKLABColorProcessor.PRESETS[name.toUpperCase()] ||
-      OKLABColorProcessor.PRESETS.STANDARD!
+      OKLABColorProcessor.PRESETS[name.toUpperCase() as keyof typeof OKLABColorProcessor.PRESETS] ||
+      OKLABColorProcessor.PRESETS.STANDARD
     );
   }
 

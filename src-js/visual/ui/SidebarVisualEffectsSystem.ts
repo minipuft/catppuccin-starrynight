@@ -713,8 +713,8 @@ export class SidebarVisualEffectsSystem extends ServiceVisualSystemBase {
     };
 
     const offsetMagnitude = 6 + energy * 6;
-    let offsetX = (vec.x + beatVec.x) * offsetMagnitude;
-    let offsetY = (vec.y + beatVec.y) * offsetMagnitude;
+    const offsetX = (vec.x + beatVec.x) * offsetMagnitude;
+    const offsetY = (vec.y + beatVec.y) * offsetMagnitude;
     const skewDeg = vec.x * 6;
 
     const baseAngle = (Math.random() * 360).toFixed(1);

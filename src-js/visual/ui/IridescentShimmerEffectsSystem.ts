@@ -775,21 +775,10 @@ export class IridescentShimmerEffectsSystem
       case "high":
         this.shimmerSettings.enabled = true;
         this.shimmerSettings.intensity = "intense";
-        this.shimmerSettings.maxSimultaneousShimmers = 12;
-        this.shimmerSettings.animationSpeed = 0.7;
-        this.shimmerSettings.oilSlickIntensity = 0.9;
-        this.shimmerSettings.chromaticAberration = 2.5;
-        this.shimmerSettings.useGPUAcceleration = true;
-        this.shimmerSettings.interferencePattern = true;
-        break;
-
-      case "high":
-        this.shimmerSettings.enabled = true;
-        this.shimmerSettings.intensity = "intense";
-        this.shimmerSettings.maxSimultaneousShimmers = 16;
-        this.shimmerSettings.animationSpeed = 1.0;
-        this.shimmerSettings.oilSlickIntensity = 1.0;
-        this.shimmerSettings.chromaticAberration = 3.0;
+        this.shimmerSettings.maxSimultaneousShimmers = 14;
+        this.shimmerSettings.animationSpeed = 0.85;
+        this.shimmerSettings.oilSlickIntensity = 0.95;
+        this.shimmerSettings.chromaticAberration = 2.75;
         this.shimmerSettings.useGPUAcceleration = true;
         this.shimmerSettings.interferencePattern = true;
         break;
@@ -985,20 +974,10 @@ export class IridescentShimmerEffectsSystem
     switch (level) {
       case "low":
         return {
-          maxSimultaneousShimmers: 3,
-          animationSpeed: 0.2,
-          oilSlickIntensity: 0.3,
-          chromaticAberration: 0.5,
-          useGPUAcceleration: false,
-          interferencePattern: false,
-        };
-        break;
-      case "low":
-        return {
-          maxSimultaneousShimmers: 5,
-          animationSpeed: 0.3,
-          oilSlickIntensity: 0.4,
-          chromaticAberration: 1.0,
+          maxSimultaneousShimmers: 4,
+          animationSpeed: 0.25,
+          oilSlickIntensity: 0.35,
+          chromaticAberration: 0.75,
           useGPUAcceleration: false,
           interferencePattern: false,
         };

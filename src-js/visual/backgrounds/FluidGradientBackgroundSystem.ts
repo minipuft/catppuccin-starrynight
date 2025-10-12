@@ -23,6 +23,11 @@ import type {
   VisualEffectState,
 } from "../effects/VisualEffectsCoordinator";
 import { WebGLGradientBackgroundSystem } from "../background/WebGLRenderer";
+import { RenderingModeSelector } from "./RenderingModeSelector";
+import {
+  RenderingMode,
+  type ModeSelectionResult,
+} from "@/types/renderingModes";
 
 // Enhanced shader with advanced liquid visual effects flow patterns
 const liquidVisualEffectsShader = `#version 300 es
@@ -443,6 +448,21 @@ export class FluidGradientBackgroundSystem
     null;
   private currentVisualEffectsField: VisualEffectState | null = null;
 
+  // Rendering mode selection and management
+  private modeSelector: RenderingModeSelector | null = null;
+  private currentRenderingMode: RenderingMode = RenderingMode.Basic;
+  private modeSelectionResult: ModeSelectionResult | null = null;
+
+  // Performance-based mode switching state
+  private lastModeSwitch = 0;
+  private modeSwitchCooldown = 5000; // 5 seconds cooldown between mode switches
+  private performanceCheckInterval = 1000; // Check performance every 1 second
+  private lastPerformanceCheck = 0;
+  private consecutiveLowFPSFrames = 0;
+  private consecutiveHighFPSFrames = 0;
+  private readonly lowFPSThreshold = 3; // Require 3 consecutive low FPS readings before downgrade
+  private readonly highFPSThreshold = 5; // Require 5 consecutive high FPS readings before upgrade
+
   // Make systemName publicly accessible for the interface
   public override readonly systemName: string =
     "FluidGradientBackgroundSystem";
@@ -464,6 +484,12 @@ export class FluidGradientBackgroundSystem
       performanceMonitor,
       musicSyncService,
       null
+    );
+
+    // Initialize rendering mode selector for capability detection
+    this.modeSelector = new RenderingModeSelector(
+      this.webglGradientSystem,
+      performanceMonitor
     );
 
     this.visualCoordinatorService =
@@ -550,46 +576,558 @@ export class FluidGradientBackgroundSystem
     // Event subscriptions will be set up during initialization
   }
 
-  protected override async performVisualSystemInitialization(): Promise<void> {
+  /**
+   * Get current rendering mode
+   */
+  public getCurrentRenderingMode(): RenderingMode {
+    return this.currentRenderingMode;
+  }
 
+  /**
+   * Get mode selection result with capabilities and fallback information
+   */
+  public getModeSelectionResult(): ModeSelectionResult | null {
+    return this.modeSelectionResult;
+  }
+
+  /**
+   * Switch to a different rendering mode at runtime
+   * Validates mode is supported by capabilities before switching
+   *
+   * @param newMode - Target rendering mode to switch to
+   * @returns Promise<boolean> - True if switch successful, false otherwise
+   */
+  public async switchRenderingMode(newMode: RenderingMode): Promise<boolean> {
+    if (newMode === this.currentRenderingMode) {
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        `Already in ${newMode} mode, no action needed`
+      );
+      return true;
+    }
+
+    if (!this.modeSelector) {
+      Y3KDebug?.debug?.error(
+        "FluidGradientBackgroundSystem",
+        "Cannot switch modes: mode selector not initialized"
+      );
+      return false;
+    }
+
+    // Validate mode is supported by capabilities
+    if (!this.canSupportMode(newMode)) {
+      Y3KDebug?.debug?.warn(
+        "FluidGradientBackgroundSystem",
+        `Cannot switch to ${newMode}: capability requirements not met`,
+        { currentCapabilities: this.modeSelectionResult?.capabilities }
+      );
+      return false;
+    }
+
+    const oldMode = this.currentRenderingMode;
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      `Attempting mode switch: ${oldMode} → ${newMode}`
+    );
+
+    try {
+      // Clean up current mode resources
+      await this.cleanupCurrentMode();
+
+      // Update current mode
+      this.currentRenderingMode = newMode;
+
+      // Initialize new mode resources
+      await this.initializeModeResources(newMode);
+
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        `Successfully switched from ${oldMode} to ${newMode}`
+      );
+      return true;
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "FluidGradientBackgroundSystem",
+        `Failed to switch to ${newMode}, attempting rollback:`,
+        error
+      );
+
+      // Rollback to old mode
+      this.currentRenderingMode = oldMode;
+      try {
+        await this.initializeModeResources(oldMode);
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          `Successfully rolled back to ${oldMode} after failed switch`
+        );
+      } catch (rollbackError) {
+        Y3KDebug?.debug?.error(
+          "FluidGradientBackgroundSystem",
+          `Rollback failed, system may be in inconsistent state:`,
+          rollbackError
+        );
+      }
+      return false;
+    }
+  }
+
+  /**
+   * Check if a rendering mode is supported by current capabilities
+   */
+  private canSupportMode(mode: RenderingMode): boolean {
+    if (!this.modeSelectionResult?.capabilities) {
+      return mode === RenderingMode.Basic;
+    }
+
+    const caps = this.modeSelectionResult.capabilities;
+
+    switch (mode) {
+      case RenderingMode.Basic:
+        return true; // Always supported
+
+      case RenderingMode.Standard:
+        return caps.hasWebGL;
+
+      case RenderingMode.Enhanced:
+        return caps.hasWebGL && caps.hasLiquidShader;
+
+      case RenderingMode.Full:
+        return caps.hasWebGL && caps.hasLiquidShader && caps.hasCorridorShader;
+
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Clean up resources from current rendering mode
+   */
+  private async cleanupCurrentMode(): Promise<void> {
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      `Cleaning up ${this.currentRenderingMode} mode resources`
+    );
+
+    // Clean up shader program if using Enhanced or Full mode
+    if (
+      (this.currentRenderingMode === RenderingMode.Enhanced ||
+        this.currentRenderingMode === RenderingMode.Full) &&
+      this.gl &&
+      this.shaderProgram
+    ) {
+      this.gl.deleteProgram(this.shaderProgram);
+      this.shaderProgram = null;
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Liquid shader program deleted"
+      );
+    }
+
+    // Disable corridor effects if leaving Full mode
+    if (this.currentRenderingMode === RenderingMode.Full) {
+      (this.webglGradientSystem as any).setCorridorEffectsEnabled?.(false);
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Corridor effects disabled"
+      );
+    }
+
+    // Unsubscribe from events if leaving Standard/Enhanced/Full mode
+    if (this.currentRenderingMode !== RenderingMode.Basic) {
+      if (!this.services.events) {
+        this.eventSubscriptionIds.forEach((subscriptionId) => {
+          unifiedEventBus.unsubscribe(subscriptionId);
+        });
+        this.eventSubscriptionIds = [];
+      }
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Event subscriptions cleaned up"
+      );
+    }
+
+    // Unregister from visual effects choreographer if applicable
+    if (
+      this.currentRenderingMode === RenderingMode.Enhanced ||
+      this.currentRenderingMode === RenderingMode.Full
+    ) {
+      if (this.visualCoordinatorService?.unregisterVisualEffectsParticipant) {
+        this.visualCoordinatorService.unregisterVisualEffectsParticipant(
+          this.systemName
+        );
+      } else if (this.visualEffectsChoreographer) {
+        try {
+          this.visualEffectsChoreographer.unregisterVisualEffectsParticipant(
+            this.systemName
+          );
+        } catch (error) {
+          Y3KDebug?.debug?.warn(
+            "FluidGradientBackgroundSystem",
+            "Failed to unregister from choreographer:",
+            error
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Initialize resources for a specific rendering mode
+   */
+  private async initializeModeResources(mode: RenderingMode): Promise<void> {
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      `Initializing ${mode} mode resources`
+    );
+
+    switch (mode) {
+      case RenderingMode.Basic:
+        // CSS-only mode, no initialization needed
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Basic mode active (CSS gradients only)"
+        );
+        break;
+
+      case RenderingMode.Standard:
+        // Basic WebGL mode
+        if (!this.gl) {
+          throw new Error("WebGL context not available for Standard mode");
+        }
+        this.subscribeToUnifiedEvents();
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Standard mode initialized (basic WebGL)"
+        );
+        break;
+
+      case RenderingMode.Enhanced:
+        // Liquid shader without corridor
+        if (!this.gl) {
+          throw new Error("WebGL context not available for Enhanced mode");
+        }
+        await this.compileLiquidShader();
+        this.setupLiquidUniforms();
+        this.subscribeToUnifiedEvents();
+        this.registerWithVisualEffectsChoreographer();
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Enhanced mode initialized (liquid shader)"
+        );
+        break;
+
+      case RenderingMode.Full:
+        // Liquid shader + corridor effects
+        if (!this.gl) {
+          throw new Error("WebGL context not available for Full mode");
+        }
+        await this.compileLiquidShader();
+        this.setupLiquidUniforms();
+        (this.webglGradientSystem as any).setCorridorEffectsEnabled?.(true);
+        this.subscribeToUnifiedEvents();
+        this.registerWithVisualEffectsChoreographer();
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Full mode initialized (liquid + corridor)"
+        );
+        break;
+
+      default:
+        throw new Error(`Unknown rendering mode: ${mode}`);
+    }
+  }
+
+  /**
+   * Get FPS thresholds based on performance mode setting
+   * Returns { downgrade: fps, upgrade: fps }
+   */
+  private getPerformanceThresholds(): { downgrade: number; upgrade: number } {
+    // Default thresholds for auto mode
+    return {
+      downgrade: 45, // Downgrade if below 45 FPS
+      upgrade: 55,   // Upgrade if above 55 FPS
+    };
+  }
+
+  /**
+   * Check if current mode can be downgraded
+   */
+  private canDowngradeMode(): boolean {
+    // Basic mode cannot be downgraded further
+    if (this.currentRenderingMode === RenderingMode.Basic) {
+      return false;
+    }
+
+    // Check cooldown period
+    const now = performance.now();
+    if (now - this.lastModeSwitch < this.modeSwitchCooldown) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Check if current mode can be upgraded
+   */
+  private canUpgradeMode(): boolean {
+    // Full mode cannot be upgraded further
+    if (this.currentRenderingMode === RenderingMode.Full) {
+      return false;
+    }
+
+    // Check cooldown period
+    const now = performance.now();
+    if (now - this.lastModeSwitch < this.modeSwitchCooldown) {
+      return false;
+    }
+
+    // Check if higher mode is supported by capabilities
+    const nextMode = this.getNextHigherMode();
+    return nextMode !== null && this.canSupportMode(nextMode);
+  }
+
+  /**
+   * Get the next lower rendering mode
+   */
+  private getNextLowerMode(): RenderingMode | null {
+    switch (this.currentRenderingMode) {
+      case RenderingMode.Full:
+        return RenderingMode.Enhanced;
+      case RenderingMode.Enhanced:
+        return RenderingMode.Standard;
+      case RenderingMode.Standard:
+        return RenderingMode.Basic;
+      case RenderingMode.Basic:
+        return null; // Cannot downgrade further
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Get the next higher rendering mode
+   */
+  private getNextHigherMode(): RenderingMode | null {
+    switch (this.currentRenderingMode) {
+      case RenderingMode.Basic:
+        return RenderingMode.Standard;
+      case RenderingMode.Standard:
+        return RenderingMode.Enhanced;
+      case RenderingMode.Enhanced:
+        return RenderingMode.Full;
+      case RenderingMode.Full:
+        return null; // Cannot upgrade further
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Downgrade to lower quality rendering mode due to performance issues
+   */
+  private async downgradeMode(): Promise<void> {
+    const nextMode = this.getNextLowerMode();
+    if (!nextMode) {
+      Y3KDebug?.debug?.warn(
+        "FluidGradientBackgroundSystem",
+        "Cannot downgrade: already at lowest mode"
+      );
+      return;
+    }
+
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      `Performance-based downgrade: ${this.currentRenderingMode} → ${nextMode}`
+    );
+
+    const success = await this.switchRenderingMode(nextMode);
+    if (success) {
+      this.lastModeSwitch = performance.now();
+      this.consecutiveLowFPSFrames = 0; // Reset counter after successful switch
+      this.consecutiveHighFPSFrames = 0;
+    }
+  }
+
+  /**
+   * Upgrade to higher quality rendering mode when performance allows
+   */
+  private async upgradeMode(): Promise<void> {
+    const nextMode = this.getNextHigherMode();
+    if (!nextMode) {
+      Y3KDebug?.debug?.log(
+        "FluidGradientBackgroundSystem",
+        "Cannot upgrade: already at highest supported mode"
+      );
+      return;
+    }
+
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      `Performance-based upgrade: ${this.currentRenderingMode} → ${nextMode}`
+    );
+
+    const success = await this.switchRenderingMode(nextMode);
+    if (success) {
+      this.lastModeSwitch = performance.now();
+      this.consecutiveHighFPSFrames = 0; // Reset counter after successful switch
+      this.consecutiveLowFPSFrames = 0;
+    }
+  }
+
+  protected override async performVisualSystemInitialization(): Promise<void> {
     // Initialize base WebGL system first
     await this.webglGradientSystem.initialize();
 
     // Get WebGL context from base system
     this.gl = (this.webglGradientSystem as any).gl;
 
-    if (!this.gl) {
-      Y3KDebug?.debug?.log(
+    // Select rendering mode based on capabilities and user preferences
+    if (!this.modeSelector) {
+      Y3KDebug?.debug?.error(
         "FluidGradientBackgroundSystem",
-        "WebGL not available, using base system"
+        "Mode selector not initialized, falling back to Basic mode"
       );
+      this.currentRenderingMode = RenderingMode.Basic;
       return;
     }
 
-    try {
-      // Compile liquid visualEffects shader
-      await this.compileLiquidShader();
+    // Perform mode selection with capability detection
+    // Pass 'this' so selector can check if liquid shader will compile
+    this.modeSelectionResult = this.modeSelector.selectMode(this);
+    this.currentRenderingMode = this.modeSelectionResult.mode;
 
-      // Setup liquid visualEffects uniforms
-      this.setupLiquidUniforms();
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      "Rendering mode selected",
+      {
+        selectedMode: this.currentRenderingMode,
+        reason: this.modeSelectionResult.reason,
+        isFallback: this.modeSelectionResult.isFallback,
+        capabilities: this.modeSelectionResult.capabilities,
+      }
+    );
 
-      // Subscribe to unified events
-      this.subscribeToUnifiedEvents();
+    // Mode-specific initialization paths
+    switch (this.currentRenderingMode) {
+      case RenderingMode.Basic:
+        // CSS-only mode, no WebGL initialization needed
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Using Basic mode (CSS gradients only)"
+        );
+        return;
 
-      // Register with visualEffects choreographer
-      this.registerWithVisualEffectsChoreographer();
+      case RenderingMode.Standard:
+        // Basic WebGL mode, no liquid or corridor shaders
+        Y3KDebug?.debug?.log(
+          "FluidGradientBackgroundSystem",
+          "Using Standard mode (basic WebGL only)"
+        );
+        // Subscribe to events even in Standard mode
+        this.subscribeToUnifiedEvents();
+        return;
 
-      Y3KDebug?.debug?.log(
-        "FluidGradientBackgroundSystem",
-        "Liquid visualEffects system initialized"
-      );
-    } catch (error) {
-      Y3KDebug?.debug?.error(
-        "FluidGradientBackgroundSystem",
-        "Failed to initialize liquid visualEffects:",
-        error
-      );
-      // Fallback to base WebGL system
+      case RenderingMode.Enhanced:
+        // Liquid shader mode, no corridor effects
+        if (!this.gl) {
+          Y3KDebug?.debug?.warn(
+            "FluidGradientBackgroundSystem",
+            "WebGL not available for Enhanced mode, falling back to Basic"
+          );
+          this.currentRenderingMode = RenderingMode.Basic;
+          return;
+        }
+
+        try {
+          await this.compileLiquidShader();
+          this.setupLiquidUniforms();
+          this.subscribeToUnifiedEvents();
+          this.registerWithVisualEffectsChoreographer();
+
+          Y3KDebug?.debug?.log(
+            "FluidGradientBackgroundSystem",
+            "Enhanced mode initialized (liquid shader without corridor)"
+          );
+        } catch (error) {
+          Y3KDebug?.debug?.error(
+            "FluidGradientBackgroundSystem",
+            "Failed to initialize Enhanced mode, falling back to Standard:",
+            error
+          );
+          this.currentRenderingMode = RenderingMode.Standard;
+          this.subscribeToUnifiedEvents();
+        }
+        break;
+
+      case RenderingMode.Full:
+        // Full mode: liquid shader + corridor effects
+        if (!this.gl) {
+          Y3KDebug?.debug?.warn(
+            "FluidGradientBackgroundSystem",
+            "WebGL not available for Full mode, falling back to Basic"
+          );
+          this.currentRenderingMode = RenderingMode.Basic;
+          return;
+        }
+
+        try {
+          // Compile liquid shader
+          await this.compileLiquidShader();
+          this.setupLiquidUniforms();
+
+          // Enable corridor effects on wrapped system
+          (this.webglGradientSystem as any).setCorridorEffectsEnabled?.(true);
+
+          Y3KDebug?.debug?.log(
+            "FluidGradientBackgroundSystem",
+            "Corridor effects enabled for Full mode"
+          );
+
+          this.subscribeToUnifiedEvents();
+          this.registerWithVisualEffectsChoreographer();
+
+          Y3KDebug?.debug?.log(
+            "FluidGradientBackgroundSystem",
+            "Full mode initialized (liquid shader + corridor effects)"
+          );
+        } catch (error) {
+          Y3KDebug?.debug?.error(
+            "FluidGradientBackgroundSystem",
+            "Failed to initialize Full mode:",
+            error
+          );
+
+          // Try to fall back to Enhanced mode (liquid without corridor)
+          try {
+            await this.compileLiquidShader();
+            this.setupLiquidUniforms();
+            this.subscribeToUnifiedEvents();
+            this.registerWithVisualEffectsChoreographer();
+
+            this.currentRenderingMode = RenderingMode.Enhanced;
+            Y3KDebug?.debug?.log(
+              "FluidGradientBackgroundSystem",
+              "Fell back to Enhanced mode after Full mode failure"
+            );
+          } catch (fallbackError) {
+            Y3KDebug?.debug?.error(
+              "FluidGradientBackgroundSystem",
+              "Fallback to Enhanced failed, using Standard mode:",
+              fallbackError
+            );
+            this.currentRenderingMode = RenderingMode.Standard;
+            this.subscribeToUnifiedEvents();
+          }
+        }
+        break;
+
+      default:
+        Y3KDebug?.debug?.warn(
+          "FluidGradientBackgroundSystem",
+          `Unknown rendering mode: ${this.currentRenderingMode}, using Basic`
+        );
+        this.currentRenderingMode = RenderingMode.Basic;
     }
   }
 
@@ -807,35 +1345,266 @@ export class FluidGradientBackgroundSystem
     );
   }
 
+  /**
+   * Read directional flow vectors from CSS variables written by GradientDirectionalFlowSystem
+   */
+  private readFlowDirectionFromCSS(): { x: number; y: number } {
+    try {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+      const flowX = parseFloat(computedStyle.getPropertyValue('--sn-flow-direction-x') || '0');
+      const flowY = parseFloat(computedStyle.getPropertyValue('--sn-flow-direction-y') || '0');
+      return { x: flowX, y: flowY };
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "FluidGradientBackgroundSystem",
+        "Failed to read flow direction from CSS:",
+        error
+      );
+      return { x: 0, y: 0 };
+    }
+  }
+
+  /**
+   * Read corridor flow (radial/inward) vectors from CSS variables
+   */
+  private readCorridorFlowFromCSS(): { intensity: number; centerX: number; centerY: number } {
+    try {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+      const intensity = parseFloat(computedStyle.getPropertyValue('--sn-corridor-flow-intensity') || '0');
+      const centerX = parseFloat(computedStyle.getPropertyValue('--sn-corridor-flow-center-x') || '0.5');
+      const centerY = parseFloat(computedStyle.getPropertyValue('--sn-corridor-flow-center-y') || '0.5');
+      return { intensity, centerX, centerY };
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "FluidGradientBackgroundSystem",
+        "Failed to read corridor flow from CSS:",
+        error
+      );
+      return { intensity: 0, centerX: 0.5, centerY: 0.5 };
+    }
+  }
+
   private updateFlowDirection(intensity: number): void {
-    // Create flowing directional patterns based on music
+    // Read beat-based flow direction from GradientDirectionalFlowSystem
+    const cssFlow = this.readFlowDirectionFromCSS();
+
+    // Read corridor flow for radial/inward effects
+    const corridorFlow = this.readCorridorFlowFromCSS();
+
+    // Calculate phase-based flow for smooth animation
     const phase = this.animationPhase;
-    this.liquidSettings.flowDirection = [
-      Math.sin(phase * 0.3) * intensity,
-      Math.cos(phase * 0.2) * intensity,
-    ];
+    const phaseFlowX = Math.sin(phase * 0.3) * intensity;
+    const phaseFlowY = Math.cos(phase * 0.2) * intensity;
+
+    // Apply corridor flow (radial/inward) if present
+    let finalFlowX = cssFlow.x * 0.7 + phaseFlowX * 0.3;
+    let finalFlowY = cssFlow.y * 0.7 + phaseFlowY * 0.3;
+
+    if (corridorFlow.intensity > 0.1) {
+      // Calculate inward vector from normalized position to center
+      // This creates radial flow pulling toward the corridor center point
+      const dx = corridorFlow.centerX - 0.5; // Offset from screen center
+      const dy = corridorFlow.centerY - 0.5;
+
+      // Apply radial flow with intensity weighting
+      finalFlowX += dx * corridorFlow.intensity * 0.5;
+      finalFlowY += dy * corridorFlow.intensity * 0.5;
+    }
+
+    // Blend DirectionalFlow's beat-based vectors (70%) with phase-based flow (30%)
+    // Plus optional corridor flow for radial effects
+    // This combines genre-aware beat detection with smooth liquid animation
+    this.liquidSettings.flowDirection = [finalFlowX, finalFlowY];
+
+    Y3KDebug?.debug?.log(
+      "FluidGradientBackgroundSystem",
+      "Flow direction updated",
+      {
+        cssFlow,
+        corridorFlow,
+        phaseFlow: { x: phaseFlowX, y: phaseFlowY },
+        blendedFlow: this.liquidSettings.flowDirection,
+      }
+    );
   }
 
   public override updateAnimation(deltaTime: number): void {
-    // Update base WebGL system
-    this.webglGradientSystem?.updateAnimation?.(deltaTime);
+    // Performance-based mode switching (Phase F)
+    const now = performance.now();
+    if (now - this.lastPerformanceCheck > this.performanceCheckInterval) {
+      this.lastPerformanceCheck = now;
+
+      // Get current FPS from performance monitor
+      if (this.performanceAnalyzer) {
+        const fps = this.performanceAnalyzer.getMedianFPS();
+        const thresholds = this.getPerformanceThresholds();
+
+        // Check for low FPS (performance degradation)
+        if (fps > 0 && fps < thresholds.downgrade) {
+          this.consecutiveLowFPSFrames++;
+          this.consecutiveHighFPSFrames = 0;
+
+          // Downgrade if sustained low FPS
+          if (this.consecutiveLowFPSFrames >= this.lowFPSThreshold && this.canDowngradeMode()) {
+            Y3KDebug?.debug?.warn(
+              "FluidGradientBackgroundSystem",
+              `Sustained low FPS detected: ${fps.toFixed(1)} FPS (threshold: ${thresholds.downgrade}), initiating downgrade`
+            );
+            void this.downgradeMode();
+          }
+        }
+        // Check for high FPS (can upgrade)
+        else if (fps > thresholds.upgrade) {
+          this.consecutiveHighFPSFrames++;
+          this.consecutiveLowFPSFrames = 0;
+
+          // Upgrade if sustained high FPS
+          if (this.consecutiveHighFPSFrames >= this.highFPSThreshold && this.canUpgradeMode()) {
+            Y3KDebug?.debug?.log(
+              "FluidGradientBackgroundSystem",
+              `Sustained high FPS detected: ${fps.toFixed(1)} FPS (threshold: ${thresholds.upgrade}), initiating upgrade`
+            );
+            void this.upgradeMode();
+          }
+        }
+        // FPS in acceptable range, reset counters
+        else {
+          this.consecutiveLowFPSFrames = 0;
+          this.consecutiveHighFPSFrames = 0;
+        }
+      }
+    }
+
+    // Check current rendering mode
+    if (this.currentRenderingMode === RenderingMode.Basic) {
+      // Basic mode: No animation needed (CSS-only)
+      return;
+    }
+
+    if (this.currentRenderingMode === RenderingMode.Standard) {
+      // Standard mode: Use base WebGL system's standard rendering
+      this.webglGradientSystem?.updateAnimation?.(deltaTime);
+      return;
+    }
+
+    // Enhanced and Full modes: Use liquid shader
+    if (!this.gl || !this.shaderProgram) {
+      // Fallback to base system if liquid shader not available
+      this.webglGradientSystem?.updateAnimation?.(deltaTime);
+      return;
+    }
 
     // Update liquid visualEffects phase
     this.liquidSettings.liquidPhase += deltaTime * 0.001;
     this.liquidSettings.visualEffectsDepth =
       0.5 + Math.sin(this.liquidSettings.liquidPhase * 0.5) * 0.3;
 
-    // Update liquid visualEffects uniforms if shader is active
-    if (this.gl && this.shaderProgram) {
-      this.updateLiquidUniforms();
+    // Render with liquid shader
+    this.renderLiquidShader();
+  }
+
+  private renderLiquidShader(): void {
+    if (!this.gl || !this.shaderProgram) return;
+
+    // Get base system resources
+    const canvas = (this.webglGradientSystem as any).canvas as HTMLCanvasElement | null;
+    const vao = (this.webglGradientSystem as any).vao as WebGLVertexArrayObject | null;
+    const gradientTexture = (this.webglGradientSystem as any).gradientTexture as WebGLTexture | null;
+    const startTime = (this.webglGradientSystem as any).startTime as number;
+    const prefersReducedMotion = (this.webglGradientSystem as any).prefersReducedMotion as boolean;
+
+    if (!canvas || !vao || !gradientTexture) {
+      Y3KDebug?.debug?.warn(
+        "FluidGradientBackgroundSystem",
+        "Base system resources not available for rendering"
+      );
+      return;
     }
+
+    // Clear and setup viewport
+    this.gl.viewport(0, 0, canvas.width, canvas.height);
+    this.gl.clearColor(0, 0, 0, 0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    // Use liquid shader program
+    this.gl.useProgram(this.shaderProgram);
+
+    // Bind VAO
+    this.gl.bindVertexArray(vao);
+
+    // Calculate time
+    const currentTime = performance.now();
+    const time = prefersReducedMotion ? 0 : (currentTime - startTime) / 1000;
+
+    // Update all liquid uniforms
+    this.updateAllLiquidUniforms(time, canvas);
+
+    // Bind gradient texture
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, gradientTexture);
+
+    if (this.liquidUniforms.u_gradientTex) {
+      this.gl.uniform1i(this.liquidUniforms.u_gradientTex, 0);
+    }
+
+    // Draw with liquid shader
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
+
+    // Cleanup
+    this.gl.bindVertexArray(null);
+  }
+
+  private updateAllLiquidUniforms(time: number, canvas: HTMLCanvasElement): void {
+    if (!this.gl || !this.shaderProgram) return;
+
+    // Base uniforms
+    if (this.liquidUniforms.u_time) {
+      this.gl.uniform1f(this.liquidUniforms.u_time, time);
+    }
+
+    if (this.liquidUniforms.u_resolution) {
+      this.gl.uniform2f(this.liquidUniforms.u_resolution, canvas.width, canvas.height);
+    }
+
+    if (this.liquidUniforms.u_flowStrength) {
+      this.gl.uniform1f(this.liquidUniforms.u_flowStrength, this.liquidSettings.flowIntensity);
+    }
+
+    if (this.liquidUniforms.u_noiseScale) {
+      this.gl.uniform1f(this.liquidUniforms.u_noiseScale, 2.0);
+    }
+
+    // Wave stack uniforms (reuse base system defaults)
+    if (this.liquidUniforms.u_waveY) {
+      this.gl.uniform1fv(this.liquidUniforms.u_waveY, [0.25, 0.5, 0.75]);
+    }
+
+    if (this.liquidUniforms.u_waveHeight) {
+      this.gl.uniform1fv(this.liquidUniforms.u_waveHeight, [0.3, 0.3, 0.3]);
+    }
+
+    if (this.liquidUniforms.u_waveOffset) {
+      this.gl.uniform1fv(this.liquidUniforms.u_waveOffset, [0.0, 1.0, 2.0]);
+    }
+
+    if (this.liquidUniforms.u_blurExp) {
+      this.gl.uniform1f(this.liquidUniforms.u_blurExp, 2.0);
+    }
+
+    if (this.liquidUniforms.u_blurMax) {
+      this.gl.uniform1f(this.liquidUniforms.u_blurMax, 0.5);
+    }
+
+    // Update liquid-specific uniforms (existing method)
+    this.updateLiquidUniforms();
   }
 
   private updateLiquidUniforms(): void {
     if (!this.gl || !this.shaderProgram) return;
 
-    this.gl.useProgram(this.shaderProgram);
-
+    // Note: shader program already bound by renderLiquidShader
     // Update liquid visualEffects uniforms
     if (this.liquidUniforms.u_liquidPhase) {
       this.gl.uniform1f(
@@ -1591,6 +2360,24 @@ export class FluidGradientBackgroundSystem
       effectDepth: this.liquidSettings.particleDensity,
       systemHarmony: this.liquidSettings.surfaceTension
     };
+  }
+
+  // ===================================================================
+  // SETTINGS INTEGRATION
+  // ===================================================================
+
+  /**
+   * 🔧 CRITICAL FIX: Forward settings changes to internal WebGLRenderer
+   * Enables settings propagation through wrapper system
+   */
+  public applyUpdatedSettings(key: string, value: any): void {
+    // Forward to internal WebGL renderer if it implements the method
+    if (
+      this.webglGradientSystem &&
+      typeof this.webglGradientSystem.applyUpdatedSettings === "function"
+    ) {
+      this.webglGradientSystem.applyUpdatedSettings(key, value);
+    }
   }
 
   // ===================================================================

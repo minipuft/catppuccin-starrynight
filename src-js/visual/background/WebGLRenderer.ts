@@ -526,8 +526,10 @@ export class WebGLGradientBackgroundSystem
 
   private loadSettings(): void {
     try {
-      // Load WebGL enabled/disabled state from typed settings
-      const webglEnabled = settings.get("sn-webgl-enabled");
+      // Derive WebGL enabled state from performance mode
+      // Performance mode "performance" disables WebGL, all other modes enable it
+      const performanceMode = settings.get("sn-performance-mode") || "auto";
+      const webglEnabled = performanceMode !== "performance";
       const intensitySetting = settings.get("sn-gradient-intensity");
 
       // Apply WebGL enabled state
@@ -535,7 +537,7 @@ export class WebGLGradientBackgroundSystem
         this.settings.enabled = false;
         Y3KDebug?.debug?.log(
           "WebGLGradientBackgroundSystem",
-          "WebGL disabled by user setting"
+          "WebGL disabled by performance mode"
         );
         return;
       }

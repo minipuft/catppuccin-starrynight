@@ -174,19 +174,24 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
     try {
       this.cssController = cssController || getGlobalCSSVariableWriter();
-      
+
       // Subscribe to UnifiedEventBus events for system integration
       this.setupEventSubscriptions();
-      
+
       this.initialized = true;
       this.lastColorUpdate = Date.now();
+
+      // PHASE 1 FIX: Apply Catppuccin Macchiato fallback colors immediately
+      // This ensures color-dependent systems have valid colors even if theme CSS isn't loaded yet
+      await this.applyFallbackColors();
 
       if (this.config.enableDebug) {
         console.log("🎨 [SpicetifyColorBridge] Initialized as IManagedSystem with", {
           mappings: SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
           batcherAvailable: !!this.cssController,
           spicetifyAvailable: this.isSpicetifyAvailable(),
-          eventSubscriptions: this.eventSubscriptionIds.length
+          eventSubscriptions: this.eventSubscriptionIds.length,
+          fallbackColorsApplied: true
         });
       }
 
@@ -196,20 +201,21 @@ export class SpicetifyColorBridge implements IManagedSystem {
         timestamp: Date.now(),
         metadata: {
           mappings: SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
-          spicetifyAvailable: this.isSpicetifyAvailable() ? 1 : 0
+          spicetifyAvailable: this.isSpicetifyAvailable() ? 1 : 0,
+          fallbackColorsApplied: 1
         }
       });
-      
+
     } catch (error) {
       console.error("[SpicetifyColorBridge] Initialization failed:", error);
-      
+
       unifiedEventBus.emitSync('system:error', {
         systemName: 'SpicetifyColorBridge',
         error: error instanceof Error ? error.message : 'Initialization failed',
         severity: 'critical',
         timestamp: Date.now()
       });
-      
+
       throw error;
     }
   }
@@ -862,15 +868,65 @@ export class SpicetifyColorBridge implements IManagedSystem {
     return changed;
   }
 
+  /**
+   * PHASE 1 FIX: Apply Catppuccin Macchiato fallback colors immediately
+   * This ensures color-dependent systems have valid colors even if theme CSS isn't loaded yet
+   */
+  private async applyFallbackColors(): Promise<void> {
+    if (!this.cssController) {
+      console.warn("[SpicetifyColorBridge] Cannot apply fallback colors - no CSS controller");
+      return;
+    }
+
+    try {
+      console.log("🎨 [SpicetifyColorBridge] Applying Catppuccin Macchiato fallback colors...");
+
+      const fallbackUpdates: Record<string, string> = {};
+      const rgbFallbackUpdates: Record<string, string> = {};
+
+      // Apply all semantic color fallbacks
+      for (const mapping of SpicetifyColorBridge.SEMANTIC_MAPPINGS) {
+        fallbackUpdates[mapping.cssVariable] = mapping.fallbackColor;
+
+        // Create RGB variant for transparency support
+        const rgbColor = Utils.hexToRgb(mapping.fallbackColor);
+        if (rgbColor) {
+          const rgbVariable = mapping.cssVariable.replace('--spice-', '--spice-rgb-');
+          rgbFallbackUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
+        }
+      }
+
+      // Apply fallback colors with high priority
+      this.cssController.batchSetVariables(
+        "SpicetifyColorBridge",
+        fallbackUpdates,
+        "high",
+        "fallback-colors"
+      );
+
+      this.cssController.batchSetVariables(
+        "SpicetifyColorBridge",
+        rgbFallbackUpdates,
+        "high",
+        "fallback-rgb-colors"
+      );
+
+      console.log(`🎨 [SpicetifyColorBridge] Applied ${Object.keys(fallbackUpdates).length} fallback colors`);
+
+    } catch (error) {
+      console.error("[SpicetifyColorBridge] Failed to apply fallback colors:", error);
+    }
+  }
+
   public destroy(): void {
     try {
       // Unsubscribe from all events
       this.cleanupEventSubscriptions();
-      
+
       // Clear caches and references
       this.clearCache();
       this.cssController = null as any;
-      
+
       // Reset state
       this.initialized = false;
       this.lastColorUpdate = 0;
@@ -881,18 +937,18 @@ export class SpicetifyColorBridge implements IManagedSystem {
       this.lastUpdateDuration = 0;
       this.updateDurations = [];
       this.skippedUpdateCount = 0;
-      
+
       // Emit system destruction event
       unifiedEventBus.emitSync('system:destroyed', {
         systemName: 'SpicetifyColorBridge',
         timestamp: Date.now(),
         reason: 'Manual destruction'
       });
-      
+
       if (this.config.enableDebug) {
         console.log("🎨 [SpicetifyColorBridge] System destroyed and cleaned up");
       }
-      
+
     } catch (error) {
       console.error("[SpicetifyColorBridge] Error during destruction:", error);
     }

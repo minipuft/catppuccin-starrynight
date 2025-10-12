@@ -298,13 +298,12 @@ export class GradientConductor implements IManagedSystem {
       this.activeBackend.setMusicMetrics(metrics);
     }
 
-    // Emit event for other systems
-    this.eventBus.emit("music:energy", {
-      energy: metrics.energy,
-      valence: metrics.valence,
-      tempo: metrics.bpm,
-      timestamp: Date.now()
-    });
+    // NOTE: Event re-emission removed to prevent infinite loop
+    // GradientConductor subscribes to "music:energy" from MusicSyncService (line 504)
+    // Re-emitting creates circular dependency: subscribe → setMusicMetrics → emit → subscribe → STACK OVERFLOW
+    // All backends receive music data via direct method call (activeBackend.setMusicMetrics)
+    // CSS variables are updated directly via updateCSSMusicVariables()
+    // Other visual systems subscribe directly to MusicSyncService's authoritative events
   }
 
   /**
@@ -540,8 +539,9 @@ export class GradientConductor implements IManagedSystem {
       this.setPerformanceConstraints(constraints);
     }, 'GradientConductor');
 
-    // Listen for settings changes (accessibility preferences)
+    // Listen for settings changes (accessibility preferences + gradient settings)
     this.eventBus.subscribe("settings:changed", (data) => {
+      // Handle accessibility settings
       if (data.settingKey.includes('accessibility') || data.settingKey.includes('motion')) {
         const preferences = {
           reducedMotion: data.settingKey.includes('motion') && data.newValue === 'reduce',
@@ -551,6 +551,12 @@ export class GradientConductor implements IManagedSystem {
         for (const registration of this.registeredBackends.values()) {
           registration.backend.applyAccessibilityPreferences?.(preferences);
         }
+      }
+
+      // 🔧 PHASE 1: Handle gradient-specific settings
+      const gradientSettings = ["sn-webgl-enabled", "sn-webgl-quality", "sn-gradient-intensity", "sn-animation-quality"];
+      if (gradientSettings.some(key => data.settingKey === key)) {
+        this.handleGradientSettingChange(data.settingKey, data.newValue);
       }
     }, 'GradientConductor');
 
@@ -887,6 +893,35 @@ export class GradientConductor implements IManagedSystem {
         ...constraints,
         qualityLevel: newQuality,
       });
+    }
+  }
+
+  /**
+   * Handle gradient-specific setting changes
+   * 🔧 PHASE 1: Modern object mapping for settings integration
+   */
+  private handleGradientSettingChange(key: string, value: any): void {
+    if (key === "sn-webgl-enabled") {
+      this.config.enabledBackends = value ? ["webgl", "css"] : ["css"];
+      this.evaluateActiveBackend();
+    }
+
+    if (key === "sn-webgl-quality") {
+      const qualityMap = { low: "low", medium: "high", high: "ultra" } as const;
+      this.config.defaultQuality = qualityMap[value as keyof typeof qualityMap] || "high";
+      this.setPerformanceConstraints({
+        ...this.currentConstraints,
+        qualityLevel: qualityMap[value as keyof typeof qualityMap] || "high",
+      });
+    }
+
+    if (key === "sn-gradient-intensity") {
+      const durationMap = { disabled: 0, minimal: 800, balanced: 500, intense: 300 } as const;
+      this.config.transitionDuration = durationMap[value as keyof typeof durationMap] ?? 500;
+    }
+
+    if (key === "sn-animation-quality") {
+      this.config.autoQualityScaling = value === "auto";
     }
   }
 }

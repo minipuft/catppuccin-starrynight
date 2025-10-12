@@ -290,7 +290,7 @@ export class AudioVisualController {
     // scroll down can expand up to 200%.  Values are clamped to avoid
     // excessive GPU cost.
     const baseScaleY = 150; // percentage
-    let clampedVel = Math.max(Math.min(payload.velocity ?? 0, 50), -50); // -50..50
+    const clampedVel = Math.max(Math.min(payload.velocity ?? 0, 50), -50); // -50..50
     const deltaScale = (clampedVel / 50) * 50; // -50..50
     const noiseScale = Math.max(140, Math.min(200, baseScaleY + deltaScale));
     // TODO(Phase-2): Profile GPU cost of color-dodge + large textures at >180%.
