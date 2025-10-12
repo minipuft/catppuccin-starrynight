@@ -14,7 +14,6 @@ import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import type { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import type { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
 import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 
 /**
@@ -33,7 +32,6 @@ export interface SharedDependencies {
   // Device detection
   deviceDetector?: DeviceCapabilityDetector;
   deviceCapabilityDetector?: DeviceCapabilityDetector; // Legacy alias
-  enhancedDeviceTierDetector?: EnhancedDeviceTierDetector;
 
   // WebGL integration
   webglSystemsIntegration?: WebGLSystemsIntegration;

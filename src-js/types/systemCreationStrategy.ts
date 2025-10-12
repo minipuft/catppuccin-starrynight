@@ -14,7 +14,6 @@ import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerf
 import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
-import type { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
 import type { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 import * as Utils from "@/utils/core/ThemeUtilities";
@@ -49,7 +48,6 @@ export interface SystemCreationContext {
     performanceCoordinator?: SimplePerformanceCoordinator;
     // New simplified performance system dependencies
     simplePerformanceCoordinator?: SimplePerformanceCoordinator;
-    enhancedDeviceTierDetector?: EnhancedDeviceTierDetector;
     webglSystemsIntegration?: WebGLSystemsIntegration;
     deviceCapabilityDetector?: DeviceCapabilityDetector;
   };
