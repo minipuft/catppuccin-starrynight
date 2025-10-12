@@ -1,16 +1,16 @@
 /**
  * WebGL Systems Integration
  *
- * Integrates the UnifiedWebGLController with existing WebGL systems
+ * Integrates the WebGLQualityCoordinator with existing WebGL systems
  * and the Year3000System architecture.
  *
  * 🔧 PHASE 2.2: WebGL gradient rendering is now managed via VisualEffectsCoordinator
  * using WebGLGradientStrategy (src-js/visual/strategies/WebGLGradientStrategy.ts).
- * This integration layer focuses on UnifiedWebGLController coordination and
+ * This integration layer focuses on WebGLQualityCoordinator coordination and
  * potential future WebGL systems (particles, corridor effects, etc.).
  */
 
-import { UnifiedWebGLController } from "./UnifiedWebGLController";
+import { WebGLQualityCoordinator } from "./WebGLQualityCoordinator";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
@@ -18,7 +18,7 @@ import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 /**
  * WebGL Systems Coordinator
  *
- * Manages the integration between UnifiedWebGLController and all WebGL systems.
+ * Manages the integration between WebGLQualityCoordinator and all WebGL systems.
  * Replaces the complex ContinuousQualityManager approach with a simple,
  * unified management system.
  *
@@ -27,14 +27,14 @@ import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 export class WebGLSystemsIntegration implements IManagedSystem {
   public initialized = false;
 
-  private controller: UnifiedWebGLController;
+  private controller: WebGLQualityCoordinator;
   private visualSystemCoordinator: any | null = null; // VisualEffectsCoordinator reference (Phase 2.2)
 
   constructor(
     deviceCapabilities: DeviceCapabilityDetector,
     visualSystemCoordinator?: any // VisualEffectsCoordinator for WebGL strategy access
   ) {
-    this.controller = new UnifiedWebGLController(deviceCapabilities);
+    this.controller = new WebGLQualityCoordinator(deviceCapabilities);
     this.visualSystemCoordinator = visualSystemCoordinator || null;
 
     Y3KDebug?.debug?.log("WebGLSystemsIntegration", "Created WebGL systems integration", {
@@ -110,7 +110,7 @@ export class WebGLSystemsIntegration implements IManagedSystem {
   /**
    * Get the unified WebGL controller for direct access
    */
-  public getController(): UnifiedWebGLController {
+  public getController(): WebGLQualityCoordinator {
     return this.controller;
   }
 
@@ -126,6 +126,17 @@ export class WebGLSystemsIntegration implements IManagedSystem {
    */
   public disableWebGL(): void {
     this.controller.disable();
+  }
+
+  /**
+   * Enable or disable WebGL effects
+   */
+  public setEnabled(enabled: boolean): void {
+    if (enabled) {
+      this.controller.enable();
+    } else {
+      this.controller.disable();
+    }
   }
 
   /**
@@ -234,12 +245,12 @@ export class WebGLSystemsIntegration implements IManagedSystem {
         const webglGradient = this.visualSystemCoordinator.getWebGLGradientStrategy();
 
         if (webglGradient) {
-          // Register with UnifiedWebGLController for quality scaling coordination
+          // Register with WebGLQualityCoordinator for quality scaling coordination
           this.controller.registerSystem("webgl-gradient", webglGradient, 100);
 
           Y3KDebug?.debug?.log(
             "WebGLSystemsIntegration",
-            "✓ WebGLGradientStrategy registered with UnifiedWebGLController (Phase 3 direct quality scaling)",
+            "✓ WebGLGradientStrategy registered with WebGLQualityCoordinator (Phase 3 direct quality scaling)",
             {
               systemName: webglGradient.getSystemName?.() || "WebGLGradientStrategy",
               isCapable: webglGradient.isCapable?.() || false,

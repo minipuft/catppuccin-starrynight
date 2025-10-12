@@ -9,7 +9,7 @@
  */
 
 import { PerformanceAnalyzer } from "./PerformanceMonitor";
-import type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode } from './PerformanceMonitor';
+import type { DeviceCapabilities, PerformanceMode } from './PerformanceMonitor';
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
@@ -39,7 +39,7 @@ export interface QualityScalingCapable {
 }
 
 // Re-export types for backward compatibility
-export type { DeviceCapabilities, ThermalState, BatteryState, PerformanceMode };
+export type { DeviceCapabilities, PerformanceMode };
 
 /**
  * SimplePerformanceCoordinator - High-Level Performance Management
@@ -53,23 +53,11 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
   private unifiedCoordinator: PerformanceAnalyzer;
   private config: Year3000Config;
 
-  constructor(
-    enhancedDeviceTierDetector?: any, // Deprecated parameter for compatibility
-    webglIntegration?: any // Deprecated parameter for compatibility
-  ) {
-    if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      console.warn(
-        '⚠️  [SimplePerformanceCoordinator] Direct instantiation is deprecated. ' +
-        'Use SimplePerformanceCoordinator.getInstance() instead. ' +
-        'This ensures proper system-wide performance management.'
-      );
-    }
-
+  constructor() {
     // Use global config for unified coordinator
     this.config = ADVANCED_SYSTEM_CONFIG as Year3000Config;
 
     // Get or create unified coordinator instance
-    // We'll create a simple mock coordinator if the real one doesn't exist
     try {
       this.unifiedCoordinator = PerformanceAnalyzer.getInstance(this.config, this);
     } catch {
@@ -203,22 +191,6 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
    */
   public getCurrentPerformanceMode(): PerformanceMode {
     return this.unifiedCoordinator.getCurrentPerformanceMode();
-  }
-
-  /**
-   * Get battery state (required by CSSVariableWriter)
-   * Delegated to PerformanceAnalyzer
-   */
-  public getBatteryState(): BatteryState | null {
-    return this.unifiedCoordinator.getBatteryState();
-  }
-
-  /**
-   * Get thermal state (required by CSSVariableWriter)
-   * Delegated to PerformanceAnalyzer
-   */
-  public getThermalState(): ThermalState | null {
-    return this.unifiedCoordinator.getThermalState();
   }
 
   // =============================================================================

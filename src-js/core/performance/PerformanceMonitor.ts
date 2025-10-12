@@ -27,23 +27,8 @@ export interface DeviceCapabilities {
   devicePixelRatio: number;
 }
 
-export interface ThermalState {
-  temperature: 'normal' | 'warm' | 'hot' | 'critical';
-  throttleLevel: number; // 0-1
-  cpuUsage: number; // 0-1
-  gpuUsage: number; // 0-1
-  memoryUsage: number; // 0-1
-}
-
-export interface BatteryState {
-  level: number; // 0-1
-  charging: boolean;
-  chargingTime?: number;
-  dischargingTime?: number;
-}
-
 export interface PerformanceMode {
-  name: 'battery' | 'balanced' | 'performance' | 'auto';
+  name: 'balanced' | 'performance' | 'auto';
   qualityLevel: number; // 0-1
   animationQuality: number; // 0-1
   effectQuality: number; // 0-1
@@ -51,6 +36,29 @@ export interface PerformanceMode {
   shadowQuality: number; // 0-1
   frameRate: number; // Target FPS
   optimizationLevel: number; // 0-3
+}
+
+// Tier-based quality settings from SimpleTierBasedPerformanceSystem consolidation
+export type PerformanceTier = 'low' | 'medium' | 'high';
+
+export interface TierSettings {
+  // WebGL Configuration
+  webglEnabled: boolean;
+  webglQuality: 'low' | 'medium' | 'high';
+
+  // Animation Configuration
+  animationQuality: 'low' | 'high';
+  animationDensity: number; // 0.0 - 1.0
+  updateFrequency: number; // Target FPS
+
+  // Effects Configuration
+  gradientIntensity: 'disabled' | 'minimal' | 'balanced' | 'intense';
+  particleMultiplier: number; // 0.0 - 2.0
+  corridorEffects: boolean;
+
+  // Feature Flags
+  advancedFeatures: boolean;
+  experimentalFeatures: boolean;
 }
 
 interface SubsystemMetrics {
@@ -142,14 +150,33 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   
   // Enhanced capabilities from PerformanceOptimizationManager consolidation
   private deviceCapabilities!: DeviceCapabilities; // Initialized in initializeDeviceCapabilities
-  private thermalState!: ThermalState; // Initialized in initializeThermalMonitoring
-  private batteryState: BatteryState | null = null;
   private currentPerformanceMode!: PerformanceMode; // Initialized in constructor
   private frameTimeHistory: number[] = [];
   private memoryUsageHistory: number[] = [];
   private lastOptimizationTime = 0;
   private optimizationCooldown = 5000; // 5 seconds
-  
+
+  // ===============================================================================
+  // TIER-BASED QUALITY SYSTEM (from SimpleTierBasedPerformanceSystem consolidation)
+  // ===============================================================================
+
+  // Tier management
+  private currentTier: PerformanceTier = 'medium';
+  private currentTierSettings!: TierSettings; // Initialized in constructor
+  private tierSettings!: Record<PerformanceTier, TierSettings>; // Initialized in constructor
+
+  // WebGL integration
+  private webglIntegration: any | null = null;
+
+  // Music energy boost
+  private energyBoostActive = false;
+  private energyBoostTimeout: number | null = null;
+  private readonly energyBoostSettings = {
+    animationBoost: 1.3,
+    particleBoost: 1.5,
+    duration: 10000 // 10 seconds
+  };
+
   // Performance thresholds
   private readonly PERFORMANCE_THRESHOLDS = {
     frameTime: {
@@ -172,16 +199,6 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   
   // Performance modes configuration (from PerformanceOptimizationManager)
   private readonly PERFORMANCE_MODES: Record<string, PerformanceMode> = {
-    battery: {
-      name: 'battery',
-      qualityLevel: 0.4,
-      animationQuality: 0.3,
-      effectQuality: 0.2,
-      blurQuality: 0.3,
-      shadowQuality: 0.2,
-      frameRate: 30,
-      optimizationLevel: 3,
-    },
     balanced: {
       name: 'balanced',
       qualityLevel: 0.8,
@@ -221,21 +238,26 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     
     // Initialize enhanced capabilities from PerformanceOptimizationManager
     this.initializeDeviceCapabilities();
-    this.initializeThermalMonitoring();
-    this.initializeBatteryMonitoring();
     this.currentPerformanceMode = this.PERFORMANCE_MODES.auto!;
-    
+
+    // Initialize tier-based quality settings
+    this.tierSettings = this.initializeTierSettings();
+    this.currentTierSettings = this.tierSettings[this.currentTier];
+
     // Initialize default optimization strategies
     this.initializeDefaultStrategies();
     
     // Start health monitoring
     this.startHealthMonitoring();
-    
+
     // Subscribe to performance events
     this.subscribeToEvents();
-    
+
+    // Setup music event listeners for energy boost
+    this.setupMusicEventListeners();
+
     if (this.config.enableDebug) {
-      console.log('[PerformanceAnalyzer] Initialized with enhanced device capabilities, thermal monitoring, and battery optimization');
+      console.log('[PerformanceAnalyzer] Initialized with enhanced device capabilities');
     }
   }
   
@@ -835,7 +857,205 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     //   }
     // });
   }
-  
+
+  // ===============================================================================
+  // TIER-BASED QUALITY MANAGEMENT (from SimpleTierBasedPerformanceSystem)
+  // ===============================================================================
+
+  /**
+   * Initialize tier-specific quality settings
+   */
+  private initializeTierSettings(): Record<PerformanceTier, TierSettings> {
+    return {
+      low: {
+        webglEnabled: false,
+        webglQuality: 'low',
+        animationQuality: 'low',
+        animationDensity: 0.6,
+        updateFrequency: 45,
+        gradientIntensity: 'minimal',
+        particleMultiplier: 0.4,
+        corridorEffects: false,
+        advancedFeatures: false,
+        experimentalFeatures: false,
+      },
+      medium: {
+        webglEnabled: true,
+        webglQuality: 'high',
+        animationQuality: 'high',
+        animationDensity: 0.9,
+        updateFrequency: 60,
+        gradientIntensity: 'balanced',
+        particleMultiplier: 1.0,
+        corridorEffects: true,
+        advancedFeatures: true,
+        experimentalFeatures: false,
+      },
+      high: {
+        webglEnabled: true,
+        webglQuality: 'high',
+        animationQuality: 'high',
+        animationDensity: 1.0,
+        updateFrequency: 60,
+        gradientIntensity: 'intense',
+        particleMultiplier: 1.2,
+        corridorEffects: true,
+        advancedFeatures: true,
+        experimentalFeatures: true,
+      }
+    };
+  }
+
+  /**
+   * Setup music event listeners for energy boost
+   */
+  private setupMusicEventListeners(): void {
+    this.eventBus.subscribe("colors:extracted", (data: any) => {
+      if (data.musicData) {
+        this.handleMusicAnalysis(data.musicData);
+      }
+    });
+
+    this.eventBus.subscribe("music:track-changed", (data: any) => {
+      if (data.analysis) {
+        this.checkEnergyBoost(data.analysis);
+      }
+    });
+  }
+
+  /**
+   * Handle music analysis for energy boost
+   */
+  private handleMusicAnalysis(musicData: any): void {
+    const isEnergeticSong = (
+      musicData.energy > 0.7 &&
+      musicData.tempo > 130 &&
+      (musicData.danceability || 0) > 0.6
+    );
+
+    if (isEnergeticSong && !this.energyBoostActive) {
+      this.activateEnergyBoost();
+    } else if (!isEnergeticSong && this.energyBoostActive) {
+      this.deactivateEnergyBoost();
+    }
+  }
+
+  /**
+   * Check if energy boost should be activated
+   */
+  private checkEnergyBoost(analysis: any): void {
+    this.handleMusicAnalysis(analysis);
+  }
+
+  /**
+   * Activate energy boost
+   */
+  private activateEnergyBoost(): void {
+    this.energyBoostActive = true;
+
+    if (this.energyBoostTimeout) {
+      clearTimeout(this.energyBoostTimeout);
+    }
+
+    // Apply boosted settings
+    this.applyTierSettings();
+
+    // Auto-deactivate after duration
+    this.energyBoostTimeout = window.setTimeout(() => {
+      this.deactivateEnergyBoost();
+    }, this.energyBoostSettings.duration);
+
+    // Emit tier change event
+    this.eventBus.emit("performance:tier-changed", {
+      tier: this.currentTier as any,
+      previousTier: this.currentTier as any,
+      energyBoost: true,
+      timestamp: Date.now()
+    } as any);
+  }
+
+  /**
+   * Deactivate energy boost
+   */
+  private deactivateEnergyBoost(): void {
+    if (!this.energyBoostActive) return;
+
+    this.energyBoostActive = false;
+
+    if (this.energyBoostTimeout) {
+      clearTimeout(this.energyBoostTimeout);
+      this.energyBoostTimeout = null;
+    }
+
+    // Return to normal settings
+    this.applyTierSettings();
+
+    // Emit tier change event
+    this.eventBus.emit("performance:tier-changed", {
+      tier: this.currentTier as any,
+      previousTier: this.currentTier as any,
+      energyBoost: false,
+      timestamp: Date.now()
+    } as any);
+  }
+
+  /**
+   * Apply tier-specific quality settings
+   */
+  private applyTierSettings(): void {
+    const effectiveSettings = this.getEffectiveTierSettings();
+
+    // Apply WebGL settings
+    if (this.webglIntegration) {
+      this.webglIntegration.setEnabled(effectiveSettings.webglEnabled);
+      this.webglIntegration.setQuality(effectiveSettings.webglQuality);
+    }
+
+    // Sync gradient intensity to settings
+    try {
+      const { settings } = require("@/config");
+      settings.set("sn-gradient-intensity", effectiveSettings.gradientIntensity);
+    } catch (error) {
+      // Settings not available
+    }
+
+    // Emit performance tier change event
+    this.eventBus.emit("performance:tier-changed", {
+      tier: this.currentTier as any,
+      previousTier: this.currentTier as any,
+      timestamp: Date.now()
+    } as any);
+
+    // Emit performance frame event for visual systems
+    this.eventBus.emit("performance:frame", {
+      deltaTime: 16,
+      fps: effectiveSettings.updateFrequency,
+      memoryUsage: 0.5,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
+   * Get effective tier settings including energy boost
+   */
+  private getEffectiveTierSettings(): TierSettings & { energyBoosted: boolean } {
+    const base = { ...this.currentTierSettings };
+
+    if (this.energyBoostActive) {
+      return {
+        ...base,
+        animationDensity: Math.min(1.0, base.animationDensity * this.energyBoostSettings.animationBoost),
+        particleMultiplier: base.particleMultiplier * this.energyBoostSettings.particleBoost,
+        energyBoosted: true
+      };
+    }
+
+    return {
+      ...base,
+      energyBoosted: false
+    };
+  }
+
   // ===============================================================================
   // ENHANCED CAPABILITIES FROM PERFORMANCEOPTIMIZATIONMANAGER CONSOLIDATION
   // ===============================================================================
@@ -888,123 +1108,11 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     }
   }
   
-  /**
-   * Initialize thermal state monitoring
-   */
-  private initializeThermalMonitoring(): void {
-    this.thermalState = {
-      temperature: 'normal',
-      throttleLevel: 0,
-      cpuUsage: 0,
-      gpuUsage: 0,
-      memoryUsage: 0,
-    };
-    
-    // Monitor performance metrics to estimate thermal state
-    setInterval(() => {
-      this.updateThermalState();
-    }, 10000); // Check every 10 seconds
-  }
-  
-  /**
-   * Initialize battery monitoring if available
-   */
-  private async initializeBatteryMonitoring(): Promise<void> {
-    try {
-      const nav = navigator as any;
-      if ('getBattery' in nav) {
-        const battery = await nav.getBattery();
-        this.batteryState = {
-          level: battery.level,
-          charging: battery.charging,
-          chargingTime: battery.chargingTime,
-          dischargingTime: battery.dischargingTime,
-        };
-        
-        // Listen for battery changes
-        battery.addEventListener('levelchange', () => {
-          if (this.batteryState) {
-            this.batteryState.level = battery.level;
-            this.adjustPerformanceModeForBattery();
-          }
-        });
-        
-        battery.addEventListener('chargingchange', () => {
-          if (this.batteryState) {
-            this.batteryState.charging = battery.charging;
-            this.adjustPerformanceModeForBattery();
-          }
-        });
-        
-        if (this.config.enableDebug) {
-          console.log('[PerformanceAnalyzer] Battery monitoring initialized');
-        }
-      }
-    } catch (error) {
-      if (this.config.enableDebug) {
-        console.log('[PerformanceAnalyzer] Battery API not available');
-      }
-    }
-  }
-  
-  /**
-   * Update thermal state based on performance metrics
-   */
-  private updateThermalState(): void {
-    const currentFPS = this.performanceAnalyzer?.getMedianFPS?.() || 60;
-    const memory = (performance as any).memory;
-    const memoryUsage = memory ? memory.usedJSHeapSize / memory.jsHeapSizeLimit : 0;
-    
-    // Estimate thermal state from performance degradation
-    let temperature: 'normal' | 'warm' | 'hot' | 'critical' = 'normal';
-    let throttleLevel = 0;
-    
-    if (currentFPS < 30 || memoryUsage > 0.9) {
-      temperature = 'critical';
-      throttleLevel = 0.8;
-    } else if (currentFPS < 45 || memoryUsage > 0.7) {
-      temperature = 'hot';
-      throttleLevel = 0.4;
-    } else if (currentFPS < 55 || memoryUsage > 0.5) {
-      temperature = 'warm';
-      throttleLevel = 0.2;
-    }
-    
-    this.thermalState = {
-      temperature,
-      throttleLevel,
-      cpuUsage: Math.min(1 - (currentFPS / 60), 1),
-      gpuUsage: 0, // TODO: Implement GPU usage detection
-      memoryUsage,
-    };
-    
-    // Adjust performance mode based on thermal state
-    if (temperature === 'critical' && this.currentPerformanceMode.name !== 'battery') {
-      this.setPerformanceMode('battery');
-    } else if (temperature === 'normal' && this.currentPerformanceMode.name === 'battery') {
-      this.setPerformanceMode('auto');
-    }
-  }
-  
-  /**
-   * Adjust performance mode based on battery state
-   */
-  private adjustPerformanceModeForBattery(): void {
-    if (!this.batteryState) return;
-    
-    if (!this.batteryState.charging && this.batteryState.level < 0.2) {
-      // Low battery, switch to battery mode
-      this.setPerformanceMode('battery');
-    } else if (this.batteryState.charging && this.currentPerformanceMode.name === 'battery') {
-      // Charging, switch back to auto mode
-      this.setPerformanceMode('auto');
-    }
-  }
   
   /**
    * Set performance mode
    */
-  public setPerformanceMode(modeName: 'battery' | 'balanced' | 'performance' | 'auto'): void {
+  public setPerformanceMode(modeName: 'balanced' | 'performance' | 'auto'): void {
     const mode = this.PERFORMANCE_MODES[modeName];
     if (!mode) return;
     
@@ -1030,19 +1138,6 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     return { ...this.deviceCapabilities };
   }
   
-  /**
-   * Get current thermal state
-   */
-  public getThermalState(): ThermalState {
-    return { ...this.thermalState };
-  }
-  
-  /**
-   * Get current battery state
-   */
-  public getBatteryState(): BatteryState | null {
-    return this.batteryState ? { ...this.batteryState } : null;
-  }
   
   /**
    * Get current performance mode
@@ -1149,10 +1244,9 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
    */
   public shouldReduceQuality(): boolean {
     const tier = this.deviceCapabilities.performanceTier;
-    const thermalState = this.thermalState.temperature;
     const healthScore = this.calculateHealthScore();
-    
-    return tier === 'low' || thermalState === 'hot' || thermalState === 'critical' || healthScore < 0.5;
+
+    return tier === 'low' || healthScore < 0.5;
   }
 
   /**
@@ -1249,7 +1343,7 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   } {
     const webglSupported = this.deviceCapabilities.supportsWebGL;
     const performanceTier = this.deviceCapabilities.performanceTier;
-    
+
     if (!webglSupported) {
       return {
         state: 'disabled',
@@ -1258,11 +1352,11 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
       };
     }
 
-    // Determine quality based on performance tier and thermal state
+    // Determine quality based on performance tier
     let quality: 'low' | 'medium' | 'high' = 'medium';
     if (performanceTier === 'premium' || performanceTier === 'high') {
-      quality = this.thermalState.temperature === 'normal' ? 'high' : 'medium';
-    } else if (performanceTier === 'low' || this.thermalState.temperature === 'critical') {
+      quality = 'high';
+    } else if (performanceTier === 'low') {
       quality = 'low';
     }
 
@@ -1309,14 +1403,9 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     if (this.deviceCapabilities.supportsWebGL) {
       reasoning.push(`WebGL supported (${this.deviceCapabilities.maxTextureSize}px max texture)`);
     }
-    if (this.thermalState.temperature !== 'normal') {
-      reasoning.push(`Thermal state: ${this.thermalState.temperature}`);
-    }
 
-    // Energy boost detection based on thermal and battery state
-    const energyBoost = this.currentPerformanceMode.name === 'performance' && 
-                       this.thermalState.temperature === 'normal' &&
-                       (this.batteryState?.charging || (this.batteryState?.level || 0) > 0.5 || !this.batteryState);
+    // Energy boost detection based on performance mode
+    const energyBoost = this.currentPerformanceMode.name === 'performance';
 
     return {
       deviceTier,
@@ -1352,9 +1441,79 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
    * Check if energy boost is active (legacy API compatibility)
    */
   public hasEnergyBoost(): boolean {
-    return this.currentPerformanceMode.name === 'performance' && 
-           this.thermalState.temperature === 'normal' &&
-           (this.batteryState?.charging || (this.batteryState?.level || 0) > 0.5 || !this.batteryState);
+    return this.currentPerformanceMode.name === 'performance';
+  }
+
+  // ===============================================================================
+  // TIER-BASED QUALITY PUBLIC API (from SimpleTierBasedPerformanceSystem)
+  // ===============================================================================
+
+  /**
+   * Register WebGL integration for quality management
+   */
+  public registerWebGLIntegration(integration: any): void {
+    this.webglIntegration = integration;
+
+    // Apply current settings immediately
+    if (this.currentTierSettings) {
+      this.applyTierSettings();
+    }
+  }
+
+  /**
+   * Apply performance mode (maps to tier)
+   */
+  public applyPerformanceMode(mode: 'auto' | 'performance' | 'balanced' | 'quality' | 'maximum'): void {
+    const MODE_TO_TIER: Record<string, PerformanceTier> = {
+      performance: 'low',
+      balanced: 'medium',
+      quality: 'high',
+      maximum: 'high'
+    };
+
+    if (mode === 'auto') {
+      // Use device tier detection
+      this.currentTier = this.getDeviceTier();
+    } else {
+      // Map mode to tier
+      this.currentTier = MODE_TO_TIER[mode] || 'medium';
+    }
+
+    // Apply tier settings
+    this.currentTierSettings = this.tierSettings[this.currentTier];
+
+    // Enable experimental for maximum mode
+    if (mode === 'maximum') {
+      this.currentTierSettings = {
+        ...this.currentTierSettings,
+        experimentalFeatures: true,
+      };
+    }
+
+    this.applyTierSettings();
+  }
+
+  /**
+   * Get current tier settings
+   */
+  public getCurrentTierSettings(): TierSettings {
+    return { ...this.currentTierSettings };
+  }
+
+  /**
+   * Get effective settings including energy boost
+   */
+  public getEffectiveSettings(): TierSettings & { energyBoosted: boolean } {
+    return this.getEffectiveTierSettings();
+  }
+
+  /**
+   * Set specific tier
+   */
+  public setTier(tier: PerformanceTier): void {
+    this.currentTier = tier;
+    this.currentTierSettings = this.tierSettings[tier];
+    this.applyTierSettings();
   }
 
   /**
@@ -1364,8 +1523,6 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     return {
       performanceMode: this.currentPerformanceMode,
       deviceCapabilities: this.deviceCapabilities,
-      thermalState: this.thermalState,
-      batteryState: this.batteryState,
       webglStatus: this.getWebGLStatus(),
     };
   }

@@ -1,11 +1,11 @@
 /**
  * WebGL System Interface for Unified Controller Integration
- * 
+ *
  * This interface defines the contract that WebGL systems must implement
- * to work with the UnifiedWebGLController's simplified approach.
+ * to work with the WebGLQualityCoordinator's simplified approach.
  */
 
-import type { WebGLQuality } from "./UnifiedWebGLController";
+import type { WebGLQuality } from "./WebGLQualityCoordinator";
 
 export interface WebGLSystemInterface {
   /**

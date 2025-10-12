@@ -10,7 +10,7 @@ interface DetectorConfig {
   spicetifyContext?: boolean; // New: Enable Spicetify-specific optimizations
 }
 
-// Enhanced tier detection from EnhancedDeviceTierDetector
+// Enhanced tier detection with focus on giving most users full experience
 export interface TierDetectionResult {
   tier: 'high' | 'medium' | 'low';
   confidence: number; // 0-1
@@ -102,8 +102,8 @@ interface DeviceCapabilities {
   display: DisplayCapabilities;
   network: NetworkCapabilities;
   overall: "high" | "medium" | "low" | "detecting";
-  
-  // Enhanced hardware info from EnhancedDeviceTierDetector
+
+  // Enhanced hardware detection information
   hardwareInfo?: {
     isHighEnd: boolean;
     isMobile: boolean;
@@ -749,12 +749,12 @@ export class DeviceCapabilityDetector {
   }
 
   // ===================================================================
-  // ENHANCED TIER DETECTION (from EnhancedDeviceTierDetector)
+  // ENHANCED TIER DETECTION
   // ===================================================================
 
   /**
    * Enhanced tier detection with focus on giving most users full experience
-   * Integrated from EnhancedDeviceTierDetector
+   * Uses comprehensive hardware analysis to determine optimal device tier
    */
   public static detectTier(): TierDetectionResult {
     const capabilities = this._analyzeBasicCapabilities();

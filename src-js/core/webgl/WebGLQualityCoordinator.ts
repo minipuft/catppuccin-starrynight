@@ -1,9 +1,9 @@
 /**
- * UnifiedWebGLController - Simplified WebGL Management System
- * 
+ * WebGLQualityCoordinator - Simplified WebGL Management System
+ *
  * Replaces the complex continuous quality scaling approach with a simple,
  * developer-friendly unified controller that manages all WebGL effects together.
- * 
+ *
  * Key Philosophy:
  * - WebGL enabled -> All WebGL effects work together
  * - WebGL disabled -> CSS fallbacks only
@@ -33,15 +33,15 @@ export interface WebGLControllerConfig {
 }
 
 /**
- * Unified WebGL Controller
- * 
+ * WebGL Quality Coordinator
+ *
  * Manages all WebGL effects as a cohesive unit:
  * - WebGL Background System
  * - Flow Gradient Effects
  * - Corridor Effects
  * - Performance-aware quality scaling
  */
-export class UnifiedWebGLController implements IManagedSystem {
+export class WebGLQualityCoordinator implements IManagedSystem {
   public initialized = false;
   private config: WebGLControllerConfig;
   private currentState: WebGLState = 'disabled';
@@ -69,7 +69,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       allowPerformanceAdjustment: true
     };
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", "Initialized with unified WebGL management");
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", "Initialized with unified WebGL management");
   }
 
   public async initialize(): Promise<void> {
@@ -94,7 +94,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     
     this.initialized = true;
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", "Initialization complete", {
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", "Initialization complete", {
       state: this.currentState,
       quality: this.config.quality,
       systemCount: this.webglSystems.size
@@ -106,7 +106,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       return {
         healthy: false,
         details: "Not initialized",
-        system: "UnifiedWebGLController"
+        system: "WebGLQualityCoordinator"
       };
     }
     
@@ -133,14 +133,14 @@ export class UnifiedWebGLController implements IManagedSystem {
         healthy: true, // Still working, but with issues
         details: `Issues detected: ${systemIssues.join(', ')}`,
         issues: systemIssues,
-        system: "UnifiedWebGLController"
+        system: "WebGLQualityCoordinator"
       };
     }
     
     return {
       healthy: true,
       details: "All WebGL systems operating normally",
-      system: "UnifiedWebGLController"
+      system: "WebGLQualityCoordinator"
     };
   }
 
@@ -157,7 +157,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     
     this.initialized = false;
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", "Destroyed - all WebGL systems disabled");
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", "Destroyed - all WebGL systems disabled");
   }
 
   public updateAnimation(deltaTime: number): void {
@@ -168,7 +168,7 @@ export class UnifiedWebGLController implements IManagedSystem {
           try {
             ref.system.updateAnimation(deltaTime);
           } catch (error) {
-            Y3KDebug?.debug?.warn("UnifiedWebGLController", `Animation update failed for ${name}:`, error);
+            Y3KDebug?.debug?.warn("WebGLQualityCoordinator", `Animation update failed for ${name}:`, error);
           }
         }
       }
@@ -188,7 +188,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     this._determineAndApplyState();
     this._saveSettings();
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", "WebGL enabled by user");
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", "WebGL enabled by user");
   }
 
   /**
@@ -200,7 +200,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     this._setState('css-fallback');
     this._saveSettings();
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", "WebGL disabled by user");
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", "WebGL disabled by user");
   }
 
   /**
@@ -212,7 +212,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     this._applyQualityToAllSystems();
     this._saveSettings();
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", `Quality set to ${quality} by user`);
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", `Quality set to ${quality} by user`);
   }
 
   /**
@@ -252,7 +252,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     this._determineAndApplyState();
     this._saveSettings();
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", `Force enable set to ${force}`);
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", `Force enable set to ${force}`);
   }
 
   // =============================================================================
@@ -274,7 +274,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       this._applyStateToSystem(name, system);
     }
     
-    Y3KDebug?.debug?.log("UnifiedWebGLController", `System registered: ${name} (priority: ${priority})`);
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", `System registered: ${name} (priority: ${priority})`);
   }
 
   /**
@@ -289,7 +289,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       }
       
       this.webglSystems.delete(name);
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `System unregistered: ${name}`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `System unregistered: ${name}`);
     }
   }
 
@@ -302,13 +302,13 @@ export class UnifiedWebGLController implements IManagedSystem {
    */
   public suggestQualityAdjustment(suggestedQuality: WebGLQuality, reason: string): void {
     if (!this.config.allowPerformanceAdjustment) {
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `Performance adjustment ignored (not allowed): ${reason}`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `Performance adjustment ignored (not allowed): ${reason}`);
       return;
     }
     
     // Don't override explicit user quality choice
     if (this.userExplicitQuality !== null) {
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `Performance adjustment ignored (user set explicit quality): ${reason}`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `Performance adjustment ignored (user set explicit quality): ${reason}`);
       return;
     }
     
@@ -317,7 +317,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       this.config.quality = suggestedQuality;
       this._applyQualityToAllSystems();
       
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `Quality adjusted by performance system: ${oldQuality} → ${suggestedQuality} (${reason})`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `Quality adjusted by performance system: ${oldQuality} → ${suggestedQuality} (${reason})`);
     }
   }
 
@@ -331,7 +331,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     
     if (this.currentState === 'webgl-active') {
       this._setState('css-fallback');
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `WebGL disabled by performance system: ${reason}`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `WebGL disabled by performance system: ${reason}`);
     }
   }
 
@@ -345,7 +345,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     
     if (this.currentState === 'css-fallback' && this.config.enabled) {
       this._determineAndApplyState();
-      Y3KDebug?.debug?.log("UnifiedWebGLController", `WebGL re-enabled by performance system: ${reason}`);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", `WebGL re-enabled by performance system: ${reason}`);
     }
   }
 
@@ -376,9 +376,9 @@ export class UnifiedWebGLController implements IManagedSystem {
         this.config.forceEnabled = webglForceEnabled === 'true';
       }
 
-      Y3KDebug?.debug?.log("UnifiedWebGLController", "Settings loaded", this.config);
+      Y3KDebug?.debug?.log("WebGLQualityCoordinator", "Settings loaded", this.config);
     } catch (error) {
-      Y3KDebug?.debug?.warn("UnifiedWebGLController", "Failed to load settings:", error);
+      Y3KDebug?.debug?.warn("WebGLQualityCoordinator", "Failed to load settings:", error);
     }
   }
 
@@ -388,7 +388,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       localStorage.setItem('sn-webgl-quality', this.config.quality);
       localStorage.setItem('sn-webgl-force-enabled', this.config.forceEnabled.toString());
     } catch (error) {
-      Y3KDebug?.debug?.warn("UnifiedWebGLController", "Failed to save settings:", error);
+      Y3KDebug?.debug?.warn("WebGLQualityCoordinator", "Failed to save settings:", error);
     }
   }
 
@@ -445,7 +445,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       timestamp: this.lastStateChange
     });
 
-    Y3KDebug?.debug?.log("UnifiedWebGLController", `State changed: ${oldState} → ${newState}`);
+    Y3KDebug?.debug?.log("WebGLQualityCoordinator", `State changed: ${oldState} → ${newState}`);
   }
 
   private _applyStateToAllSystems(): void {
@@ -480,7 +480,7 @@ export class UnifiedWebGLController implements IManagedSystem {
       }
       
     } catch (error) {
-      Y3KDebug?.debug?.warn("UnifiedWebGLController", `Failed to apply state to ${name}:`, error);
+      Y3KDebug?.debug?.warn("WebGLQualityCoordinator", `Failed to apply state to ${name}:`, error);
     }
   }
 
@@ -501,7 +501,7 @@ export class UnifiedWebGLController implements IManagedSystem {
           }
         }
       } catch (error) {
-        Y3KDebug?.debug?.warn("UnifiedWebGLController", `Failed to apply quality to ${name}:`, error);
+        Y3KDebug?.debug?.warn("WebGLQualityCoordinator", `Failed to apply quality to ${name}:`, error);
       }
     }
     
@@ -531,7 +531,7 @@ export class UnifiedWebGLController implements IManagedSystem {
     // Listen for performance tier changes
     unifiedEventBus.subscribe("performance:tier-changed", (data) => {
       // Map tier to quality if needed
-      const qualityFromTier = data.tier === "excellent" ? "high" : 
+      const qualityFromTier = data.tier === "excellent" ? "high" :
                             data.tier === "good" ? "medium" : "low";
       if (qualityFromTier !== this.config.quality) {
         this.setQuality(qualityFromTier as any);
@@ -539,3 +539,6 @@ export class UnifiedWebGLController implements IManagedSystem {
     });
   }
 }
+
+// Backward compatibility alias
+export { WebGLQualityCoordinator as UnifiedWebGLController };
