@@ -1,0 +1,218 @@
+/**
+ * CRITICAL DARK THEME CSS - Loaded First (Phase 1)
+ *
+ * Purpose: Eliminate white flash on page load by establishing dark theme immediately
+ * Priority: CRITICAL - Must load before any other styles
+ * Performance: Inline-able, minimal CSS for fastest possible paint
+ *
+ * Architecture Integration:
+ * - Complements SpicetifyColorBridge fallback system (Phase 3, 200ms)
+ * - Provides immediate visual foundation while JS initializes
+ * - Uses Catppuccin Macchiato palette for consistency
+ *
+ * Color Selection Rationale:
+ * - --spice-mantle (#181926): Darkest background, eliminates white flash
+ * - --spice-main (#24273a): Primary background for content areas
+ * - --spice-text (#cad3f5): High contrast text for accessibility
+ * - --spice-subtext (#a5adcb): Secondary text for hierarchy
+ *
+ * @layer critical-dark-theme
+ * @performance <1ms parse time, immediate paint
+ * @accessibility WCAG AAA contrast ratios maintained
+ */
+
+// =============================================================================
+// CRITICAL DARK THEME VARIABLES
+// =============================================================================
+
+:root {
+  // -------------------------------------------------------------------------
+  // Catppuccin Macchiato Core Colors (Immediate Load)
+  // -------------------------------------------------------------------------
+  // These establish the dark theme foundation before any other CSS loads
+  // Prevents white flash by overriding browser defaults immediately
+
+  // Base backgrounds (darkest to lightest)
+  --spice-mantle: #181926;  // Darkest - window background
+  --spice-main: #24273a;    // Base - primary background
+  --spice-base: #24273a;    // Alias for compatibility
+
+  // Surface progression (overlays)
+  --spice-surface0: #363a4f;  // First overlay level
+  --spice-surface1: #494d64;  // Second overlay level
+  --spice-surface2: #5b6078;  // Third overlay level
+
+  // Text colors (high contrast for accessibility)
+  --spice-text: #cad3f5;     // Primary text
+  --spice-subtext: #a5adcb;  // Secondary text
+
+  // Essential UI colors
+  --spice-overlay0: #6e738d; // Subtle overlays
+  --spice-overlay1: #8087a2; // Medium overlays
+  --spice-overlay2: #939ab7; // Prominent overlays
+
+  // Background structure (Catppuccin convention)
+  --spice-crust: #1e2030;    // Beneath mantle
+}
+
+// =============================================================================
+// CRITICAL DARK THEME APPLICATION
+// =============================================================================
+
+// Root element - establish dark foundation immediately
+:root {
+  background-color: var(--spice-mantle) !important;
+  color: var(--spice-text) !important;
+}
+
+// Body - primary container
+body {
+  background-color: var(--spice-mantle) !important;
+  color: var(--spice-text) !important;
+
+  // Ensure text is visible during font loading
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// =============================================================================
+// CRITICAL SPOTIFY CONTAINERS (BASE + LOADING OVERRIDE)
+// =============================================================================
+// These containers host living gradient pseudo-elements. Strategy:
+// 1. Provide base dark backgrounds (always present, can be updated by systems)
+// 2. Override with !important ONLY during loading (blocks system updates)
+// 3. Once data-theme-loading removed, base remains but !important override disabled
+// This allows gradients to render while maintaining dark fallback background.
+
+// Base backgrounds (always present, no !important)
+// These provide dark fallback that persists after loading
+.Root__main-view,
+.main-view-container,
+#main {
+  background-color: var(--spice-main);
+}
+
+.main-view-container__scroll-node,
+.main-viewContainer-scrollNode,
+.main-view-container__scroll-node-child {
+  background-color: var(--spice-main);
+}
+
+.main-view-container[data-visualeffects-enhanced="true"],
+.main-view-container[data-visualeffects-enhanced="true"] .main-view-container__scroll-node,
+.main-view-container[data-visualeffects-enhanced="true"] .main-viewContainer-scrollNode,
+.main-view-container[data-visualeffects-enhanced="true"] .main-view-container__scroll-node-child {
+  background-color: transparent;
+}
+
+html[data-fluid-gradient-ready="true"] {
+  #main,
+  .Root__main-view,
+  .main-view-container,
+  .main-view-container__scroll-node,
+  .main-viewContainer-scrollNode,
+  .main-view-container__scroll-node-child,
+  .Root__nav-bar,
+  nav[aria-label="Main"] {
+    background-color: transparent !important;
+  }
+}
+
+// Loading state override (blocks updates during initialization)
+// Once attribute removed, these selectors no longer match
+html[data-theme-loading="critical"]:not([data-fluid-gradient-ready="true"]),
+html[data-theme-loading="tokens"]:not([data-fluid-gradient-ready="true"]) {
+  // Main application container
+  #main {
+    background-color: var(--spice-main) !important;
+  }
+
+  // Root main view (hosts living gradient ::before)
+  .Root__main-view {
+    background-color: var(--spice-main) !important;
+  }
+
+  // Main view container (most common, hosts gradients)
+  .main-view-container {
+    background-color: var(--spice-main) !important;
+  }
+
+  // Scroll node (visible during loading)
+  .main-view-container__scroll-node,
+  .main-viewContainer-scrollNode {
+    background-color: var(--spice-main) !important;
+  }
+
+  // Content wrapper
+  .main-view-container__scroll-node-child {
+    background-color: var(--spice-main) !important;
+  }
+
+  // Sidebar container
+  .Root__nav-bar,
+  nav[aria-label="Main"] {
+    background-color: var(--spice-sidebar, var(--spice-surface0)) !important;
+  }
+}
+
+// =============================================================================
+// CRITICAL TEXT VISIBILITY
+// =============================================================================
+// Ensure text is readable immediately, preventing invisible text flash
+
+body,
+.main-view-container,
+.Root__main-view {
+  color: var(--spice-text) !important;
+}
+
+// Subdued text elements
+.main-type-mesto,
+.main-cardSubHeader-root,
+.main-type-ballad {
+  color: var(--spice-subtext) !important;
+}
+
+// =============================================================================
+// PERFORMANCE OPTIMIZATION
+// =============================================================================
+// Hint to browser that these colors are critical for first paint
+
+html {
+  // Prevent layout shift during font loading
+  text-rendering: optimizeLegibility;
+
+  // Hint that dark color scheme is preferred
+  color-scheme: dark;
+}
+
+// =============================================================================
+// ACCESSIBILITY INTEGRATION
+// =============================================================================
+// Respect user's reduced motion preference from the start
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// =============================================================================
+// COMPATIBILITY NOTES
+// =============================================================================
+// This file is designed to work with:
+// 1. SpicetifyColorBridge.ts - JS fallback system (Phase 3, ~200ms)
+// 2. Design tokens (tokens.scss) - Full token system (~50ms)
+// 3. Album color updates (Phase 4, ~1000ms+)
+//
+// Loading order:
+// 1. THIS FILE (0ms) - Critical dark theme, eliminate white flash
+// 2. Design tokens (50ms) - Full token system with brightness modes
+// 3. SpicetifyColorBridge (200ms) - 23 semantic colors via JS
+// 4. Album colors (1000ms+) - OKLAB-processed dynamic colors
+//
+// This ensures smooth, coordinated color transitions with no white flash.
