@@ -209,7 +209,7 @@ export class StrategyBasedFactory implements IStrategyBasedFactory {
       "DeviceCapabilityDetector",
       "PerformanceAnalyzer",
       "CSSVariableWriter",
-      "SettingsManager",
+      // NOTE: SettingsManager removed - using TypedSettingsManager singleton (Phase 5 migration)
       "TimerConsolidationSystem",
     ];
 

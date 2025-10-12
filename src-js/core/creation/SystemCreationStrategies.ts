@@ -261,9 +261,6 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
         case "performanceCoordinator":
           params.push(context.dependencies.performanceCoordinator);
           break;
-        case "enhancedDeviceTierDetector":
-          params.push(context.dependencies.enhancedDeviceTierDetector);
-          break;
         case "webglSystemsIntegration":
           params.push(context.dependencies.webglSystemsIntegration);
           break;
@@ -349,30 +346,13 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
       },
     });
 
-    // UnifiedPerformanceCoordinator
-    this.registerSystemConfig({
-      systemKey: "UnifiedPerformanceCoordinator",
-      requiredDependencies: ["config"],
-      optionalDependencies: ["simplePerformanceCoordinator"],
-      constructorMapping: {
-        parameterNames: ["config", "simplePerformanceCoordinator"],
-        dependencyMapping: {
-          config: "config",
-          simplePerformanceCoordinator: "simplePerformanceCoordinator",
-        },
-      },
-      creationPreferences: {
-        useSingleton: true,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false,
-      },
-    });
+    // NOTE: UnifiedPerformanceCoordinator removed - backward compatibility handled via registry alias
+    // System now maps directly to SimplePerformanceCoordinator in InfrastructureSystemCoordinator
 
     // Simple systems with no parameters
     const simpleSystemKeys = [
       "DeviceCapabilityDetector",
-      "SettingsManager",
+      // NOTE: SettingsManager removed - using TypedSettingsManager singleton (Phase 5 migration)
       // NOTE: SimplePerformanceCoordinator removed - replaced with SimplePerformanceCoordinator (see below)
     ];
 
@@ -569,47 +549,9 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
    */
   private registerNewSimplifiedSystems(): void {
     // SimplePerformanceCoordinator - main simplified performance system
+    // Note: Constructor parameters are deprecated and ignored - creates dependencies internally
     this.registerSystemConfig({
       systemKey: "SimplePerformanceCoordinator",
-      requiredDependencies: ["enhancedDeviceTierDetector", "webglSystemsIntegration"],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ["enhancedDeviceTierDetector", "webglSystemsIntegration"],
-        dependencyMapping: {
-          enhancedDeviceTierDetector: "enhancedDeviceTierDetector",
-          webglSystemsIntegration: "webglSystemsIntegration",
-        },
-      },
-      creationPreferences: {
-        useSingleton: true,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false,
-      },
-    });
-
-    // SimpleTierBasedPerformanceSystem - tier-based performance logic
-    this.registerSystemConfig({
-      systemKey: "SimpleTierBasedPerformanceSystem",
-      requiredDependencies: ["enhancedDeviceTierDetector"],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: ["enhancedDeviceTierDetector"],
-        dependencyMapping: {
-          enhancedDeviceTierDetector: "enhancedDeviceTierDetector",
-        },
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: false,
-        builderPattern: false,
-      },
-    });
-
-    // EnhancedDeviceTierDetector - static class, no dependencies
-    this.registerSystemConfig({
-      systemKey: "EnhancedDeviceTierDetector",
       requiredDependencies: [],
       optionalDependencies: [],
       constructorMapping: {

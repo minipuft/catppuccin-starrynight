@@ -136,14 +136,14 @@ export class ThemeLifecycleCoordinator {
   public get simpleTierBasedPerformanceSystem() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "SimpleTierBasedPerformanceSystem"
+        "SimplePerformanceCoordinator"
       ) || null
     );
   }
   public get enhancedDeviceTierDetector() {
     return (
       this.facadeCoordinator?.getCachedNonVisualSystem(
-        "EnhancedDeviceTierDetector"
+        "DeviceCapabilityDetector"
       ) || null
     );
   }

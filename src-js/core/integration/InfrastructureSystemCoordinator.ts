@@ -56,8 +56,6 @@ import { TimerConsolidationSystem } from "@/core/performance/TimerConsolidationS
 
 // New simplified performance system imports (replacing complex monitoring)
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
-import { SimpleTierBasedPerformanceSystem } from "@/core/performance/SimpleTierBasedPerformanceSystem";
-import { EnhancedDeviceTierDetector } from "@/core/performance/EnhancedDeviceTierDetector";
 import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 
 // Legacy performance imports (deprecated, for backward compatibility)
@@ -105,13 +103,11 @@ export type InfrastructureSystemKey =
   | "CSSVariableWriter"
   | "OptimizedCSSVariableManager" // Alias for CSSVariableWriter (Phase 6.1 backward compatibility)
   // PerformanceAwareLerpCoordinator consolidated into AnimationFrameCoordinator
-  
+
   // New simplified performance systems (replacing complex monitoring)
   | "SimplePerformanceCoordinator"
-  | "SimpleTierBasedPerformanceSystem"
-  | "EnhancedDeviceTierDetector"
   | "WebGLSystemsIntegration"
-  
+
   // Legacy performance systems (deprecated, for backward compatibility)
   | "UnifiedPerformanceCoordinator" // Backward compatibility alias for PerformanceAnalyzer
   | "PerformanceAnalyzer"
@@ -147,8 +143,7 @@ export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode =
   | "progressive"
   | "performance-first"
-  | "quality-first"
-  | "battery-optimized";
+  | "quality-first";
 
 export interface InfrastructureSystemConfig {
   mode: IntegrationMode;
@@ -217,8 +212,7 @@ export class InfrastructureSystemCoordinator {
   // New simplified performance system dependencies
   private simplePerformanceCoordinator: SimplePerformanceCoordinator | null = null;
   private webglSystemsIntegration: WebGLSystemsIntegration | null = null;
-  private enhancedDeviceTierDetector: EnhancedDeviceTierDetector | null = null;
-  
+
   // Legacy performance system dependencies (deprecated, for backward compatibility)
   private performanceAnalyzer: SimplePerformanceCoordinator | null = null;
   private performanceCoordinator: PerformanceAnalyzer | null = null;
@@ -389,6 +383,10 @@ export class InfrastructureSystemCoordinator {
       "performanceAnalyzer",
     ]);
 
+    // UnifiedPerformanceCoordinator - backward compatibility alias (maps to SimplePerformanceCoordinator)
+    this.systemRegistry.set("UnifiedPerformanceCoordinator", SimplePerformanceCoordinator);
+    this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
+
     this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
     this.systemDependencies.set("SimplePerformanceCoordinator", [
       "performanceAnalyzer",
@@ -406,22 +404,11 @@ export class InfrastructureSystemCoordinator {
 
     // New simplified performance systems (replacing complex monitoring)
     this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
-    this.systemDependencies.set("SimplePerformanceCoordinator", [
-      "enhancedDeviceTierDetector",
-      "webglSystemsIntegration",
-    ]);
-
-    this.systemRegistry.set("SimpleTierBasedPerformanceSystem", SimpleTierBasedPerformanceSystem);
-    this.systemDependencies.set("SimpleTierBasedPerformanceSystem", [
-      "enhancedDeviceTierDetector",
-    ]);
-
-    this.systemRegistry.set("EnhancedDeviceTierDetector", EnhancedDeviceTierDetector);
-    this.systemDependencies.set("EnhancedDeviceTierDetector", []);
+    this.systemDependencies.set("SimplePerformanceCoordinator", []);
 
     this.systemRegistry.set("WebGLSystemsIntegration", WebGLSystemsIntegration);
     this.systemDependencies.set("WebGLSystemsIntegration", [
-      "deviceCapabilityDetector", // WebGLSystemsIntegration needs DeviceCapabilityDetector, not EnhancedDeviceTierDetector
+      "deviceCapabilityDetector", // WebGLSystemsIntegration needs DeviceCapabilityDetector
     ]);
 
     // CSS systems consolidated into CSSVariableWriter:
@@ -475,7 +462,7 @@ export class InfrastructureSystemCoordinator {
     this.systemRegistry.set("MusicEmotionAnalyzer", MusicEmotionAnalyzer);
     this.systemDependencies.set("MusicEmotionAnalyzer", [
       "musicSyncService",
-      "settingsManager",
+      // NOTE: settingsManager dependency removed - using TypedSettingsManager singleton
     ]);
 
     // 🔧 PHASE 4: VisualEffectsCoordinator - Consolidates ColorConsciousnessState and DynamicCatppuccinBridge
@@ -484,7 +471,7 @@ export class InfrastructureSystemCoordinator {
       VisualEffectsCoordinator
     );
     this.systemDependencies.set("VisualEffectsCoordinator", [
-      "settingsManager",
+      // NOTE: settingsManager dependency removed - using TypedSettingsManager singleton
     ]);
 
     // UI Managers
@@ -492,13 +479,13 @@ export class InfrastructureSystemCoordinator {
     this.systemDependencies.set("GlassmorphismManager", [
       "cssVariableManager",
       "performanceAnalyzer",
-      "settingsManager",
+      // NOTE: settingsManager dependency removed - using TypedSettingsManager singleton
     ]);
 
     this.systemRegistry.set("Card3DManager", Card3DManager);
     this.systemDependencies.set("Card3DManager", [
       "performanceAnalyzer",
-      "settingsManager",
+      // NOTE: settingsManager dependency removed - using TypedSettingsManager singleton
     ]);
 
     this.systemRegistry.set("GenreUIBridge", GenreUIBridge);
@@ -574,11 +561,10 @@ export class InfrastructureSystemCoordinator {
     const coreSystemsOrder = [
       // Core dependency systems first
       "DeviceCapabilityDetector", // Needed by WebGL integration
-      "EnhancedDeviceTierDetector", // Needed by simplified performance systems
 
       // New simplified performance systems (primary) - order matters for dependencies
       "WebGLSystemsIntegration", // Depends on DeviceCapabilityDetector
-      "SimplePerformanceCoordinator", // Depends on EnhancedDeviceTierDetector and WebGLSystemsIntegration
+      "SimplePerformanceCoordinator", // Simplified performance coordination
 
       // Legacy performance systems (for backward compatibility)
       "PerformanceAnalyzer",
@@ -607,10 +593,7 @@ export class InfrastructureSystemCoordinator {
               this.year3000System.deviceCapabilityDetector = system;
             }
             break;
-          case "EnhancedDeviceTierDetector":
-            this.enhancedDeviceTierDetector = system;
-            break;
-          
+
           // New simplified performance systems
           case "WebGLSystemsIntegration":
             this.webglSystemsIntegration = system;
@@ -662,6 +645,25 @@ export class InfrastructureSystemCoordinator {
   }
 
   /**
+   * 🔧 CRITICAL FIX: Broadcast setting changes to all cached infrastructure systems
+   * Enables settings propagation through facade layer
+   */
+  public broadcastSettingChange(key: string, value: any): void {
+    for (const [systemKey, system] of this.systemCache.entries()) {
+      if (system && typeof system.applyUpdatedSettings === "function") {
+        try {
+          system.applyUpdatedSettings(key, value);
+        } catch (err) {
+          console.warn(
+            `[InfrastructureSystemCoordinator] ${systemKey} failed to apply settings:`,
+            err
+          );
+        }
+      }
+    }
+  }
+
+  /**
    * Factory method to create and return non-visual systems
    * This is the main interface for the facade pattern
    *
@@ -694,15 +696,6 @@ export class InfrastructureSystemCoordinator {
       return deviceCapabilityDetector as T;
     }
 
-    if (key === "EnhancedDeviceTierDetector" && this.enhancedDeviceTierDetector) {
-      this.systemCache.set(key, this.enhancedDeviceTierDetector);
-      Y3KDebug?.debug?.log(
-        "InfrastructureSystemCoordinator",
-        "Using shared EnhancedDeviceTierDetector instance from SystemCoordinator"
-      );
-      return this.enhancedDeviceTierDetector as T;
-    }
-    
     // New simplified performance systems (priority)
     if (key === "WebGLSystemsIntegration" && this.webglSystemsIntegration) {
       this.systemCache.set(key, this.webglSystemsIntegration);
@@ -919,9 +912,6 @@ export class InfrastructureSystemCoordinator {
       const deviceDetector = coordinator.getSharedDependency('deviceCapabilityDetector');
       if (deviceDetector) deps.deviceCapabilityDetector = deviceDetector;
 
-      const enhancedDetector = coordinator.getSharedDependency('enhancedDeviceTierDetector');
-      if (enhancedDetector) deps.enhancedDeviceTierDetector = enhancedDetector;
-
       // WebGL integration
       const webgl = coordinator.getSharedDependency('webglSystemsIntegration');
       if (webgl) deps.webglSystemsIntegration = webgl;
@@ -938,7 +928,6 @@ export class InfrastructureSystemCoordinator {
       if (this.performanceOrchestrator) deps.performanceOrchestrator = this.performanceOrchestrator;
 
       if (this.year3000System?.deviceCapabilityDetector) deps.deviceCapabilityDetector = this.year3000System.deviceCapabilityDetector;
-      if (this.enhancedDeviceTierDetector) deps.enhancedDeviceTierDetector = this.enhancedDeviceTierDetector;
 
       if (this.webglSystemsIntegration) deps.webglSystemsIntegration = this.webglSystemsIntegration;
 
@@ -1005,12 +994,8 @@ export class InfrastructureSystemCoordinator {
           dependencies.performanceCoordinator || dependencies.performanceAnalyzer
         ) as T;
 
-      // Unified Performance Coordinator (legacy)
-      case "UnifiedPerformanceCoordinator":
-        return new SystemClass(
-          this.config,
-          dependencies.performanceAnalyzer || dependencies.performanceCoordinator
-        ) as T;
+      // NOTE: UnifiedPerformanceCoordinator removed - alias maps to PerformanceAnalyzer → SimplePerformanceCoordinator
+      // System creation handled by registry alias, no explicit constructor case needed
 
       // Glassmorphism Manager
       case "GlassmorphismManager":
@@ -1039,10 +1024,6 @@ export class InfrastructureSystemCoordinator {
           year3000System: this.year3000System,
         }) as T;
 
-      // Enhanced Device Tier Detector (static class)
-      case "EnhancedDeviceTierDetector":
-        return SystemClass as any as T;
-
       // WebGL Systems Integration
       case "WebGLSystemsIntegration":
         if (!dependencies.deviceCapabilityDetector) {
@@ -1050,22 +1031,11 @@ export class InfrastructureSystemCoordinator {
         }
         return new SystemClass(dependencies.deviceCapabilityDetector) as T;
 
-      // Simple Performance Coordinator
+      // Simple Performance Coordinator (and backward compatibility alias)
+      // Note: Constructor parameters are deprecated and ignored - creates dependencies internally
       case "SimplePerformanceCoordinator":
-        if (!dependencies.enhancedDeviceTierDetector || !dependencies.webglSystemsIntegration) {
-          throw new Error("SimplePerformanceCoordinator requires EnhancedDeviceTierDetector and WebGLSystemsIntegration");
-        }
-        return new SystemClass(
-          dependencies.enhancedDeviceTierDetector,
-          dependencies.webglSystemsIntegration
-        ) as T;
-
-      // Simple Tier Based Performance System
-      case "SimpleTierBasedPerformanceSystem":
-        if (!dependencies.enhancedDeviceTierDetector) {
-          throw new Error("SimpleTierBasedPerformanceSystem requires EnhancedDeviceTierDetector");
-        }
-        return new SystemClass(dependencies.enhancedDeviceTierDetector) as T;
+      case "UnifiedPerformanceCoordinator":
+        return new SystemClass() as T;
 
       // Default: try no-args constructor, then fall back to common pattern
       default:
@@ -1360,10 +1330,6 @@ export class InfrastructureSystemCoordinator {
       case "quality-first":
         this.facadeConfig.systemPreferences.lazyInitialization = false;
         this.facadeConfig.systemPreferences.performanceOptimization = true;
-        break;
-      case "battery-optimized":
-        this.facadeConfig.performanceThresholds.maxCPUPercent = 5;
-        this.facadeConfig.systemPreferences.lazyInitialization = true;
         break;
     }
   }

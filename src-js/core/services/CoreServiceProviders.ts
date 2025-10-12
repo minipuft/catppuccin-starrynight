@@ -726,8 +726,6 @@ export class DefaultPerformanceProfileService implements PerformanceProfileServi
   ): PerformanceProfileSnapshot["quality"] {
     if (!mode) return fallback;
     switch (mode.name) {
-      case "battery":
-        return "low";
       case "performance":
         return "high";
       case "auto":
