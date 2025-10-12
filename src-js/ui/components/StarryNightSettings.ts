@@ -186,7 +186,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
   (section as any).addDropDown(
     "sn-palette-system",
     "Palette system (color foundation vs enhancement)",
-    paletteLabels as unknown as string[],
+    paletteOptions as unknown as string[],
     Math.max(0, paletteOptions.indexOf(currentPalette as any)),
     undefined,
     {
@@ -196,7 +196,8 @@ export async function initializeStarryNightSettings(): Promise<void> {
         // Trigger Year3000System to refresh palette coordination
         void getThemeService()?.applyInitialSettings();
       },
-    }
+    },
+    paletteLabels // Pass user-friendly labels
   );
 
   // Glassmorphism level
@@ -236,11 +237,7 @@ export async function initializeStarryNightSettings(): Promise<void> {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
         const mode = artisticOptions[idx];
         settings.set("sn-artistic-mode", mode as any);
-        // Forward the change to the live Year3000System instance so that all
-        // subsystems (including ColorHarmonyEngine) receive the update via the
-        // shared configuration object.
-        const coordinator = getThemeService()?.getCoordinator();
-        (coordinator as any)?.ADVANCED_SYSTEM_CONFIG?.safeSetArtisticMode?.(mode);
+        // TypedSettingsManager will automatically propagate to all systems via onChange listener
       },
     }
   );
@@ -307,57 +304,102 @@ export async function initializeStarryNightSettings(): Promise<void> {
 
   // === Performance Controls ===============================================
   
-  // WebGL enabled toggle (TypedSettingsManager provides boolean type)
-  const enableWebGL = settings.get("sn-webgl-enabled");
-  (section as any).addToggle(
-    "sn-webgl-enabled",
-    "WebGL effects (master toggle for all WebGL backgrounds)",
-    enableWebGL,
-    {
-      onClick: (e: any) => {
-        const checked = (e.currentTarget as HTMLInputElement).checked;
-        settings.set(
-          "sn-webgl-enabled",
-          checked
-        );
-      },
-    }
-  );
+  // Performance Mode - Master Quality Control (Consolidates WebGL, animation, gradient quality)
+  const performanceModes = ["auto", "performance", "balanced", "quality", "maximum"] as const;
+  const performanceModeLabels = [
+    "Auto (detect device capabilities - recommended)",
+    "Performance (faster, reduced effects - low-end devices)",
+    "Balanced (standard quality for most devices)",
+    "Quality (high quality with all features - powerful devices)",
+    "Maximum (ultra quality + experimental features - enthusiasts)",
+  ] as const;
 
-  // WebGL quality drop-down
-  const webglQualityOptions = ["low", "medium", "high"] as const;
-  const currentWebGLQ = settings.get("sn-webgl-quality") || "medium";
+  const currentPerformanceMode = settings.get("sn-performance-mode") || "auto";
+  const currentModeIndex = Math.max(0, performanceModes.indexOf(currentPerformanceMode as any));
+
   (section as any).addDropDown(
-    "sn-webgl-quality",
-    "WebGL quality (performance vs visual quality)",
-    webglQualityOptions as unknown as string[],
-    Math.max(0, webglQualityOptions.indexOf(currentWebGLQ as any)),
+    "sn-performance-mode",
+    "Performance mode (controls WebGL, animations, and effects quality)",
+    performanceModes as unknown as string[],
+    currentModeIndex,
     undefined,
     {
-      onChange: (e: any) => {
-        const idx = e?.currentTarget?.selectedIndex ?? 1;
-        const val = webglQualityOptions[idx] ?? "medium";
-        settings.set("sn-webgl-quality", val as any);
+      onChange: async (e: any) => {
+        try {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const mode = performanceModes[idx] ?? "auto";
+
+          // Update settings
+          settings.set("sn-performance-mode", mode as any);
+
+          // Log the change
+          console.log(`[StarryNight] Performance mode changed to: ${mode} - ${performanceModeLabels[idx]}`);
+
+          // Settings change event will trigger SystemIntegrationCoordinator
+          // to apply the mode through PerformanceAnalyzer (Phase 3 consolidation)
+
+        } catch (err) {
+          console.error("[StarryNight] Failed to update performance mode", err);
+        }
       },
-    }
+    },
+    performanceModeLabels as unknown as string[]
   );
 
-  // Animation quality drop-down
-  const animQualityOptions = ["auto", "low", "high"] as const;
-  const currentAnimQ = settings.get("sn-animation-quality") || "auto";
+  // Corridor effects mode drop-down (user-friendly control)
+  const corridorOptions = ["auto", "enabled", "disabled"] as const;
+  const corridorLabels = [
+    "Auto (intelligent detection)",
+    "Enabled (force on if supported)",
+    "Disabled (never use corridor effects)"
+  ] as const;
+  const currentCorridor = settings.get("sn-corridor-effects-mode") || "auto";
   (section as any).addDropDown(
-    "sn-animation-quality",
-    "Animation quality (auto/low/high performance)",
-    animQualityOptions as unknown as string[],
-    Math.max(0, animQualityOptions.indexOf(currentAnimQ as any)),
+    "sn-corridor-effects-mode",
+    "Corridor effects (3D tunnel/depth effects)",
+    corridorOptions as unknown as string[],
+    Math.max(0, corridorOptions.indexOf(currentCorridor as any)),
     undefined,
     {
       onChange: (e: any) => {
         const idx = e?.currentTarget?.selectedIndex ?? 0;
-        const val = animQualityOptions[idx] ?? "auto";
-        settings.set("sn-animation-quality", val as any);
+        const val = corridorOptions[idx] ?? "auto";
+        settings.set("sn-corridor-effects-mode", val as any);
+        // Trigger full re-initialization to apply new corridor mode
+        void getThemeService()?.applyInitialSettings();
+        console.log(`[StarryNight] Corridor effects mode changed to: ${val}`);
       },
-    }
+    },
+    corridorLabels as unknown as string[] // Pass user-friendly labels
+  );
+
+  // Rendering mode drop-down (advanced control)
+  const renderingOptions = ["auto", "basic", "standard", "enhanced", "full"] as const;
+  const renderingLabels = [
+    "Auto (intelligent selection)",
+    "Basic (CSS only, no WebGL)",
+    "Standard (basic WebGL)",
+    "Enhanced (liquid shader)",
+    "Full (liquid + corridor effects)"
+  ] as const;
+  const currentRendering = settings.get("sn-rendering-mode") || "auto";
+  (section as any).addDropDown(
+    "sn-rendering-mode",
+    "Rendering mode (advanced: manual quality override)",
+    renderingOptions as unknown as string[],
+    Math.max(0, renderingOptions.indexOf(currentRendering as any)),
+    undefined,
+    {
+      onChange: (e: any) => {
+        const idx = e?.currentTarget?.selectedIndex ?? 0;
+        const val = renderingOptions[idx] ?? "auto";
+        settings.set("sn-rendering-mode", val as any);
+        // Trigger full re-initialization to apply new rendering mode
+        void getThemeService()?.applyInitialSettings();
+        console.log(`[StarryNight] Rendering mode changed to: ${val}`);
+      },
+    },
+    renderingLabels as unknown as string[] // Pass user-friendly labels
   );
 
   // === GLASS PULSE CONTROLS ===============================================

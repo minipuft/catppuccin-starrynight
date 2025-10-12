@@ -1,4 +1,5 @@
 import type { HarmonicMode } from "@/types/models";
+import type { CorridorEffectsMode, RenderingModePreference } from "@/types/renderingModes";
 import { HARMONIC_MODES } from "./harmonicModes";
 import { ARTISTIC_MODE_PROFILES } from "./artisticProfiles";
 import { CORE_THEME_VALIDATORS } from "./coreTheme";
@@ -21,6 +22,7 @@ export type HarmonicModeKey = keyof typeof HARMONIC_MODES;
 export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
+export type PerformanceMode = "auto" | "performance" | "balanced" | "quality" | "maximum";
 
 /**
  * Complete typed settings interface
@@ -44,9 +46,9 @@ export interface TypedSettings {
   "sn-glassmorphism-level": IntensityLevel;
   
   // === PERFORMANCE SETTINGS ===
-  "sn-webgl-enabled": boolean;            // Auto-parsed from string
-  "sn-animation-quality": QualityLevel;
-  "sn-webgl-quality": WebGLQuality;
+  "sn-performance-mode": PerformanceMode; // Master performance control
+  "sn-corridor-effects-mode": CorridorEffectsMode;
+  "sn-rendering-mode": RenderingModePreference;
 }
 
 /**
@@ -83,7 +85,7 @@ export const SETTINGS_METADATA: {
   },
   
   "sn-brightness-mode": {
-    defaultValue: "bright",
+    defaultValue: "dark", // Phase 2: Dark mode is default for refined appearance
     validator: CORE_THEME_VALIDATORS.brightnessMode,
     description: "Overall theme brightness level",
     category: "core",
@@ -157,32 +159,27 @@ export const SETTINGS_METADATA: {
   },
   
   // === PERFORMANCE SETTINGS ===
-  "sn-webgl-enabled": {
-    defaultValue: true,
-    validator: (value): value is boolean => typeof value === "boolean",
-    parser: (value: string) => {
-      if (value === "true") return true;
-      if (value === "false") return false;
-      return null;
-    },
-    serializer: (value: boolean) => value.toString(),
-    description: "Enable WebGL-accelerated visual effects",
-    category: "performance",
-  },
-  
-  "sn-animation-quality": {
+  "sn-performance-mode": {
     defaultValue: "auto",
-    validator: (value): value is QualityLevel =>
-      typeof value === "string" && ["auto", "low", "high"].includes(value),
-    description: "Animation performance vs quality balance",
+    validator: (value): value is PerformanceMode =>
+      typeof value === "string" && ["auto", "performance", "balanced", "quality", "maximum"].includes(value),
+    description: "Master performance mode controlling all quality settings",
     category: "performance",
   },
-  
-  "sn-webgl-quality": {
-    defaultValue: "medium",
-    validator: (value): value is WebGLQuality =>
-      typeof value === "string" && ["low", "medium", "high"].includes(value),
-    description: "WebGL rendering quality level",
+
+  "sn-corridor-effects-mode": {
+    defaultValue: "auto",
+    validator: (value): value is CorridorEffectsMode =>
+      typeof value === "string" && ["auto", "enabled", "disabled"].includes(value),
+    description: "Corridor shader effects control (auto enables on capable devices)",
+    category: "performance",
+  },
+
+  "sn-rendering-mode": {
+    defaultValue: "auto",
+    validator: (value): value is RenderingModePreference =>
+      typeof value === "string" && ["auto", "basic", "standard", "enhanced", "full"].includes(value),
+    description: "Advanced: Manual rendering backend selection",
     category: "performance",
   },
 };

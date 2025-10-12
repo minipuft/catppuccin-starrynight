@@ -3,7 +3,12 @@
  * Integrates with VariantResolver for consistent typography across the theme
  */
 
-import React, { useEffect, useRef } from "react";
+// Use Spicetify's provided React instead of bundled external
+// ESBuild marks react as external → converts to require() at runtime
+// Spicetify environment doesn't support require() (no CommonJS runtime)
+const React = (window as any).Spicetify?.React;
+const { useEffect, useRef } = React || {};
+
 // Import theme-specific Spicetify type extensions
 /// <reference path="../../types/spicetify-extensions.d.ts" />
 import { VariantResolver } from "@/utils/spicetify/VariantResolver";
@@ -46,10 +51,10 @@ export const VariantText: React.FC<VariantTextProps> = ({
   musicContext,
   ...props
 }) => {
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = (useRef as any)(null);
   const resolver = getVariantResolver();
 
-  useEffect(() => {
+  (useEffect as any)(() => {
     if (elementRef.current) {
       const context = musicContext ? {
         component: component,

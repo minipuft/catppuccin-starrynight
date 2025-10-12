@@ -69,7 +69,7 @@ export function launchSidebarClone(context: DragContext): void {
   // from its original context.
   (function stripCloneArtefacts(root: HTMLElement) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+     
     while (walker.nextNode()) {
       const el = walker.currentNode as HTMLElement;
       // Remove redundant aria-labels that may clash with the source list.

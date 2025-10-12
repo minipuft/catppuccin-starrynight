@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import ReactDOM from "react-dom";
+// Use Spicetify's provided React instead of bundled external
+// ESBuild marks react/react-dom as external → converts to require() at runtime
+// Spicetify environment doesn't support require() (no CommonJS runtime)
+const React = (window as any).Spicetify?.React;
+const ReactDOM = (window as any).Spicetify?.ReactDOM;
+const { useState } = React || {}; // Destructure hooks after runtime resolution
+
 import {
   ISettingsField,
   ISettingsFieldButton,
@@ -97,13 +102,15 @@ export class SettingsSection {
     options: string[],
     defaultIndex: number,
     _onSelect?: () => void, // unused – consistent signature
-    events?: ISettingsFieldDropdown["events"]
+    events?: ISettingsFieldDropdown["events"],
+    labels?: string[] // Optional user-friendly labels for display
   ) => {
     this.settingsFields[nameId] = {
       type: "dropdown",
       description,
       defaultValue: options[defaultIndex],
       options,
+      labels, // Store labels if provided
       events,
     } as ISettingsFieldDropdown;
   };
@@ -176,7 +183,7 @@ export class SettingsSection {
 
   /* ---------------------- React wrappers ----------------------------- */
   private FieldsContainer = () => {
-    const [nonce, setNonce] = useState(0);
+    const [nonce, setNonce] = (useState as any)(0);
     this.setRerender = setNonce;
 
     return (
@@ -201,7 +208,7 @@ export class SettingsSection {
       field.type === "button"
         ? (field as ISettingsFieldButton).value
         : this.getFieldValue<any>(nameId) ?? (field as any).defaultValue;
-    const [value, setVal] = useState<any>(initial);
+    const [value, setVal] = (useState as any)(initial);
 
     const setValue = (v: any) => {
       setVal(v);
@@ -231,6 +238,8 @@ export class SettingsSection {
 
     switch (field.type) {
       case "dropdown":
+        // Use labels if provided, otherwise use options as display text
+        const displayLabels = field.labels || field.options;
         Control = (
           <select
             className="main-dropDown-dropDown"
@@ -245,7 +254,7 @@ export class SettingsSection {
           >
             {field.options.map((opt, i) => (
               <option key={opt} value={opt} selected={opt === value}>
-                {opt}
+                {displayLabels[i]}
               </option>
             ))}
           </select>

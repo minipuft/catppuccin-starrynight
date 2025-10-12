@@ -9,7 +9,7 @@
 // heavy dependencies. It is fully gated so that if any requirement is missing
 // (e.g., Spicetify not ready) it silently aborts, preserving default behaviour.
 // ----------------------------------------------------------------------------
-/* eslint-disable no-console */
+ 
 
 import { spring } from "@/utils/animation/flipSpring";
 import { isSidebarCloneCapable as sidebarCloneCapable } from "@/utils/dom/sidebarDetector";

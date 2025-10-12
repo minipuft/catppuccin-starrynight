@@ -20,6 +20,7 @@ export interface ISettingsFieldDropdown {
   description?: string;
   defaultValue: string;
   options: string[];
+  labels?: string[]; // Optional user-friendly display labels (if omitted, options are used as labels)
   events?: Partial<React.SelectHTMLAttributes<HTMLSelectElement>>;
 }
 

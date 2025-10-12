@@ -9,7 +9,7 @@
 // Public API: `enableEnhancedDragPreview()` – idempotent.
 // ----------------------------------------------------------------------------
 
-/* eslint-disable no-console */
+ 
 
 import { buildDragGhostCanvas } from "@/utils/graphics/CanvasGhostBuilder";
 
