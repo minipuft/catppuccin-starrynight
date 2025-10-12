@@ -1,140 +1,238 @@
-# Test Organization Guide
+# Testing Guide - Catppuccin StarryNight
 
-This document explains the test structure for the Catppuccin StarryNight Spicetify theme.
+## Overview
 
-## Directory Structure
+This document provides guidance for writing and maintaining tests in the Catppuccin StarryNight Spicetify theme. The test suite has been modernized to align with the service composition pattern and 3-layer orchestration architecture.
 
+## Test Structure
+
+### Directory Organization
 ```
 tests/
-├── unit/                          # Unit tests (.test.ts)
-│   ├── audio/                     # Audio system tests (ColorHarmonyEngine, MusicSync)
-│   ├── core/                      # Core system tests (UnifiedSystemIntegration, Performance)
-│   ├── visual/                    # Visual system tests (WebGL, Visual Integration)
-│   └── utils/                     # Utility tests (ShaderLoader, Validation, etc.)
-├── integration/                   # Integration tests (.test.ts)
-│   ├── orchestration/             # System orchestration tests
-│   └── visual-effects-integration.test.ts
-├── manual/                        # Manual test scripts (.js/.html)
-│   ├── webgl/                     # WebGL testing scripts
-│   ├── performance/               # Performance testing scripts
-│   └── integration/               # Integration validation scripts
-└── setup/                         # Test configuration
-    └── jest.setup.ts              # Jest global setup
+├── integration/          # Cross-system integration tests
+│   ├── color/          # Color-related integrations
+│   ├── orchestration/  # System coordination tests
+│   └── visual/         # Visual effects integrations
+├── unit/               # Individual component tests
+│   ├── audio/          # Music sync and color harmony
+│   ├── core/           # Core systems and lifecycle
+│   ├── utils/          # Utility functions and processors
+│   └── visual/         # Visual effect systems
+├── performance/        # Performance benchmark tests
+├── helpers/            # Test utilities and mock factories
+└── README.md          # This file
 ```
 
-## Test Categories
+## Test Utilities
 
-### Unit Tests (`tests/unit/`)
-Formal Jest tests that validate individual components and systems.
+### Mock Factories
 
-- **Audio Tests**: Music sync, color harmony, beat detection
-- **Core Tests**: System coordination, performance management, integration
-- **Visual Tests**: WebGL rendering, visual effects, animation systems
-- **Utils Tests**: Utilities, validation, shader loading
+Use standardized mock factories for consistent test setup:
 
-### Integration Tests (`tests/integration/`)
-Tests that validate interactions between multiple systems.
+```typescript
+import { createMockPerformanceAnalyzer, createMockCSSVariableWriter, createTestOrchestration } from './helpers/mockFactories';
 
-- **Orchestration Tests**: System-wide coordination and communication
-- **Visual Effects Integration**: Cross-system visual effects coordination
+// Create a complete orchestration setup for integration tests
+const { coordinator, mocks } = createTestOrchestration({
+  mockLevel: 'full' // 'minimal', 'standard', or 'full'
+});
 
-### Manual Tests (`tests/manual/`)
-Browser-executable scripts for manual testing and debugging.
+// Create specific mocks for unit tests
+const mockPerformanceAnalyzer = createMockPerformanceAnalyzer();
+const mockCSSWriter = createMockCSSVariableWriter(config, mockPerformanceAnalyzer);
+```
 
-- **WebGL Tests**: WebGL system validation, shader testing
-- **Performance Tests**: Performance monitoring, device capability testing
-- **Integration Tests**: Live system integration validation
+### Test Utilities
+
+Common test utilities are available in `tests/helpers/testUtilities.ts`:
+
+```typescript
+import { waitForSystemInitialization, assertHealthy, cleanupSystems } from './helpers/testUtilities';
+
+// Wait for system to initialize with timeout
+await waitForSystemInitialization(system);
+
+// Assert that system health check passes
+await assertHealthy(system);
+
+// Clean up systems after tests
+await cleanupSystems(system1, system2, system3);
+```
+
+## Writing Tests
+
+### Unit Tests
+
+Unit tests should focus on individual components in isolation:
+
+1. Use mock factories for dependencies
+2. Test one component at a time
+3. Verify inputs, outputs, and side effects
+4. Follow AAA pattern: Arrange, Act, Assert
+
+```typescript
+describe('MyComponent', () => {
+  let component: MyComponent;
+  let mockDependency: jest.Mocked<Dependency>;
+
+  beforeEach(() => {
+    mockDependency = createMockDependency();
+    component = new MyComponent(mockDependency);
+  });
+
+  afterEach(async () => {
+    await cleanupSystems(component);
+  });
+
+  it('should process input correctly', async () => {
+    // Arrange
+    const input = { value: 42 };
+
+    // Act
+    const result = await component.process(input);
+
+    // Assert
+    expect(result).toBe(expectedOutput);
+    expect(mockDependency.method).toHaveBeenCalledWith(input);
+  });
+});
+```
+
+### Integration Tests
+
+Integration tests should verify that multiple systems work together:
+
+1. Test orchestration and coordination
+2. Verify event flow between systems
+3. Validate dependency injection patterns
+4. Test system lifecycle management
+
+```typescript
+describe('System Integration', () => {
+  let { coordinator, mocks } = createTestOrchestration();
+
+  beforeEach(async () => {
+    await coordinator.initialize();
+  });
+
+  afterEach(async () => {
+    await coordinator.destroy();
+  });
+
+  it('should coordinate visual and non-visual systems', async () => {
+    // Test that systems work together through the coordinator
+    const visualSystem = coordinator.getVisualSystem('MyVisualSystem');
+    const nonVisualSystem = coordinator.getCachedNonVisualSystem('MyNonVisualSystem');
+
+    expect(visualSystem).toBeDefined();
+    expect(nonVisualSystem).toBeDefined();
+  });
+});
+```
+
+## Architecture-Specific Patterns
+
+### Service Composition Pattern
+
+Systems now use composition instead of inheritance. When testing:
+
+- Mock services that are injected
+- Verify service interactions rather than internal state
+- Test service lifecycle through the composition
+
+### 3-Layer Orchestration
+
+The architecture follows a 3-layer orchestration pattern:
+1. ThemeLifecycleCoordinator (top level)
+2. SystemIntegrationCoordinator (middle level) 
+3. VisualEffectsCoordinator and InfrastructureSystemCoordinator (bottom level)
+
+When testing orchestration:
+- Use `createTestOrchestration()` for full setup
+- Verify coordination between layers
+- Test event propagation across layers
+
+### Dependency Injection
+
+Modern systems rely on dependency injection. In tests:
+- Always provide required dependencies via mock factories
+- Verify that systems gracefully handle missing dependencies
+- Test that injected dependencies are used correctly
+
+## Best Practices
+
+### 1. Use Type-Safe Mocks
+- All mock factories return properly typed mocks
+- Override only the methods you need to customize
+- Keep mock implementations minimal and focused
+
+### 2. Clean Up Resources
+- Always clean up systems in `afterEach` hooks
+- Remove DOM elements created during tests
+- Cancel any timers or event listeners
+
+### 3. Handle Async Operations Properly
+- Use async/await for system initialization
+- Wait for promises to resolve before making assertions
+- Use appropriate timeouts for initialization
+
+### 4. Focus on Behavior, Not Implementation
+- Test what the system does, not how it does it
+- Avoid testing private methods directly
+- Focus on inputs, outputs, and observable effects
+
+### 5. Performance Considerations
+- Keep test execution time reasonable
+- Use appropriate test durations for performance tests
+- Test performance under various conditions
+
+## Common Pitfalls
+
+### 1. Avoid Complex Setup
+- Use mock factories to keep setup simple
+- Don't recreate the same mocks across multiple tests
+- Extract common setup to `beforeEach` blocks
+
+### 2. Don't Mock What You Don't Own
+- Only mock external dependencies and complex internals
+- Test the actual behavior of your own code
+- Use real objects when possible
+
+### 3. Proper Error Handling Tests
+- Test both success and failure paths
+- Verify error handling and fallback behavior
+- Test edge cases and invalid inputs
 
 ## Running Tests
 
 ### All Tests
 ```bash
-npm test                    # Run all Jest tests
-npm run validate           # Run tests + linting + typecheck
+npm test
 ```
 
-### Specific Test Categories
+### Unit Tests Only
 ```bash
-npm run test:unit          # Run all unit tests
-npm run test:integration   # Run integration tests
+npm run test:unit
 ```
 
-### Specific Unit Test Groups
+### Integration Tests Only
 ```bash
-npm run test:unit:audio    # Audio system tests
-npm run test:unit:core     # Core system tests
-npm run test:unit:visual   # Visual system tests
-npm run test:unit:utils    # Utility tests
+npm run test:integration
 ```
 
-### Manual Tests
-Manual tests must be run directly in the browser:
-
-1. Open Spicetify developer console
-2. Copy and paste the test script content
-3. Or serve the HTML files through a local server
-
-Example manual test execution:
-```javascript
-// In Spicetify console, load and run:
-// tests/manual/performance/test-performance-system.js
+### Specific Test File
+```bash
+npm test -- path/to/your/test.file.ts
 ```
 
-## Test Configuration
-
-- **Jest Config**: `jest.config.js`
-- **Setup File**: `tests/setup/jest.setup.ts`
-- **Module Mapping**: `@/` → `src-js/`
-- **Environment**: jsdom with TypeScript support
-
-## Guidelines
-
-### Unit Tests
-- Use `.test.ts` extension
-- Test individual components/systems
-- Mock external dependencies
-- Maintain 90%+ coverage
-
-### Integration Tests  
-- Test system interactions
-- Use real implementations where possible
-- Focus on facade patterns and event bus
-
-### Manual Tests
-- Use `.js` extension for console execution
-- Include descriptive logging
-- Test real Spicetify environment
-- Document expected outcomes
-
-## Examples
-
-### Unit Test Example
-```typescript
-// tests/unit/audio/ColorHarmonyEngine.test.ts
-describe('ColorHarmonyEngine', () => {
-  it('should process OKLAB colors correctly', () => {
-    const engine = new ColorHarmonyEngine();
-    const result = engine.processColor([0.7, 0.1, 0.1]);
-    expect(result).toBeDefined();
-  });
-});
+### Watch Mode
+```bash
+npm test -- --watch
 ```
 
-### Manual Test Example  
-```javascript
-// tests/manual/webgl/test-webgl-system.js
-console.log('Testing WebGL System...');
-const canvas = document.querySelector('canvas');
-if (canvas) {
-  console.log('✓ WebGL canvas found');
-} else {
-  console.log('⚠ WebGL canvas not found');
-}
-```
+## Test Coverage
 
-## Migration Notes
-
-This structure was created to organize previously scattered test files:
-- Moved loose `test-*.js` files from project root to `tests/manual/`
-- Categorized formal tests by system (audio, core, visual, utils)
-- Maintained all existing test functionality and configuration
+- Aim for 80%+ coverage on critical systems
+- Focus coverage on high-risk areas
+- Coverage reports are generated automatically
+- New features should include appropriate tests

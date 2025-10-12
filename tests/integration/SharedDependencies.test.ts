@@ -5,15 +5,15 @@
  * Validates that dependencies are properly initialized and accessible.
  */
 
-import { SystemCoordinator } from '@/core/integration/SystemCoordinator';
+import { SystemIntegrationCoordinator } from '@/core/integration/SystemIntegrationCoordinator';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/ThemeUtilities';
 
 describe('Shared Dependencies Integration', () => {
-  let coordinator: SystemCoordinator;
+  let coordinator: SystemIntegrationCoordinator;
 
   beforeEach(async () => {
-    coordinator = new SystemCoordinator(
+    coordinator = new SystemIntegrationCoordinator(
       ADVANCED_SYSTEM_CONFIG,
       Utils,
       {}
@@ -149,7 +149,7 @@ describe('Shared Dependencies Integration', () => {
 
   describe('Memory Management', () => {
     test('Shared dependencies are cleaned up on destroy', async () => {
-      const coord = new SystemCoordinator(
+      const coord = new SystemIntegrationCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
         {}
@@ -179,7 +179,7 @@ describe('Shared Dependencies Integration', () => {
       const iterations = 5;
 
       for (let i = 0; i < iterations; i++) {
-        const coord = new SystemCoordinator(
+        const coord = new SystemIntegrationCoordinator(
           ADVANCED_SYSTEM_CONFIG,
           Utils,
           {}

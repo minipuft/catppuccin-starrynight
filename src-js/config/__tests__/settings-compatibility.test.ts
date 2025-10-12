@@ -77,14 +77,14 @@ describe("TypedSettingsManager", () => {
 
   describe("Type Conversion", () => {
     test("should auto-convert boolean values", () => {
-      settings.set("sn-webgl-enabled", false);
+      settings.set("sn-harmonic-evolution", false);
 
       // Check raw storage (should be string)
-      const raw = mockSpicetify.LocalStorage.get("sn-webgl-enabled");
+      const raw = mockSpicetify.LocalStorage.get("sn-harmonic-evolution");
       expect(raw).toBe("false");
 
       // Check typed get (should be boolean)
-      const value = settings.get("sn-webgl-enabled");
+      const value = settings.get("sn-harmonic-evolution");
       expect(typeof value).toBe("boolean");
       expect(value).toBe(false);
     });
@@ -237,17 +237,17 @@ describe("TypedSettingsManager", () => {
   describe("Import/Export", () => {
     test("should export all settings", () => {
       settings.set("sn-gradient-intensity", "intense");
-      settings.set("sn-webgl-enabled", false);
+      settings.set("sn-harmonic-evolution", false);
 
       const exported = settings.export();
       expect(exported["sn-gradient-intensity"]).toBe("intense");
-      expect(exported["sn-webgl-enabled"]).toBe(false);
+      expect(exported["sn-harmonic-evolution"]).toBe(false);
     });
 
     test("should import settings", () => {
       const toImport = {
         "sn-gradient-intensity": "minimal" as const,
-        "sn-webgl-enabled": true,
+        "sn-harmonic-evolution": true,
         "sn-harmonic-intensity": 0.5,
       };
 
@@ -257,7 +257,7 @@ describe("TypedSettingsManager", () => {
 
       // Verify imported
       expect(settings.get("sn-gradient-intensity")).toBe("minimal");
-      expect(settings.get("sn-webgl-enabled")).toBe(true);
+      expect(settings.get("sn-harmonic-evolution")).toBe(true);
       expect(settings.get("sn-harmonic-intensity")).toBe(0.5);
     });
   });
@@ -266,7 +266,7 @@ describe("TypedSettingsManager", () => {
     test("should validate all settings", () => {
       // Set some valid settings
       settings.set("sn-gradient-intensity", "balanced");
-      settings.set("sn-webgl-enabled", true);
+      settings.set("sn-harmonic-evolution", true);
 
       const validation = settings.validateAllSettings();
       expect(validation.valid).toBeGreaterThan(0);
@@ -321,8 +321,8 @@ export const liveSpicetifyTest = `
 
   // Test 4: Type conversion
   console.log("\\n✓ Test 4: Type conversion");
-  settings.set("sn-webgl-enabled", false);
-  const bool = settings.get("sn-webgl-enabled");
+  settings.set("sn-harmonic-evolution", false);
+  const bool = settings.get("sn-harmonic-evolution");
   console.assert(typeof bool === "boolean", "❌ Boolean parsing failed");
   console.log("  ✅ Boolean conversion:", bool, typeof bool);
 

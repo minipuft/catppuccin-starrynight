@@ -1,19 +1,19 @@
 /**
- * Integration Tests: SystemCoordinator
+ * Integration Tests: SystemIntegrationCoordinator
  *
  * Tests the central orchestration layer that coordinates visual and infrastructure systems.
  * Validates dependency injection, system lifecycle, and cross-system communication.
  */
 
-import { SystemCoordinator } from '@/core/integration/SystemCoordinator';
+import { SystemIntegrationCoordinator } from '@/core/integration/SystemIntegrationCoordinator';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import * as Utils from '@/utils/core/ThemeUtilities';
 
 describe('SystemCoordinator Integration', () => {
-  let coordinator: SystemCoordinator;
+  let coordinator: SystemIntegrationCoordinator;
 
   beforeEach(async () => {
-    coordinator = new SystemCoordinator(
+    coordinator = new SystemIntegrationCoordinator(
       ADVANCED_SYSTEM_CONFIG,
       Utils,
       {} // mock year3000System
@@ -61,7 +61,7 @@ describe('SystemCoordinator Integration', () => {
 
   describe('System Lifecycle', () => {
     test('SystemCoordinator initializes successfully', async () => {
-      const newCoord = new SystemCoordinator(
+      const newCoord = new SystemIntegrationCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
         {}
@@ -72,7 +72,7 @@ describe('SystemCoordinator Integration', () => {
     });
 
     test('SystemCoordinator destroys cleanly', async () => {
-      const newCoord = new SystemCoordinator(
+      const newCoord = new SystemIntegrationCoordinator(
         ADVANCED_SYSTEM_CONFIG,
         Utils,
         {}
@@ -84,7 +84,7 @@ describe('SystemCoordinator Integration', () => {
 
     test('No errors during multiple init/destroy cycles', async () => {
       for (let i = 0; i < 3; i++) {
-        const coord = new SystemCoordinator(
+        const coord = new SystemIntegrationCoordinator(
           ADVANCED_SYSTEM_CONFIG,
           Utils,
           {}

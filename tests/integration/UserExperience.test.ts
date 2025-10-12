@@ -8,7 +8,7 @@
  * Focus: Theme behavior, user interactions, visual quality
  */
 
-import { AdvancedThemeSystem } from '@/core/lifecycle/AdvancedThemeSystem';
+import { AdvancedThemeSystem } from '@/core/lifecycle/ThemeLifecycleCoordinator';
 import { MusicBeatSynchronizer } from '@/visual/music/MusicSyncVisualEffects';
 import { ColorHarmonyEngine } from '@/audio/ColorHarmonyEngine';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';

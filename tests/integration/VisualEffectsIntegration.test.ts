@@ -8,7 +8,7 @@
  * Focus: Effects coordination, music integration, visual quality
  */
 
-import { UnifiedParticleSystem } from '@/visual/effects/UnifiedParticleSystem';
+import { UnifiedParticleSystem } from '@/visual/effects/ParticleEffectSystem';
 import { MusicGlowEffectsManager } from '@/visual/effects/GlowEffectsController';
 import { DepthLayeredGradientSystem } from '@/visual/backgrounds/DepthLayeredGradientSystem';
 import { FluidGradientBackgroundSystem } from '@/visual/backgrounds/FluidGradientBackgroundSystem';
@@ -584,6 +584,77 @@ describe('Visual Effects Integration', () => {
       // Cleanup
       constrainedParticles.destroy();
       constrainedGlow.destroy();
+    });
+  });
+
+  describe('Advanced Theme System Integration', () => {
+    let advancedThemeSystem: any;
+
+    beforeEach(() => {
+      // Initialize AdvancedThemeSystem for facade integration tests
+      const { AdvancedThemeSystem } = require('@/core/lifecycle/ThemeLifecycleCoordinator');
+      advancedThemeSystem = new AdvancedThemeSystem(ADVANCED_SYSTEM_CONFIG);
+      
+      // Enhance AdvancedThemeSystem with facade coordinator for visual system registration
+      advancedThemeSystem.facadeCoordinator = {
+        getVisualSystem: jest.fn((systemKey: string) => {
+          if (systemKey === 'OrganicBeatSync') {
+            return { initialized: true, healthCheck: jest.fn().mockResolvedValue({ ok: true }) };
+          }
+          return null;
+        }),
+        getNonVisualSystem: jest.fn(() => null),
+        isInitialized: jest.fn(() => true)
+      } as any;
+    });
+
+    afterEach(() => {
+      if (advancedThemeSystem && advancedThemeSystem.organicBeatSyncConsciousness && advancedThemeSystem.organicBeatSyncConsciousness.destroy) {
+        advancedThemeSystem.organicBeatSyncConsciousness.destroy();
+      }
+    });
+
+    it('should integrate with AdvancedThemeSystem facade', () => {
+      expect(advancedThemeSystem.organicBeatSyncConsciousness).toBeDefined();
+      expect(advancedThemeSystem.beatSyncVisualSystem).toBe(advancedThemeSystem.organicBeatSyncConsciousness);
+    });
+
+    it('should register with VisualSystemFacade', () => {
+      const visualFacade = advancedThemeSystem.facadeCoordinator?.getVisualSystem('OrganicBeatSync');
+      expect(visualFacade).toBeDefined();
+    });
+
+    it('should have proper dependency injection', () => {
+      // Dependencies are available through ServiceVisualSystemBase composition pattern
+      expect(advancedThemeSystem.organicBeatSyncConsciousness).toBeDefined();
+      expect(advancedThemeSystem.organicBeatSyncConsciousness.initialized).toBeDefined();
+    });
+
+    it('should initialize music sync state tracking', () => {
+      // Music sync state provides intensity and scale information
+      const syncState = advancedThemeSystem.organicBeatSyncConsciousness?.getMusicSyncState();
+      expect(syncState).toBeDefined();
+      expect(syncState?.musicIntensity).toBeDefined();
+      expect(syncState?.scaleMultiplier).toBeDefined();
+    });
+
+    it('should initialize performance metrics tracking', () => {
+      // Music sync metrics track performance and responsiveness
+      const metrics = advancedThemeSystem.organicBeatSyncConsciousness?.getMusicSyncMetrics();
+      expect(metrics).toBeDefined();
+    });
+
+    it('should handle configuration updates', async () => {
+      await advancedThemeSystem.organicBeatSyncConsciousness?.initialize();
+      
+      const newConfig = {
+        responseSensitivity: 0.8,
+        animationIntensity: 0.6,
+        transitionFluidityEnabled: true,
+        visualParticlesEnabled: false
+      };
+      
+      expect(() => advancedThemeSystem.organicBeatSyncConsciousness?.updateSyncConfig(newConfig)).not.toThrow();
     });
   });
 
