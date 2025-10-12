@@ -14,7 +14,7 @@
 // safe to call multiple times (hot-reload friendly).
 // ----------------------------------------------------------------------------
 
-/* eslint-disable no-console */
+ 
 
 interface DragStartLog {
   time: string;

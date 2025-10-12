@@ -39,8 +39,7 @@ export interface PerformanceContext {
   qualityLevel: "minimal" | "low" | "medium" | "high" | "ultra";
   qualityScore: number;
   deviceTier: "minimal" | "low" | "medium" | "high" | "ultra";
-  thermalState: "nominal" | "warm" | "hot" | "critical";
-  powerLevel: "high" | "balanced" | "battery-saver";
+  powerLevel: "high" | "balanced";
 }
 
 export interface AnimationSystem {

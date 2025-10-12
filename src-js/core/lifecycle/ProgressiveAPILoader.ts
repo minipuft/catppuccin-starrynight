@@ -142,27 +142,71 @@ export async function waitForDOMElement(
 /**
  * Wait for Catppuccin theme to be fully loaded
  *
- * @param timeout - Maximum time to wait in milliseconds
- * @returns Promise resolving to true if theme loaded, false if timeout
+ * PHASE 1 FIX: Reduced timeout and improved color validation
+ * - Reduced default timeout from 8s to 3s (reasonable for CSS loading)
+ * - Added early Spicetify color extraction availability check
+ * - Added validation to reject white/invalid fallback values
+ * - Check multiple critical color variables for robustness
+ *
+ * @param timeout - Maximum time to wait in milliseconds (default: 3000ms)
+ * @returns Promise resolving to true if theme loaded with valid colors, false if timeout
  */
 export async function waitForCatppuccinTheme(
-  timeout = 5000
+  timeout = 3000
 ): Promise<boolean> {
   const start = Date.now();
+  let attemptCount = 0;
+
+  // Early check: If Spicetify.colorExtractor is available, we can proceed faster
+  const hasColorExtractor = !!(window as any).Spicetify?.colorExtractor;
+  if (hasColorExtractor) {
+    console.log(
+      `✅ [ProgressiveAPILoader] Spicetify.colorExtractor available - theme colors ready`
+    );
+  }
 
   while (Date.now() - start < timeout) {
+    attemptCount++;
     try {
       // Check for Catppuccin CSS variables
       const rootStyles = getComputedStyle(document.documentElement);
-      const baseColor = rootStyles.getPropertyValue("--ctp-base");
 
-      if (baseColor && baseColor.trim() !== "") {
+      // Check multiple critical color variables for robustness
+      const baseColor = rootStyles.getPropertyValue("--ctp-base").trim();
+      const accentColor = rootStyles.getPropertyValue("--ctp-mauve").trim();
+      const textColor = rootStyles.getPropertyValue("--ctp-text").trim();
+
+      // Validate colors are not white/invalid fallback values
+      const invalidColors = ['#ffffff', '#fff', 'white', '#000000', '#000', 'black', '', 'transparent'];
+
+      const isBaseValid = baseColor && !invalidColors.includes(baseColor.toLowerCase());
+      const isAccentValid = accentColor && !invalidColors.includes(accentColor.toLowerCase());
+      const isTextValid = textColor && !invalidColors.includes(textColor.toLowerCase());
+
+      // Require at least base and text to be valid (accent can be missing in some themes)
+      if (isBaseValid && isTextValid) {
         console.log(
-          `✅ [ProgressiveAPILoader] Catppuccin theme loaded (${
+          `✅ [ProgressiveAPILoader] Catppuccin theme loaded with valid colors (${
             Date.now() - start
-          }ms)`
+          }ms, ${attemptCount} attempts)`,
+          { base: baseColor, accent: accentColor, text: textColor }
         );
         return true;
+      }
+
+      // Log invalid colors for debugging
+      if (attemptCount % 10 === 0) {
+        console.log(
+          `🔄 [ProgressiveAPILoader] Waiting for valid theme colors (attempt ${attemptCount})`,
+          {
+            base: baseColor || 'missing',
+            baseValid: isBaseValid,
+            accent: accentColor || 'missing',
+            accentValid: isAccentValid,
+            text: textColor || 'missing',
+            textValid: isTextValid
+          }
+        );
       }
     } catch (e) {
       console.warn(
@@ -173,9 +217,26 @@ export async function waitForCatppuccinTheme(
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
+  // Enhanced diagnostic information on timeout
   console.warn(
-    `❌ [ProgressiveAPILoader] Catppuccin theme not detected after ${timeout}ms`
+    `❌ [ProgressiveAPILoader] Catppuccin theme not detected with valid colors after ${timeout}ms (${attemptCount} attempts)`
   );
+
+  // Provide final diagnostic snapshot
+  try {
+    const rootStyles = getComputedStyle(document.documentElement);
+    console.warn("❌ [ProgressiveAPILoader] Final CSS variable snapshot:", {
+      'ctp-base': rootStyles.getPropertyValue("--ctp-base").trim() || 'missing',
+      'ctp-mauve': rootStyles.getPropertyValue("--ctp-mauve").trim() || 'missing',
+      'ctp-text': rootStyles.getPropertyValue("--ctp-text").trim() || 'missing',
+      'spice-base': rootStyles.getPropertyValue("--spice-base").trim() || 'missing',
+      'spice-accent': rootStyles.getPropertyValue("--spice-accent").trim() || 'missing',
+      'spice-text': rootStyles.getPropertyValue("--spice-text").trim() || 'missing',
+    });
+  } catch (e) {
+    console.warn("❌ [ProgressiveAPILoader] Could not get final CSS snapshot:", e);
+  }
+
   return false;
 }
 

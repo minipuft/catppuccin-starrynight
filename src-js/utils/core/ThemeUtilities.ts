@@ -593,7 +593,7 @@ export function processOklabColor(
   const multipliers = ADVANCED_SYSTEM_CONFIG.getCurrentMultipliers();
 
   let adjusted_L = L * (1 + (valence - 0.5) * 0.1);
-  let adjusted_C =
+  const adjusted_C =
     C * (1 + (energy - 0.5) * 0.2) * (multipliers?.saturation || 1);
 
   adjusted_L = Math.max(

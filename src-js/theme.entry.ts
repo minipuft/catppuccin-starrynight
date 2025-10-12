@@ -7,6 +7,7 @@ import { waitForSpicetifyReady } from "./utils/platform/spicetifyReady";
 import { initializeAberrationManager } from "./visual/ui/Aberration/AberrationManager"; // Re-enabled for hybrid CSS+WebGL approach
 import { initializeAudioVisualController } from "./visual/ui/AudioVisualController";
 import { startCardDOMWatcher } from "./utils/dom/CardDOMWatcher"; // Phase 2: Card normalization
+import { migrateToPerformanceMode } from "./utils/migration/performanceModeMigration"; // Phase 7: Settings migration
 
 // Progressive enhancement utilities
 import {
@@ -14,6 +15,7 @@ import {
   waitForDOMElement,
   waitForCatppuccinTheme,
 } from "./core/lifecycle/ProgressiveAPILoader";
+import { waitForGradientSystemReady } from "./utils/platform/gradientSystemReady";
 
 // A placeholder for the settings UI function until it can be properly typed.
 declare const initializeSettingsUI: (location: any) => void;
@@ -31,6 +33,10 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
 
   console.log("🌟 [Catppuccin StarryNight] Theme entry point starting...");
 
+  // Phase 1: Set critical loading state immediately
+  document.documentElement.setAttribute('data-theme-loading', 'critical');
+  console.log('🎨 [StarryNight] Phase 1: Critical dark CSS active');
+
   // 🚦 Wait until Spicetify signals that its registry is fully initialised
   const spicetifyReady = await waitForSpicetifyReady(10000);
   if (!spicetifyReady) {
@@ -46,22 +52,22 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
     console.log("✅ [StarryNight] Spicetify platform fully ready");
   }
 
-  // 🔧 CRITICAL FIX: Wait for Catppuccin theme to be fully loaded before initializing color systems
-  const themeReady = await waitForCatppuccinTheme(8000);
+  // 🔧 PHASE 1 FIX: Wait for Catppuccin theme with improved timing and validation
+  // Reduced timeout from 8s to 3s with better color validation
+  const themeReady = await waitForCatppuccinTheme(3000);
   if (!themeReady) {
-    console.error(
-      "❌ [StarryNight] CRITICAL: Catppuccin theme not fully loaded after 8s – may experience color issues"
+    console.warn(
+      "⚠️ [StarryNight] Catppuccin theme colors not detected after 3s – using fallback strategy"
     );
-    // Additional diagnostic information
-    const rootStyle = getComputedStyle(document.documentElement);
-    console.error("❌ [StarryNight] Current CSS variables:", {
-      base: rootStyle.getPropertyValue("--spice-base").trim(),
-      accent: rootStyle.getPropertyValue("--spice-accent").trim(),
-      text: rootStyle.getPropertyValue("--spice-text").trim(),
-    });
+    console.warn("⚠️ [StarryNight] Theme will use Catppuccin Macchiato fallback colors");
+    // SpicetifyColorBridge will handle fallback to Catppuccin Macchiato colors
   } else {
-    console.log("✅ [StarryNight] Catppuccin theme fully loaded");
+    console.log("✅ [StarryNight] Catppuccin theme fully loaded with valid colors");
   }
+
+  // Phase 2: Design tokens loaded (CSS already applied by this point)
+  document.documentElement.setAttribute('data-theme-loading', 'tokens');
+  console.log('🎨 [StarryNight] Phase 2: Design tokens loaded');
 
   // Progressive API detection with reasonable timeouts
   const requiredAPIs = {
@@ -150,6 +156,20 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
     });
   }
 
+  // 0. Migrate legacy settings to unified performance mode (Phase 7)
+  // This must run before system initialization to ensure performance mode is available
+  try {
+    const migratedMode = migrateToPerformanceMode();
+    if (migratedMode) {
+      console.log(
+        `🔧 [StarryNight] Settings migration complete: using ${migratedMode} mode`
+      );
+    }
+  } catch (error) {
+    console.error("[StarryNight] Settings migration failed:", error);
+    // Continue with default performance mode
+  }
+
   // 1. Instantiate the main system. It will handle its own internal dependencies.
   const year3000System = new ThemeLifecycleCoordinator(ADVANCED_SYSTEM_CONFIG);
 
@@ -176,6 +196,10 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
       year3000System.setupMusicAnalysisAndColorExtraction();
 
       console.log("🌟 [StarryNight] Full initialization complete");
+
+      // Phase 3: JS systems initialized (SpicetifyColorBridge active)
+      document.documentElement.setAttribute('data-theme-loading', 'systems');
+      console.log('🎨 [StarryNight] Phase 3: JS systems initialized');
 
       // 🌌 Enable Year3000 Stellar Navigation Mode (Dot Matrix Grid Effects)
       document.body.setAttribute('data-layout', 'navigation');
@@ -225,13 +249,35 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
         console.error("[StarryNight] UI controller initialization failed:", uiError);
         // Continue without UI controllers
       }
+
+      // Phase 4: Wait for gradient system ready, then remove loading state
+      // This allows living gradients to fade in smoothly
+      const gradientReady = await waitForGradientSystemReady(2000);
+      if (gradientReady) {
+        document.documentElement.removeAttribute('data-theme-loading');
+        console.log('🎨 [StarryNight] Phase 4: Living gradients active, critical CSS removed');
+      } else {
+        console.warn('⚠️ [StarryNight] Gradient system not ready, keeping critical CSS active for graceful degradation');
+        // Keep data-theme-loading attribute - critical CSS stays active as fallback
+      }
     }
   } catch (error) {
     console.error("[StarryNight] System initialization failed:", error);
     // Continue with basic theme functionality
   }
 
-  // 3. Initialize Settings UI using Spicetify's native React components
+  // 3. Initialize Spicetify settings integration
+  try {
+    const { initializeSpicetifySettingsSync } = await import(
+      "./config/spicetifySettingsIntegration"
+    );
+    initializeSpicetifySettingsSync();
+    console.log("🌟 [StarryNight] Spicetify settings integration initialized");
+  } catch (e) {
+    console.error("[StarryNight] Failed to initialize Spicetify settings integration:", e);
+  }
+
+  // 4. Initialize Settings UI using Spicetify's native React components
   try {
     // Only initialize settings if React APIs are available
     if (requiredAPIs.react && requiredAPIs.reactDOM) {
@@ -254,8 +300,11 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
     );
   }
 
-  // 4. Expose for debugging
+  // 5. Expose for debugging
   if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
+    const { getStorageDiagnostics, repairSettingsStorage } = await import(
+      "./config/spicetifySettingsIntegration"
+    );
     (window as any).Y3K = {
       system: year3000System,
       // Expose internal modules for easier debugging
@@ -266,6 +315,11 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
       health: year3000System.systemHealthMonitor,
       // Add degraded mode info
       mode: degradedMode ? "degraded" : "full",
+      // Add storage diagnostics
+      storage: {
+        diagnostics: getStorageDiagnostics,
+        repair: repairSettingsStorage,
+      },
       availableAPIs: requiredAPIs,
     };
   }

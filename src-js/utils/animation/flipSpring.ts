@@ -26,8 +26,8 @@ export function spring(config: SpringConfig) {
   const d = config.damping ?? 24;
   const m = config.mass ?? 1;
 
-  let current: Record<string, number> = {};
-  let velocity: Record<string, number> = {};
+  const current: Record<string, number> = {};
+  const velocity: Record<string, number> = {};
   let target: Record<string, number> = {};
   let animId: number | null = null;
 

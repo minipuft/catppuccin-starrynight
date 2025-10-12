@@ -47,7 +47,7 @@ const SUPPORTS_REGISTRY = typeof FinalizationRegistry !== "undefined";
 // Clean-up callback removes the cache entry once its value is GC-collected.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const registry: any = SUPPORTS_REGISTRY
-  ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  ?  
     // @ts-ignore – lib dom may not include FinalizationRegistry in older TS bundlers
     new FinalizationRegistry((selector: string) => {
       CACHE.delete(selector);
