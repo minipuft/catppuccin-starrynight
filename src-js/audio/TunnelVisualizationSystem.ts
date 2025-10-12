@@ -371,7 +371,7 @@ export class TunnelVisualizationSystem extends ServiceVisualSystemBase {
 
     if (buffer.length === 0) return this.currentLightingState;
 
-    let smoothed = { ...buffer[0]! };
+    const smoothed = { ...buffer[0]! };
 
     for (let i = 1; i < buffer.length; i++) {
       const current = buffer[i]!;

@@ -1721,7 +1721,7 @@ export class MusicSyncService {
       // Use individual settings from the typed system instead of a single JSON blob
       return {
         enableMusicSync: true, // Always enabled since no specific setting exists
-        audioAnalysisQuality: settings.get("sn-webgl-quality") || "medium",
+        audioAnalysisQuality: "medium", // Managed internally by performance mode system
         gradientIntensity: settings.get("sn-gradient-intensity") || "balanced",
         artisticMode: settings.get("sn-artistic-mode") || "artist-vision",
       };

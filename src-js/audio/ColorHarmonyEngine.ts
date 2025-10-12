@@ -2424,7 +2424,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
         }
 
         // Apply audioAnalysis state modulation (preserves OKLAB processing)
-        let finalColor = this._applyVisualEffectsModulation(interpolatedColor, {
+        const finalColor = this._applyVisualEffectsModulation(interpolatedColor, {
           musicInfluence,
           valenceGravity,
           hueShift,
@@ -4760,7 +4760,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   ): { harmonyScore: number; explanation: string } {
     try {
       let harmonyScore = 1.0; // Default confidence multiplier
-      let explanationParts: string[] = [];
+      const explanationParts: string[] = [];
 
       // Convert album colors to HSL for color psychology analysis
       const albumHslColors = Object.entries(albumArtColors)

@@ -123,11 +123,6 @@ describe("Color diagnostics service integration", () => {
       unregisterVisualEffectsParticipant: jest.fn(),
     } as unknown as VisualCoordinatorService;
 
-    DefaultServiceFactory.registerOverrides({
-      themeLifecycle: mockThemeLifecycleService,
-      visualCoordinator: mockVisualCoordinatorService,
-    });
-
     jest.spyOn(console, "warn").mockImplementation(() => undefined);
     jest.spyOn(console, "error").mockImplementation(() => undefined);
   });
@@ -140,6 +135,14 @@ describe("Color diagnostics service integration", () => {
 
   it("ColorEventRouter resolves performance coordinator through services", async () => {
     await jest.isolateModulesAsync(async () => {
+      const { DefaultServiceFactory: Factory } = await import(
+        "@/core/services/CoreServiceProviders"
+      );
+      Factory.resetServices();
+      Factory.registerOverrides({
+        themeLifecycle: mockThemeLifecycleService,
+        visualCoordinator: mockVisualCoordinatorService,
+      });
       const { ColorEventRouter } = await import(
         "@/core/events/ColorEventRouter"
       );
@@ -150,11 +153,24 @@ describe("Color diagnostics service integration", () => {
 
   it("CSSColorController initializes with service-provided CSS controller", async () => {
     await jest.isolateModulesAsync(async () => {
+      const { DefaultServiceFactory: Factory } = await import(
+        "@/core/services/CoreServiceProviders"
+      );
+      Factory.resetServices();
+      Factory.registerOverrides({
+        themeLifecycle: mockThemeLifecycleService,
+        visualCoordinator: mockVisualCoordinatorService,
+      });
+      const servicesSnapshot = Factory.getServices();
+      expect(servicesSnapshot.themeLifecycle).toBe(mockThemeLifecycleService);
       const { CSSColorController } = await import(
         "@/core/css/ColorStateManager"
       );
       const controller = new CSSColorController();
       await controller.initialize();
+      const actualCssController = (controller as any).cssController;
+      expect(getCssControllerMock).toHaveBeenCalled();
+      expect(actualCssController).toBe(mockCssController);
       expect(mockCssController.batchSetVariables).toHaveBeenCalled();
       expect((globalThis as any).year3000System).toBe(sentinel);
       controller.destroy();
@@ -163,6 +179,14 @@ describe("Color diagnostics service integration", () => {
 
   it("ColorHarmonyEngine instantiates without touching legacy globals", async () => {
     await jest.isolateModulesAsync(async () => {
+      const { DefaultServiceFactory: Factory } = await import(
+        "@/core/services/CoreServiceProviders"
+      );
+      Factory.resetServices();
+      Factory.registerOverrides({
+        themeLifecycle: mockThemeLifecycleService,
+        visualCoordinator: mockVisualCoordinatorService,
+      });
       const { ColorHarmonyEngine } = await import(
         "@/audio/ColorHarmonyEngine"
       );
@@ -174,6 +198,14 @@ describe("Color diagnostics service integration", () => {
 
   it("DebugCoordinator health check relies on facade service", async () => {
     await jest.isolateModulesAsync(async () => {
+      const { DefaultServiceFactory: Factory } = await import(
+        "@/core/services/CoreServiceProviders"
+      );
+      Factory.resetServices();
+      Factory.registerOverrides({
+        themeLifecycle: mockThemeLifecycleService,
+        visualCoordinator: mockVisualCoordinatorService,
+      });
       const { DebugCoordinator } = await import("@/debug/DebugCoordinator");
       const debug = DebugCoordinator.getInstance({
         enableConsoleReporting: false,
