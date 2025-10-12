@@ -1,6 +1,6 @@
-# Catppuccin StarryNight - Codex Agent Guide
+# Catppuccin StarryNight - Agent Quick Start
 
-## Rule Layers
+## Documentation Layers
 
 | Layer             | Purpose                                                              | File               |
 | ----------------- | -------------------------------------------------------------------- | ------------------ |
@@ -9,39 +9,48 @@
 | Local workflow    | Environment, build, and verification guidance tailored for this repo | `AGENTS.local.md`  |
 | Claude deep dive  | Full reference used by Claude when you need exhaustive detail        | `CLAUDE.md`        |
 
-## Quick Start
+## Core Stack
+- **Languages**: TypeScript (strict mode) + SCSS
+- **Build**: ESBuild for TypeScript, SASS for SCSS → producing `theme.js` and `user.css`
+- **Architecture**: Modular TypeScript with service composition and unified lifecycle management
+- **Entry points**: `src-js/theme.entry.ts` → `theme.js`, `app.scss` → `user.css`
 
-- Core stack: TypeScript + SCSS with ESBuild and SASS pipelines producing `theme.js` and `user.css`.
-- Entry point: `src-js/theme.entry.ts` bootstraps `AdvancedThemeSystem` that wires visual and service layers.
-- Rebuild after changes: `npm run build:js:dev` (TS), `npm run build:css:dev` (SCSS), or `npm run build` for both.
-- Validate often: `npm run typecheck`, `npm test`, `npm run lint:js`, `npm run lint:css`, `npm run validate`.
+## Essential Commands
+- `npm run build` - Full development build (TS + SCSS)
+- `npm run build:js:dev` - TypeScript rebuild with sourcemap (`src-js/` → `theme.js`)
+- `npm run build:css:dev` - SCSS rebuild expanded (`src/` → `user.css`)
+- `npm run validate` - Complete validation (typecheck + lint + test)
 
 ## Safe Coding Defaults
+- **Edit sources only**: Never patch compiled artifacts (`theme.js`, `user.css`) directly
+- **Performance first**: Guard 60fps target and memory budgets; highlight hot paths
+- **Accessibility**: Respect `prefers-reduced-motion`, contrast requirements, fallbacks
+- **Reversible changes**: Small increments, thorough interface searches, documented assumptions
 
-- Edit sources only; rebuild to update `theme.js` and `user.css`, never patch artifacts directly.
-- Identify affected systems upfront and run targeted tests or builds before handoff; summarize results.
-- Guard performance budgets (60fps target, low memory churn) and highlight introduced hot paths.
-- Preserve accessibility defaults: respect `prefers-reduced-motion`, Catppuccin contrast, and fallback behavior.
-- Keep changes reversible: small increments, thorough searches before interface edits, document assumptions.
+## Development Workflow
+1. **Investigate**: Use domain rules and search (`rg`) to understand impacted systems
+2. **Plan**: Consider interfaces, lifecycle, and performance end-to-end before implementation
+3. **Build & Validate**: Rebuild and test after changes, noting results in summary
+4. **Performance**: Keep 60fps target and graceful degradation in mind during testing
 
-## Workflow Pattern
+## Next Steps
 
-- Investigate before editing: open modules referenced in the domain rules, rely on `rg` for search.
-- Plan changes end-to-end (interfaces, lifecycle, performance) prior to implementation.
-- Keep performance budgets in mind (60fps target, graceful degradation) and reflect that in testing.
-- Rebuild and rerun relevant validation commands before sharing work; note results in your summary.
+### Need Architecture/Domain Details?
+→ Read `AGENTS.domain.md` for system hierarchy, interface patterns, and constraints
 
-## When You Need More Detail
+### Need Local Environment/Workflow?
+→ Read `AGENTS.local.md` for environment setup, commands, and verification process
 
-- Architecture, system responsibilities, constraints -> `AGENTS.domain.md`.
-- Environment specifics, build outputs, execution tips -> `AGENTS.local.md`.
-- Full Claude brief (long form, optional deep dive) -> `CLAUDE.md`.
-- Feature specs and research notes live under `docs/`; link to them only when necessary.
+### Need Exhaustive Reference?
+→ Read `CLAUDE.md` for full development workflow, testing strategies, and deep dive details
 
-## Reference Index
+## Context Engineering Playbooks
+- `.cursor/rules/architecture.mdc` - Architecture patterns and constraints
+- `.cursor/rules/performance.mdc` - Performance requirements and optimization
+- `.cursor/rules/development.mdc` - Development workflow and standards
 
-- `docs/MASTER_ARCHITECTURE_OVERVIEW.md` - full system design narrative.
-- `docs/API_REFERENCE.md` - interface catalog with usage notes.
-- `docs/VISUAL_EFFECTS_COORDINATION.md` - visual pipeline and coordinator detail.
-- `docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md` - budgets, metrics, and tuning strategies.
-- `.cursor/rules/*.mdc` - context-engineering playbooks for features, requirements, and flows.
+## Key References
+- `docs/MASTER_ARCHITECTURE_OVERVIEW.md` - Complete system architecture
+- `docs/API_REFERENCE.md` - Interface catalog and implementation examples  
+- `docs/VISUAL_EFFECTS_COORDINATION.md` - Visual system coordination guide
+- `docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md` - Performance budgets and optimization

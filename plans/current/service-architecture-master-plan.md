@@ -118,6 +118,7 @@ Deliverable for Preparation Track: ✅ Summary captured in `plans/current/visual
 - **Verification**
   - [x] Run typecheck and capture sample health report confirming service-based resolution.
   - [x] Document follow-up test plan under `plans/future/color-diagnostics-testing-plan.md`.
+  - [x] `ColorDiagnosticsService` integration test updated to assert service-provided CSS writer; passing via `npm test -- --runTestsByPath tests/integration/color/ColorDiagnosticsService.integration.test.ts --runInBand`.
 
 ### Phase A7 – Legacy Documentation & Diagnostic Refresh *(NEW)*
 - **Documentation**

@@ -38,6 +38,21 @@ This document is the authoritative overview of the current Catppuccin StarryNigh
   - Interactions: `ui/interactions/DragPreviewManager.ts` (enhanced drag ghost) and `ui/interactions/PlaylistQuickAddMenu.ts` (Quick Add radial) replace the legacy `effects/*` implementations.
   - Atmospheric/Depth controllers (`visual/effects/DepthLayerController.ts`, `visual/atmospheric/AtmosphericCrystalsSystem.ts`) subscribe to music and performance events via the coordinator.
 
+## Rendering Mode System
+- `src-js/visual/backgrounds/FluidGradientBackgroundSystem.ts`
+  - Primary gradient rendering system with four-tier progressive enhancement: Basic (CSS) → Standard (WebGL) → Enhanced (Liquid shader) → Full (Liquid + Corridor effects).
+  - Wraps `WebGLGradientBackgroundSystem` internally for base WebGL functionality.
+  - `RenderingModeSelector` chooses optimal mode based on device capabilities (WebGL support, shader compilation success, device tier).
+  - Runtime mode switching via `switchRenderingMode()` with proper resource cleanup and automatic rollback on failure.
+  - Performance-based adaptation: Monitors FPS and automatically downgrades/upgrades rendering mode (45 FPS downgrade threshold, 55 FPS upgrade threshold).
+  - Hysteresis pattern prevents mode thrashing (3 consecutive low FPS frames for downgrade, 5 for upgrade).
+  - Settings: `sn-corridor-effects-mode` (auto/enabled/disabled) and `sn-rendering-mode` (auto/basic/standard/enhanced/full).
+
+- `src-js/visual/backgrounds/RenderingModeSelector.ts`
+  - Capability detection: WebGL availability, liquid shader compilation, corridor shader compilation, device tier.
+  - Mode selection algorithm respects user preferences with automatic fallback chains.
+  - Debug logging provides transparency for capability detection and mode selection reasoning.
+
 ## Audio & Color Pipeline
 - `src-js/audio/MusicSyncService.ts`
   - Centralizes Spicetify Player integration, beat detection, enhanced BPM analysis, caching, and event publication.

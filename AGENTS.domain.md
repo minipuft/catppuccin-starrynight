@@ -1,44 +1,110 @@
 # Catppuccin StarryNight - Domain Rules
 
-## Stack and Constraints
-- Languages: TypeScript (strict, `@/` aliases) and SCSS composed through design tokens; no runtime CSS-in-JS.
-- Tooling: ESBuild bundler, SASS/PostCSS pipeline, Jest/ts-jest for tests; keep configurations aligned with repo defaults.
-- Performance: Target 60fps, minimal memory churn, and graceful degradation via device tier detection.
-- Resilience: Wrap Spicetify API calls in try/catch with fallbacks to CSS-only behavior; maintain accessibility defaults (`prefers-reduced-motion`, Catppuccin contrast).
-- Avoid: Heavy UI/animation libs (jQuery, GSAP, Three.js), alternative bundlers (Webpack/Rollup/Parcel), and tight DOM mutation loops.
+## Core Architecture
+- **Coordination Pattern**: ThemeLifecycleCoordinator → SystemIntegrationCoordinator → (VisualEffectsCoordinator + InfrastructureSystemCoordinator)
+- **Unified Interface**: All systems implement `IManagedSystem` for consistent lifecycle management
+- **Service Composition**: Modern systems use `SystemServiceBridge` (composition) instead of `BaseVisualSystem` (inheritance)
+- **Performance-First**: 60fps target with adaptive quality scaling and device-aware optimization
+- **OKLAB Color Science**: Perceptually uniform color processing for natural visual experiences
+- **Audio Integration**: Real-time music analysis driving visual harmonization
 
-## Project Architecture Snapshot
-- `AdvancedThemeSystem` boots `SystemCoordinator`, linking `VisualSystemCoordinator` and `NonVisualSystemFacade`.
-- Visual effects reside in `src-js/visual/` (WebGL renderer, effect controllers) paired with SCSS modules in `src/`.
-- Audio and color services in `src-js/audio/` (`MusicSyncService`, `ColorHarmonyEngine`) feed shared state and drive visuals.
-- Entry point `src-js/theme.entry.ts` negotiates Spicetify APIs progressively and manages lifecycle sequencing.
-- Runtime systems implement `IManagedSystem` (`initialize`, `updateAnimation`, `healthCheck`, `destroy`, optional `forceRepaint`).
+## Tech Stack
+- **Languages**: TypeScript (strict mode), SCSS, JavaScript ES6+
+- **Build**: ESBuild bundling, Jest testing, SASS compilation
+- **APIs**: Spicetify Player/Platform, React/ReactDOM, colorExtractor, getAudioData
+- **Performance**: WebGL2 with CSS fallbacks, Intersection Observer, Performance Observer
 
-## Build Pipelines
-- TypeScript: `src-js/**/*.ts` -> bundled `theme.js` via ESBuild (tree-shaken, React/ReactDOM treated as externals).
-- SCSS: `src/**/*.scss` -> compiled `user.css` through SASS with PostCSS optimizers.
-- Commands: `npm run build:js:dev` / `npm run build:js:prod`, `npm run build:css:dev` / `npm run build:css:prod`, or `npm run build` for both; only the generated `theme.js` and `user.css` are loaded by Spicetify.
-- Treat build outputs as artifacts; never hand-edit them.
+## System Hierarchy
+#### 1. Central Orchestration Layer
+- **`AdvancedThemeSystem`** - Central system orchestrator (Year3000System)
+- **`SystemCoordinator`** - Dependency injection and facade coordination
+- **Progressive API Detection** - Graceful degradation when Spicetify APIs unavailable
 
-## System Responsibilities
-- `src-js/core/` - coordinators, lifecycle orchestration, dependency wiring.
-- `src-js/audio/` - beat detection, audio analysis, music-driven cues.
-- `src-js/visual/` - effect modules, renderers, background systems.
-- `src-js/utils/` / `src-js/config/` - shared helpers, configuration defaults, feature flags.
-- `src/` SCSS structure mirrors systems (layout, components, systems) and hosts Catppuccin tokens.
+#### 2. System Coordination Layer
+- **`SystemIntegrationCoordinator`** - Main facade coordinator managing both visual and infrastructure systems
+- **`VisualEffectsCoordinator`** - Manages visual systems (backgrounds, particles, effects, UI)
+- **`InfrastructureSystemCoordinator`** - Manages non-visual systems (performance, CSS, settings, music sync)
+- **Unified lifecycle management** through `IManagedSystem` interface
+- **Service composition** via `DefaultServiceFactory` providing shared services to all systems
 
-## Quality Standards
-- Performance features expose tuning hooks via `SettingsManager` and integrate with `PerformanceAnalyzer`.
-- Extend tests under `tests/unit`, `tests/integration`, and `tests/performance`; keep subset commands (`npm run test:unit:*`) healthy.
-- Update JSDoc/markdown references when altering public interfaces or workflows.
+#### 3. Visual & Audio Integration Layer
+- **`MusicSyncService`** - Spicetify API integration with beat detection
+- **`ColorHarmonyEngine`** - OKLAB color science processing
+- **`VisualEffectsCoordinator`** - Unified visual state coordination
+- **`WebGLRenderer`** - Hardware-accelerated visuals with CSS fallbacks
+- **Background Systems** - Multiple specialized visual effect controllers
 
-## Coding Practices
-- Favor explicit interfaces over `any`; keep path aliases consistent with `tsconfig.json` and `jest.config.js`.
-- Maintain naming conventions: classes PascalCase, utilities camelCase, SCSS mixins kebab-case, CSS vars prefixed `--sn-`.
-- Register new systems with the appropriate coordinator/facade and implement the full `IManagedSystem` contract.
+#### 4. Performance Optimization Layer
+- **`PerformanceAnalyzer`** - Real-time monitoring and quality scaling
+- **`DeviceCapabilityDetector`** - Hardware detection and optimization
+- **`OptimizedUnifiedCSSController`** - Efficient DOM updates and variable management
 
-## Supporting References
-- Full brief: `CLAUDE.md`.
-- Visual coordination: `docs/VISUAL_EFFECTS_COORDINATION.md`.
-- Performance playbook: `docs/PERFORMANCE_OPTIMIZATION_GUIDELINES.md`.
-- Feature acceptance criteria: `.cursor/rules/features.mdc`.
+## Interface Pattern
+All systems implement the `IManagedSystem` interface:
+```typescript
+interface IManagedSystem {
+  initialized: boolean;
+  initialize(): Promise<void>;
+  updateAnimation(deltaTime: number): void;
+  healthCheck(): Promise<HealthCheckResult>;
+  destroy(): void;
+  forceRepaint?(reason?: string): void;
+}
+```
+
+## Module Path Mapping (TypeScript only)
+- `@/` → `src-js/` (main source directory)
+- `@/audio/*` → `src-js/audio/*` (music sync and color harmony)
+- `@/core/*` → `src-js/core/*` (system architecture and coordination)
+- `@/visual/*` → `src-js/visual/*` (visual effects and rendering)
+- `@/utils/*` → `src-js/utils/*` (utilities and helpers)
+- `@/config/*` → `src-js/config/*` (configuration and settings)
+- `@/types/*` → `src-js/types/*` (TypeScript type definitions)
+
+**Note**: Path aliases only apply to TypeScript files in `src-js/`. SCSS files in `src/` use standard SCSS `@import` or `@use` statements.
+
+## Technology Constraints
+
+### Allowed Technologies
+- **Languages**: TypeScript (strict), SCSS, JavaScript ES6+
+- **APIs**: Spicetify Player/Platform, React/ReactDOM, colorExtractor, getAudioData
+- **Build**: ESBuild, TypeScript compiler, Jest/ts-jest, SASS, PostCSS
+- **Performance**: WebGL2, CSS transitions, Intersection Observer, Performance Observer
+- **Libraries**: OKLAB color utilities, lightweight utilities (<10KB total)
+
+### Prohibited Technologies
+- **Heavy Libraries**: jQuery, GSAP, Three.js, external UI frameworks
+- **Build Tools**: Webpack, Rollup, Parcel (ESBuild only)
+- **Styling**: CSS-in-JS, styled-components, runtime CSS generation
+- **Anti-Patterns**: Continuous loops, canvas physics, high-frequency DOM manipulation
+
+## Development Standards
+
+### Performance Requirements (Target Goals)
+- **Frame Rate**: 60fps target with graceful degradation
+- **Memory**: Minimize heap usage, prevent leaks during extended sessions
+- **Responsiveness**: UI interactions <100ms, smooth transitions
+
+### Code Quality Standards
+- **TypeScript**: Strict mode enabled, working toward eliminating `any` types
+- **Interface Compliance**: Core systems implement `IManagedSystem` (ongoing migration)
+- **Error Handling**: All Spicetify API calls should have try-catch with fallbacks
+- **Accessibility**: `prefers-reduced-motion` support implemented
+
+### Naming Conventions
+**Classes** - Clear, descriptive, indicate function:
+- ✅ `AudioAnalyzer`, `ColorHarmonyEngine`, `PerformanceAnalyzer`
+- ❌ `ConsciousnessManager`, `OrganicInterface`, `FlowEntity`
+
+**Methods** - Action-oriented, specify behavior:
+- ✅ `updateColorsFromMusic()`, `detectBeat()`, `optimizePerformance()`
+- ❌ `channelConsciousness()`, `breatheInterface()`, `orchestrateFlow()`
+
+**Variables** - Describe data clearly:
+- ✅ `currentTrack`, `colorTemperature`, `frameRate`, `deviceCapabilities`
+- ❌ `consciousness`, `organicState`, `synapticData`
+
+**Technical Naming**:
+- **Files**: `PascalCase.ts` for systems, `camelCase.ts` for utilities
+- **CSS Variables**: `--sn-*` theme prefix, `--spice-*` Spicetify compatibility
+- **SCSS Mixins**: `kebab-case` with descriptive names

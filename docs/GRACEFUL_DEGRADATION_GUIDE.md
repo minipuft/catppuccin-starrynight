@@ -23,10 +23,28 @@ How Catppuccin StarryNight keeps the theme functional when Spicetify APIs or run
 - If `VisualEffectsCoordinator` or WebGL systems fail, background participants unregister and CSS-based systems continue (handled inside each participant via try/catch + health checks).
 - Participants should degrade to CSS tokens (e.g., `--sn-dynamic-*`, `--sn-color-*`) when music intensity or color data is missing.
 
+### Rendering Mode Fallback System
+- `FluidGradientBackgroundSystem` implements four-tier progressive enhancement with automatic fallback:
+  * **Full Mode**: Liquid physics shader + corridor effects (requires WebGL2 + both shaders + capable device)
+  * **Enhanced Mode**: Liquid physics shader only (requires WebGL2 + liquid shader compilation)
+  * **Standard Mode**: Basic WebGL gradients (requires WebGL1/2)
+  * **Basic Mode**: CSS-only gradients (always available, no JS required)
+- Fallback triggers:
+  * **Compilation failure**: Enhanced → Standard → Basic
+  * **Capability limits**: Full → Enhanced (if corridor unsupported) → Standard (if liquid unsupported) → Basic (if WebGL unavailable)
+  * **Performance degradation**: Automatic downgrade when FPS < 45 for 3 consecutive frames
+  * **Performance improvement**: Automatic upgrade when FPS > 55 for 5 consecutive frames (if higher mode supported)
+- Mode switching includes:
+  * Capability validation before attempt
+  * Resource cleanup (shader deletion, event unsubscription, choreographer unregistration)
+  * Automatic rollback to previous mode on failure
+  * 5-second cooldown between mode switches to prevent thrashing
+
 ## Install/Runtime Recovery
 - Install scripts always run `spicetify backup` before applying, allowing `spicetify restore` to revert when errors occur.
 - Debug mode exposes `(window as any).Y3K.mode` (`"degraded"` or `"full"`) for quick inspection.
 
-## Verification Notes (2025-10-06)
-- Confirmed behavior in `src-js/core/lifecycle/ThemeLifecycleCoordinator.ts`, `src-js/core/lifecycle/DegradedModeCoordinator.ts`, and `src-js/audio/MusicSyncService.ts` (Promise.allSettled + fallback sections).
+## Verification Notes
+- **2025-10-06**: Confirmed behavior in `src-js/core/lifecycle/ThemeLifecycleCoordinator.ts`, `src-js/core/lifecycle/DegradedModeCoordinator.ts`, and `src-js/audio/MusicSyncService.ts` (Promise.allSettled + fallback sections).
+- **2025-01-11**: Added rendering mode fallback system documentation. Verified four-tier progressive enhancement in `src-js/visual/backgrounds/FluidGradientBackgroundSystem.ts` and capability detection in `src-js/visual/backgrounds/RenderingModeSelector.ts`.
 
