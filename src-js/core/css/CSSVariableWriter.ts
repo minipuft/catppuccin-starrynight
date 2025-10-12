@@ -664,8 +664,9 @@ export class CSSVariableWriter implements IManagedSystem {
           // Efficient cssText batching for multiple properties
           this.applyCSSTextBatch(element, elementUpdates);
         } else {
-          // Fast path for single/few properties
+          // Fast path for single/few properties - ALWAYS use native to avoid hijack recursion
           for (const update of elementUpdates) {
+            // CRITICAL: Use native setProperty to bypass hijack and prevent infinite recursion
             if (CSSVariableWriter.nativeSetProperty) {
               CSSVariableWriter.nativeSetProperty.call(
                 element.style,
@@ -673,6 +674,7 @@ export class CSSVariableWriter implements IManagedSystem {
                 update.value
               );
             } else {
+              // Fallback only if native not available (shouldn't happen after hijack enabled)
               element.style.setProperty(update.property, update.value);
             }
           }
@@ -1024,13 +1026,6 @@ export class CSSVariableWriter implements IManagedSystem {
       this.applyPerformanceModeOptimizations();
       this.updateCSSPerformanceVariables();
     }, 'CSSVariableWriter');
-
-    // Subscribe to performance frame events for thermal monitoring
-    this.eventBus.subscribe("performance:frame", (payload: any) => {
-      if (payload.temperature && payload.temperature > 80) {
-        this.applyThermalOptimizations(payload.temperature);
-      }
-    }, 'CSSVariableWriter');
   }
 
   private applyInitialOptimizations(): void {
@@ -1058,17 +1053,8 @@ export class CSSVariableWriter implements IManagedSystem {
     this.applyDeviceOptimizations();
     this.applyPerformanceModeOptimizations();
 
-    // Get current performance metrics and apply optimizations
-    const batteryState = this.performanceCoordinator.getBatteryState();
-    const thermalState = this.performanceCoordinator.getThermalState();
-
-    if (batteryState) {
-      this.applyBatteryOptimizations(batteryState.level, batteryState.charging);
-    }
-
-    // Apply thermal state
-    const thermalTemp = thermalState.temperature || "normal";
-    this.applyThermalOptimizations(thermalTemp);
+    // Note: Battery and thermal optimizations removed as the APIs are non-functional in Spotify environment
+    // Performance optimizations are now handled through device tier detection and performance mode
   }
 
   private updateCSSPerformanceVariables(): void {
@@ -1287,41 +1273,6 @@ export class CSSVariableWriter implements IManagedSystem {
     if (memoryGB >= 8) return "medium";
     if (memoryGB >= 4) return "low";
     return "minimal";
-  }
-
-  private applyThermalOptimizations(thermalState: string): void {
-    if (!this.cssConfig.enableThermalThrottling) return;
-
-    // Remove existing thermal classes
-    this.removeClassesByPrefix("thermal-");
-
-    // Apply current thermal state class
-    const thermalClass = `thermal-${thermalState}`;
-    this.addCSSClass(thermalClass);
-  }
-
-  private applyBatteryOptimizations(
-    batteryLevel: number,
-    charging: boolean
-  ): void {
-    if (!this.cssConfig.enableBatteryOptimization) return;
-
-    // Remove existing battery classes
-    this.removeClassesByPrefix("battery-");
-
-    // Apply battery level classes
-    if (batteryLevel < 0.2) {
-      this.addCSSClass("battery-low");
-    } else if (batteryLevel < 0.5) {
-      this.addCSSClass("battery-medium");
-    } else {
-      this.addCSSClass("battery-high");
-    }
-
-    // Apply charging state
-    if (charging) {
-      this.addCSSClass("battery-charging");
-    }
   }
 
   // ===================================================================
@@ -1892,10 +1843,20 @@ export class CSSVariableWriter implements IManagedSystem {
    */
   private applyCriticalUpdate(property: string, value: string, targetElement?: Element): void {
     const element = targetElement || document.documentElement;
-    
+
     try {
-      (element as HTMLElement).style.setProperty(property, value);
-      
+      // CRITICAL: Use native setProperty to bypass hijack and prevent infinite recursion
+      if (CSSVariableWriter.nativeSetProperty) {
+        CSSVariableWriter.nativeSetProperty.call(
+          (element as HTMLElement).style,
+          property,
+          value
+        );
+      } else {
+        // Fallback only if native not available
+        (element as HTMLElement).style.setProperty(property, value);
+      }
+
       if (this.config.enableDebug) {
         console.log(`[CSSVariableWriter] Critical update applied: ${property} = ${value}`);
       }

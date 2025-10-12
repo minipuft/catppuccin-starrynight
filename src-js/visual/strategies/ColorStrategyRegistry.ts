@@ -326,7 +326,7 @@ export class ColorStrategyRegistry implements IColorStrategyRegistry {
       "enhancement";
     let priority = 5;
     let memoryImpact: "low" | "medium" | "high" = "medium";
-    let deviceRequirements: string[] = [];
+    const deviceRequirements: string[] = [];
 
     // Analyze strategy name and type to infer metadata
     switch (strategyName) {

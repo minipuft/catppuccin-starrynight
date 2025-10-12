@@ -1,5 +1,5 @@
 /**
- * UnifiedParticleSystem - Consolidated Particle System with Visual Effects Integration
+ * ParticleEffectSystem - Consolidated Particle System with Visual Effects Integration
  *
  * Consolidates LightweightParticleSystem and ParticleFieldSystem into a single
  * visual-effects-aware particle system that responds smoothly to musical dynamics.
@@ -669,15 +669,15 @@ class VisualParticleRenderer {
 // ===================================================================
 
 /**
- * Unified Particle System Module
+ * Particle Effect System Module
  * Consolidates LightweightParticleSystem and ParticleFieldSystem
  */
-export class UnifiedParticleSystem
+export class ParticleEffectSystem
   extends ServiceVisualSystemBase
   implements BackgroundSystemParticipant
 {
   // Required BackgroundSystemParticipant implementation
-  public override readonly systemName: string = "UnifiedParticleSystem";
+  public override readonly systemName: string = "ParticleEffectSystem";
   public get systemPriority(): "low" | "normal" | "high" | "critical" {
     return "normal"; // Particles are normal priority for visual enhancement
   }
@@ -1848,3 +1848,6 @@ export class UnifiedParticleSystem
 
   // Note: Main interface methods are implemented above, these are for compatibility
 }
+
+// Backward compatibility alias
+export { ParticleEffectSystem as UnifiedParticleSystem };

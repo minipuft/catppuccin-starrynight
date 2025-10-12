@@ -20,7 +20,7 @@ import type {
 } from "@/types/colorStrategy";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import type { WebGLSystemInterface } from "@/core/webgl/WebGLSystemInterface";
-import type { WebGLQuality } from "@/core/webgl/UnifiedWebGLController";
+import type { WebGLQuality } from "@/core/webgl/WebGLQualityCoordinator";
 import { WebGLQualityMapper } from "@/core/webgl/WebGLSystemInterface";
 import { settings } from "@/config";
 import {
@@ -271,7 +271,7 @@ interface WebGLFlowSettings {
  * This triple-interface approach enables:
  * - Color Processing Layer: ColorStrategySelector → WebGLGradientStrategy (IColorProcessor)
  * - Visual System Layer: VisualEffectsCoordinator → WebGLGradientStrategy (IManagedSystem)
- * - Quality Scaling Layer: UnifiedWebGLController → WebGLGradientStrategy (WebGLSystemInterface)
+ * - Quality Scaling Layer: WebGLQualityCoordinator → WebGLGradientStrategy (WebGLSystemInterface)
  *
  * Phase 2.2 optimization: Direct quality scaling communication eliminates event bus overhead.
  */
@@ -401,6 +401,11 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
    */
   canProcess(context: ColorContext): boolean {
     // Enhanced logging for WebGL gradient debugging
+    const safeTrackUri = context?.trackUri ?? "unknown";
+    const rawColorCount = context?.rawColors
+      ? Object.keys(context.rawColors).length
+      : 0;
+
     Y3KDebug?.debug?.log(
       "WebGLGradientStrategy",
       "🔍 canProcess() - WebGL Gradient Capability Check",
@@ -408,8 +413,8 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
         isWebGLAvailable: this.webglState.isWebGLAvailable,
         flowSettingsEnabled: this.flowSettings.enabled,
         webglReady: this.webglState.webglReady,
-        contextTrackUri: context.trackUri,
-        contextColorCount: Object.keys(context.rawColors).length,
+        contextTrackUri: safeTrackUri,
+        contextColorCount: rawColorCount,
       }
     );
 
@@ -425,36 +430,23 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
     // Strategy must be enabled
     if (!this.flowSettings.enabled) {
       Y3KDebug?.debug?.warn(
-        "WebGLGradientStrategy", 
+        "WebGLGradientStrategy",
         "❌ canProcess: WebGL strategy disabled in settings"
       );
       return false;
     }
 
-    // Check for force WebGL setting - bypass device performance restrictions
-    // WebGL is enabled by default unless disabled in settings
-    const webglEnabled = settings.get("sn-webgl-enabled");
-    
-    if (webglEnabled) {
-      Y3KDebug?.debug?.log(
-        "WebGLGradientStrategy",
-        "canProcess: WebGL force enabled - bypassing device restrictions"
-      );
-      return true;
-    }
+    // WebGL availability is now managed by performance mode via ColorStrategySelector
+    // Strategy selector determines which quality level (full/degraded) to use based on:
+    // - Performance mode setting
+    // - Device capabilities
+    // - User preferences
+    // This strategy just needs to ensure WebGL is technically available
 
-    // Normal device capability check (no longer hard-excludes "low" devices)
-    const performanceLevel = this.deviceDetector.recommendPerformanceQuality();
-    
-    // Allow WebGL on medium and high devices, log decision for low devices
-    if (performanceLevel === "low") {
-      Y3KDebug?.debug?.log(
-        "WebGLGradientStrategy",
-        `canProcess: Low performance device detected, allowing based on strategy selection (not force mode)`
-      );
-      // Strategy selector should handle degraded vs full WebGL - don't block here
-      return true;
-    }
+    Y3KDebug?.debug?.log(
+      "WebGLGradientStrategy",
+      "canProcess: WebGL available, strategy selection handled by ColorStrategySelector"
+    );
 
     return true;
   }
@@ -772,6 +764,13 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
     window.addEventListener("resize", this.resizeWebGLCanvas.bind(this));
 
     this.webglState.webglReady = true;
+
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute(
+        "data-fluid-gradient-ready",
+        "true"
+      );
+    }
 
     // Announce WebGL readiness to CSS visual effects system
     try {
@@ -1300,6 +1299,29 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
   }
 
   /**
+   * Read directional flow CSS variables from GradientDirectionalFlowSystem
+   */
+  private readFlowDirectionFromCSS(): { x: number; y: number } {
+    try {
+      const root = document.documentElement;
+      const computedStyle = getComputedStyle(root);
+
+      const flowX = parseFloat(computedStyle.getPropertyValue('--sn-flow-direction-x') || '0');
+      const flowY = parseFloat(computedStyle.getPropertyValue('--sn-flow-direction-y') || '0');
+
+      // Return normalized flow vector
+      return { x: flowX, y: flowY };
+    } catch (error) {
+      Y3KDebug?.debug?.warn(
+        "WebGLGradientStrategy",
+        "Failed to read flow direction CSS variables:",
+        error
+      );
+      return { x: 0, y: 0 };
+    }
+  }
+
+  /**
    * Render WebGL frame
    */
   private renderWebGLFrame(currentTime: number): void {
@@ -1312,10 +1334,17 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
       return;
     }
 
+    // Read directional flow from CSS variables (written by GradientDirectionalFlowSystem)
+    const flowDirection = this.readFlowDirectionFromCSS();
+
     // Update uniform values with LERP smoothing
     const deltaTimeSeconds =
       (currentTime - this.webglState.lastFrameTime) / 1000;
     this.updateUniformsWithLERP(deltaTimeSeconds);
+
+    // Modulate flow strength with directional flow magnitude
+    const flowMagnitude = Math.sqrt(flowDirection.x * flowDirection.x + flowDirection.y * flowDirection.y);
+    const directionalFlowStrength = this.webglState.currentFlowStrength * (1.0 + flowMagnitude * 0.5);
 
     // Clear canvas
     this.webglState.gl.viewport(
@@ -1353,7 +1382,7 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
     if (this.uniforms.u_flowStrength) {
       this.webglState.gl.uniform1f(
         this.uniforms.u_flowStrength,
-        this.webglState.currentFlowStrength // Use smoothed value
+        directionalFlowStrength // Use directional flow strength modulated by music
       );
     }
 
@@ -1775,7 +1804,11 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
         }),
 
         // IColorProcessor compatibility flag
-        canProcess: this.canProcess({} as ColorContext),
+        canProcess: this.canProcess({
+          rawColors: {},
+          trackUri: "healthcheck:webgl-gradient",
+          timestamp: Date.now(),
+        }),
       },
     };
 

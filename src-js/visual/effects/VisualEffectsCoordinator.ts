@@ -32,7 +32,6 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
-import { GradientPerformanceOptimizer } from "@/core/performance/GradientPerformanceOptimizer";
 import {
   UnifiedPerformanceCoordinator,
   PerformanceAnalyzer,
@@ -55,6 +54,8 @@ import { UIEffectsController } from "@/visual/effects/UIVisualEffectsController"
 import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffectsController";
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
+import { GradientConductor, type GradientConductorConfig } from "@/visual/backbone/GradientConductor";
+import { settings } from "@/config";
 
 // ===================================================================
 // CSS VARIABLE NAMING STANDARDS
@@ -171,8 +172,6 @@ export interface VisualEffectState {
   deviceCapabilities: DeviceCapabilities;
   performanceMode: PerformanceMode;
   adaptiveQuality: number; // 0-1 current quality level
-  thermalState: number; // 0-1 thermal throttling level
-  batteryConservation: number; // 0-1 battery optimization level
 
   // === TEMPORAL TRACKING ===
   timestamp: number; // When this state was created
@@ -381,17 +380,18 @@ export type SmoothTransitionConfig = VisualDynamicTransitionConfig;
  */
 export type VisualSystemKey =
   | "Particle"
-  | "SidebarVisualEffects" 
+  | "SidebarVisualEffects"
   | "UIVisualEffects"
   | "HeaderVisualEffects"
   | "WebGLBackground"
   | "FluidGradient"
   | "DepthLayers"
   | "IridescentShimmer"
-  | "DirectionalFlow";
+  | "DirectionalFlow"
+  | "GradientConductor";
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
-export type IntegrationMode = "progressive" | "performance-first" | "quality-first" | "battery-optimized";
+export type IntegrationMode = "progressive" | "performance-first" | "quality-first";
 export type GradientBackend = "css" | "webgl" | "hybrid";
 export type TransitionMode = "instant" | "crossfade" | "progressive";
 export type QualityLevel = "auto" | "low" | "balanced" | "high" | "ultra";
@@ -408,13 +408,11 @@ export interface VisualSystemConfig {
   performanceThresholds?: {
     minFPS: number;
     maxMemoryMB: number;
-    thermalThreshold: number;
   };
   // 🔧 PHASE 2.2: VisualSystemCoordinator compatibility
   qualityPreferences?: {
     preferHighQuality: boolean;
     allowDynamicScaling: boolean;
-    batteryConservation: boolean;
   };
 }
 
@@ -529,7 +527,6 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     performanceThresholds: {
       minFPS: 45,
       maxMemoryMB: 100,
-      thermalThreshold: 0.7,
     },
   };
 
@@ -828,8 +825,6 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       deviceCapabilities,
       performanceMode,
       adaptiveQuality: performanceMode.qualityLevel,
-      thermalState: 0.0, // Cool
-      batteryConservation: 0.0, // Not conserving
 
       // === TEMPORAL TRACKING ===
       timestamp: performance.now(),
@@ -1065,15 +1060,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         this.performanceCoordinator.getCurrentPerformanceMode();
       state.adaptiveQuality = state.performanceMode.qualityLevel;
 
-      // Update thermal and battery state
-      const thermalState = this.performanceCoordinator.getThermalState();
-      const batteryState = this.performanceCoordinator.getBatteryState();
-
-      state.thermalState = thermalState.throttleLevel || 0;
-      state.batteryConservation =
-        batteryState && !batteryState.charging
-          ? (1 - batteryState.level) * 0.5
-          : 0;
+      // Note: Thermal and battery state removed - APIs non-functional in Spotify environment
+      // Performance awareness now relies on device tier detection and performance mode
     }
   }
 
@@ -1825,6 +1813,44 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   // ===================================================================
 
   /**
+   * Derive GradientConductor config from existing settings
+   * 🔧 PHASE 1: Settings-driven configuration without case statements
+   */
+  private deriveGradientConfigFromSettings(): Partial<GradientConductorConfig> {
+    // Derive configuration from performance mode and gradient intensity
+    const performanceMode = settings.get("sn-performance-mode") || "auto";
+    const gradientIntensity = settings.get("sn-gradient-intensity");
+
+    // Determine WebGL enabled state from performance mode
+    // Performance mode "performance" disables WebGL, all other modes enable it
+    const webglEnabled = performanceMode !== "performance";
+
+    // Map performance mode to quality
+    let quality: "low" | "high" | "ultra" = "high";
+    if (performanceMode === "performance") {
+      quality = "low";
+    } else if (performanceMode === "quality" || performanceMode === "maximum") {
+      quality = "ultra";
+    }
+
+    // Transition duration from intensity: disabled→0ms, minimal→800ms, balanced→500ms, intense→300ms
+    const transitionMap = {
+      disabled: 0,
+      minimal: 800,
+      balanced: 500,
+      intense: 300
+    } as const;
+
+    return {
+      enabledBackends: webglEnabled ? ["webgl", "css"] : ["css"],
+      defaultQuality: quality,
+      transitionDuration: transitionMap[gradientIntensity as keyof typeof transitionMap] ?? 500,
+      performanceMonitoring: true,
+      autoQualityScaling: performanceMode === "auto", // Auto mode enables quality scaling
+    };
+  }
+
+  /**
    * Initialize factory registry from VisualSystemCoordinator consolidation
    */
   private initializeFactoryRegistry(): void {
@@ -1852,6 +1878,16 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     this.systemRegistry.set("DirectionalFlow", GradientDirectionalFlowSystem);
     this.systemDependencies.set("DirectionalFlow", ["performanceAnalyzer", "musicSyncService", "cssVariableController"]);
+
+    // 🔧 PHASE 1: GradientConductor registration
+    this.systemRegistry.set("GradientConductor", GradientConductor);
+    this.systemDependencies.set("GradientConductor", [
+      "eventBus",
+      "cssVariableController",
+      "colorHarmonyEngine",
+      "musicSyncService",
+      "performanceAnalyzer"
+    ]);
   }
 
   /**
@@ -1898,7 +1934,11 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       // Create system instance with dependency injection
       const constructorArgs = this.getBaseConstructorArgs();
       const dependencies = this.resolveDependencies(systemName);
-      const systemInstance = new SystemClass(...constructorArgs, ...dependencies);
+
+      // 🔧 PHASE 1: Special case for GradientConductor - pass derived config
+      const systemInstance = systemKey === "GradientConductor"
+        ? new SystemClass(...dependencies, this.deriveGradientConfigFromSettings())
+        : new SystemClass(...constructorArgs, ...dependencies);
 
       // Initialize system
       if (systemInstance.initialize) {
@@ -2107,14 +2147,16 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   private async transitionToWebGL(config: TransitionConfig): Promise<void> {
-    const webglSystem = await this.createVisualSystem("WebGLBackground");
-    if (webglSystem && webglSystem.initialize) {
-      await webglSystem.initialize();
+    // 🔧 PHASE 2: Use FluidGradient (which wraps WebGL internally) instead of standalone WebGL
+    const fluidSystem = await this.createVisualSystem("FluidGradient");
+    if (fluidSystem && fluidSystem.initialize) {
+      await fluidSystem.initialize();
     }
   }
 
   private async transitionToCSS(config: TransitionConfig): Promise<void> {
-    // Transition to CSS-based gradients
+    // 🔧 PHASE 2: FluidGradient provides CSS fallback internally - no dual system needed
+    // FluidGradient wraps WebGL and gracefully falls back to CSS when needed
     const fluidSystem = await this.createVisualSystem("FluidGradient");
     if (fluidSystem && fluidSystem.initialize) {
       await fluidSystem.initialize();
@@ -2122,11 +2164,12 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   private async transitionToHybrid(config: TransitionConfig): Promise<void> {
-    // Enable both CSS and WebGL systems for hybrid rendering
-    await Promise.all([
-      this.transitionToCSS(config),
-      this.transitionToWebGL(config),
-    ]);
+    // 🔧 PHASE 2: FluidGradient handles both WebGL and CSS fallback - no dual system needed
+    // Single FluidGradient system provides hybrid rendering internally
+    const fluidSystem = await this.createVisualSystem("FluidGradient");
+    if (fluidSystem && fluidSystem.initialize) {
+      await fluidSystem.initialize();
+    }
   }
 
   // ===================================================================
@@ -2234,7 +2277,6 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         performanceThresholds: {
           minFPS: event.newSettings.animationFPS || 45,
           maxMemoryMB: this.factoryConfig.performanceThresholds?.maxMemoryMB || 512,
-          thermalThreshold: this.factoryConfig.performanceThresholds?.thermalThreshold || 0.8
         }
       };
     }
@@ -2346,7 +2388,32 @@ export class VisualEffectsCoordinator implements IManagedSystem {
    * @returns Visual system instance if cached, null otherwise
    */
   public getCachedVisualSystem<T = IManagedSystem>(key: string): T | null {
+    // 🔧 PHASE 1: GradientConductor special case - get from SystemIntegrationCoordinator
+    if (key === "GradientConductor") {
+      const systemIntegrationCoordinator = (this as any).year3000System?.systemIntegrationCoordinator;
+      return systemIntegrationCoordinator?.getSharedGradientConductor() || null;
+    }
+
     return this.systemInstances.get(key) as T || null;
+  }
+
+  /**
+   * 🔧 CRITICAL FIX: Broadcast setting changes to all cached visual systems
+   * Enables settings propagation through facade layer
+   */
+  public broadcastSettingChange(key: string, value: any): void {
+    for (const [systemKey, system] of this.systemInstances.entries()) {
+      if (system && typeof (system as any).applyUpdatedSettings === "function") {
+        try {
+          (system as any).applyUpdatedSettings(key, value);
+        } catch (err) {
+          console.warn(
+            `[VisualEffectsCoordinator] ${systemKey} failed to apply settings:`,
+            err
+          );
+        }
+      }
+    }
   }
 
   /**

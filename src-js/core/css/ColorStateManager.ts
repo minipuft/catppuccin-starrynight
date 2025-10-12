@@ -444,8 +444,8 @@ export class CSSColorController implements IManagedSystem {
         // Apply to CSS variables
         await this.applyColorStateToCSSVariables(newState);
 
-        // Apply brightness mode overrides to ensure they take precedence over base colors
-        await this.applyBrightnessModeOverrides(newState.effectiveConfig.brightnessMode);
+        // Apply brightness mode via data attribute (CSS handles all adjustments)
+        this.applyBrightnessModeAttribute(newState.effectiveConfig.brightnessMode);
 
         // Update state
         this.currentState = newState;
@@ -482,78 +482,18 @@ export class CSSColorController implements IManagedSystem {
   }
 
   /**
-   * Apply brightness mode specific CSS variables that take precedence over base colors
+   * Apply brightness mode via data attribute only
+   * CSS handles all brightness adjustments via --sn-brightness-current-* variables
+   *
+   * This eliminates the double-darkening bug where JavaScript applied 0.85x darkening
+   * on top of CSS brightness multipliers, causing colors to be 15% darker than intended.
    */
-  private async applyBrightnessModeOverrides(brightnessMode: 'bright' | 'balanced' | 'dark'): Promise<void> {
-    // Get brightness-adjusted accent color using default accent for current brightness mode
-    const config = this.getCurrentConfig();
-    const defaultAccent = getDefaultAccentColor(config.paletteSystemFlavor);
+  private applyBrightnessModeAttribute(brightnessMode: 'bright' | 'balanced' | 'dark'): void {
+    // Set data attribute - CSS will handle all brightness adjustments
+    document.documentElement.setAttribute('data-brightness-mode', brightnessMode);
 
-    // Apply brightness adjustment to the accent color by modifying RGB values
-    let adjustedAccentColor = defaultAccent;
-
-    // For accent colors, we adjust saturation/brightness similarly to CSS multipliers
-    if (brightnessMode === 'dark') {
-      // Dark mode: reduce brightness/saturation for less bright colors
-      const rgbValues = defaultAccent.rgb.split(', ').map(Number);
-      if (rgbValues.length === 3 && rgbValues.every(val => !isNaN(val) && val !== undefined)) {
-        const r = rgbValues[0]!;
-        const g = rgbValues[1]!;
-        const b = rgbValues[2]!;
-        const darkR = Math.floor(r * 0.85);
-        const darkG = Math.floor(g * 0.85);
-        const darkB = Math.floor(b * 0.85);
-        adjustedAccentColor = {
-          ...defaultAccent,
-          rgb: `${darkR}, ${darkG}, ${darkB}`,
-          hex: `#${darkR.toString(16).padStart(2, '0')}${darkG.toString(16).padStart(2, '0')}${darkB.toString(16).padStart(2, '0')}`
-        };
-      }
-    } else if (brightnessMode === 'bright') {
-      // Bright mode: increase vibrancy but not raw brightness
-      const rgbValues = defaultAccent.rgb.split(', ').map(Number);
-      if (rgbValues.length === 3 && rgbValues.every(val => !isNaN(val) && val !== undefined)) {
-        const r = rgbValues[0]!;
-        const g = rgbValues[1]!;
-        const b = rgbValues[2]!;
-        const brightR = Math.min(255, Math.floor(r * 1.1));
-        const brightG = Math.min(255, Math.floor(g * 1.1));
-        const brightB = Math.min(255, Math.floor(b * 1.1));
-        adjustedAccentColor = {
-          ...defaultAccent,
-          rgb: `${brightR}, ${brightG}, ${brightB}`,
-          hex: `#${brightR.toString(16).padStart(2, '0')}${brightG.toString(16).padStart(2, '0')}${brightB.toString(16).padStart(2, '0')}`
-        };
-      }
-    }
-    // balanced mode uses default accent as-is
-
-    // These CSS variables ensure the brightness mode affects all visual processing
-    const brightnessOverrides = {
-      // Core brightness mode state (highest priority)
-      '--sn-brightness-mode': `"${brightnessMode}"`,
-      '--sn-brightness-data-attr': brightnessMode,
-
-      // Brightness-adjusted accent color (critical for proper color hierarchy)
-      '--sn-brightness-adjusted-accent-hex': adjustedAccentColor.hex,
-      '--sn-brightness-adjusted-accent-rgb': adjustedAccentColor.rgb,
-
-      // CSS gradient adjustments based on brightness mode
-      '--sn-bg-gradient-saturation': `var(--sn-brightness-${brightnessMode}-saturation)`,
-      '--sn-bg-gradient-brightness': `var(--sn-brightness-${brightnessMode}-brightness)`,
-      '--sn-bg-gradient-contrast': `var(--sn-brightness-${brightnessMode}-contrast)`,
-      '--sn-bg-gradient-opacity': `var(--sn-brightness-${brightnessMode}-opacity)`,
-    };
-
-    // Apply brightness overrides with critical priority to ensure they take precedence
-    this.cssController.batchSetVariables(
-      "ColorStateManager",
-      brightnessOverrides,
-      "critical",
-      "brightness-mode-overrides"
-    );
-
-    console.log(`🎨 [ColorStateManager] Applied brightness mode overrides: ${brightnessMode}`);
+    // Log for debugging
+    console.log(`🎨 [ColorStateManager] Brightness mode set: ${brightnessMode} (CSS-only, no JS processing)`);
   }
 
   /**

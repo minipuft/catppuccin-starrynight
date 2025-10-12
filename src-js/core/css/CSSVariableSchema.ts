@@ -603,42 +603,6 @@ export const UNIFIED_VARIABLE_GROUPS: Record<VariableGroup, VariableGroupDefinit
         defaultValue: '1',
         type: 'number',
         description: 'Shader quality level (0-1)'
-      },
-      'thermal.throttle': {
-        name: '--sn-perf-thermal-throttle',
-        defaultValue: '0',
-        type: 'boolean',
-        description: 'Thermal throttling active (0/1)'
-      },
-      'thermal.temperature': {
-        name: '--sn-perf-thermal-temperature',
-        defaultValue: '0',
-        type: 'number',
-        description: 'Estimated temperature (0-1)'
-      },
-      'thermal.threshold': {
-        name: '--sn-perf-thermal-threshold',
-        defaultValue: '0.8',
-        type: 'number',
-        description: 'Thermal threshold (0-1)'
-      },
-      'battery.saver': {
-        name: '--sn-perf-battery-saver',
-        defaultValue: '0',
-        type: 'boolean',
-        description: 'Battery saver mode (0/1)'
-      },
-      'battery.level': {
-        name: '--sn-perf-battery-level',
-        defaultValue: '1',
-        type: 'number',
-        description: 'Battery level (0-1)'
-      },
-      'battery.charging': {
-        name: '--sn-perf-battery-charging',
-        defaultValue: '0',
-        type: 'boolean',
-        description: 'Battery charging state (0/1)'
       }
     }
   },

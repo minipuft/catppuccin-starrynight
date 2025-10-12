@@ -652,11 +652,12 @@ export class ColorEventRouter {
   // Helper methods for getting current settings
   private getPerformanceLevel(): "low" | "medium" | "high" {
     try {
-      // Map WebGL quality to performance level
-      const webglQuality = settings.get("sn-webgl-quality");
-      if (webglQuality === "low") return "low";
-      if (webglQuality === "high") return "high";
-      return "medium";
+      // Map performance mode to performance level
+      // Quality settings now managed internally by PerformanceAnalyzer (Phase 3 consolidation)
+      const performanceMode = settings.get("sn-performance-mode");
+      if (performanceMode === "performance") return "low";
+      if (performanceMode === "quality" || performanceMode === "maximum") return "high";
+      return "medium"; // auto, balanced, or default
     } catch {
       return "medium";
     }
@@ -664,10 +665,11 @@ export class ColorEventRouter {
 
   private getQualityLevel(): "basic" | "enhanced" | "premium" {
     try {
-      const animationQuality = settings.get("sn-animation-quality");
-      if (animationQuality === "low") return "basic";
-      if (animationQuality === "high") return "premium";
-      return "enhanced";
+      // Map performance mode to quality level
+      const performanceMode = settings.get("sn-performance-mode");
+      if (performanceMode === "performance") return "basic";
+      if (performanceMode === "quality" || performanceMode === "maximum") return "premium";
+      return "enhanced"; // auto, balanced, or default
     } catch {
       return "enhanced";
     }
@@ -686,9 +688,9 @@ export class ColorEventRouter {
       const artisticMode = settings.get("sn-artistic-mode");
       return {
         harmonicMode: typeof artisticMode === "string" ? artisticMode : "cosmic",
-        intensity: settings.get("sn-gradient-intensity") === "intense" ? 1.0 : 
+        intensity: settings.get("sn-gradient-intensity") === "intense" ? 1.0 :
                   settings.get("sn-gradient-intensity") === "balanced" ? 0.8 : 0.5,
-        enableAdvancedBlending: settings.get("sn-webgl-enabled") || true,
+        enableAdvancedBlending: true, // Always enabled, controlled by performance mode internally
       };
     } catch {
       return {
@@ -760,12 +762,7 @@ export class ColorEventRouter {
       return false;
     }
 
-    // Check if OKLAB coordination is enabled (assume enabled if using advanced processing)
-    const webglEnabled = settings.get("sn-webgl-enabled") ?? true;
-    if (!webglEnabled) {
-      return false; // Use OKLAB when WebGL/advanced processing is enabled
-    }
-
+    // OKLAB coordination always available (performance controlled by performance mode)
     return true;
   }
 
@@ -789,9 +786,9 @@ export class ColorEventRouter {
       // Get processing options from settings
       const processingOptions: ProcessingOptions = {
         // preferGenreOverEmotion is omitted (not available in current settings schema)
-        intensityMultiplier: settings.get("sn-gradient-intensity") === "intense" ? 1.5 : 
+        intensityMultiplier: settings.get("sn-gradient-intensity") === "intense" ? 1.5 :
                            settings.get("sn-gradient-intensity") === "balanced" ? 1.0 : 0.5,
-        enableAdvancedBlending: settings.get("sn-webgl-enabled") ?? true,
+        enableAdvancedBlending: true, // Always enabled, controlled by performance mode internally
         enableDebugLogging: false, // Debug logging handled by global debug manager
       };
 

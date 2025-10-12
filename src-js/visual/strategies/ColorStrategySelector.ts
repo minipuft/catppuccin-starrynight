@@ -590,11 +590,15 @@ export class ColorStrategySelector {
    */
   private buildSettingsContext(): BackgroundStrategySelectionCriteria["settingsContext"] {
     try {
+      // Derive WebGL state from performance mode
+      const performanceMode = settings.get("sn-performance-mode") || "auto";
+      const webglEnabled = performanceMode !== "performance"; // WebGL disabled only in performance mode
+
       return {
         dynamicAccentEnabled: true, // Always enabled for dynamic accent
         gradientIntensity: settings.get("sn-gradient-intensity"),
-        webglEnabled: settings.get("sn-webgl-enabled"),
-        webglForceEnabled: settings.get("sn-webgl-enabled"), // Use same setting
+        webglEnabled,
+        webglForceEnabled: false, // Force option removed - managed by performance mode
         visualGuideMode: settings.get("sn-artistic-mode") as string, // Use artistic mode as visual guide
         depthLayersEnabled: settings.get("sn-gradient-intensity") !== "disabled",
         visualEffectsLevel: 0.8, // Fixed value for visual effects level
