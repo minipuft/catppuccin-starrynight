@@ -44,11 +44,11 @@
   border-radius: 12px;
   overflow: visible;
 
-  // Floating shadow (enhanced by music) - Phase 4C: explicit blue accent
+  // Floating shadow (enhanced by music) - Phase 4D: semantic accent lighting
   box-shadow:
     0 calc(var(--sn-ui-glass-float-distance, 15px) * 0.5) 40px
     rgba(
-      var(--oklab-blue-rgb, var(--spice-rgb-accent)),
+      var(--ui-accent-base-rgb, var(--spice-rgb-accent)),
       calc(var(--sn-ui-glass-pulse-enabled, 0.6) * var(--sn-music-intensity-boost, 1) * 0.15)
     );
 
@@ -120,8 +120,8 @@
       $breathing-duration: 3s
     );
 
-    // Phase 4C: explicit blue accent for selected track
-    border: 2px solid rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.4);
+    // Phase 4D: accent highlight framing for selected track
+    border: 2px solid rgba(var(--ui-accent-lit-rgb, var(--spice-rgb-accent)), 0.4);
 
     // Music-reactive intensity
     --sn-music-intensity-boost: calc(1 + var(--sn-unified-music-energy, 0.5));
@@ -186,8 +186,8 @@
   );
 
   border-radius: 0;
-  // Phase 4C: explicit blue accent for playback bar
-  border-top: 2px solid rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.3);
+  // Phase 4D: accent-shadow contrast for playback bar edge
+  border-top: 2px solid rgba(var(--ui-accent-shadowed-rgb, var(--spice-rgb-accent)), 0.3);
 
   // Control buttons
   .main-playButton-PlayButton,
@@ -238,8 +238,8 @@ input[type="search"],
   &:focus {
     --sn-unified-effect-intensity: 0.6;
     outline: none;
-    // Phase 4C: explicit blue accent for focus state
-    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4D: lit accent focus ring
+    border-color: rgba(var(--ui-accent-lit-rgb, var(--spice-rgb-accent)), 0.6);
   }
 }
 
@@ -332,14 +332,14 @@ input[type="search"],
 
   @include card-container-universal {
     border-width: 2px;
-    // Phase 4C: explicit blue accent for high contrast
-    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4D: lit accent for high contrast framing
+    border-color: rgba(var(--ui-accent-lit-rgb, var(--spice-rgb-accent)), 0.6);
   }
 
   @include tracklist-row {
     border-width: 2px;
-    // Phase 4C: explicit blue accent for high contrast
-    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4D: lit accent for high contrast track rows
+    border-color: rgba(var(--ui-accent-lit-rgb, var(--spice-rgb-accent)), 0.6);
   }
 }
 

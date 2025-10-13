@@ -25,6 +25,7 @@
 // === LAYER 1: FOUNDATION (Load Order Critical) ===
 // Single authoritative design token source - all modules depend on these
 @use "../design-tokens/tokens" as *; // Unified design token system (932 lines, all tokens)
+@use "../design-tokens/lighting-variants" as *; // Phase 4D lighting variants (static + dynamic)
 
 // === LAYER 2: UTILITIES (Mixin Dependencies) ===
 // Utility mixins and functions - loaded after tokens, before implementations

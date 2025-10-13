@@ -1,0 +1,122 @@
+// PHASE 4D: LIGHTING VARIANTS (Layer 3)
+// Progressive enhancement: static fallbacks with relative-color overrides
+
+@use "tokens" as *;
+
+// ============================================================================
+// APPROACH C: STATIC FALLBACK (works everywhere)
+// Pre-calculated lighting variants keep legacy browsers functional
+// ============================================================================
+
+:root {
+  // === ACCENT LIGHTING VARIANTS (Static) ===
+  // Base: Blue #8ab5fb (138, 181, 251)
+  --ui-accent-lit: #b5d4ff;                  // Lighter, warmer (+15% L)
+  --ui-accent-lit-rgb: 181, 212, 255;
+  --ui-accent-shadowed: #6789c8;             // Darker, cooler (-15% L)
+  --ui-accent-shadowed-rgb: 103, 137, 200;
+  --ui-accent-reflected: #7a9ddb;            // In shadow with bounce (-8% L)
+  --ui-accent-reflected-rgb: 122, 157, 219;
+
+  // === STRUCTURAL LIGHTING VARIANTS (Static) ===
+  // Base: Mauve #ccb7f8 (204, 183, 248)
+  --ui-structural-lit: #e5d9ff;
+  --ui-structural-lit-rgb: 229, 217, 255;
+  --ui-structural-shadowed: #9b86c5;
+  --ui-structural-shadowed-rgb: 155, 134, 197;
+  --ui-structural-reflected: #b29ddb;
+  --ui-structural-reflected-rgb: 178, 157, 219;
+
+  // === EMPHASIS LIGHTING VARIANTS (Static) ===
+  // Base: Pink #f6c3e8 (246, 195, 232)
+  --ui-emphasis-lit: #ffdff5;
+  --ui-emphasis-lit-rgb: 255, 223, 245;
+  --ui-emphasis-shadowed: #d199c8;
+  --ui-emphasis-shadowed-rgb: 209, 153, 200;
+  --ui-emphasis-reflected: #e8b3db;
+  --ui-emphasis-reflected-rgb: 232, 179, 219;
+
+  // === LIGHT SOURCE VARIANTS (Static) ===
+  // Base: Yellow #f9e2af (249, 226, 175)
+  --ui-light-source-pure: #fffef5;           // Nearly white for specular
+  --ui-light-source-pure-rgb: 255, 254, 245;
+  --ui-light-source-warm: #fff5d9;           // Warm glow
+  --ui-light-source-warm-rgb: 255, 245, 217;
+}
+
+// ============================================================================
+// APPROACH A: DYNAMIC OVERRIDE (Chromium 119+ and modern browsers)
+// Relative colors automatically react to palette updates when supported
+// ============================================================================
+
+@supports (color: oklch(from red l c h)) {
+  :root {
+    // === ACCENT LIGHTING VARIANTS (Dynamic) ===
+    --ui-accent-lit: oklch(
+      from var(--ui-accent-base)
+      calc(l + 0.15)
+      calc(c * 1.2)
+      calc(h - 5deg)
+    );
+
+    --ui-accent-shadowed: oklch(
+      from var(--ui-accent-base)
+      calc(l - 0.15)
+      calc(c * 0.8)
+      calc(h + 10deg)
+    );
+
+    --ui-accent-reflected: oklch(
+      from var(--ui-accent-base)
+      calc(l - 0.08)
+      calc(c * 0.9)
+      calc(h + 15deg)
+    );
+
+    // === STRUCTURAL LIGHTING VARIANTS (Dynamic) ===
+    --ui-structural-lit: oklch(
+      from var(--ui-structural-base)
+      calc(l + 0.12) calc(c * 1.15) calc(h - 8deg)
+    );
+
+    --ui-structural-shadowed: oklch(
+      from var(--ui-structural-base)
+      calc(l - 0.18) calc(c * 0.75) calc(h + 12deg)
+    );
+
+    --ui-structural-reflected: oklch(
+      from var(--ui-structural-base)
+      calc(l - 0.10) calc(c * 0.85) calc(h + 8deg)
+    );
+
+    // === EMPHASIS LIGHTING VARIANTS (Dynamic) ===
+    --ui-emphasis-lit: oklch(
+      from var(--ui-accent-tertiary)
+      calc(l + 0.18) calc(c * 1.25) calc(h - 10deg)
+    );
+
+    --ui-emphasis-shadowed: oklch(
+      from var(--ui-accent-tertiary)
+      calc(l - 0.12) calc(c * 0.85) calc(h + 8deg)
+    );
+
+    --ui-emphasis-reflected: oklch(
+      from var(--ui-accent-tertiary)
+      calc(l - 0.08) calc(c * 0.90) calc(h + 12deg)
+    );
+
+    // === LIGHT SOURCE VARIANTS (Dynamic) ===
+    --ui-light-source-pure: oklch(
+      from var(--ui-light-source)
+      calc(l + 0.25) calc(c * 0.5) h
+    );
+
+    --ui-light-source-warm: oklch(
+      from var(--ui-light-source)
+      calc(l + 0.12) calc(c * 0.8) h
+    );
+
+    // Note: RGB fallbacks remain static because OKLCH → RGB conversion
+    // is not directly available inside CSS relative color syntax.
+  }
+}

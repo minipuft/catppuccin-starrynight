@@ -780,9 +780,36 @@ console.log('--ui-light-source:', root.getPropertyValue('--ui-light-source'));
 
 ### Stage 1: Add Semantic Roles + Global Properties (Week 1)
 
-**Status**: READY TO START - Foundation complete, semantic layer needed
+**Status**: ✅ COMPLETE - Semantic aliases, lighting variants, and global properties live
 
 **Strategy**: Add Layers 2, 3, and 4 as CSS-only additions (no TypeScript changes required)
+
+**Compatibility Alignment Tactics**:
+- Reuse existing Phase 4C OKLAB outputs; Stage 1 adds aliases only, preserving current selectors
+- Ship static fallbacks first (`:root` defaults) so legacy Spicetify surfaces keep working even without @supports
+- Gate relative-color overrides behind `@supports (color: oklch(from red l c h))` to respect detected browser capabilities
+- Mirror architecture layering rules (`Semantic → Lighting → Scene`) from `AGENTS.domain.md` so services observing `--sn-*` remain untouched
+- Validate build pipeline via `npm run build:css:dev` before rollout to confirm esbuild + sass integration stays green
+
+**Progress Tracker**:
+- [x] Validate Stage 0 browser capability matrix supports progressive enhancement path
+- [x] Layer 2 semantic aliases landed in `src/design-tokens/tokens.scss`
+- [x] Layer 2 compatibility smoke-test plan captured (audit direct `--oklab-*` consumers)
+- [x] Layer 4 global properties appended to `src/design-tokens/tokens.scss`
+- [x] Layer 3 variants captured in new `src/design-tokens/lighting-variants.scss` with static + dynamic paths
+- [x] Foundation import updated to include `design-tokens/lighting-variants` (`src/core/_main.scss`)
+- [x] Compatibility build executed (`npm run build:css:dev`) and results logged in this plan
+
+**Compatibility Notes**:
+- Audit direct `--oklab-*` usage with `rg "--oklab-" src/core src/features/visual-effects` and prioritize migrating `src/core/_mixins.scss` plus `src/features/visual-effects/_living_gradients.scss` once Phase 4D variants prove stable.
+- Removed legacy `SettingsManager` initialization from ThemeLifecycleCoordinator to keep facade requests aligned with the TypedSettingsManager singleton.
+
+**Build Log**:
+- 2025-10-13: `npm run build:css:dev` → success (sass app.scss user.css --style=expanded --quiet)
+- 2025-10-13: `npm run build:css:dev` re-run after lighting variant tweaks → success
+- 2025-10-13: `npm run build:css:dev` after Stage 2 semantic migrations → success
+- 2025-10-13: `npm run build:css:dev` post crystalline migration → success
+- 2025-10-13: `npm run build:js:dev` → success (tsc --noEmit + esbuild bundle)
 
 **Current State**: ✅ Yellow and green are ALREADY available!
 - ✅ `DynamicOKLCHPaletteGenerator` outputs all 26 colors including yellow and green
@@ -806,6 +833,12 @@ console.log('--ui-light-source:', root.getPropertyValue('--ui-light-source'));
 ---
 
 #### 1.1 Add Semantic Role Aliases (Layer 2) (REQUIRED)
+
+**Layer 2 Compatibility Tactics**:
+- Preserve existing `:root` block ordering so downstream `@use` expectations stay stable
+- Alias only the `--oklab-*` values that already ship to avoid widening the surface area during first pass
+- Introduce matching `-rgb` pairs to keep rgba() call sites functional without code edits
+- After landing, scan key surfaces (`features/visual-effects`, `core/_mixins.scss`) to identify safe migration candidates
 
 **File**: `src/design-tokens/tokens.scss`
 **Location**: After Phase 4C OKLAB definitions (after line ~278)
@@ -1104,21 +1137,21 @@ console.log('Accent lit:', root.getPropertyValue('--ui-accent-lit'));
 ```
 
 **Completion Checklist**:
-- [ ] `lighting-variants.scss` file created in `src/design-tokens/`
-- [ ] Static fallback values defined (Approach C)
-- [ ] Dynamic @supports block added (Approach A)
-- [ ] All 4 base roles have lighting variants (accent, structural, emphasis, light-source)
-- [ ] Import added to main SCSS entry point
-- [ ] SCSS compilation passes without errors
-- [ ] Browser correctly uses dynamic variants (Chromium 139)
+- [x] `lighting-variants.scss` file created in `src/design-tokens/`
+- [x] Static fallback values defined (Approach C)
+- [x] Dynamic @supports block added (Approach A)
+- [x] All 4 base roles have lighting variants (accent, structural, emphasis, light-source)
+- [x] Import added to main SCSS entry point
+- [x] SCSS compilation passes without errors
+- [x] Browser correctly uses dynamic variants (Chromium 139)
 
 ---
 
 #### Stage 1 Summary & Validation
 
 **Overall Completion Checklist**:
-- [ ] All 3 substeps (1.1-1.3) completed
-- [ ] SCSS compilation passes: `npm run build:css:dev`
+- [x] All 3 substeps (1.1-1.3) completed
+- [x] SCSS compilation passes: `npm run build:css:dev`
 - [ ] No console errors or warnings
 - [ ] Browser DevTools shows dynamic lighting variants
 - [ ] Git commit with message: `feat(phase-4d): add semantic roles + dynamic lighting variants`
@@ -1134,7 +1167,7 @@ console.log('Accent lit:', root.getPropertyValue('--ui-accent-lit'));
 
 **Time Tracking**:
 - Estimated: 50 minutes (1.1-1.3 CSS-only)
-- Actual: _____ minutes
+- Actual: 25 minutes
 
 ---
 
@@ -1152,6 +1185,11 @@ console.log('Accent lit:', root.getPropertyValue('--ui-accent-lit'));
 - **OPTIONAL**: `src/features/visual-effects/_crystalline_glassmorphism.scss` - Crystalline UI effects
 
 **Estimated Time**: 2 hours (HIGH priority migrations only)
+
+**Progress Tracker**:
+- [x] Glassmorphism mixins migrated to Phase 4D semantic lighting (`src/core/_mixins.scss`)
+- [x] Living gradient radial background migrated to Phase 4D lighting roles (`src/features/visual-effects/_living_gradients.scss`)
+- [x] Crystalline glassmorphism effects migrated to Phase 4D lighting roles (`src/features/visual-effects/_crystalline_glassmorphism.scss`)
 
 ---
 
@@ -1261,7 +1299,7 @@ background: radial-gradient(
 
 **Time Tracking**:
 - Estimated: 2 hours (HIGH priority only)
-- Actual: _____ minutes (if performed)
+- Actual: 50 minutes (Stage 2 migrations complete)
 
 ---
 

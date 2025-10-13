@@ -1052,7 +1052,6 @@ export class ThemeLifecycleCoordinator {
       const foundationSystems = [
         "SimplePerformanceCoordinator",
         "UnifiedDebugManager",
-        "SettingsManager",
         "DeviceCapabilityDetector",
         "TimerConsolidationSystem",
       ];
@@ -3029,7 +3028,6 @@ export class ThemeLifecycleCoordinator {
 
     // Skip systems that require Spicetify APIs
     const skippedSystems = [
-      "SettingsManager",
       "MusicSyncService",
       "ColorHarmonyEngine",
       "GlassmorphismManager",

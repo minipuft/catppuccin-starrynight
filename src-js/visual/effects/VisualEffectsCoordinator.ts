@@ -42,6 +42,7 @@ import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { ChoreographyEventType, DynamicTransitionConfig } from "@/types/animationCoordination";
+import type { VisualEffectsState } from "@/types/colorTypes";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { DepthLayeredGradientSystem } from "@/visual/backgrounds/DepthLayeredGradientSystem";
 import { FluidGradientBackgroundSystem } from "@/visual/backgrounds/FluidGradientBackgroundSystem";
@@ -484,6 +485,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private previousVisualState: VisualEffectState | null = null;
   private fieldUpdateTimer: NodeJS.Timeout | null = null;
   private lastFieldUpdate: number = 0;
+  private lastDominantEmotion: string = "neutral";
+  private lastCoordinationSnapshot: VisualEffectsState | null = null;
 
   // System participants
   private registeredParticipants: Map<string, BackgroundSystemParticipant> =
@@ -841,6 +844,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
 
     if (!this.currentVisualState) {
       this.currentVisualState = this.createInitialVisualState();
+      this.getCoordinationSnapshot();
       return;
     }
 
@@ -861,6 +865,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     } else {
       this.currentVisualState = newState;
     }
+
+    // Update legacy coordination snapshot for cross-system events
+    this.getCoordinationSnapshot();
 
     // Apply standardized CSS variables (fire and forget)
     this.applyStandardizedVisualVariables().catch(error => {
@@ -949,6 +956,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         state.energyLevel = emotionalProfile.arousal;
         state.colorTemperature = 3000 + emotionalProfile.valence * 10000; // 3000K-13000K
         state.harmonicComplexity = emotionalProfile.complexity;
+        this.lastDominantEmotion = emotionalProfile.mood || this.lastDominantEmotion;
 
         // Update musical flow based on mood
         const moodFlowMap: { [key: string]: Vector2D } = {
@@ -1592,6 +1600,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       }, "VisualEffectsCoordinator");
 
       this.eventBus.subscribe("music:emotion-analyzed", (payload: any) => {
+        if (payload?.emotion?.primary) {
+          this.lastDominantEmotion = payload.emotion.primary;
+        }
         this.choreographEvent("intensity-peak", {
           intensity: payload?.energy || 0.5,
           affectedSystems: ["all"],
@@ -1638,20 +1649,58 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   }
 
   /**
+   * Build or reuse a legacy coordination snapshot for cross-system events
+   */
+  private getCoordinationSnapshot(): VisualEffectsState {
+    const state = this.currentVisualState;
+
+    const intensity = state?.energyLevel ?? this.lastCoordinationSnapshot?.intensity ?? 0.5;
+    const animationScale = state?.musicIntensity ?? this.lastCoordinationSnapshot?.animationScale ?? intensity;
+    const colorTemperature = state?.colorTemperature ?? this.lastCoordinationSnapshot?.colorTemperature ?? 6500;
+    const pulseCycle = state?.pulseRate ?? this.lastCoordinationSnapshot?.pulsingCycle ?? 0;
+    const resonance = state?.systemHarmony ?? this.lastCoordinationSnapshot?.resonance ?? intensity;
+
+    const snapshot: VisualEffectsState = {
+      intensity,
+      colorTemperature,
+      animationScale,
+      dominantEmotion: this.lastDominantEmotion || this.lastCoordinationSnapshot?.dominantEmotion || "neutral",
+      resonance,
+      symbioticResonance: resonance,
+      surfaceFluidityIndex: state?.transitionFluidity ?? this.lastCoordinationSnapshot?.surfaceFluidityIndex ?? animationScale,
+      animationScaleRate: state?.energyLevel ?? this.lastCoordinationSnapshot?.animationScaleRate ?? intensity,
+      emotionalTemperature: colorTemperature,
+      pulsingCycle: pulseCycle,
+      cinematicIntensity: state?.effectDepth ?? this.lastCoordinationSnapshot?.cinematicIntensity ?? intensity,
+    };
+
+    this.lastCoordinationSnapshot = snapshot;
+    return { ...snapshot };
+  }
+
+  /**
    * Map choreography events to unified event names
    */
   private mapChoreographyEventToUnified(eventType: ChoreographyEventType): { eventName: string; payload: any } | null {
+    const coordinationPayload = () => ({
+      source: "choreographer",
+      state: this.getCoordinationSnapshot(),
+      timestamp: Date.now(),
+      type: eventType,
+      coordinationType: eventType,
+    });
+
     switch (eventType) {
       case "rhythm-shift":
-        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "rhythm-shift" } };
+        return { eventName: "visual-effects:coordination", payload: coordinationPayload() };
       case "intensity-peak":
         return { eventName: "visual-effects:intensity-changed", payload: { intensity: 0.8, userEngagement: 0.6, timestamp: Date.now() } };
       case "genre-transition":
-        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "genre-transition" } };
+        return { eventName: "visual-effects:coordination", payload: coordinationPayload() };
       case "emotional-shift":
-        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: "emotional-shift" } };
+        return { eventName: "visual-effects:coordination", payload: coordinationPayload() };
       default:
-        return { eventName: "visual-effects:coordination", payload: { source: "choreographer", type: eventType } };
+        return { eventName: "visual-effects:coordination", payload: coordinationPayload() };
     }
   }
 

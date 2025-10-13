@@ -209,6 +209,8 @@ export interface UnifiedEventMap {
     source: string;
     state: VisualEffectsState;
     timestamp: number;
+    type?: string;
+    coordinationType?: string;
   };
 
   "music:beat-sync": {

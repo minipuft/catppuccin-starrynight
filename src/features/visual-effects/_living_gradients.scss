@@ -57,27 +57,27 @@ body,
         calc(
           50% + (var(--sn-music-rhythm-phase, 0deg) * 6%) + var(--sn-bg-gradient-flow-y, 0%)
         ),
-        /* Phase 4C: explicit radial color progression (center → edge) */
-        /* Primary mauve center with breathing intensity */
+        /* Phase 4D: semantic radial color progression (center → edge) */
+        /* Light source center with breathing intensity */
         rgba(
-            var(--oklab-mauve-rgb),
+            var(--ui-light-source-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * var(--sn-musical-oklab-intensity, 0.5))
           )
           0%,
-        /* Blue accent mid-radius with chroma adjustment */
+        /* Structural area receiving light */
         rgba(
-            var(--oklab-blue-rgb),
+            var(--ui-structural-lit-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * 0.6 * var(--sn-musical-oklab-intensity, 0.5))
           )
           40%,
-        /* Pink highlight outer ring with uniformity */
+        /* Reflected emphasis hue in shadow */
         rgba(
-            var(--oklab-pink-rgb),
+            var(--ui-emphasis-reflected-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * 0.3 * var(--sn-musical-oklab-intensity, 0.5))
           )
           70%,
         /* Mantle shadow edge blend */
-        rgba(var(--oklab-mantle-rgb), 0.02) 85%,
+        rgba(var(--ui-depth-moderate-rgb), 0.02) 85%,
         var(--spice-base) 100%
       );
 

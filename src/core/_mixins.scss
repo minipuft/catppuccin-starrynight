@@ -231,36 +231,40 @@
     contrast(1.1) 
     saturate(#{$saturation});
     
-  // Crystal-like border (Phase 4C: explicit blue accent)
-  border: 1px solid rgba(var(--oklab-blue-rgb), 0.2);
+  // Lighting-aware border stack (top lit, sides neutral, bottom shadowed)
+  border: 1px solid transparent;
+  border-top-color: rgba(var(--ui-accent-lit-rgb), 0.25);
+  border-left-color: rgba(var(--ui-accent-base-rgb), 0.2);
+  border-right-color: rgba(var(--ui-accent-base-rgb), 0.2);
+  border-bottom-color: rgba(var(--ui-accent-shadowed-rgb), 0.15);
 
   // Layered crystalline background (Phase 4C: explicit color hierarchy)
   background:
     // Primary crystal surface - hierarchical gradient (mauve → blue → base)
     linear-gradient(
       135deg,
-      rgba(var(--oklab-mauve-rgb), #{$opacity}) 0%,
-      rgba(var(--oklab-blue-rgb), calc(#{$opacity} * 1.5)) 50%,
-      rgba(var(--oklab-base-rgb), calc(#{$opacity} * 0.75)) 100%
+      rgba(var(--ui-structural-base-rgb), #{$opacity}) 0%,
+      rgba(var(--ui-accent-base-rgb), calc(#{$opacity} * 1.5)) 50%,
+      rgba(var(--ui-depth-soft-rgb), calc(#{$opacity} * 0.75)) 100%
     ),
     // Iridescent overlay - shimmer effect (lavender → sapphire → teal)
     linear-gradient(
       45deg,
       transparent 0%,
-      rgba(var(--oklab-lavender-rgb), calc(#{$opacity} * 0.375)) 25%,
-      rgba(var(--oklab-sapphire-rgb), calc(#{$opacity} * 0.625)) 50%,
-      rgba(var(--oklab-teal-rgb), calc(#{$opacity} * 0.375)) 75%,
+      rgba(var(--ui-atmosphere-warm-rgb), calc(#{$opacity} * 0.375)) 25%,
+      rgba(var(--ui-atmosphere-neutral-rgb), calc(#{$opacity} * 0.625)) 50%,
+      rgba(var(--ui-atmosphere-cool-rgb), calc(#{$opacity} * 0.375)) 75%,
       transparent 100%
     );
   
   background-size: 100% 100%, 300% 300%;
   
-  // Crystalline box shadow (Phase 4C: explicit pink highlight, blue accent glow)
+  // Crystalline box shadow tied to semantic lighting roles
   box-shadow:
-    inset 0 1px 0 rgba(var(--oklab-pink-rgb), 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-    0 calc(#{$float-height} * 2) 60px rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.25)),
-    0 0 20px rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.17));
+    inset 0 1px 0 rgba(var(--ui-light-source-rgb), 0.12),
+    inset 0 -1px 0 rgba(var(--ui-depth-soft-rgb), 0.1),
+    0 calc(#{$float-height} * 2) 60px rgba(var(--ui-accent-base-rgb), calc(#{$intensity} * 0.25)),
+    0 0 20px rgba(var(--ui-accent-base-rgb), calc(#{$intensity} * 0.17));
   
   // Crystalline animations
   animation: 
@@ -297,12 +301,12 @@
     background:
       radial-gradient(
         ellipse at 30% 20%,
-        rgba(var(--oklab-blue-rgb), calc(#{$opacity} * 0.75)) 0%,
+        rgba(var(--ui-accent-base-rgb), calc(#{$opacity} * 0.75)) 0%,
         transparent 60%
       ),
       radial-gradient(
         ellipse at 70% 80%,
-        rgba(var(--oklab-mauve-rgb), calc(#{$opacity} * 0.5)) 0%,
+        rgba(var(--ui-structural-base-rgb), calc(#{$opacity} * 0.5)) 0%,
         transparent 50%
       );
     border-radius: inherit;
@@ -324,11 +328,11 @@
     
     // Enhanced glow (Phase 4C: explicit blue accent)
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.05),
-      0 calc(#{$float-height} * 3) 80px rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.42)),
-      0 0 40px rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.33)),
-      0 0 60px rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.17));
+      inset 0 1px 0 rgba(var(--ui-light-source-rgb), 0.18),
+      inset 0 -1px 0 rgba(var(--ui-depth-soft-rgb), 0.08),
+      0 calc(#{$float-height} * 3) 80px rgba(var(--ui-accent-lit-rgb), calc(#{$intensity} * 0.42)),
+      0 0 40px rgba(var(--ui-accent-base-rgb), calc(#{$intensity} * 0.33)),
+      0 0 60px rgba(var(--ui-accent-shadowed-rgb), calc(#{$intensity} * 0.17));
     
     &::before {
       background: linear-gradient(

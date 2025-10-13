@@ -327,6 +327,69 @@
   --oklab-green: var(--sn-green);
   --oklab-green-rgb: var(--sn-green-rgb);
 
+  // ============================================================================
+  // PHASE 4D: SEMANTIC ROLE LAYER (Layer 2)
+  // Artist-informed lighting architecture - semantic intent aliases
+  // ============================================================================
+
+  // === INTERACTIVE ELEMENTS ===
+  --ui-accent-base: var(--oklab-blue);
+  --ui-accent-base-rgb: var(--oklab-blue-rgb);
+  --ui-accent-secondary: var(--oklab-mauve);
+  --ui-accent-secondary-rgb: var(--oklab-mauve-rgb);
+  --ui-accent-tertiary: var(--oklab-pink);
+  --ui-accent-tertiary-rgb: var(--oklab-pink-rgb);
+
+  // === LIGHT SOURCES ===
+  --ui-light-source: var(--oklab-yellow);
+  --ui-light-source-rgb: var(--oklab-yellow-rgb);
+  --ui-light-ambient: var(--oklab-lavender);
+  --ui-light-ambient-rgb: var(--oklab-lavender-rgb);
+
+  // === STRUCTURAL FOUNDATION ===
+  --ui-structural-base: var(--oklab-mauve);
+  --ui-structural-base-rgb: var(--oklab-mauve-rgb);
+  --ui-structural-emphasis: var(--oklab-pink);
+  --ui-structural-emphasis-rgb: var(--oklab-pink-rgb);
+
+  // === DEPTH & SHADOWS ===
+  --ui-depth-soft: var(--oklab-overlay0);
+  --ui-depth-soft-rgb: var(--oklab-overlay0-rgb);
+  --ui-depth-moderate: var(--oklab-mantle);
+  --ui-depth-moderate-rgb: var(--oklab-mantle-rgb);
+  --ui-depth-strong: var(--oklab-crust);
+  --ui-depth-strong-rgb: var(--oklab-crust-rgb);
+
+  // === ATMOSPHERIC EFFECTS ===
+  --ui-atmosphere-cool: var(--oklab-teal);
+  --ui-atmosphere-cool-rgb: var(--oklab-teal-rgb);
+  --ui-atmosphere-neutral: var(--oklab-sapphire);
+  --ui-atmosphere-neutral-rgb: var(--oklab-sapphire-rgb);
+  --ui-atmosphere-warm: var(--oklab-lavender);
+  --ui-atmosphere-warm-rgb: var(--oklab-lavender-rgb);
+
+  // ============================================================================
+  // PHASE 4D: GLOBAL LIGHTING PROPERTIES (Layer 4)
+  // Scene-wide lighting settings affecting all colors uniformly
+  // ============================================================================
+
+  // === LIGHTING TEMPERATURE ===
+  --global-light-temperature: 0.8;           // 0=cool, 1=warm default bias
+  --global-shadow-temperature: 0.3;          // Shadows lean toward complementary coolness
+
+  // === LIGHTING INTENSITY ===
+  --global-light-intensity: 0.5;             // Highlight strength (0-1 range)
+  --global-shadow-intensity: 0.4;            // Shadow depth (0-1 range)
+
+  // === ATMOSPHERIC PROPERTIES ===
+  --global-atmosphere-density: 0.3;          // Depth haze amount
+  --global-atmosphere-color: var(--oklab-teal);
+
+  // === MUSIC-REACTIVE MODULATION (set by TypeScript) ===
+  --music-light-boost: 1.0;
+  --music-shadow-boost: 1.0;
+  --music-temperature-shift: 0deg;
+
   // === LEGACY COMPATIBILITY BRIDGE ===
   // Maps old ambiguous variables to new explicit ones
   // TODO: Remove after full SCSS migration (Phase 4C-Stage 3)
