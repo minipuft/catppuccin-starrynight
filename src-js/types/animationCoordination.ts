@@ -9,11 +9,14 @@
  */
 
 // Import base types for extension and re-export
-import type { 
+import type {
   VisualEffectState,
   BackgroundSystemParticipant,
   Vector2D
 } from '@/visual/effects/VisualEffectsCoordinator';
+
+// Import lerp smoothing utilities
+import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
 
 // Define choreography event types locally since they may not exist yet
 export type ChoreographyEventType = 'rhythm-shift' | 'intensity-peak' | 'genre-transition' | 'emotional-shift';
@@ -33,6 +36,248 @@ export type {
 
 // Modern API - use VisualEffectState directly
 // Legacy alias moved to backwards compatibility section below
+
+// ===================================================================
+// LERP SMOOTHING UTILITIES
+// Framerate-independent animation smoothing using exponential decay
+// ===================================================================
+
+/**
+ * Lerp state container for framerate-independent smoothing
+ * Encapsulates current/target/halfLife pattern used across visual systems
+ *
+ * @example
+ * const opacityLerp: LerpState = { current: 0, target: 1, halfLife: 0.15 };
+ */
+export interface LerpState {
+  current: number;
+  target: number;
+  halfLife: number;
+}
+
+/**
+ * RGB color type for lerp operations
+ */
+export interface RGBColor {
+  r: number;
+  g: number;
+  b: number;
+}
+
+/**
+ * RGBA color type for lerp operations with alpha channel
+ */
+export interface RGBAColor extends RGBColor {
+  a: number;
+}
+
+/**
+ * Lerp state manager - encapsulates current/target/halfLife pattern
+ * Provides stateful lerp smoothing with automatic state management
+ *
+ * @example
+ * const opacityManager = new LerpStateManager(0, 1, 0.15);
+ * requestAnimationFrame((deltaTime) => {
+ *   const smoothedOpacity = opacityManager.update(deltaTime / 1000);
+ * });
+ */
+export class LerpStateManager {
+  constructor(
+    public current = 0,
+    public target = 0,
+    public halfLife = 0.15
+  ) {}
+
+  /**
+   * Set new target value for lerp smoothing
+   */
+  setTarget(value: number): void {
+    this.target = value;
+  }
+
+  /**
+   * Update lerp state with deltaTime and return smoothed value
+   * @param deltaTime Time elapsed since last frame (in seconds)
+   * @returns Current smoothed value
+   */
+  update(deltaTime: number): number {
+    this.current = ThemeUtilities.lerpSmooth(
+      this.current,
+      this.target,
+      deltaTime,
+      this.halfLife
+    );
+    return this.current;
+  }
+
+  /**
+   * Get current value without updating
+   */
+  getCurrent(): number {
+    return this.current;
+  }
+
+  /**
+   * Reset both current and target to specified value
+   */
+  reset(value = 0): void {
+    this.current = value;
+    this.target = value;
+  }
+
+  /**
+   * Check if lerp has reached target (within epsilon)
+   */
+  isAtTarget(epsilon = 0.001): boolean {
+    return Math.abs(this.current - this.target) < epsilon;
+  }
+}
+
+/**
+ * Vector2D lerp helper for smooth 2D transitions
+ * Applies framerate-independent smoothing to both x and y components
+ *
+ * @example
+ * const smoothPosition = lerpVector2D(
+ *   { x: 0, y: 0 },
+ *   { x: 100, y: 100 },
+ *   deltaTime,
+ *   0.2
+ * );
+ */
+export function lerpVector2D(
+  current: Vector2D,
+  target: Vector2D,
+  deltaTime: number,
+  halfLife = 0.15
+): Vector2D {
+  return {
+    x: ThemeUtilities.lerpSmooth(current.x, target.x, deltaTime, halfLife),
+    y: ThemeUtilities.lerpSmooth(current.y, target.y, deltaTime, halfLife),
+  };
+}
+
+/**
+ * RGB color lerp helper for smooth color transitions
+ * Applies framerate-independent smoothing to all color channels
+ *
+ * @example
+ * const smoothColor = lerpRGB(
+ *   { r: 255, g: 0, b: 0 },
+ *   { r: 0, g: 255, b: 0 },
+ *   deltaTime,
+ *   0.3
+ * );
+ */
+export function lerpRGB(
+  current: RGBColor,
+  target: RGBColor,
+  deltaTime: number,
+  halfLife = 0.15
+): RGBColor {
+  return {
+    r: ThemeUtilities.lerpSmooth(current.r, target.r, deltaTime, halfLife),
+    g: ThemeUtilities.lerpSmooth(current.g, target.g, deltaTime, halfLife),
+    b: ThemeUtilities.lerpSmooth(current.b, target.b, deltaTime, halfLife),
+  };
+}
+
+/**
+ * RGBA color lerp helper with alpha channel support
+ * Applies framerate-independent smoothing to all color channels including alpha
+ *
+ * @example
+ * const smoothColor = lerpRGBA(
+ *   { r: 255, g: 0, b: 0, a: 1 },
+ *   { r: 0, g: 255, b: 0, a: 0.5 },
+ *   deltaTime,
+ *   0.3
+ * );
+ */
+export function lerpRGBA(
+  current: RGBAColor,
+  target: RGBAColor,
+  deltaTime: number,
+  halfLife = 0.15
+): RGBAColor {
+  return {
+    r: ThemeUtilities.lerpSmooth(current.r, target.r, deltaTime, halfLife),
+    g: ThemeUtilities.lerpSmooth(current.g, target.g, deltaTime, halfLife),
+    b: ThemeUtilities.lerpSmooth(current.b, target.b, deltaTime, halfLife),
+    a: ThemeUtilities.lerpSmooth(current.a, target.a, deltaTime, halfLife),
+  };
+}
+
+/**
+ * Multiple value lerp helper for arrays of numbers
+ * Applies framerate-independent smoothing to array of values
+ *
+ * @example
+ * const smoothValues = lerpArray(
+ *   [0, 50, 100],
+ *   [100, 150, 200],
+ *   deltaTime,
+ *   0.2
+ * );
+ */
+export function lerpArray(
+  current: number[],
+  target: number[],
+  deltaTime: number,
+  halfLife = 0.15
+): number[] {
+  const length = Math.min(current.length, target.length);
+  const result: number[] = [];
+
+  for (let i = 0; i < length; i++) {
+    const currentVal = current[i];
+    const targetVal = target[i];
+    if (currentVal !== undefined && targetVal !== undefined) {
+      result.push(
+        ThemeUtilities.lerpSmooth(currentVal, targetVal, deltaTime, halfLife)
+      );
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Predefined lerp half-life values for common animation types
+ * Provides consistent smoothing behavior across systems
+ */
+export const LERP_HALF_LIVES = {
+  // Ultra-fast response (60fps at 4 frames to 50%)
+  ultraFast: 0.067,
+
+  // Fast response (60fps at 9 frames to 50%)
+  fast: 0.15,
+
+  // Normal response (60fps at 18 frames to 50%)
+  normal: 0.3,
+
+  // Slow response (60fps at 30 frames to 50%)
+  slow: 0.5,
+
+  // Very slow response (60fps at 60 frames to 50%)
+  verySlow: 1.0,
+
+  // Specific animation types
+  parallaxOffset: 0.3,
+  opacity: 0.2,
+  blur: 0.25,
+  hueRotate: 0.4,
+  scale: 0.15,
+  position: 0.2,
+  rotation: 0.3,
+  color: 0.3,
+  intensity: 0.15,
+
+  // Music-responsive animations
+  beatResponse: 0.08,
+  energyResponse: 0.25,
+  rhythmResponse: 0.35,
+} as const;
 
 // ===================================================================
 // CHOREOGRAPHY EVENT PAYLOADS
@@ -260,6 +505,72 @@ export const ANIMATION_TRANSITION_PATTERNS: { [key: string]: AnimationTransition
     duration: 4000,
     intensityModifier: 0.6,
     visualInspiration: 'Phototropism and circadian growth rhythms'
+  },
+
+  // ===================================================================
+  // LERP-ENHANCED TRANSITION PATTERNS
+  // These patterns simulate lerp-style exponential decay using easing
+  // ===================================================================
+
+  lerpFast: {
+    name: 'lerpFast',
+    description: 'Fast exponential decay lerp simulation',
+    easingFunction: (t: number) => {
+      // Simulates lerp with halfLife = 0.15 (fast response)
+      // Uses exponential decay: 1 - exp(-t / halfLife)
+      return 1 - Math.exp(-t / 0.15);
+    },
+    duration: 600,
+    intensityModifier: 1.3,
+    visualInspiration: 'Framerate-independent fast response (halfLife: 0.15s)'
+  },
+
+  lerpNormal: {
+    name: 'lerpNormal',
+    description: 'Normal exponential decay lerp simulation',
+    easingFunction: (t: number) => {
+      // Simulates lerp with halfLife = 0.3 (normal response)
+      return 1 - Math.exp(-t / 0.3);
+    },
+    duration: 1200,
+    intensityModifier: 1.0,
+    visualInspiration: 'Framerate-independent normal response (halfLife: 0.3s)'
+  },
+
+  lerpSlow: {
+    name: 'lerpSlow',
+    description: 'Slow exponential decay lerp simulation',
+    easingFunction: (t: number) => {
+      // Simulates lerp with halfLife = 0.5 (slow response)
+      return 1 - Math.exp(-t / 0.5);
+    },
+    duration: 2000,
+    intensityModifier: 0.8,
+    visualInspiration: 'Framerate-independent slow response (halfLife: 0.5s)'
+  },
+
+  lerpBeat: {
+    name: 'lerpBeat',
+    description: 'Ultra-fast beat-responsive lerp simulation',
+    easingFunction: (t: number) => {
+      // Simulates lerp with halfLife = 0.08 (beat response)
+      return 1 - Math.exp(-t / 0.08);
+    },
+    duration: 300,
+    intensityModifier: 1.8,
+    visualInspiration: 'Music beat response (halfLife: 0.08s)'
+  },
+
+  lerpEnergy: {
+    name: 'lerpEnergy',
+    description: 'Energy-responsive lerp simulation',
+    easingFunction: (t: number) => {
+      // Simulates lerp with halfLife = 0.25 (energy response)
+      return 1 - Math.exp(-t / 0.25);
+    },
+    duration: 1000,
+    intensityModifier: 1.2,
+    visualInspiration: 'Music energy response (halfLife: 0.25s)'
   }
 };
 

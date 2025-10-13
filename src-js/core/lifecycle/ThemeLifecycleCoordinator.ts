@@ -1,5 +1,3 @@
-declare const Spicetify: any;
-
 // Phase 4: Facade imports for unified system access
 import { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
 
@@ -12,10 +10,10 @@ import { ColorEventCoordinator } from "@/core/lifecycle/ColorEventCoordinator";
 
 // Settings import for typed access
 import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config/typedSettingsManager";
 
 // Color coordination imports for Strategy pattern
 import { globalColorStateManager } from "@/core/css/ColorStateManager";
-import { globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 
 // Event-driven integration imports
 import { unifiedEventBus } from "@/core/events/EventBus";
@@ -119,12 +117,11 @@ export class ThemeLifecycleCoordinator {
   }
   public get cssVariableController() {
     return (
-      this.facadeCoordinator?.getCachedNonVisualSystem(
-        "CSSVariableWriter"
-      ) || null
+      this.facadeCoordinator?.getCachedNonVisualSystem("CSSVariableWriter") ||
+      null
     );
   }
-  
+
   // New simplified performance system getters (primary)
   public get simplePerformanceCoordinator() {
     return (
@@ -154,7 +151,7 @@ export class ThemeLifecycleCoordinator {
       ) || null
     );
   }
-  
+
   // Legacy compatibility getters
   public get unifiedCSSManager() {
     return this.cssVariableController || null;
@@ -178,8 +175,9 @@ export class ThemeLifecycleCoordinator {
   /** @deprecated Use simplePerformanceCoordinator instead - legacy complex performance system */
   public get performanceAnalyzer() {
     return (
-      this.facadeCoordinator?.getCachedNonVisualSystem("SimplePerformanceCoordinator") ||
-      null
+      this.facadeCoordinator?.getCachedNonVisualSystem(
+        "SimplePerformanceCoordinator"
+      ) || null
     );
   }
   /** @deprecated Use simplePerformanceCoordinator instead - legacy complex performance system */
@@ -226,9 +224,7 @@ export class ThemeLifecycleCoordinator {
   // 🔧 PHASE 3: Unified Color Processing Access
   public get unifiedColorProcessingEngine() {
     return (
-      this.facadeCoordinator?.getCachedNonVisualSystem(
-        "ColorProcessor"
-      ) || null
+      this.facadeCoordinator?.getCachedNonVisualSystem("ColorProcessor") || null
     );
   }
 
@@ -306,7 +302,9 @@ export class ThemeLifecycleCoordinator {
     return this.visualEffectsCoordinator || null;
   }
   public get dynamicCatppuccinBridge() {
-    return this._dynamicCatppuccinBridge || this.visualEffectsCoordinator || null;
+    return (
+      this._dynamicCatppuccinBridge || this.visualEffectsCoordinator || null
+    );
   }
 
   public set dynamicCatppuccinBridge(bridge: any) {
@@ -324,9 +322,7 @@ export class ThemeLifecycleCoordinator {
   }
 
   public get uiVisualEffectsController() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
 
   public get headerVisualEffectsController() {
@@ -342,32 +338,24 @@ export class ThemeLifecycleCoordinator {
 
   // UI Effects systems now consolidated into UIVisualEffectsController
   public get iridescentShimmerEffectsSystem() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
   public get interactionTrackingSystem() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
   public get whiteLayerDiagnosticSystem() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
   public get audioVisualController() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
   public get prismaticScrollSheenSystem() {
-    return (
-      this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null
-    );
+    return this.facadeCoordinator?.getVisualSystem("UIVisualEffects") || null;
   }
   public get beatSyncVisualSystem() {
-    return this.facadeCoordinator?.getVisualSystem("MusicBeatSync" as any) || null;
+    return (
+      this.facadeCoordinator?.getVisualSystem("MusicBeatSync" as any) || null
+    );
   }
   public get webGLGradientBackgroundSystem() {
     return this.facadeCoordinator?.getVisualSystem("WebGLBackground") || null;
@@ -387,7 +375,8 @@ export class ThemeLifecycleCoordinator {
   }
   public get spotifyUIApplicationSystem() {
     return (
-      this.facadeCoordinator?.getVisualSystem("SpotifyUIApplication" as any) || null
+      this.facadeCoordinator?.getVisualSystem("SpotifyUIApplication" as any) ||
+      null
     );
   }
 
@@ -429,6 +418,8 @@ export class ThemeLifecycleCoordinator {
   private _boundArtisticModeHandler: (event: Event) => void;
   // NEW: Flush pending style updates when the tab becomes backgrounded
   private _boundVisibilityChangeHandler: () => void;
+  // NEW: Bridge TypedSettingsManager onChange callbacks to legacy broadcast system
+  private _boundTypedSettingsHandler: ((event: any) => void) | null = null;
   private _disposeNowPlayingWatcher: (() => void) | null = null;
 
   /**
@@ -443,7 +434,9 @@ export class ThemeLifecycleCoordinator {
   /** Global switch other systems can read to know guardrails are active */
   public performanceGuardActive: boolean = false;
 
-  constructor(config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG) {
+  constructor(
+    config: AdvancedSystemConfig | Year3000Config = ADVANCED_SYSTEM_CONFIG
+  ) {
     this.ADVANCED_SYSTEM_CONFIG = this._deepCloneConfig(config);
     if (typeof this.ADVANCED_SYSTEM_CONFIG.init === "function") {
       this.ADVANCED_SYSTEM_CONFIG.init();
@@ -465,7 +458,9 @@ export class ThemeLifecycleCoordinator {
       );
     }
 
-    // Listen for live settings changes (registered early so no duplicates)
+    // DEPRECATED: DOM event listener kept for external compatibility only
+    // TypedSettingsManager now uses onChange() callbacks (see _handleTypedSettingsChange)
+    // This listener may be removed in future versions
     this._boundExternalSettingsHandler =
       this._handleExternalSettingsChange.bind(this);
     document.addEventListener(
@@ -479,6 +474,11 @@ export class ThemeLifecycleCoordinator {
       "year3000ArtisticModeChanged",
       this._boundArtisticModeHandler
     );
+
+    // Register TypedSettingsManager onChange callback (Phase 6B modern pattern)
+    this._boundTypedSettingsHandler =
+      this._handleTypedSettingsChange.bind(this);
+    settings.onChange(this._boundTypedSettingsHandler);
 
     // NEW: Flush pending style updates when the tab becomes backgrounded
     this._boundVisibilityChangeHandler =
@@ -513,7 +513,9 @@ export class ThemeLifecycleCoordinator {
     }, 0);
   }
 
-  private _deepCloneConfig(config: AdvancedSystemConfig | Year3000Config): Year3000Config {
+  private _deepCloneConfig(
+    config: AdvancedSystemConfig | Year3000Config
+  ): Year3000Config {
     // From v0.9.15 we stop deep-cloning the shared configuration to avoid state
     // divergence between the global ADVANCED_SYSTEM_CONFIG (used by the settings UI)
     // and the copy referenced by subsystems. We simply keep the original object
@@ -1049,7 +1051,7 @@ export class ThemeLifecycleCoordinator {
       // Group 1: Independent foundation systems (can initialize in parallel)
       const foundationSystems = [
         "SimplePerformanceCoordinator",
-        "UnifiedDebugManager", 
+        "UnifiedDebugManager",
         "SettingsManager",
         "DeviceCapabilityDetector",
         "TimerConsolidationSystem",
@@ -1081,14 +1083,18 @@ export class ThemeLifecycleCoordinator {
 
       // Parallel initialization Group 1: Foundation systems
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🌌 [Year3000System] Initializing foundation systems in parallel...");
+        console.log(
+          "🌌 [Year3000System] Initializing foundation systems in parallel..."
+        );
       }
       const foundationPromises = foundationSystems.map(async (systemKey) => {
         try {
           if (!this.facadeCoordinator) {
             throw new Error("Facade coordinator not available");
           }
-          const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);
+          const system = await this.facadeCoordinator.getNonVisualSystem(
+            systemKey as any
+          );
           if (system && typeof system.initialize === "function") {
             await system.initialize();
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
@@ -1098,23 +1104,30 @@ export class ThemeLifecycleCoordinator {
           }
           return { systemKey, success: false, reason: "No initialize method" };
         } catch (error) {
-          console.error(`🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`, error);
+          console.error(
+            `🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`,
+            error
+          );
           return { systemKey, success: false, error };
         }
       });
 
       await Promise.all(foundationPromises);
 
-      // Parallel initialization Group 2: Dependent systems  
+      // Parallel initialization Group 2: Dependent systems
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🌌 [Year3000System] Initializing dependent systems in parallel...");
+        console.log(
+          "🌌 [Year3000System] Initializing dependent systems in parallel..."
+        );
       }
       const dependentPromises = dependentSystems.map(async (systemKey) => {
         try {
           if (!this.facadeCoordinator) {
             throw new Error("Facade coordinator not available");
           }
-          const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);
+          const system = await this.facadeCoordinator.getNonVisualSystem(
+            systemKey as any
+          );
           if (system && typeof system.initialize === "function") {
             await system.initialize();
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
@@ -1124,7 +1137,10 @@ export class ThemeLifecycleCoordinator {
           }
           return { systemKey, success: false, reason: "No initialize method" };
         } catch (error) {
-          console.error(`🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`, error);
+          console.error(
+            `🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`,
+            error
+          );
           return { systemKey, success: false, error };
         }
       });
@@ -1133,14 +1149,18 @@ export class ThemeLifecycleCoordinator {
 
       // Parallel initialization Group 3: Event-driven systems
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🌌 [Year3000System] Initializing event-driven systems in parallel...");
+        console.log(
+          "🌌 [Year3000System] Initializing event-driven systems in parallel..."
+        );
       }
       const eventDrivenPromises = eventDrivenSystems.map(async (systemKey) => {
         try {
           if (!this.facadeCoordinator) {
             throw new Error("Facade coordinator not available");
           }
-          const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);
+          const system = await this.facadeCoordinator.getNonVisualSystem(
+            systemKey as any
+          );
           if (system && typeof system.initialize === "function") {
             await system.initialize();
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
@@ -1150,7 +1170,10 @@ export class ThemeLifecycleCoordinator {
           }
           return { systemKey, success: false, reason: "No initialize method" };
         } catch (error) {
-          console.error(`🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`, error);
+          console.error(
+            `🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`,
+            error
+          );
           return { systemKey, success: false, error };
         }
       });
@@ -1159,14 +1182,18 @@ export class ThemeLifecycleCoordinator {
 
       // Parallel initialization Group 4: UI systems
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🌌 [Year3000System] Initializing UI systems in parallel...");
+        console.log(
+          "🌌 [Year3000System] Initializing UI systems in parallel..."
+        );
       }
       const uiPromises = uiSystems.map(async (systemKey) => {
         try {
           if (!this.facadeCoordinator) {
             throw new Error("Facade coordinator not available");
           }
-          const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);
+          const system = await this.facadeCoordinator.getNonVisualSystem(
+            systemKey as any
+          );
           if (system && typeof system.initialize === "function") {
             await system.initialize();
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
@@ -1176,7 +1203,10 @@ export class ThemeLifecycleCoordinator {
           }
           return { systemKey, success: false, reason: "No initialize method" };
         } catch (error) {
-          console.error(`🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`, error);
+          console.error(
+            `🌌 [Year3000System] ✗ Failed to initialize ${systemKey}:`,
+            error
+          );
           return { systemKey, success: false, error };
         }
       });
@@ -1208,25 +1238,34 @@ export class ThemeLifecycleCoordinator {
       ];
 
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🌌 [Year3000System] Initializing visual systems in parallel...");
+        console.log(
+          "🌌 [Year3000System] Initializing visual systems in parallel..."
+        );
       }
-      
+
       const visualPromises = essentialVisualSystems.map(async (systemKey) => {
         try {
           if (!this.facadeCoordinator) {
             throw new Error("Facade coordinator not available");
           }
-          const system = this.facadeCoordinator.getVisualSystem(systemKey as any);
+          const system = this.facadeCoordinator.getVisualSystem(
+            systemKey as any
+          );
           if (system && typeof system.initialize === "function") {
             await system.initialize();
             if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-              console.log(`🌌 [Year3000System] ✓ Visual ${systemKey} initialized`);
+              console.log(
+                `🌌 [Year3000System] ✓ Visual ${systemKey} initialized`
+              );
             }
             return { systemKey, success: true };
           }
           return { systemKey, success: false, reason: "No initialize method" };
         } catch (error) {
-          console.error(`🌌 [Year3000System] ✗ Failed to initialize visual ${systemKey}:`, error);
+          console.error(
+            `🌌 [Year3000System] ✗ Failed to initialize visual ${systemKey}:`,
+            error
+          );
           return { systemKey, success: false, error };
         }
       });
@@ -1259,7 +1298,9 @@ export class ThemeLifecycleCoordinator {
    */
   private async _validateFacadeIntegration(): Promise<void> {
     if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-      console.log("🔍 [Year3000System] Performing facade integration validation...");
+      console.log(
+        "🔍 [Year3000System] Performing facade integration validation..."
+      );
     }
 
     const validationResults: {
@@ -1293,65 +1334,109 @@ export class ThemeLifecycleCoordinator {
             validationResults.errors.push("CSS Controller registration failed");
           }
         } catch (error) {
-          validationResults.errors.push(`CSS Controller validation error: ${error}`);
+          validationResults.errors.push(
+            `CSS Controller validation error: ${error}`
+          );
         }
 
         // Test 2: Validate Strategy Pattern Systems (Phase 2 fix)
-        const strategyPatternSystems = ["ColorHarmonyEngine", "MusicEmotionAnalyzer"];
+        const strategyPatternSystems = [
+          "ColorHarmonyEngine",
+          "MusicEmotionAnalyzer",
+        ];
         let strategySystemsFound = 0;
 
         for (const systemKey of strategyPatternSystems) {
           try {
-            const system = await this.facadeCoordinator.getNonVisualSystem(systemKey as any);
+            const system = await this.facadeCoordinator.getNonVisualSystem(
+              systemKey as any
+            );
             if (system) {
               strategySystemsFound++;
             }
           } catch (error) {
-            validationResults.errors.push(`Strategy system ${systemKey} not found: ${error}`);
+            validationResults.errors.push(
+              `Strategy system ${systemKey} not found: ${error}`
+            );
           }
         }
 
-        validationResults.strategyPatternSystems = strategySystemsFound === strategyPatternSystems.length;
-        if (validationResults.strategyPatternSystems && this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-          console.log("✓ [Validation] Strategy pattern systems registration working");
+        validationResults.strategyPatternSystems =
+          strategySystemsFound === strategyPatternSystems.length;
+        if (
+          validationResults.strategyPatternSystems &&
+          this.ADVANCED_SYSTEM_CONFIG.enableDebug
+        ) {
+          console.log(
+            "✓ [Validation] Strategy pattern systems registration working"
+          );
         }
 
         // Test 3: Validate Parallel Initialization Performance (Phase 3 fix)
         const initStartTime = performance.now();
         try {
           // Test that we can initialize a small system quickly (should be <100ms for simple systems)
-          const testSystem = await this.facadeCoordinator.getNonVisualSystem("PerformanceAnalyzer" as any);
+          const testSystem = await this.facadeCoordinator.getNonVisualSystem(
+            "PerformanceAnalyzer" as any
+          );
           const initEndTime = performance.now();
           const initTime = initEndTime - initStartTime;
-          
+
           validationResults.parallelInitialization = initTime < 100; // Should be fast due to parallel optimization
-          if (validationResults.parallelInitialization && this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-            console.log(`✓ [Validation] Parallel initialization optimization working (${initTime.toFixed(2)}ms)`);
+          if (
+            validationResults.parallelInitialization &&
+            this.ADVANCED_SYSTEM_CONFIG.enableDebug
+          ) {
+            console.log(
+              `✓ [Validation] Parallel initialization optimization working (${initTime.toFixed(
+                2
+              )}ms)`
+            );
           } else if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-            console.warn(`⚠ [Validation] Initialization may be slow (${initTime.toFixed(2)}ms)`);
+            console.warn(
+              `⚠ [Validation] Initialization may be slow (${initTime.toFixed(
+                2
+              )}ms)`
+            );
           }
         } catch (error) {
-          validationResults.errors.push(`Parallel initialization test failed: ${error}`);
+          validationResults.errors.push(
+            `Parallel initialization test failed: ${error}`
+          );
         }
 
         // Test 4: Validate Facade Health Check (Phase 4 validation)
         try {
           const healthCheck = await this.facadeCoordinator.performHealthCheck();
-          validationResults.facadeHealthCheck = healthCheck.overall === "excellent" || healthCheck.overall === "good";
-          
-          if (validationResults.facadeHealthCheck && this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-            console.log(`✓ [Validation] Facade health check passed (${healthCheck.overall})`);
+          validationResults.facadeHealthCheck =
+            healthCheck.overall === "excellent" ||
+            healthCheck.overall === "good";
+
+          if (
+            validationResults.facadeHealthCheck &&
+            this.ADVANCED_SYSTEM_CONFIG.enableDebug
+          ) {
+            console.log(
+              `✓ [Validation] Facade health check passed (${healthCheck.overall})`
+            );
           } else {
-            validationResults.errors.push(`Facade health check failed: ${healthCheck.overall}`);
+            validationResults.errors.push(
+              `Facade health check failed: ${healthCheck.overall}`
+            );
             if (healthCheck.recommendations?.length > 0) {
-              console.warn("🔧 [Validation] Health recommendations:", healthCheck.recommendations);
+              console.warn(
+                "🔧 [Validation] Health recommendations:",
+                healthCheck.recommendations
+              );
             }
           }
         } catch (error) {
           validationResults.errors.push(`Facade health check error: ${error}`);
         }
       } else {
-        validationResults.errors.push("Facade coordinator not available for validation");
+        validationResults.errors.push(
+          "Facade coordinator not available for validation"
+        );
       }
 
       // Report validation results
@@ -1364,20 +1449,26 @@ export class ThemeLifecycleCoordinator {
       ].filter(Boolean).length;
 
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log(`🔍 [Year3000System] Facade validation complete: ${passedTests}/${totalTests} tests passed`);
-        
+        console.log(
+          `🔍 [Year3000System] Facade validation complete: ${passedTests}/${totalTests} tests passed`
+        );
+
         if (validationResults.errors.length > 0) {
-          console.warn("⚠ [Year3000System] Validation errors:", validationResults.errors);
+          console.warn(
+            "⚠ [Year3000System] Validation errors:",
+            validationResults.errors
+          );
         }
-        
+
         if (passedTests === totalTests) {
-          console.log("🎉 [Year3000System] All facade integration fixes validated successfully!");
+          console.log(
+            "🎉 [Year3000System] All facade integration fixes validated successfully!"
+          );
         }
       }
 
       // Store validation results for debugging
       (window as any).Y3K_FACADE_VALIDATION = validationResults;
-
     } catch (error) {
       console.error("🔍 [Year3000System] Facade validation failed:", error);
       validationResults.errors.push(`Validation process error: ${error}`);
@@ -1456,10 +1547,7 @@ export class ThemeLifecycleCoordinator {
   private async _initializeVisualSystems(
     results: InitializationResults
   ): Promise<void> {
-    if (
-      !this.performanceAnalyzer ||
-      !this.musicSyncService
-    ) {
+    if (!this.performanceAnalyzer || !this.musicSyncService) {
       console.error(
         "[Year3000System] Cannot initialize visual systems due to missing core dependencies (SimplePerformanceCoordinator, MusicSyncService)."
       );
@@ -1621,8 +1709,8 @@ export class ThemeLifecycleCoordinator {
 
     // Phase 4: All system cleanup is now handled by the facade coordinator
     // Individual system destruction is managed via the facades
-    if (Spicetify.Player && this._songChangeHandler) {
-      Spicetify.Player.removeEventListener(
+    if (Spicetify?.Player && this._songChangeHandler) {
+      Spicetify.Player.removeEventListener?.(
         "songchange",
         this._songChangeHandler
       );
@@ -1650,6 +1738,12 @@ export class ThemeLifecycleCoordinator {
       "visibilitychange",
       this._boundVisibilityChangeHandler
     );
+
+    // Clean up TypedSettingsManager onChange listener
+    if (this._boundTypedSettingsHandler) {
+      settings.offChange(this._boundTypedSettingsHandler);
+      this._boundTypedSettingsHandler = null;
+    }
 
     // Dispose NowPlaying watcher
     if (this._disposeNowPlayingWatcher) {
@@ -1721,11 +1815,10 @@ export class ThemeLifecycleCoordinator {
       const evolutionEnabled = settings.get("sn-harmonic-evolution");
 
       // NEW – harmonic mode selection
-      const harmonicModeKey = settings.get(
-        "sn-current-harmonic-mode"
-      );
+      const harmonicModeKey = settings.get("sn-current-harmonic-mode");
       if (harmonicModeKey) {
-        this.ADVANCED_SYSTEM_CONFIG.currentColorHarmonyMode = String(harmonicModeKey);
+        this.ADVANCED_SYSTEM_CONFIG.currentColorHarmonyMode =
+          String(harmonicModeKey);
       }
 
       console.log(
@@ -1808,7 +1901,7 @@ export class ThemeLifecycleCoordinator {
       `🎨 [Year3000System] _applyCatppuccinAccent: Applying accent color '${selectedAccent}'`
     );
     const accent = selectedAccent === "none" ? "text" : selectedAccent;
-    const colorScheme = Spicetify.Config.color_scheme || "mocha";
+    const colorScheme = Spicetify?.Config?.color_scheme || "mocha";
     const equalizerUrl = document.querySelector(
       "body > script.marketplaceScript"
     )
@@ -2037,7 +2130,8 @@ export class ThemeLifecycleCoordinator {
         this.processingState.processingChain.splice(chainIndex, 1);
       }
     }
-    */ // End of deprecated legacy code
+    */
+    // End of deprecated legacy code
   }
 
   /**
@@ -2075,7 +2169,7 @@ export class ThemeLifecycleCoordinator {
       // Delegate Spicetify variables to CSS authority systems
       // ColorStateManager handles: --spice-accent, --spice-base, --spice-rgb-accent etc.
       // DynamicCatppuccinBridge handles: dynamic accent updates during playback
-      
+
       // Only handle specialized variables not covered by CSS authority systems
       const cssVariables: Record<string, string> = {};
 
@@ -2193,7 +2287,7 @@ export class ThemeLifecycleCoordinator {
 
           // Note: Spicetify variables handled by CSS authority systems
           totalVariablesSet: Object.keys(cssVariables).length,
-          cssAuthorityDelegation: "ColorStateManager + DynamicCatppuccinBridge"
+          cssAuthorityDelegation: "ColorStateManager + DynamicCatppuccinBridge",
         });
       }
 
@@ -2214,12 +2308,16 @@ export class ThemeLifecycleCoordinator {
       }
 
       if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
-        console.log("🔧 [Year3000System] Applied musical harmony variables via CSS coordination:", {
-          totalVariables: Object.keys(cssVariables).length,
-          accentColor: accentHex,
-          cssControllerUsed: !!this.cssVariableController,
-          spicetifyDelegation: "ColorStateManager + DynamicCatppuccinBridge handle --spice-* variables"
-        });
+        console.log(
+          "🔧 [Year3000System] Applied musical harmony variables via CSS coordination:",
+          {
+            totalVariables: Object.keys(cssVariables).length,
+            accentColor: accentHex,
+            cssControllerUsed: !!this.cssVariableController,
+            spicetifyDelegation:
+              "ColorStateManager + DynamicCatppuccinBridge handle --spice-* variables",
+          }
+        );
       }
     } catch (error) {
       console.error(
@@ -2339,7 +2437,7 @@ export class ThemeLifecycleCoordinator {
 
   public async waitForTrackData(maxRetries = 10, delayMs = 100): Promise<any> {
     for (let i = 0; i < maxRetries; i++) {
-      if (Spicetify.Player.data?.track?.uri) {
+      if (Spicetify?.Player?.data?.track?.uri) {
         return Spicetify.Player.data;
       }
       await this.utils.sleep(delayMs);
@@ -3117,6 +3215,41 @@ export class ThemeLifecycleCoordinator {
     }
   }
 
+  /**
+   * Bridge TypedSettingsManager onChange callbacks to legacy broadcast system
+   * Handles settings changes from TypedSettingsManager (Phase 6B modern pattern)
+   */
+  private _handleTypedSettingsChange(event: SettingsChangeEvent): void {
+    const { settingKey, newValue } = event;
+
+    // Map typed setting keys to legacy keys for backward compatibility
+    const legacyKeyMap: Record<string, string> = {
+      // Color harmony settings
+      "sn-artistic-mode": "artisticMode",
+      "sn-harmonic-intensity": "harmonicIntensity",
+      "sn-harmonic-evolution": "harmonicEvolution",
+      "sn-current-harmonic-mode": "harmonicMode",
+      "sn-manual-base-color": "manualBaseColor",
+      "catppuccin-accentColor": "accentColor",
+
+      // Theme foundation settings (missing - fixed)
+      "catppuccin-flavor": "flavor",
+      "sn-palette-system": "paletteSystem",
+      "sn-brightness-mode": "brightnessMode",
+
+      // Visual effects settings
+      "sn-glassmorphism-level": "glassmorphismLevel",
+      "sn-gradient-intensity": "gradientIntensity",
+    };
+
+    const legacyKey = legacyKeyMap[settingKey] || settingKey;
+
+    // Use existing _handleExternalSettingsChange logic
+    this._handleExternalSettingsChange({
+      detail: { key: legacyKey, value: newValue },
+    } as CustomEvent);
+  }
+
   private _handleExternalSettingsChange(event: Event): void {
     const { key, value } = (event as CustomEvent).detail || {};
 
@@ -3185,6 +3318,85 @@ export class ThemeLifecycleCoordinator {
         }
         break;
       }
+      case "flavor": {
+        // Catppuccin flavor changed - trigger full color system refresh
+        if (value !== null && value !== undefined) {
+          console.log(`🎨 [Year3000System] Flavor changed to: ${value}`);
+
+          // CRITICAL: Synchronize with Spicetify's Config.color_scheme
+          // Spicetify manages the base Catppuccin palette CSS variables (--spice-*)
+          // based on Config.color_scheme, so we must update it to trigger palette reload
+          if (typeof Spicetify !== 'undefined' && Spicetify.Config) {
+            const oldScheme = Spicetify.Config.color_scheme;
+            Spicetify.Config.color_scheme = String(value);
+
+            if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
+              console.log(
+                `🎨 [Year3000System] Synchronized Spicetify.Config.color_scheme: ${oldScheme} → ${value}`
+              );
+            }
+
+            // Trigger Spicetify's native palette reload if available
+            if (typeof Spicetify.colorScheme === 'function') {
+              Spicetify.colorScheme(String(value));
+            }
+          }
+
+          // Trigger ColorStateManager update if available
+          if (
+            this.colorStateManager &&
+            typeof this.colorStateManager.initialize === "function"
+          ) {
+            void this.colorStateManager.initialize();
+          }
+
+          // Also trigger full settings reapplication for flavor-dependent systems
+          void this.applyInitialSettings("flavor");
+        }
+        break;
+      }
+      case "paletteSystem": {
+        // Palette system changed (catppuccin vs year3000)
+        if (
+          value !== null &&
+          value !== undefined &&
+          this.ADVANCED_SYSTEM_CONFIG
+        ) {
+          console.log(
+            `🎨 [Year3000System] Palette system changed to: ${value}`
+          );
+          this.ADVANCED_SYSTEM_CONFIG.paletteSystem = String(value) as any;
+          // Trigger full color refresh to apply new palette
+          void this.applyInitialSettings("full");
+        }
+        break;
+      }
+      case "brightnessMode": {
+        // Brightness mode changed
+        if (value !== null && value !== undefined) {
+          console.log(
+            `🎨 [Year3000System] Brightness mode changed to: ${value}`
+          );
+          // ColorStateManager already listens to settings changes directly
+          // Just trigger color system refresh
+          void this.applyInitialSettings("brightness");
+        }
+        break;
+      }
+      case "glassmorphismLevel": {
+        // Glassmorphism level - handled by GlassmorphismManager via broadcast
+        console.log(
+          `🎨 [Year3000System] Glassmorphism level changed to: ${value}`
+        );
+        break;
+      }
+      case "gradientIntensity": {
+        // Gradient intensity - handled by WebGLRenderer via broadcast
+        console.log(
+          `🎨 [Year3000System] Gradient intensity changed to: ${value}`
+        );
+        break;
+      }
       default:
         // Other settings handled generically below
         break;
@@ -3207,6 +3419,7 @@ export class ThemeLifecycleCoordinator {
     const systems: any[] = [
       this.colorHarmonyEngine,
       this.glassmorphismManager,
+      this.webGLGradientBackgroundSystem, // Added for gradient-intensity updates
       this.card3DManager,
       this.lightweightParticleSystem,
       this.interactionTrackingSystem,
@@ -3214,6 +3427,7 @@ export class ThemeLifecycleCoordinator {
       this.sidebarSystemsIntegration,
       this.particleFieldSystem,
       // contextMenuSystem removed
+      // ColorStateManager listens to settings directly, not via broadcast
     ];
 
     systems.forEach((sys) => {
@@ -3259,9 +3473,53 @@ export class ThemeLifecycleCoordinator {
    */
   private _onArtisticModeChanged(): void {
     try {
+      // Get current artistic mode multipliers from profile
+      const multipliers = this.ADVANCED_SYSTEM_CONFIG.getCurrentMultipliers();
+
+      if (!multipliers) {
+        console.warn("[ThemeLifecycleCoordinator] No multipliers available for artistic mode");
+        return;
+      }
+
+      // Write multipliers as CSS variables for use by SCSS and JavaScript systems
+      const cssVariables: Record<string, string> = {
+        '--sn-artistic-opacity': String(multipliers.opacity ?? 0.35),
+        '--sn-artistic-saturation': String(multipliers.saturation ?? 1.0),
+        '--sn-artistic-brightness': String(multipliers.brightness ?? 1.0),
+        '--sn-artistic-contrast': String(multipliers.contrast ?? 1.0),
+        '--sn-artistic-intensity': String(multipliers.animationIntensity ?? 0.8),
+        '--sn-artistic-music-boost': String(multipliers.musicEnergyBoost ?? 1.0),
+        '--sn-artistic-interaction': String(multipliers.interactionStrength ?? 0.6),
+        '--sn-artistic-visual-base': String(multipliers.visualIntensityBase ?? 1.0),
+      };
+
+      // Apply variables through CSS controller with batching
+      if (this.cssVariableController?.batchSetVariables) {
+        this.cssVariableController.batchSetVariables(
+          'ArtisticMode',
+          cssVariables,
+          'high',
+          'artistic-mode-change'
+        );
+      } else {
+        // Fallback: direct DOM write
+        const root = document.documentElement;
+        Object.entries(cssVariables).forEach(([key, value]) => {
+          root.style.setProperty(key, value);
+        });
+      }
+
+      // Trigger color refresh with updated multipliers
       this.updateColorsFromCurrentTrack?.();
+
+      if (this.ADVANCED_SYSTEM_CONFIG.enableDebug) {
+        console.log(
+          `🎨 [ThemeLifecycleCoordinator] Applied artistic mode CSS variables`,
+          cssVariables
+        );
+      }
     } catch (e) {
-      console.warn("[Year3000System] _onArtisticModeChanged stub error", e);
+      console.warn("[ThemeLifecycleCoordinator] _onArtisticModeChanged error", e);
     }
   }
 
@@ -3333,8 +3591,10 @@ export class ThemeLifecycleCoordinator {
 // -----------------------------------------------------------------------------
 
 // Backward compatibility exports - maintain all legacy names
-export { ThemeLifecycleCoordinator as AdvancedThemeSystem };
-export { ThemeLifecycleCoordinator as Year3000System };
+export {
+  ThemeLifecycleCoordinator as AdvancedThemeSystem,
+  ThemeLifecycleCoordinator as Year3000System,
+};
 
 // Singleton export
 const themeLifecycleCoordinator = new ThemeLifecycleCoordinator();

@@ -18,7 +18,7 @@ import type {
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import type { AdvancedSystemConfig, Year3000Config, ArtisticMode } from "@/types/models";
 import type { IManagedSystem } from "@/types/systems";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import {
@@ -3134,6 +3134,166 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     // Debounced palette refresh is intentionally bypassed here—we want an
     // immediate update so UI responds in the same frame.
     this.refreshPalette?.();
+  }
+
+  /**
+   * Apply runtime settings updates immediately
+   * Part of ISettingsResponsiveSystem interface
+   * Enables real-time visual feedback for color-related settings
+   */
+  public applyUpdatedSettings(key: string, value: any): void {
+    switch (key) {
+      case 'sn-artistic-mode':
+        this.updateArtisticMode(value as ArtisticMode);
+        break;
+
+      case 'sn-harmonic-intensity':
+        this.updateHarmonicIntensity(value);
+        break;
+
+      case 'sn-harmonic-evolution':
+        this.updateEvolutionRate(value);
+        break;
+
+      case 'sn-current-harmonic-mode':
+        this.switchHarmonicMode(value as string);
+        break;
+
+      case 'sn-manual-base-color':
+        this.updateBaseColor(value as string);
+        break;
+
+      case 'catppuccin-accentColor':
+        this.updateAccentColor(value as string);
+        break;
+    }
+  }
+
+  /**
+   * Update artistic mode with immediate effect
+   */
+  private updateArtisticMode(mode: ArtisticMode): void {
+    if (!mode) return;
+
+    this.config.artisticMode = mode;
+
+    if (this.config?.enableDebug) {
+      console.log(`[ColorHarmonyEngine] Artistic mode updated to: ${mode}`);
+    }
+
+    // Force immediate palette recalculation
+    this.refreshPalette();
+  }
+
+  /**
+   * Update harmonic intensity with validation
+   */
+  private updateHarmonicIntensity(value: any): void {
+    const intensity = parseFloat(value);
+
+    if (isNaN(intensity)) {
+      console.warn(`[ColorHarmonyEngine] Invalid intensity value: ${value}`);
+      return;
+    }
+
+    // Use existing setIntensity method with proper clamping
+    this.setIntensity(intensity);
+
+    // Update config for consistency
+    this.config.colorHarmonyIntensity = this.userIntensity;
+
+    // Trigger visual update
+    this.forceRepaint('intensity-change');
+  }
+
+  /**
+   * Update evolution rate (enable/disable evolution)
+   */
+  private updateEvolutionRate(value: any): void {
+    const enabled = value === 'true' || value === true;
+
+    this.evolutionEnabled = enabled;
+    this.config.colorHarmonyEvolution = enabled;
+
+    if (this.config?.enableDebug) {
+      console.log(`[ColorHarmonyEngine] Evolution ${enabled ? 'enabled' : 'disabled'}`);
+    }
+
+    // Restart or stop evolution timer as needed
+    if (enabled && !this._evolutionTimer) {
+      this._startEvolution();
+    } else if (!enabled && this._evolutionTimer) {
+      this._stopEvolution();
+    }
+  }
+
+  /**
+   * Switch harmonic mode with immediate effect
+   */
+  private switchHarmonicMode(mode: string): void {
+    if (!mode) return;
+
+    this.config.currentColorHarmonyMode = mode;
+
+    if (this.config?.enableDebug) {
+      console.log(`[ColorHarmonyEngine] Harmonic mode switched to: ${mode}`);
+    }
+
+    // Force immediate palette refresh with new mode
+    this.refreshPalette();
+  }
+
+  /**
+   * Update manual base color
+   */
+  private updateBaseColor(color: string): void {
+    if (!color) return;
+
+    this.config.colorHarmonyBaseColor = color;
+
+    if (this.config?.enableDebug) {
+      console.log(`[ColorHarmonyEngine] Base color updated to: ${color}`);
+    }
+
+    this.refreshPalette();
+  }
+
+  /**
+   * Update accent color (Catppuccin primary)
+   */
+  private updateAccentColor(color: string): void {
+    if (!color) return;
+
+    if (this.config?.enableDebug) {
+      console.log(`[ColorHarmonyEngine] Accent color updated to: ${color}`);
+    }
+
+    // Accent color changes trigger full palette recalculation
+    this.refreshPalette();
+  }
+
+  /**
+   * Start evolution timer for gradual color transitions
+   */
+  private _startEvolution(): void {
+    if (this._evolutionTimer) return;
+
+    const evolutionInterval = 3000; // 3 seconds between evolution steps
+    this._evolutionTimer = setInterval(() => {
+      if (this.evolutionEnabled) {
+        this.refreshPalette();
+      }
+    }, evolutionInterval);
+  }
+
+  /**
+   * Stop evolution timer
+   */
+  private _stopEvolution(): void {
+    if (this._evolutionTimer) {
+      clearInterval(this._evolutionTimer);
+      this._evolutionTimer = null;
+    }
   }
 
   // ============================================================================

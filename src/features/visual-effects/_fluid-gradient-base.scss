@@ -44,14 +44,15 @@
     saturate(calc(1 + #{$intensity} * var(--sn-bg-gradient-saturation, 0.3)))
     hue-rotate(calc(var(--sn-music-rhythm-phase, 0deg) * 0.5));
 
-  // Conic gradient for oil-slick appearance
+  // Conic gradient for oil-slick appearance (Phase 4C: explicit rainbow progression)
+  // Color progression: mauve → blue → pink → lavender → mauve (continuous loop)
   background: conic-gradient(
     from var(--sn-music-rhythm-phase),
-    rgba(var(--sn-musical-oklab-primary-rgb), calc(#{$intensity} * 0.12)) 0%,
-    rgba(var(--sn-musical-oklab-accent-rgb), calc(#{$intensity} * 0.14)) 25%,
-    rgba(var(--sn-musical-oklab-highlight-rgb), calc(#{$intensity} * 0.13)) 50%,
-    rgba(var(--sn-musical-oklab-shadow-rgb), calc(#{$intensity} * 0.15)) 75%,
-    rgba(var(--sn-musical-oklab-primary-rgb), calc(#{$intensity} * 0.11)) 100%
+    rgba(var(--oklab-mauve-rgb), calc(#{$intensity} * 0.12)) 0%,
+    rgba(var(--oklab-blue-rgb), calc(#{$intensity} * 0.14)) 25%,
+    rgba(var(--oklab-pink-rgb), calc(#{$intensity} * 0.13)) 50%,
+    rgba(var(--oklab-lavender-rgb), calc(#{$intensity} * 0.15)) 75%,
+    rgba(var(--oklab-mauve-rgb), calc(#{$intensity} * 0.11)) 100%
   );
 }
 

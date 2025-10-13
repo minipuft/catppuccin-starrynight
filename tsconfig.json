@@ -45,7 +45,6 @@
   },
   "include": [
     "src-js",
-    "types",
     "src-js/types",
     "tests/ShaderLoader.test.ts",
     "tests/WebGLGradientBackgroundSystem.test.ts",

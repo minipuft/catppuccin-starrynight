@@ -44,11 +44,11 @@
   border-radius: 12px;
   overflow: visible;
 
-  // Floating shadow (enhanced by music)
+  // Floating shadow (enhanced by music) - Phase 4C: explicit blue accent
   box-shadow:
     0 calc(var(--sn-ui-glass-float-distance, 15px) * 0.5) 40px
     rgba(
-      var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
+      var(--oklab-blue-rgb, var(--spice-rgb-accent)),
       calc(var(--sn-ui-glass-pulse-enabled, 0.6) * var(--sn-music-intensity-boost, 1) * 0.15)
     );
 
@@ -120,7 +120,8 @@
       $breathing-duration: 3s
     );
 
-    border: 2px solid rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.4);
+    // Phase 4C: explicit blue accent for selected track
+    border: 2px solid rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.4);
 
     // Music-reactive intensity
     --sn-music-intensity-boost: calc(1 + var(--sn-unified-music-energy, 0.5));
@@ -185,7 +186,8 @@
   );
 
   border-radius: 0;
-  border-top: 2px solid rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.3);
+  // Phase 4C: explicit blue accent for playback bar
+  border-top: 2px solid rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.3);
 
   // Control buttons
   .main-playButton-PlayButton,
@@ -236,7 +238,8 @@ input[type="search"],
   &:focus {
     --sn-unified-effect-intensity: 0.6;
     outline: none;
-    border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4C: explicit blue accent for focus state
+    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
   }
 }
 
@@ -329,12 +332,14 @@ input[type="search"],
 
   @include card-container-universal {
     border-width: 2px;
-    border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4C: explicit blue accent for high contrast
+    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
   }
 
   @include tracklist-row {
     border-width: 2px;
-    border-color: rgba(var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)), 0.6);
+    // Phase 4C: explicit blue accent for high contrast
+    border-color: rgba(var(--oklab-blue-rgb, var(--spice-rgb-accent)), 0.6);
   }
 }
 

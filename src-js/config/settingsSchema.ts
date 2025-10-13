@@ -1,8 +1,10 @@
-import type { HarmonicMode } from "@/types/models";
-import type { CorridorEffectsMode, RenderingModePreference } from "@/types/renderingModes";
-import { HARMONIC_MODES } from "./harmonicModes";
+import type {
+  CorridorEffectsMode,
+  RenderingModePreference,
+} from "@/types/renderingModes";
 import { ARTISTIC_MODE_PROFILES } from "./artisticProfiles";
 import { CORE_THEME_VALIDATORS } from "./coreTheme";
+import { HARMONIC_MODES } from "./harmonicModes";
 
 /**
  * Type-safe settings schema with automatic validation and type conversion
@@ -11,10 +13,23 @@ import { CORE_THEME_VALIDATORS } from "./coreTheme";
 
 // Base types for settings values
 export type CatppuccinFlavor = "mocha" | "latte" | "frappe" | "macchiato";
-export type AccentColor = 
-  | "rosewater" | "flamingo" | "pink" | "mauve" | "red" | "maroon"
-  | "peach" | "yellow" | "green" | "teal" | "sky" | "sapphire" 
-  | "blue" | "lavender" | "text" | "none";
+export type AccentColor =
+  | "rosewater"
+  | "flamingo"
+  | "pink"
+  | "mauve"
+  | "red"
+  | "maroon"
+  | "peach"
+  | "yellow"
+  | "green"
+  | "teal"
+  | "sky"
+  | "sapphire"
+  | "blue"
+  | "lavender"
+  | "text"
+  | "none";
 export type BrightnessMode = "bright" | "balanced" | "dark";
 export type PaletteSystem = "catppuccin" | "year3000";
 export type ArtisticMode = keyof typeof ARTISTIC_MODE_PROFILES;
@@ -22,7 +37,12 @@ export type HarmonicModeKey = keyof typeof HARMONIC_MODES;
 export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
-export type PerformanceMode = "auto" | "performance" | "balanced" | "quality" | "maximum";
+export type PerformanceMode =
+  | "auto"
+  | "performance"
+  | "balanced"
+  | "quality"
+  | "maximum";
 
 /**
  * Complete typed settings interface
@@ -33,18 +53,18 @@ export interface TypedSettings {
   "catppuccin-flavor": CatppuccinFlavor;
   "catppuccin-accentColor": AccentColor;
   "sn-brightness-mode": BrightnessMode;
-  
+
   // === ADVANCED SYSTEMS ===
   "sn-palette-system": PaletteSystem;
   "sn-artistic-mode": ArtisticMode;
   "sn-current-harmonic-mode": HarmonicModeKey;
-  "sn-harmonic-intensity": number;        // Auto-parsed from string
-  "sn-harmonic-evolution": boolean;       // Auto-parsed from string
-  
+  "sn-harmonic-intensity": number; // Auto-parsed from string
+  "sn-harmonic-evolution": boolean; // Auto-parsed from string
+
   // === VISUAL CONTROLS ===
   "sn-gradient-intensity": IntensityLevel;
   "sn-glassmorphism-level": IntensityLevel;
-  
+
   // === PERFORMANCE SETTINGS ===
   "sn-performance-mode": PerformanceMode; // Master performance control
   "sn-corridor-effects-mode": CorridorEffectsMode;
@@ -67,7 +87,7 @@ export interface SettingMetadata<T> {
  * Complete settings metadata registry
  */
 export const SETTINGS_METADATA: {
-  [K in keyof TypedSettings]: SettingMetadata<TypedSettings[K]>
+  [K in keyof TypedSettings]: SettingMetadata<TypedSettings[K]>;
 } = {
   // === CORE THEME SETTINGS ===
   "catppuccin-flavor": {
@@ -76,21 +96,21 @@ export const SETTINGS_METADATA: {
     description: "Catppuccin color theme variant",
     category: "core",
   },
-  
+
   "catppuccin-accentColor": {
     defaultValue: "mauve",
     validator: CORE_THEME_VALIDATORS.accentColor,
     description: "Primary accent color for UI elements",
     category: "core",
   },
-  
+
   "sn-brightness-mode": {
     defaultValue: "dark", // Phase 2: Dark mode is default for refined appearance
     validator: CORE_THEME_VALIDATORS.brightnessMode,
     description: "Overall theme brightness level",
     category: "core",
   },
-  
+
   // === ADVANCED SYSTEMS ===
   "sn-palette-system": {
     defaultValue: "catppuccin",
@@ -98,15 +118,15 @@ export const SETTINGS_METADATA: {
     description: "Color palette system (Catppuccin or Year 3000)",
     category: "advanced",
   },
-  
+
   "sn-artistic-mode": {
     defaultValue: "artist-vision",
-    validator: (value): value is ArtisticMode => 
+    validator: (value): value is ArtisticMode =>
       typeof value === "string" && value in ARTISTIC_MODE_PROFILES,
     description: "Visual intensity and behavior preset",
     category: "advanced",
   },
-  
+
   "sn-current-harmonic-mode": {
     defaultValue: "analogous-flow",
     validator: (value): value is HarmonicModeKey =>
@@ -114,7 +134,7 @@ export const SETTINGS_METADATA: {
     description: "Color harmony rule for music synchronization",
     category: "advanced",
   },
-  
+
   "sn-harmonic-intensity": {
     defaultValue: 0.7,
     validator: (value): value is number =>
@@ -127,7 +147,7 @@ export const SETTINGS_METADATA: {
     description: "Intensity of color harmony effects (0-1)",
     category: "advanced",
   },
-  
+
   "sn-harmonic-evolution": {
     defaultValue: true,
     validator: (value): value is boolean => typeof value === "boolean",
@@ -140,29 +160,32 @@ export const SETTINGS_METADATA: {
     description: "Enable dynamic color harmony evolution",
     category: "advanced",
   },
-  
+
   // === VISUAL CONTROLS ===
   "sn-gradient-intensity": {
     defaultValue: "balanced",
     validator: (value): value is IntensityLevel =>
-      typeof value === "string" && ["disabled", "minimal", "balanced", "intense"].includes(value),
+      typeof value === "string" &&
+      ["disabled", "minimal", "balanced", "intense"].includes(value),
     description: "Master control for all gradient background effects",
     category: "visual",
   },
-  
+
   "sn-glassmorphism-level": {
     defaultValue: "balanced" as IntensityLevel,
     validator: (value): value is IntensityLevel =>
-      typeof value === "string" && ["disabled", "minimal", "balanced", "intense"].includes(value),
+      typeof value === "string" &&
+      ["disabled", "minimal", "balanced", "intense"].includes(value),
     description: "Glass-like transparency effects intensity",
     category: "visual",
   },
-  
+
   // === PERFORMANCE SETTINGS ===
   "sn-performance-mode": {
     defaultValue: "auto",
     validator: (value): value is PerformanceMode =>
-      typeof value === "string" && ["auto", "performance", "balanced", "quality", "maximum"].includes(value),
+      typeof value === "string" &&
+      ["auto", "performance", "balanced", "quality", "maximum"].includes(value),
     description: "Master performance mode controlling all quality settings",
     category: "performance",
   },
@@ -170,15 +193,18 @@ export const SETTINGS_METADATA: {
   "sn-corridor-effects-mode": {
     defaultValue: "auto",
     validator: (value): value is CorridorEffectsMode =>
-      typeof value === "string" && ["auto", "enabled", "disabled"].includes(value),
-    description: "Corridor shader effects control (auto enables on capable devices)",
+      typeof value === "string" &&
+      ["auto", "enabled", "disabled"].includes(value),
+    description:
+      "Corridor shader effects control (auto enables on capable devices)",
     category: "performance",
   },
 
   "sn-rendering-mode": {
     defaultValue: "auto",
     validator: (value): value is RenderingModePreference =>
-      typeof value === "string" && ["auto", "basic", "standard", "enhanced", "full"].includes(value),
+      typeof value === "string" &&
+      ["auto", "basic", "standard", "enhanced", "full"].includes(value),
     description: "Advanced: Manual rendering backend selection",
     category: "performance",
   },
@@ -187,7 +213,9 @@ export const SETTINGS_METADATA: {
 /**
  * Get all setting keys by category
  */
-export function getSettingsByCategory(category: SettingMetadata<any>["category"]): (keyof TypedSettings)[] {
+export function getSettingsByCategory(
+  category: SettingMetadata<any>["category"]
+): (keyof TypedSettings)[] {
   return Object.entries(SETTINGS_METADATA)
     .filter(([_, metadata]) => metadata.category === category)
     .map(([key, _]) => key as keyof TypedSettings);
@@ -221,16 +249,16 @@ export function parseSetting<K extends keyof TypedSettings>(
   value: string
 ): TypedSettings[K] | null {
   const metadata = SETTINGS_METADATA[key];
-  
+
   if (metadata.parser) {
     return metadata.parser(value) as TypedSettings[K] | null;
   }
-  
+
   // For non-parsed types, validate the string directly
   if (metadata.validator(value)) {
     return value as TypedSettings[K];
   }
-  
+
   return null;
 }
 
@@ -242,11 +270,11 @@ export function serializeSetting<K extends keyof TypedSettings>(
   value: TypedSettings[K]
 ): string {
   const metadata = SETTINGS_METADATA[key];
-  
+
   if (metadata.serializer) {
     return metadata.serializer(value);
   }
-  
+
   // Default serialization
   return String(value);
 }

@@ -316,4 +316,43 @@ describe('Core Orchestration Integration', () => {
       unifiedEventBus.unsubscribeAll('order-test');
     });
   });
+
+  describe('Settings Propagation to ColorHarmonyEngine', () => {
+    it('should have broadcastSettingChange method', async () => {
+      await systemCoordinator.initialize();
+
+      expect(typeof systemCoordinator.broadcastSettingChange).toBe('function');
+    });
+
+    it('should call broadcastSettingChange without errors', async () => {
+      await systemCoordinator.initialize();
+
+      // These should not throw errors even with mocked systems
+      expect(() => {
+        systemCoordinator.broadcastSettingChange('sn-artistic-mode', 'advanced-maximum');
+      }).not.toThrow();
+
+      expect(() => {
+        systemCoordinator.broadcastSettingChange('sn-harmonic-intensity', 0.85);
+      }).not.toThrow();
+
+      expect(() => {
+        systemCoordinator.broadcastSettingChange('sn-harmonic-evolution', true);
+      }).not.toThrow();
+
+      expect(() => {
+        systemCoordinator.broadcastSettingChange('catppuccin-accentColor', '#cba6f7');
+      }).not.toThrow();
+    });
+
+    it('should have getSharedColorHarmonyEngine method', async () => {
+      await systemCoordinator.initialize();
+
+      expect(typeof systemCoordinator.getSharedColorHarmonyEngine).toBe('function');
+
+      const colorEngine = systemCoordinator.getSharedColorHarmonyEngine();
+      // In test environment, may be null or mock
+      expect(colorEngine === null || typeof colorEngine === 'object').toBe(true);
+    });
+  });
 });

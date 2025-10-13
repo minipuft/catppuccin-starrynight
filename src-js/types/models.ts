@@ -242,6 +242,7 @@ export interface AdvancedSystemConfig {
   enableDebug: boolean;
   enableContextualIntelligence: boolean;
   paletteSystem: PaletteSystem;
+  useDynamicPalettes?: boolean;
   logging: {
     level: "off" | "error" | "warn" | "info" | "debug" | "verbose";
     performance: {

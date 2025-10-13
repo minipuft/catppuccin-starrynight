@@ -12,6 +12,7 @@ import {
   ISettingsFieldInput,
   ISettingsFieldToggle,
 } from "./SettingsField";
+import { settings } from "@/config";
 
 /**
  * StarryNight-internal replica of the SettingsSection helper from the
@@ -22,7 +23,7 @@ export class SettingsSection {
   public settingsFields: { [nameId: string]: ISettingsField } =
     this.initialSettingsFields;
   private stopHistoryListener: any;
-  private setRerender: Function | null = null;
+  public setRerender: Function | null = null; // Made public for modal usage
 
   constructor(
     public name: string,
@@ -147,42 +148,21 @@ export class SettingsSection {
     } as ISettingsFieldInput;
   };
 
-  /* ----- generic storage helpers (use Spicetify.LocalStorage) -------- */
+  /* ----- generic storage helpers (use TypedSettingsManager) -------- */
   getFieldValue = <T,>(nameId: string): T | undefined => {
-    // Use direct key without prefix to match SettingsManager
-    const value = (window as any).Spicetify?.LocalStorage.get(nameId);
-    
-    // Handle both old prefixed format and new direct format for backwards compatibility
-    if (value === null || value === undefined) {
-      // Try old prefixed format for migration
-      const legacyKey = `${this.settingsId}.${nameId}`;
-      const legacyValue = (window as any).Spicetify?.LocalStorage.get(legacyKey);
-      if (legacyValue) {
-        try {
-          const parsed = JSON.parse(legacyValue);
-          const extractedValue = parsed?.value ?? legacyValue;
-          // Migrate to new format
-          (window as any).Spicetify?.LocalStorage.set(nameId, extractedValue);
-          // Clean up old format
-          (window as any).Spicetify?.LocalStorage.remove(legacyKey);
-          return extractedValue as T;
-        } catch {
-          return legacyValue as T;
-        }
-      }
-      return undefined;
-    }
-    
-    return value as T;
+    // Read from TypedSettingsManager instead of direct LocalStorage
+    // TypedSettingsManager handles all storage access and type conversion
+    return settings.get(nameId as any) as T | undefined;
   };
-  
+
   setFieldValue(nameId: string, newValue: any) {
-    // Use direct key without prefix to match SettingsManager
-    (window as any).Spicetify?.LocalStorage.set(nameId, newValue);
+    // Write through TypedSettingsManager instead of direct LocalStorage
+    // This ensures onChange() callbacks fire and systems update automatically
+    settings.set(nameId as any, newValue);
   }
 
   /* ---------------------- React wrappers ----------------------------- */
-  private FieldsContainer = () => {
+  public FieldsContainer = () => { // Made public for modal usage
     const [nonce, setNonce] = (useState as any)(0);
     this.setRerender = setNonce;
 
@@ -212,18 +192,14 @@ export class SettingsSection {
 
     const setValue = (v: any) => {
       setVal(v);
-      this.setFieldValue(nameId, v);
-      
-      // Emit settings change event to notify SettingsManager and other systems
-      // This ensures the storage unification works properly
-      try {
-        const customEvent = new CustomEvent("year3000SystemSettingsChanged", {
-          detail: { key: nameId, value: v },
-        });
-        document.dispatchEvent(customEvent);
-      } catch (error) {
-        console.warn(`[SettingsSection] Failed to emit settings change event for ${nameId}:`, error);
-      }
+
+      // Use TypedSettingsManager for all storage operations
+      // This automatically triggers onChange() callbacks → ThemeLifecycleCoordinator → systems
+      settings.set(nameId as any, v);
+
+      // No longer need: Direct LocalStorage write (removed)
+      // No longer need: Deprecated CustomEvent emission (removed)
+      // TypedSettingsManager.set() handles onChange() callbacks automatically
     };
 
     if (field.type === "hidden") return <></>;

@@ -1,7 +1,5 @@
 import type { StorageInterface } from "../typedSettingsManager";
 
-declare const Spicetify: any;
-
 /**
  * Spicetify LocalStorage adapter
  * Implements the StorageInterface for Spicetify environment
@@ -16,18 +14,19 @@ export class SpicetifyStorageAdapter implements StorageInterface {
     if (this._available !== null) {
       return this._available;
     }
-    
+
     try {
       this._available =
         typeof Spicetify !== "undefined" &&
+        !!Spicetify &&
         typeof Spicetify.LocalStorage?.get === "function" &&
         typeof Spicetify.LocalStorage?.set === "function";
-        
+
       if (this._available) {
         // Test with a dummy operation
-        Spicetify.LocalStorage.get("__test__");
+        (Spicetify!.LocalStorage!.get as ((key: string) => string | null))("__test__");
       }
-      
+
       return this._available;
     } catch (error) {
       console.warn("[SpicetifyStorageAdapter] Spicetify.LocalStorage not available:", error);
@@ -44,9 +43,10 @@ export class SpicetifyStorageAdapter implements StorageInterface {
       console.warn(`[SpicetifyStorageAdapter] Cannot get ${key}: Spicetify not available`);
       return null;
     }
-    
+
     try {
-      return Spicetify.LocalStorage.get(key);
+      // Type assertion safe here due to isAvailable check
+      return (Spicetify!.LocalStorage!.get as ((key: string) => string | null))(key);
     } catch (error) {
       console.error(`[SpicetifyStorageAdapter] Error reading key ${key}:`, error);
       return null;
@@ -61,9 +61,10 @@ export class SpicetifyStorageAdapter implements StorageInterface {
       console.warn(`[SpicetifyStorageAdapter] Cannot set ${key}: Spicetify not available`);
       return false;
     }
-    
+
     try {
-      Spicetify.LocalStorage.set(key, value);
+      // Type assertion safe here due to isAvailable check
+      (Spicetify!.LocalStorage!.set as ((key: string, value: string) => void))(key, value);
       return true;
     } catch (error) {
       console.error(`[SpicetifyStorageAdapter] Error setting key ${key}:`, error);
@@ -79,14 +80,17 @@ export class SpicetifyStorageAdapter implements StorageInterface {
       console.warn(`[SpicetifyStorageAdapter] Cannot remove ${key}: Spicetify not available`);
       return false;
     }
-    
+
     try {
+      // Type assertion safe here due to isAvailable check
+      const storage = Spicetify!.LocalStorage!;
+
       // Some Spicetify versions may not have remove method
-      if (typeof Spicetify.LocalStorage.remove === "function") {
-        Spicetify.LocalStorage.remove(key);
+      if (typeof storage.remove === "function") {
+        (storage.remove as ((key: string) => void))(key);
       } else {
-        // Fallback: set to null
-        Spicetify.LocalStorage.set(key, null);
+        // Fallback: set to empty string
+        (storage.set as ((key: string, value: string) => void))(key, "");
       }
       return true;
     } catch (error) {

@@ -135,15 +135,16 @@
       saturate(calc(1 + var(--depth-effects-intensity) * 0.2));
     
     /* Cinematic depth enhancement using design system colors */
-    background: 
+    /* Phase 4C: explicit atmospheric depth colors (mauve structural + lavender atmospheric) */
+    background:
       radial-gradient(
         ellipse 40% 30% at 30% 70%,
-        rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--depth-effects-intensity) * 0.08)) 0%,
+        rgba(var(--oklab-mauve-rgb), calc(var(--depth-effects-intensity) * 0.08)) 0%,
         transparent 70%
       ),
       radial-gradient(
         ellipse 50% 40% at 70% 30%,
-        rgba(var(--sn-musical-oklab-accent-rgb), calc(var(--depth-effects-intensity) * 0.06)) 0%,
+        rgba(var(--oklab-lavender-rgb), calc(var(--depth-effects-intensity) * 0.06)) 0%,
         transparent 80%
       );
     
@@ -184,9 +185,10 @@
     bottom: 0;
     z-index: -1;
     pointer-events: none;
-    
+
     /* Minimal atmospheric enhancement using design system colors */
-    background: rgba(var(--sn-musical-oklab-primary-rgb), 0.01);
+    /* Phase 4C: explicit mauve for subtle structural base */
+    background: rgba(var(--oklab-mauve-rgb), 0.01);
     @include breathing-animation('gentle', --depth-animation-duration, --sn-anim-easing-organic, 0.3);
   }
 }
@@ -216,12 +218,13 @@
     
     /* Enhanced chrome effects */
     @extend .audio-chrome !optional;
-    
+
     /* Stronger atmospheric effects for chrome using design system colors */
-    background: 
+    /* Phase 4C: explicit blue for UI chrome enhancement */
+    background:
       linear-gradient(135deg,
         transparent 0%,
-        rgba(var(--sn-musical-oklab-primary-rgb), calc(var(--depth-effects-intensity) * 0.1)) 30%,
+        rgba(var(--oklab-blue-rgb), calc(var(--depth-effects-intensity) * 0.1)) 30%,
         transparent 70%
       );
   }

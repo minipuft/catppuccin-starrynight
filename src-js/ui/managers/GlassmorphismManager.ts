@@ -36,8 +36,6 @@ interface GlassEffectState {
   animationRate: number;
 }
 
-declare const Spicetify: any;
-
 export class GlassmorphismManager extends ViewportAwareSystem implements QualityScalingCapable {
   private static instance: GlassmorphismManager;
   private config: typeof Config;

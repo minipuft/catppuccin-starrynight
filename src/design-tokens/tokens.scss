@@ -1,9 +1,9 @@
 /**
  * Design Token System - Catppuccin StarryNight
- * 
+ *
  * Unified design token source providing structured, namespaced CSS custom properties
  * for the Year 3000 System architecture- All visual systems derive from these tokens-
- * 
+ *
  * @architecture Year3000System
  * @performance Critical variables bypass CSSVariableBatcher for real-time updates
  * @accessibility All tokens support prefers-reduced-motion and color contrast requirements
@@ -31,12 +31,12 @@
   // -------------------------------------------------------------------------
   // Background System (--sn-bg-*)
   // -------------------------------------------------------------------------
-  
+
   // WebGL/WebGPU Status
   --sn-bg-webgl-ready: 0;
   --sn-bg-webgpu-ready: 0;
   --sn-bg-active-backend: "css"; // "css" | "webgl" | "webgpu"
-  
+
   // Gradient Configuration - cascades from dynamic > cosmic > spicetify
   --sn-bg-gradient-primary-rgb: var(--sn-dynamic-accent-rgb);
   --sn-bg-gradient-secondary-rgb: var(--sn-cosmic-secondary-rgb);
@@ -78,39 +78,27 @@
   --sn-brightness-dark-brightness: 1.0;
   --sn-brightness-dark-contrast: 1.0;
   --sn-brightness-dark-opacity: 0.15;
-  
+
   // -------------------------------------------------------------------------
   // Music System (--sn-music-*) - Critical Real-time Variables
   // -------------------------------------------------------------------------
-  
+
   // Beat Synchronization (Fast-path in CSSVariableBatcher)
   --sn-music-beat-pulse-intensity: 0; // ⚡ Real-time
-  --sn-music-rhythm-phase: 0deg; // ⚡ Real-time  
+  --sn-music-rhythm-phase: 0deg; // ⚡ Real-time
   --sn-music-breathing-scale: 1.0; // ⚡ Real-time
   --sn-music-spectrum-phase: 0deg; // ⚡ Real-time
-  
+
   // Music Analysis
   --sn-music-energy-level: 0.5;
   --sn-music-valence: 0.5;
   --sn-music-tempo-bpm: 120;
   --sn-music-intensity-boost: 1.0;
   --sn-music-sync-enabled: 1;
-  
-  // Micro-beat System
-  --sn-music-micro-beat-intensity: 0;
-  --sn-music-micro-rhythm-phase: 0deg;
-  --sn-music-micro-breathing-scale: 1.0;
-  
+
   // Feed & Content Response
   --sn-music-feed-bloom-intensity: 0;
   --sn-music-energy-modulation: 1.0;
-
-  // Musical Animation Coordination (Animation System Integration)
-  --sn-anim-musical-beat-duration: calc(60s / var(--sn-music-tempo-bpm, 120)); // Beat-based animation duration
-  --sn-anim-musical-measure-duration: calc(var(--sn-anim-musical-beat-duration) * 4); // Measure duration (4 beats)
-  --sn-anim-musical-phrase-duration: calc(var(--sn-anim-musical-measure-duration) * 4); // Phrase duration (16 beats)
-  --sn-anim-musical-color-transition: var(--sn-musical-transition-duration, 800ms); // Musical color transitions
-  --sn-anim-musical-color-easing: var(--sn-musical-transition-easing, cubic-bezier(0.4, 0, 0.2, 1)); // Musical easing
 
   // Beat-Synchronized Background Effects
   --sn-bg-beat-pulse-intensity: var(--sn-music-beat-color-pulse, 0); // Beat pulse intensity for backgrounds
@@ -121,11 +109,6 @@
   // -------------------------------------------------------------------------
   // Animation System (--sn-anim-*)
   // -------------------------------------------------------------------------
-  
-  // Frame Budget & Performance Targeting
-  --sn-anim-frame-budget: 16.67ms; // Target frame budget for 60fps (1000ms / 60)
-  --sn-anim-frame-priority: normal; // Animation scheduling priority
-  --sn-anim-frame-fps: 60; // Target frames per second
 
   // Motion Controls
   --sn-anim-motion-scale: 1; // Global animation scale multiplier (0-1)
@@ -158,11 +141,11 @@
   // Motion Intelligence
   --sn-anim-motion-intelligence-level: 3; // 0.5 scale
   --sn-anim-motion-reduced: 0; // 0 = full motion, 1 = reduced
-  
+
   // -------------------------------------------------------------------------
   // Performance System (--sn-perf-*)
   // -------------------------------------------------------------------------
-  
+
   // GPU & Hardware
   --sn-perf-webgl-context-ready: 0;
   --sn-perf-webgpu-context-ready: 0;
@@ -174,33 +157,13 @@
   --sn-perf-quality-particles: 1.0;
   --sn-perf-quality-shadows: 1.0;
   --sn-perf-quality-blur: 1.0;
-  
+
   // -------------------------------------------------------------------------
   // UI Component System (--sn-ui-*)
   // -------------------------------------------------------------------------
-  
-  // Card System
-  --sn-ui-card-energy-level: 0;
-  --sn-ui-card-rhythm-phase: 0deg;
-  --sn-ui-card-beat-intensity: 0;
-  --sn-ui-card-constellation-opacity: 0.3;
-  --sn-ui-card-harmonic-saturation: 1.0;
-  --sn-ui-card-3d-enabled: 1;
-  
-  // Glass Effects
-  --sn-ui-glass-opacity: 0.1;
-  --sn-ui-glass-blur: 20px;
+
+  // Glass Effects (Active only)
   --sn-ui-glass-pulse-enabled: 1;
-  --sn-ui-glass-beat-opacity: 0;
-  --sn-ui-glass-frost-intensity: 0.5;
-  --sn-ui-glass-float-distance: 15px; // Floating animation distance for glass elements
-  
-  // Navigation System
-  --sn-ui-nav-glow-intensity: 0;
-  --sn-ui-nav-echo-opacity: 0;
-  --sn-ui-nav-magnetic-pull: 1.0;
-  --sn-ui-nav-neural-primary-rgb: 139, 233, 253;
-  --sn-ui-nav-neural-secondary-rgb: 250, 179, 135;
 
   // Echo Effects (SidebarVisualEffectsSystem integration)
   --sn-echo-radius-multiplier: 1.0;    // Echo radius scale
@@ -209,24 +172,22 @@
   --sn-echo-offset-y: 0px;             // Echo vertical offset
   --sn-echo-skew: 0deg;                // Echo skew transformation
   --sn-echo-rotate: 0deg;              // Echo rotation angle
-  
+
   // Sidebar Visual Effects
   --sn-ui-sidebar-visual-effects-opacity: 0.8;
   --sn-ui-sidebar-visual-effects-deep-rgb: 17, 17, 27;
-  --sn-ui-sidebar-magnetic-hover-pull: 1.2;
-  --sn-ui-sidebar-magnetic-focus-pull: 1.5;
-  
+
   // Button System
   --sn-ui-button-accent-hex: var(--sn-accent-hex);
   --sn-ui-button-accent-rgb: var(--sn-accent-rgb);
   --sn-ui-button-cosmic-glow: 0;
   --sn-ui-button-energy-brightness: 1.0;
   --sn-ui-button-hologram-opacity: 0;
-  
+
   // -------------------------------------------------------------------------
   // Text System (--sn-text-*)
   // -------------------------------------------------------------------------
-  
+
   // Text Effects
   --sn-text-glow-intensity: 0; // ⚡ Dynamic via ColorHarmonyEngine
   --sn-text-gradient-angle: 45deg;
@@ -234,35 +195,35 @@
   --sn-text-rhythm-hue: 0deg;
   --sn-text-cosmic-blur: 0px;
   --sn-text-harmonic-saturation: 1.0;
-  
+
   // -------------------------------------------------------------------------
   // Interaction System (--sn-ix-*)
   // -------------------------------------------------------------------------
-  
+
   // Feedback Intensity
   --sn-ix-feedback-subtle: 0.2;
   --sn-ix-feedback-moderate: 0.5;
   --sn-ix-feedback-prominent: 0.8;
-  
+
   // Ripple Effects
   --sn-ix-ripple-intensity: 0.6;
   --sn-ix-ripple-duration: 600ms;
   --sn-ix-ripple-color-rgb: var(--sn-bg-gradient-accent-rgb);
-  
+
   // Magnetic Interactions
   --sn-ix-magnetic-hover-pull: 1.05;
   --sn-ix-magnetic-focus-pull: 1.1;
   --sn-ix-magnetic-active-pull: 0.95;
-  
+
   // Temporal Echo System
   --sn-ix-echo-past-opacity: 0.3;
   --sn-ix-echo-present-opacity: 1.0;
   --sn-ix-echo-future-opacity: 0.1;
-  
+
   // -------------------------------------------------------------------------
   // Color System (--sn-color-*) - StarryNight Cosmic Theme
   // -------------------------------------------------------------------------
-  
+
   // === CATPPUCCIN THEME DEFAULTS ===
   // Catppuccin Mocha palette - used as fallbacks, will be dynamically updated by ColorStateManager
   // These values are replaced at runtime based on flavor + brightness mode selection
@@ -276,7 +237,7 @@
   --sn-cosmic-secondary-rgb: 69, 71, 90;            // Catppuccin Mocha surface1 RGB
   --sn-cosmic-text-hex: #cdd6f4;                    // Catppuccin Mocha text
   --sn-cosmic-text-rgb: 205, 214, 244;              // Catppuccin Mocha text RGB
-  
+
   // === DYNAMIC COLOR VARIABLES ===
   // These are updated in real-time by ColorHarmonyEngine and music systems
   // When music is playing, these override cosmic defaults
@@ -286,7 +247,7 @@
   --sn-dynamic-primary-rgb: var(--sn-cosmic-accent-rgb);
   --sn-dynamic-secondary-hex: var(--sn-cosmic-secondary-hex);
   --sn-dynamic-secondary-rgb: var(--sn-cosmic-secondary-rgb);
-  
+
   // === UNIFIED COLOR INTERFACE ===
   // Three-tier cascade: dynamic > cosmic > spicetify
   --sn-color-accent-hex: var(--sn-dynamic-accent-hex);
@@ -295,7 +256,7 @@
   --sn-color-primary-rgb: var(--sn-dynamic-primary-rgb);
   --sn-color-base-hex: var(--sn-cosmic-base-hex);
   --sn-color-base-rgb: var(--sn-cosmic-base-rgb);
-  
+
   // === BASE OKLAB COLORS (Source of Truth) ===
   // ⚠️ CONSOLIDATED Phase 4.2: Unified OKLAB namespace
   // Updated by ColorHarmonyEngine - perceptually uniform color processing
@@ -316,21 +277,100 @@
   --sn-musical-oklab-highlight-rgb: var(--sn-oklab-highlight-rgb);
   --sn-musical-oklab-shadow-rgb: var(--sn-oklab-shadow-rgb);
 
+  // =============================================================================
+  // PHASE 4C: EXPLICIT OKLAB VARIANT MAPPINGS (Hybrid Coverage Strategy)
+  // Strategic color variable architecture with clear palette relationships
+  // =============================================================================
+
+  // === TIER 1: ESSENTIAL UI COLORS (8 variants) ===
+  // Primary semantic colors - core visual identity
+  --oklab-blue: var(--sn-blue);
+  --oklab-blue-rgb: var(--sn-blue-rgb);
+  --oklab-mauve: var(--sn-mauve);
+  --oklab-mauve-rgb: var(--sn-mauve-rgb);
+  --oklab-pink: var(--sn-pink);
+  --oklab-pink-rgb: var(--sn-pink-rgb);
+
+  // Primary surface colors - structural foundation
+  --oklab-base: var(--sn-base);
+  --oklab-base-rgb: var(--sn-base-rgb);
+  --oklab-text: var(--sn-text);
+  --oklab-text-rgb: var(--sn-text-rgb);
+  --oklab-mantle: var(--sn-mantle);
+  --oklab-mantle-rgb: var(--sn-mantle-rgb);
+  --oklab-crust: var(--sn-crust);
+  --oklab-crust-rgb: var(--sn-crust-rgb);
+  --oklab-overlay0: var(--sn-overlay0);
+  --oklab-overlay0-rgb: var(--sn-overlay0-rgb);
+
+  // === TIER 2: ATMOSPHERIC ENHANCEMENT (5 variants) ===
+  // Complementary semantic colors - visual richness
+  --oklab-teal: var(--sn-teal);
+  --oklab-teal-rgb: var(--sn-teal-rgb);
+  --oklab-sapphire: var(--sn-sapphire);
+  --oklab-sapphire-rgb: var(--sn-sapphire-rgb);
+  --oklab-lavender: var(--sn-lavender);
+  --oklab-lavender-rgb: var(--sn-lavender-rgb);
+
+  // Mid-tone surface colors - layered depth
+  --oklab-surface1: var(--sn-surface1);
+  --oklab-surface1-rgb: var(--sn-surface1-rgb);
+  --oklab-overlay1: var(--sn-overlay1);
+  --oklab-overlay1-rgb: var(--sn-overlay1-rgb);
+
+  // === TIER 3: FEEDBACK STATES (3 variants) ===
+  // Semantic feedback colors - user feedback
+  --oklab-red: var(--sn-red);
+  --oklab-red-rgb: var(--sn-red-rgb);
+  --oklab-yellow: var(--sn-yellow);
+  --oklab-yellow-rgb: var(--sn-yellow-rgb);
+  --oklab-green: var(--sn-green);
+  --oklab-green-rgb: var(--sn-green-rgb);
+
+  // === LEGACY COMPATIBILITY BRIDGE ===
+  // Maps old ambiguous variables to new explicit ones
+  // TODO: Remove after full SCSS migration (Phase 4C-Stage 3)
+  --sn-musical-oklab-accent-rgb: var(--oklab-blue-rgb);        // Primary accent → blue
+  --sn-musical-oklab-primary-rgb: var(--oklab-mauve-rgb);      // Secondary accent → mauve
+  --sn-musical-oklab-highlight-rgb: var(--oklab-pink-rgb);     // Tertiary accent → pink
+  --sn-musical-oklab-shadow-rgb: var(--oklab-mantle-rgb);      // Deep shadow → mantle
+  --sn-musical-oklab-secondary-rgb: var(--oklab-base-rgb);     // Background → base
+
+  // === PHASE 4C DOCUMENTATION ===
+  // Color relationship architecture:
+  //
+  // Base Palette (OKLCH-generated from album art):
+  //   --sn-blue: Derived from album VIBRANT/PRIMARY via OKLCH hue rotation
+  //   --sn-mauve: Derived from album accent via OKLCH chroma adjustment
+  //   --sn-base: Derived from album DARK_VIBRANT via OKLCH lightness offset
+  //
+  // OKLAB Variants (music-reactive enhancement):
+  //   --oklab-blue: Music-enhanced variant of --sn-blue (energy-based vibrancy)
+  //   --oklab-mauve: Music-enhanced variant of --sn-mauve (tempo-based saturation)
+  //   --oklab-base: Music-enhanced variant of --sn-base (mood-based lightness)
+  //
+  // Palette Transform (final aesthetic):
+  //   Applied to ALL colors (palette + OKLAB) as final post-processing step
+  //   Ensures uniform aesthetic (chromaMultiplier, hueBias, lightnessRange)
+  //
+  // Result: Single coherent color system where ALL colors flow through:
+  //   Album Art → OKLCH Palette → OKLAB Enhancement → Palette Transform
+
   // === GENRE-SPECIFIC OKLAB PRESETS ===
   // OKLAB presets optimized for different music genres (updated by GenreProfileManager)
-  
+
   // Electronic/EDM - Vibrant, high-energy OKLAB processing
   --sn-genre-electronic-oklab-chroma-boost: 1.6;
   --sn-genre-electronic-oklab-lightness-boost: 1.2;
-  
+
   // Classical - Subtle, refined OKLAB processing
   --sn-genre-classical-oklab-chroma-boost: 1.1;
   --sn-genre-classical-oklab-lightness-boost: 1.05;
-  
+
   // Rock/Metal - Bold, intense OKLAB processing
   --sn-genre-rock-oklab-chroma-boost: 1.4;
   --sn-genre-rock-oklab-lightness-boost: 1.1;
-  
+
 
   // === GENRE UI BRIDGE INTEGRATION ===
   // CSS variables for genre-aware UI styling (GenreUIBridge integration)
@@ -340,16 +380,16 @@
   --genre-saturation-variation: 0.2;   // Saturation variation amount
   --genre-brightness-base: 1.0;        // Base brightness level
   --genre-brightness-variation: 0.1;   // Brightness variation amount
-  
+
   // === VISUAL EFFECTS FIELD COLORS ===
   --sn-color-visual-effects-deep-rgb: var(--sn-cosmic-base-rgb);
   --sn-color-visual-effects-surface-rgb: var(--sn-cosmic-surface-rgb);
   --sn-color-visual-effects-glow-rgb: var(--sn-color-accent-rgb);
-  
+
   // -------------------------------------------------------------------------
   // Layout System (--sn-layout-*)
   // -------------------------------------------------------------------------
-  
+
   // Z-Index Management
   --sn-layout-z-background: -11;
   --sn-layout-z-nebula: -10;
@@ -357,7 +397,7 @@
   --sn-layout-z-content: 0;
   --sn-layout-z-ui: 10;
   --sn-layout-z-modal: 100;
-  
+
   // Spacing Scale
   --sn-layout-space-xs: 0.25rem;
   --sn-layout-space-sm: 0.5rem;
@@ -365,51 +405,39 @@
   --sn-layout-space-lg: 1.5rem;
   --sn-layout-space-xl: 2rem;
   --sn-layout-space-2xl: 3rem;
-  
+
   // Border Radius
   --sn-layout-radius-sm: 4px;
   --sn-layout-radius-md: 8px;
   --sn-layout-radius-lg: 12px;
   --sn-layout-radius-xl: 16px;
   --sn-layout-radius-full: 9999px;
-  
+
   // -------------------------------------------------------------------------
   // Visual Effects Field System (--sn-visual-effects-*) - Magnetic Depth
   // -------------------------------------------------------------------------
-  
-  // 3D Perspective & Depth
-  --sn-visual-effects-depth-field: 800px; // Comfortable 3D perspective for readability
-  --sn-visual-effects-depth-approach: 20px;
-  --sn-visual-effects-depth-recede: -10px;
-  --sn-visual-effects-depth-neutral: 0px;
-  
+
   // Magnetic Interaction Forces
   --sn-visual-effects-magnetic-hover-pull: 12px;
   --sn-visual-effects-magnetic-focus-pull: 18px;
   --sn-visual-effects-magnetic-interest-pull: 8px;
   --sn-visual-effects-magnetic-transition-speed: 0.6s;
-  
-  // Depth Hierarchy (translateZ values)
-  --sn-visual-effects-depth-priority-high: translateZ(8px);
-  --sn-visual-effects-depth-priority-medium: translateZ(4px);
-  --sn-visual-effects-depth-priority-low: translateZ(0px);
-  --sn-visual-effects-depth-priority-receded: translateZ(-6px);
-  
+
   // Readability & Accessibility
   --sn-visual-effects-magnetic-max-rotation: 2deg;
   --sn-visual-effects-text-clarity: 1;
   --sn-visual-effects-contrast-boost: 1.05;
-  
+
   // Field Dynamics
   --sn-visual-effects-field-intensity: 0.4;
   --sn-visual-effects-animation-rate: 12s;
   --sn-visual-effects-response-sensitivity: 0.8;
-  
+
   // Performance & Mobile
   --sn-visual-effects-performance-mode: 1;
   --sn-visual-effects-accessibility-scale: 1;
   --sn-visual-effects-mobile-reduction: 0.6;
-  
+
   // Visual effects modifier flags (extend existing systems without duplicating)
   --sn-visual-effects-advanced-mode: 1; // Enable advanced behavior in existing systems
   --sn-visual-effects-subdivision-mode: 1; // Enable subdivision patterns in existing systems
@@ -421,31 +449,31 @@
   // -------------------------------------------------------------------------
   // Visual Effects Theme RGB Colors - Unified System
   // -------------------------------------------------------------------------
-  
+
   // === YEAR3000 VISUAL THEME SYSTEM ===
   // Cyberpunk aesthetic themes mapped to Catppuccin palette for design consistency
   // Visual Guide: Ethereal (soft glow), Natural (organic), Cinematic (dramatic energy)
-  
+
   // Ethereal theme colors (soft glow effects) - Mapped to Catppuccin
   --sn-theme-ethereal-soft-rgb: var(--spice-rgb-mauve);      // Soft primary glow
   --sn-theme-ethereal-mystical-rgb: var(--spice-rgb-teal);   // Mystical glow accent
   --sn-theme-ethereal-dreamy-rgb: var(--spice-rgb-rosewater); // Dreamy mist overlay
   --sn-theme-ethereal-emotional-rgb: var(--spice-rgb-yellow); // Emotional heart pulse
   --sn-theme-ethereal-highlight-rgb: var(--spice-rgb-lavender); // Ethereal highlight
-  
+
   // Natural theme colors (organic nature effects) - Mapped to Catppuccin
   --sn-theme-natural-earthy-rgb: var(--spice-rgb-green);     // Spring earthy base
   --sn-theme-natural-forest-rgb: var(--spice-rgb-green);     // Deep forest (same as earthy for consistency)
   --sn-theme-natural-sky-rgb: var(--spice-rgb-sky);          // Natural sky blue
   --sn-theme-natural-sunset-rgb: var(--spice-rgb-peach);     // Sunset glow warmth
   --sn-theme-natural-stone-rgb: var(--spice-rgb-overlay0);   // Stone gray base
-  
+
   // Cinematic theme colors (dramatic energy burst effects) - Mapped to Catppuccin
   --sn-theme-cinematic-red-rgb: var(--spice-rgb-red);        // Cinematic energy burst
   --sn-theme-cinematic-amber-rgb: var(--spice-rgb-peach);    // Amber glow (warm accent)
   --sn-theme-cinematic-blue-rgb: var(--spice-rgb-blue);      // Cool energy accent
   --sn-theme-cinematic-cyan-rgb: var(--spice-rgb-teal);      // Cyan effects highlight
-  
+
   // Unified breathing animation durations
   --sn-anim-breathing-energetic: 2000ms;  // Active, dynamic breathing
   --sn-anim-breathing-cosmic: 6000ms;     // Deep, cosmic breathing
@@ -463,7 +491,7 @@
     --sn-music-rhythm-phase: 0deg !important;
     --sn-music-breathing-scale: 1.0 !important;
     --sn-anim-motion-reduced: 1;
-    
+
     // Disable all transition durations (using primary tokens)
     --sn-transition-fast-duration: 0ms;
     --sn-transition-standard-duration: 0ms;
@@ -474,7 +502,7 @@
     // Disable particle effects
     --sn-bg-particle-density: 0;
     --sn-perf-quality-particles: 0;
-    
+
     // Reduce visual effects field motion
     --sn-visual-effects-magnetic-hover-pull: 4px;
     --sn-visual-effects-magnetic-focus-pull: 6px;
@@ -505,11 +533,11 @@
   --spicetify-surface: var(--spice-surface1, var(--sn-cosmic-surface-hex));
   --spicetify-accent: var(--spice-accent, var(--sn-cosmic-accent-hex));
   --spicetify-text: var(--spice-text, var(--sn-cosmic-text-hex));
-  
+
   // Optional Catppuccin compatibility layer
   // These are only used if user has Catppuccin as their base Spicetify theme
   --catppuccin-base: #1e1e2e;
-  --catppuccin-mantle: #181825;  
+  --catppuccin-mantle: #181825;
   --catppuccin-crust: #11111b;
   --catppuccin-surface0: #313244;
   --catppuccin-surface1: #45475a;
@@ -562,7 +590,6 @@ html[style*="--sn-brightness-mode: \"dark\""] {
 @media (max-width: 768px) {
   :root {
     // Mobile visual effects field optimization
-    --sn-visual-effects-depth-field: 600px;
     --sn-visual-effects-magnetic-hover-pull: calc(12px * var(--sn-visual-effects-mobile-reduction));
     --sn-visual-effects-magnetic-focus-pull: calc(18px * var(--sn-visual-effects-mobile-reduction));
     --sn-visual-effects-field-intensity: calc(0.4 * var(--sn-visual-effects-mobile-reduction));

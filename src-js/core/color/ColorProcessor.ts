@@ -45,6 +45,12 @@ import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector
 import { WebGLGradientStrategy } from "@/visual/strategies/WebGLGradientStrategy";
 import { DepthLayeredStrategy } from "@/visual/strategies/DepthLayeredStrategy";
 import { DynamicGradientStrategy } from "@/visual/strategies/DynamicGradientStrategy";
+import { DynamicPaletteIntegration } from "@/core/css/DynamicPaletteIntegration";
+import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
+import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { settings } from "@/config";
+import { PaletteTransform, type PaletteTransformConfig } from "@/utils/color/PaletteTransform";
+import { AESTHETIC_PROFILES } from "@/utils/color/PaletteConstants";
 
 // ============================================================================
 // Unified Processing Interfaces (Enhanced with ColorCoordinator features)
@@ -141,6 +147,9 @@ export class ColorProcessor
   private oklabProcessor: OKLABColorProcessor;
   private musicalOKLABProcessor: MusicalOKLABProcessor;
 
+  // === PHASE 4A: DYNAMIC PALETTE INTEGRATION ===
+  private dynamicPaletteIntegration: DynamicPaletteIntegration | null = null;
+
   // === STATE MANAGEMENT ===
   private processingState: ProcessingState = {
     isProcessing: false,
@@ -212,6 +221,14 @@ export class ColorProcessor
     // Initialize color processing systems
     this.oklabProcessor = new OKLABColorProcessor();
     this.musicalOKLABProcessor = new MusicalOKLABProcessor(true);
+
+    // PHASE 4A: Initialize dynamic palette integration if feature flag enabled
+    if (ADVANCED_SYSTEM_CONFIG.useDynamicPalettes) {
+      this.dynamicPaletteIntegration = new DynamicPaletteIntegration(
+        ADVANCED_SYSTEM_CONFIG.enableDebug
+      );
+      console.log("🎨 [ColorProcessor] PHASE 4A: Dynamic palette integration enabled");
+    }
   }
 
   public async initialize(): Promise<void> {
@@ -392,10 +409,15 @@ export class ColorProcessor
       // Check context deduplication
       if (this.isDuplicateContext(context)) {
         Y3KDebug?.debug?.log(
-          "UnifiedColorProcessingEngine", 
+          "UnifiedColorProcessingEngine",
           "Skipping duplicate context within TTL"
         );
         return this.getLastProcessedResult() || this.createFallbackResult(context, new Error("No previous result"));
+      }
+
+      // PHASE 4A: Generate dynamic palette and enrich context
+      if (this.dynamicPaletteIntegration?.shouldUseDynamicGeneration()) {
+        await this.enrichContextWithDynamicPalette(context);
       }
 
       // Multi-strategy processing or single strategy
@@ -408,6 +430,10 @@ export class ColorProcessor
         this.metrics.strategySelections++;
         result = await this.processWithOKLAB(context, strategy);
       }
+
+      // PHASE 4B: Apply palette transform as FINAL STEP (primary implementation)
+      // This ensures ALL colors from ALL sources get uniform aesthetic treatment
+      result = await this.applyPaletteTransformToResult(result, context);
 
       // Performance tracking
       const processingTime = performance.now() - startTime;
@@ -815,15 +841,27 @@ export class ColorProcessor
 
   /**
    * 🔧 PHASE 3: Process context with OKLAB coordination
-   * Consolidates OKLAB processing from ColorHarmonyEngine
+   * 🔧 PHASE 4B FIX: OKLAB processes strategy colors (not raw album art)
+   *
+   * Order of operations (CRITICAL):
+   * 1. Strategy processes first (uses OKLCH palette colors derived from album art)
+   * 2. OKLAB enhances THOSE palette colors with music reactivity
+   * 3. Result: Single coherent color system where oklab-* are variants of displayed colors
+   *
+   * Architecture: Album art substantially influences → Palette dictates direction → Music adds reactivity
    */
   private async processWithOKLAB(
     context: ColorContext,
     strategy: IColorProcessor
   ): Promise<ColorResult> {
-    // Musical OKLAB coordination (from ColorHarmonyEngine)
+    // PHASE 4B FIX: Strategy processing FIRST
+    // This gets us the palette colors (blue, mauve, etc.) that are already influenced by album art
+    const strategyResult = await strategy.processColors(context);
+
+    // PHASE 4B FIX: OKLAB processes strategy's colors (not rawColors!)
+    // This creates music-reactive variants of the colors we're ACTUALLY using
     const musicalContext: MusicalColorContext = {
-      rawColors: context.rawColors,
+      rawColors: strategyResult.processedColors,  // ← Use strategy colors (album-art-influenced palette)
       musicData: context.musicData as any, // Type compatibility
       trackUri: context.trackUri,
       timestamp: context.timestamp,
@@ -835,14 +873,19 @@ export class ColorProcessor
       );
     this.metrics.oklabCoordinations++;
 
-    // Strategy processing with OKLAB enhancement
-    const strategyResult = await strategy.processColors(context);
-
-    // Enhance strategy result with OKLAB processing
+    // Enhance strategy result with OKLAB variants of SAME colors
     const enhancedColors = await this.enhanceWithOKLAB(
       strategyResult.processedColors,
       oklabResult
     );
+
+    if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
+      console.log('🎨 [ColorProcessor] PHASE 4B: OKLAB created variants of palette colors:', {
+        strategyColors: Object.keys(strategyResult.processedColors).slice(0, 5),
+        oklabVariants: Object.keys(oklabResult.enhancedColors || {}).slice(0, 5),
+        message: 'oklab-* colors are now variants of displayed palette colors'
+      });
+    }
 
     return {
       ...strategyResult,
@@ -853,6 +896,63 @@ export class ColorProcessor
         oklabCoordination: oklabResult,
       },
     };
+  }
+
+  /**
+   * PHASE 4A: Enrich color context with dynamic OKLCH-generated palette
+   *
+   * Generates a 26-color palette from base and accent colors and adds it to
+   * the context for strategy consumption. This ensures all strategies have
+   * access to perceptually uniform, OKLCH-derived colors for consistent
+   * visual output across WebGL gradients, CSS effects, and UI elements.
+   *
+   * @param context - Color context to enrich with palette
+   */
+  private async enrichContextWithDynamicPalette(context: ColorContext): Promise<void> {
+    if (!this.dynamicPaletteIntegration) return;
+
+    try {
+      // Get current color state for palette generation
+      const paletteSystem = paletteSystemManager.getCurrentPaletteSystem();
+      const brightnessMode = settings.get('sn-brightness-mode') as 'bright' | 'balanced' | 'dark' || 'balanced';
+      const currentFlavor = paletteSystemManager.getCurrentDefaultFlavor();
+
+      // Determine base and accent colors
+      // Priority: Raw colors from album art > Current theme colors
+      const baseColorObj = paletteSystemManager.getBrightnessAdjustedBaseColor(currentFlavor, brightnessMode);
+      const baseColor = context.rawColors?.PRIMARY || baseColorObj.hex;
+      const accentColor = context.rawColors?.VIBRANT || paletteSystemManager.getDefaultAccentColor().hex;
+
+      // Generate dynamic palette
+      const palette = this.dynamicPaletteIntegration.getPaletteColorsOnly({
+        baseColor,
+        accentColor,
+        brightnessMode: brightnessMode === 'dark' ? 'dark' : 'light',
+        paletteSystem,
+      });
+
+      // Enrich context with generated palette (cast to Record<string, string> for flexibility)
+      // TypeScript double cast needed for structural type compatibility
+      context.dynamicPalette = palette as unknown as Record<string, string>;
+
+      if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
+        console.log('🎨 [ColorProcessor] PHASE 4A: Context enriched with dynamic palette:', {
+          colorCount: Object.keys(palette).length,
+          baseColor,
+          accentColor,
+          brightnessMode,
+          paletteSystem,
+          sampleColors: {
+            base: palette.base,
+            blue: palette.blue,
+            text: palette.text,
+          },
+        });
+      }
+    } catch (error) {
+      console.error('[ColorProcessor] PHASE 4A: Failed to enrich context with dynamic palette:', error);
+      // Don't throw - allow strategies to fall back to raw colors
+    }
   }
 
   /**
@@ -1351,6 +1451,99 @@ export class ColorProcessor
     if (energy > 0.6) return "dynamic";
     if (energy > 0.4) return "balanced";
     return "ambient";
+  }
+
+  // ============================================================================
+  // PHASE 4B: Palette Transform Integration (Primary Implementation)
+  // ============================================================================
+
+  /**
+   * PHASE 4B: Apply palette aesthetic transform to ALL colors in result
+   *
+   * This is the FINAL STEP in color processing, ensuring every color from
+   * every source (album art, OKLCH palette, OKLAB variants, strategies,
+   * Spicetify variables) receives the same aesthetic profile treatment.
+   *
+   * @param result - Color processing result with all colors
+   * @param context - Processing context for metadata
+   * @returns Result with transformed colors
+   */
+  private async applyPaletteTransformToResult(
+    result: ColorResult,
+    context: ColorContext
+  ): Promise<ColorResult> {
+    const startTime = performance.now();
+
+    try {
+      // Get current palette system and profile
+      const paletteSystem = paletteSystemManager.getCurrentPaletteSystem();
+      const profile = AESTHETIC_PROFILES[paletteSystem];
+
+      if (!profile) {
+        console.warn(
+          `[ColorProcessor] PHASE 4B: Unknown palette system "${paletteSystem}", skipping transform`
+        );
+        return result;
+      }
+
+      // Build transform configuration from aesthetic profile
+      const transformConfig: PaletteTransformConfig = {
+        chromaMultiplier: profile.chromaMultiplier,
+        lightnessRange: profile.lightnessRange,
+        hueBias: profile.hueBias,
+        surfaceDesaturation: profile.surfaceDesaturation,
+        preserveSemantics: false, // Transform all colors including text
+      };
+
+      // Apply transform to ALL processed colors
+      const transformedColors = PaletteTransform.applyToColorMap(
+        result.processedColors,
+        transformConfig
+      );
+
+      const processingTime = performance.now() - startTime;
+
+      if (ADVANCED_SYSTEM_CONFIG.enableDebug) {
+        console.log('🎨 [ColorProcessor] PHASE 4B: Palette transform applied:', {
+          profile: paletteSystem,
+          colorCount: Object.keys(transformedColors).length,
+          processingTimeMs: processingTime.toFixed(2),
+          config: transformConfig,
+          sampleTransforms: {
+            blue: {
+              before: result.processedColors.blue,
+              after: transformedColors.blue,
+            },
+            'oklab-PRIMARY': {
+              before: result.processedColors['oklab-PRIMARY'],
+              after: transformedColors['oklab-PRIMARY'],
+            },
+          },
+        });
+      }
+
+      // Return result with transformed colors and metadata
+      return {
+        ...result,
+        processedColors: transformedColors,
+        metadata: {
+          ...result.metadata,
+          paletteTransform: {
+            profile: paletteSystem,
+            config: transformConfig,
+            processingTimeMs: processingTime,
+            appliedToColorCount: Object.keys(transformedColors).length,
+          },
+        },
+      };
+    } catch (error) {
+      console.error(
+        '[ColorProcessor] PHASE 4B: Palette transform failed:',
+        error
+      );
+      // Return original result on error
+      return result;
+    }
   }
 
   private createFallbackResult(

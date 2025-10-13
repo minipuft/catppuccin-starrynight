@@ -27,6 +27,16 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
   enableContextualIntelligence: true,
   paletteSystem: 'catppuccin', // Default to maintain compatibility
 
+  // Phase 2: OKLCH Dynamic Palette System
+  useDynamicPalettes: false, // Feature flag for gradual rollout
+
+  // Phase 4B: Palette transform now ALWAYS applied (primary implementation)
+  // No flag needed - this is the correct architecture
+
+  // Phase 4C: Strategic Color Variable Architecture - OKLAB Variant Tiers
+  enableTier2OKLABVariants: true, // Atmospheric enhancement colors (teal, sapphire, lavender, surface1, overlay1)
+  enableTier3OKLABVariants: true, // Feedback state colors (red, yellow, green)
+
   performanceProfiles: PERFORMANCE_PROFILES,
 
   // Enhanced logging configuration

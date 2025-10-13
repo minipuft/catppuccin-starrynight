@@ -145,6 +145,63 @@ interface IManagedSystem {
 - **Build Target**: Chromium engine (Spotify's embedded browser)
 - **Runtime APIs**: `Spicetify.Player`, `Platform`, `colorExtractor`, `getAudioData`
 
+### Spicetify Type Definitions Architecture
+
+The project uses a **three-file type architecture** for optimal TypeScript performance:
+
+1. **Active Types** ([src-js/types/spicetify.d.ts](src-js/types/spicetify.d.ts)):
+   - Minimal production types (~190 lines)
+   - Only APIs actually used by the theme
+   - Included in TypeScript compilation
+   - Fast compilation, zero bundle impact
+
+2. **Theme Extensions** ([src-js/types/spicetify-extensions.d.ts](src-js/types/spicetify-extensions.d.ts)):
+   - Theme-specific type augmentations
+   - Custom interfaces and type guards
+   - Variant and SemanticColor types
+
+3. **Reference Documentation** ([docs/reference/spicetify.d.ts](docs/reference/spicetify.d.ts)):
+   - Comprehensive API surface (2427 lines)
+   - Source: [spicetify-lucid](https://github.com/sanoojes/spicetify-lucid)
+   - **NOT included in compilation** (documentation only)
+   - Zero performance impact
+
+#### Copy-On-Demand Pattern
+
+When adding new Spicetify API usage:
+
+1. **Find the API** in `docs/reference/spicetify.d.ts`
+2. **Copy specific types** to `src-js/types/spicetify.d.ts`
+3. **Test compilation** with `npm run typecheck`
+
+```typescript
+// Example: Adding PlayerState tracking
+// 1. Find in docs/reference/spicetify.d.ts
+type PlayerState = {
+  timestamp: number;
+  context: PlayerContext;
+  item: PlayerTrack;
+};
+
+// 2. Copy to src-js/types/spicetify.d.ts
+declare namespace Spicetify {
+  type PlayerState = {
+    timestamp: number;
+    context: PlayerContext;
+    item: PlayerTrack;
+  };
+}
+
+// 3. Use in code with full type safety
+const state: Spicetify.PlayerState = Spicetify.Player.data;
+```
+
+**Performance Characteristics**:
+- Type definitions have **zero runtime impact** (no bundle size increase)
+- Compile-time only - types don't exist in transpiled JavaScript
+- Reference docs excluded from compilation for fast builds
+- See [docs/reference/README.md](docs/reference/README.md) for complete usage guide
+
 ## Development Standards
 
 ### Performance Requirements (Target Goals)

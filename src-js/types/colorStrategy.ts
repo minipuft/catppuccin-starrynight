@@ -16,19 +16,19 @@
 export interface ColorContext {
   /** Raw colors extracted from album art */
   rawColors: Record<string, string>;
-  
+
   /** Current track URI for caching and context */
   trackUri: string;
-  
+
   /** Processing timestamp */
   timestamp: number;
-  
+
   /** Current color harmony mode setting */
   colorHarmonyMode?: string;
-  
+
   /** @deprecated Use colorHarmonyMode instead */
   harmonicMode?: string;
-  
+
   /** Music analysis data for context-aware processing */
   musicData?: {
     energy?: number;
@@ -36,13 +36,25 @@ export interface ColorContext {
     tempo?: number;
     genre?: string;
   } | undefined;
-  
+
   /** Performance hints for strategy selection */
   performanceHints?: {
     preferLightweight?: boolean;
     enableAdvancedBlending?: boolean;
     maxProcessingTime?: number;
   };
+
+  /**
+   * PHASE 4A: Dynamic OKLCH-generated palette colors (26 colors)
+   *
+   * When useDynamicPalettes feature flag is enabled, this contains the full
+   * OKLCH-generated palette (14 semantic + 12 surface colors) derived from
+   * base and accent colors. Strategies should prefer these over rawColors
+   * for consistent, perceptually uniform color application.
+   *
+   * @since Phase 4A - Strategy-Level Palette Integration
+   */
+  dynamicPalette?: Record<string, string>;
 }
 
 /**

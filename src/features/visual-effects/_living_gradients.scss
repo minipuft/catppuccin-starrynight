@@ -38,7 +38,7 @@ body,
   background: var(--living-base-gradient);
 
   /* Ensure smooth transitions */
-  transition: background 800ms var(--sn-anim-easing-smooth, ease-out);
+  transition: background 800ms var(--sn-anim-easing-organic);
 }
 
 /* Enhanced living visual effects layer for main application */
@@ -57,26 +57,27 @@ body,
         calc(
           50% + (var(--sn-music-rhythm-phase, 0deg) * 6%) + var(--sn-bg-gradient-flow-y, 0%)
         ),
-        /* Primary color with breathing intensity */
+        /* Phase 4C: explicit radial color progression (center → edge) */
+        /* Primary mauve center with breathing intensity */
         rgba(
-            var(--sn-musical-oklab-primary-rgb),
+            var(--oklab-mauve-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * var(--sn-musical-oklab-intensity, 0.5))
           )
           0%,
-        /* Accent color with chroma adjustment */
+        /* Blue accent mid-radius with chroma adjustment */
         rgba(
-            var(--sn-musical-oklab-accent-rgb),
+            var(--oklab-blue-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * 0.6 * var(--sn-musical-oklab-intensity, 0.5))
           )
           40%,
-        /* Highlight color with uniformity */
+        /* Pink highlight outer ring with uniformity */
         rgba(
-            var(--sn-musical-oklab-highlight-rgb),
+            var(--oklab-pink-rgb),
             calc(var(--sn-bg-gradient-opacity, 0.8) * 0.3 * var(--sn-musical-oklab-intensity, 0.5))
           )
           70%,
-        /* Shadow blend */
-        rgba(var(--sn-musical-oklab-shadow-rgb), 0.02) 85%,
+        /* Mantle shadow edge blend */
+        rgba(var(--oklab-mantle-rgb), 0.02) 85%,
         var(--spice-base) 100%
       );
 

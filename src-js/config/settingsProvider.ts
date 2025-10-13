@@ -213,6 +213,7 @@ export const settings = {
   set: <K extends keyof TypedSettings>(key: K, value: TypedSettings[K]) => getSettings().set(key, value),
   reset: <K extends keyof TypedSettings>(key: K) => getSettings().reset(key),
   onChange: (listener: (event: any) => void) => getSettings().onChange(listener),
+  offChange: (listener: (event: any) => void) => getSettings().offChange(listener),
   export: () => getSettings().export(),
   import: (settings: Partial<TypedSettings>) => getSettings().import(settings),
 };

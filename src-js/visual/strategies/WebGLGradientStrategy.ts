@@ -475,34 +475,57 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
         await this.initializeWebGLGradient();
       }
 
-      // Process colors through OKLAB if enabled
-      let processedColors = context.rawColors;
-      if (this.flowSettings.oklabProcessingEnabled) {
-        const preset = OKLABColorProcessor.getPreset(
-          this.flowSettings.oklabPreset
-        );
-        oklabResults = this.oklabProcessor.processColorPalette(
-          context.rawColors,
-          preset
-        );
+      // PHASE 4A: Prioritize dynamic palette over raw colors
+      let processedColors: Record<string, string>;
 
-        // Create processed colors map using enhanced colors
-        processedColors = Object.fromEntries(
-          Object.entries(oklabResults).map(([key, result]) => [
-            key,
-            result.enhancedHex,
-          ])
-        );
+      if (context.dynamicPalette) {
+        // Use OKLCH Dynamic Palette colors for perceptually uniform gradients
+        processedColors = context.dynamicPalette;
 
         Y3KDebug?.debug?.log(
           "WebGLGradientStrategy",
-          "OKLAB color enhancement applied:",
+          "🎨 PHASE 4A: Using dynamic OKLCH palette for gradient generation",
           {
-            originalColors: Object.keys(context.rawColors).length,
-            processedColors: Object.keys(processedColors).length,
-            preset: preset.name,
+            paletteColorCount: Object.keys(processedColors).length,
+            sampleColors: {
+              base: processedColors.base,
+              blue: processedColors.blue,
+              mauve: processedColors.mauve,
+              text: processedColors.text,
+            },
           }
         );
+      } else {
+        // Fallback to raw colors with OKLAB processing
+        processedColors = context.rawColors;
+
+        if (this.flowSettings.oklabProcessingEnabled) {
+          const preset = OKLABColorProcessor.getPreset(
+            this.flowSettings.oklabPreset
+          );
+          oklabResults = this.oklabProcessor.processColorPalette(
+            context.rawColors,
+            preset
+          );
+
+          // Create processed colors map using enhanced colors
+          processedColors = Object.fromEntries(
+            Object.entries(oklabResults).map(([key, result]) => [
+              key,
+              result.enhancedHex,
+            ])
+          );
+
+          Y3KDebug?.debug?.log(
+            "WebGLGradientStrategy",
+            "OKLAB color enhancement applied (fallback):",
+            {
+              originalColors: Object.keys(context.rawColors).length,
+              processedColors: Object.keys(processedColors).length,
+              preset: preset.name,
+            }
+          );
+        }
       }
 
       // Create gradient from processed color context
@@ -1001,19 +1024,40 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
 
   /**
    * Create gradient stops from extracted colors with OKLAB enhancement
+   *
+   * PHASE 4A: Enhanced to detect and prioritize OKLCH Dynamic Palette colors
+   * over raw album art colors. When dynamic palette is available, uses semantic
+   * color names (blue, mauve, pink, etc.) for perceptually uniform gradients.
    */
   private createGradientStops(
     colors: Record<string, string>,
     oklabResults: Record<string, OKLABProcessingResult> = {}
   ) {
-    const priorities = [
-      "PRIMARY",
-      "VIBRANT",
-      "VIBRANT_NON_ALARMING",
-      "LIGHT_VIBRANT",
-      "DARK_VIBRANT",
-      "PROMINENT",
-    ];
+    // PHASE 4A: Check if colors contain OKLCH palette colors (semantic names)
+    const isPalette = colors.blue || colors.mauve || colors.pink;
+
+    let priorities: string[];
+    if (isPalette) {
+      // Use OKLCH semantic color names for palette
+      priorities = [
+        "blue",      // Primary accent
+        "mauve",     // Secondary accent
+        "pink",      // Tertiary highlight
+        "sapphire",  // Cool tone
+        "lavender",  // Light accent
+        "teal",      // Green-blue blend
+      ];
+    } else {
+      // Use Spicetify colorExtractor keys for raw colors
+      priorities = [
+        "PRIMARY",
+        "VIBRANT",
+        "VIBRANT_NON_ALARMING",
+        "LIGHT_VIBRANT",
+        "DARK_VIBRANT",
+        "PROMINENT",
+      ];
+    }
 
     const stops = [];
     const usedColors = new Set<string>();

@@ -17,7 +17,7 @@
 
   // === Dynamic Flow Variables ===
   --particle-flow-variance: 15deg;
-  --particle-dynamic-curve: var(--sn-easing-smooth, var(--sn-anim-easing-smooth));
+  --particle-dynamic-curve: var(--sn-anim-easing-organic);
   --particle-life-cycle: 12s;
   --particle-emergence-delay: 3s;
 

@@ -29,6 +29,13 @@ interface OklabColorLCH {
   h: number | null;
 }
 
+// Type definition for OKLCH color (cylindrical Oklab)
+export interface OKLCHColor {
+  L: number;  // Lightness: 0-1 (perceptually uniform)
+  C: number;  // Chroma: 0-0.4 (saturation/intensity)
+  H: number;  // Hue: 0-360 degrees (color wheel angle)
+}
+
 // Centralized getRootStyle
 export function getRootStyle(): HTMLElement {
   return document.documentElement;
@@ -711,6 +718,52 @@ export function colorDifference(rgb1: RgbColor, rgb2: RgbColor): number {
   const deltaB = lab1.b - lab2.b;
 
   return Math.sqrt(deltaL * deltaL + deltaA * deltaA + deltaB * deltaB);
+}
+
+export function convertOklabToOklch(oklab: OklabColor): OKLCHColor {
+  const { L, a, b } = oklab;
+  const C = Math.sqrt(a * a + b * b);
+  let h_rad = Math.atan2(b, a);
+
+  if (h_rad < 0) {
+    h_rad += 2 * Math.PI;
+  }
+
+  const H = h_rad * (180 / Math.PI);
+
+  return {
+    L,
+    C,
+    H: C > 0.001 ? H : 0,
+  };
+}
+
+export function oklchToOklab(oklch: OKLCHColor): OklabColor {
+  const L = oklch.L;
+  const a = oklch.C * Math.cos((oklch.H * Math.PI) / 180);
+  const b = oklch.C * Math.sin((oklch.H * Math.PI) / 180);
+  return { L, a, b };
+}
+
+export function oklchToRgb(oklch: OKLCHColor): RgbColor {
+  const oklab = oklchToOklab(oklch);
+  return oklabToRgb(oklab.L, oklab.a, oklab.b);
+}
+
+export function rgbToOklch(rgb: RgbColor): OKLCHColor {
+  const oklab = rgbToOklab(rgb.r, rgb.g, rgb.b);
+  return convertOklabToOklch(oklab);
+}
+
+export function hexToOklch(hex: string): OKLCHColor | null {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return null;
+  return rgbToOklch(rgb);
+}
+
+export function oklchToHex(oklch: OKLCHColor): string {
+  const rgb = oklchToRgb(oklch);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
 }
 
 class HealthMonitor {

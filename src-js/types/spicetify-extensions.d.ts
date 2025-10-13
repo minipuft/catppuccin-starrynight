@@ -68,30 +68,6 @@ declare global {
     | string; // Allow custom semantic colors
 
   // =============================================================================
-  // COSMOS API TYPE EXTENSIONS
-  // =============================================================================
-  
-  /**
-   * CosmosAsync interface for async requests
-   * Provides type safety for Spicetify.CosmosAsync operations
-   */
-  interface CosmosAsync {
-    get(url: string, options?: any): Promise<any>;
-    post(url: string, body?: any, options?: any): Promise<any>;
-    put(url: string, body?: any, options?: any): Promise<any>;
-    patch(url: string, body?: any, options?: any): Promise<any>;
-    del(url: string, options?: any): Promise<any>;
-    head(url: string, options?: any): Promise<any>;
-    sub(url: string, callback: (data: any) => void): () => void;
-    request(options: {
-      url: string;
-      method?: string;
-      body?: any;
-      headers?: Record<string, string>;
-    }): Promise<any>;
-  }
-
-  // =============================================================================
   // ENHANCED PLAYER DATA INTERFACE
   // =============================================================================
   
@@ -186,9 +162,6 @@ declare global {
       clear?(): void;
       [key: string]: any;
     };
-    
-    // Theme-specific additions
-    CosmosAsync?: Spicetify.CosmosAsync;
     
     // Functions
     colorExtractor?: (imageUrl: string) => Promise<{

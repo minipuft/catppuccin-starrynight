@@ -154,14 +154,16 @@
     brightness(calc(1 + #{$effective-intensity} * var(--sn-unified-brightness-delta)));
 
   // Background with design system colors
+  /* Phase 4C: explicit mauve for structural glass base */
   background: rgba(
-    var(--sn-musical-oklab-primary-rgb, var(--spice-rgb-surface0)),
+    var(--oklab-mauve-rgb, var(--spice-rgb-surface0)),
     calc(0.08 * #{$effective-intensity})
   );
 
   // Border with accent color
+  /* Phase 4C: explicit blue for interactive accent border */
   border: 1px solid rgba(
-    var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
+    var(--oklab-blue-rgb, var(--spice-rgb-accent)),
     calc(0.2 * #{$effective-intensity})
   );
 
@@ -256,10 +258,11 @@
   }
 
   // Add subtle glow effect
+  /* Phase 4C: explicit blue for interactive accent glow */
   box-shadow:
     0 0 calc($intensity * var(--sn-unified-glow-radius))
     rgba(
-      var(--sn-musical-oklab-accent-rgb, var(--spice-rgb-accent)),
+      var(--oklab-blue-rgb, var(--spice-rgb-accent)),
       calc($intensity * 0.3)
     );
 
