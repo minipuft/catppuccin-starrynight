@@ -202,6 +202,7 @@ export function createMockVisualEffectsCoordinator() {
 
   // Create the VisualEffectsCoordinator with mock dependencies
   const bridge = new VisualEffectsCoordinator(
+    ADVANCED_SYSTEM_CONFIG,
     mockCSSVariableWriter,
     mockPerformanceAnalyzer,
     mockMusicSyncService,

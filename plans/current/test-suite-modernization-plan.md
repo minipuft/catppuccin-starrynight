@@ -24,6 +24,10 @@ The test suite has undergone comprehensive modernization to align with Phase 6.1
 
 ## Progress Summary (Updated 2025-10-09)
 
+### ♻️ Follow-up Modernization (2025-10-10)
+- Refined **VisualEffectsIntegration.test.ts** to rely on standardized mock factories, validating choreography, health diagnostics, and visual state refresh without full system spin-up.
+- Rebuilt **InfrastructureSystemCoordinator.test.ts** around the modern dependency injection pattern, leveraging shared mocks and focused metrics assertions for coordinator health.
+
 ### ✅ MAJOR MILESTONES COMPLETED
 
 #### Phase 1: Test Infrastructure ✅ COMPLETE
