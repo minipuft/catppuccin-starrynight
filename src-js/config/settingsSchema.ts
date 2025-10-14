@@ -34,7 +34,17 @@ export type BrightnessMode = "bright" | "balanced" | "dark";
 export type PaletteSystem = "catppuccin" | "year3000";
 export type ArtisticMode = keyof typeof ARTISTIC_MODE_PROFILES;
 export type HarmonicModeKey = keyof typeof HARMONIC_MODES;
-export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
+export type GradientIntensityLevel =
+  | "disabled"
+  | "minimal"
+  | "balanced"
+  | "intense";
+export type IntensityLevel = GradientIntensityLevel;
+export type GlassmorphismLevel =
+  | "disabled"
+  | "minimal"
+  | "moderate"
+  | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
 export type PerformanceMode =
@@ -53,6 +63,7 @@ export interface TypedSettings {
   "catppuccin-flavor": CatppuccinFlavor;
   "catppuccin-accentColor": AccentColor;
   "sn-brightness-mode": BrightnessMode;
+  "sn-dynamic-text-accent": boolean;
 
   // === ADVANCED SYSTEMS ===
   "sn-palette-system": PaletteSystem;
@@ -62,11 +73,14 @@ export interface TypedSettings {
   "sn-harmonic-evolution": boolean; // Auto-parsed from string
 
   // === VISUAL CONTROLS ===
-  "sn-gradient-intensity": IntensityLevel;
-  "sn-glassmorphism-level": IntensityLevel;
+  "sn-gradient-intensity": GradientIntensityLevel;
+  "sn-glassmorphism-level": GlassmorphismLevel;
 
   // === PERFORMANCE SETTINGS ===
   "sn-performance-mode": PerformanceMode; // Master performance control
+  "sn-webgl-enabled": boolean;
+  "sn-webgl-quality": WebGLQuality;
+  "sn-animation-quality": QualityLevel;
   "sn-corridor-effects-mode": CorridorEffectsMode;
   "sn-rendering-mode": RenderingModePreference;
 }
@@ -109,6 +123,19 @@ export const SETTINGS_METADATA: {
     validator: CORE_THEME_VALIDATORS.brightnessMode,
     description: "Overall theme brightness level",
     category: "core",
+  },
+
+  "sn-dynamic-text-accent": {
+    defaultValue: true,
+    validator: (value): value is boolean => typeof value === "boolean",
+    parser: (value: string) => {
+      if (value === "true") return true;
+      if (value === "false") return false;
+      return null;
+    },
+    serializer: (value: boolean) => value.toString(),
+    description: "Allow dynamic colors to update Spicetify text accent",
+    category: "visual",
   },
 
   // === ADVANCED SYSTEMS ===
@@ -164,7 +191,7 @@ export const SETTINGS_METADATA: {
   // === VISUAL CONTROLS ===
   "sn-gradient-intensity": {
     defaultValue: "balanced",
-    validator: (value): value is IntensityLevel =>
+    validator: (value): value is GradientIntensityLevel =>
       typeof value === "string" &&
       ["disabled", "minimal", "balanced", "intense"].includes(value),
     description: "Master control for all gradient background effects",
@@ -172,10 +199,10 @@ export const SETTINGS_METADATA: {
   },
 
   "sn-glassmorphism-level": {
-    defaultValue: "balanced" as IntensityLevel,
-    validator: (value): value is IntensityLevel =>
+    defaultValue: "moderate",
+    validator: (value): value is GlassmorphismLevel =>
       typeof value === "string" &&
-      ["disabled", "minimal", "balanced", "intense"].includes(value),
+      ["disabled", "minimal", "moderate", "intense"].includes(value),
     description: "Glass-like transparency effects intensity",
     category: "visual",
   },
@@ -187,6 +214,35 @@ export const SETTINGS_METADATA: {
       typeof value === "string" &&
       ["auto", "performance", "balanced", "quality", "maximum"].includes(value),
     description: "Master performance mode controlling all quality settings",
+    category: "performance",
+  },
+
+  "sn-webgl-enabled": {
+    defaultValue: true,
+    validator: (value): value is boolean => typeof value === "boolean",
+    parser: (value: string) => {
+      if (value === "true") return true;
+      if (value === "false") return false;
+      return null;
+    },
+    serializer: (value: boolean) => value.toString(),
+    description: "Toggle WebGL-based visual systems",
+    category: "performance",
+  },
+
+  "sn-webgl-quality": {
+    defaultValue: "medium",
+    validator: (value): value is WebGLQuality =>
+      typeof value === "string" && ["low", "medium", "high"].includes(value),
+    description: "Preferred quality level for WebGL rendering",
+    category: "performance",
+  },
+
+  "sn-animation-quality": {
+    defaultValue: "auto",
+    validator: (value): value is QualityLevel =>
+      typeof value === "string" && ["auto", "low", "high"].includes(value),
+    description: "Animation quality preference for dynamic effects",
     category: "performance",
   },
 

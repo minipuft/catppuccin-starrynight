@@ -130,7 +130,7 @@ export interface ColorApplicationResult {
 export interface ThemeAppearance extends ThemeService {
   // Core components managed by this service
   paletteSystemManager: any; // PaletteSystemManager
-  colorStateManager: any; // ColorStateManager
+  cssColorController: any; // CSSColorController
   settingsManager: any; // SettingsManager
   oklabColorProcessor: any; // OKLABColorProcessor
   

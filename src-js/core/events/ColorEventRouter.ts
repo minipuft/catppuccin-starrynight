@@ -20,6 +20,7 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import {
   MusicalOKLABProcessor,
   type ProcessingOptions,
@@ -84,6 +85,7 @@ export class ColorEventRouter {
 
   // Event subscription IDs for cleanup
   private subscriptionIds: string[] = [];
+  private settingsUnsubscribe: (() => void) | null = null;
 
   // Processing timeout to prevent stuck states
   private processingTimeout: number | null = null;
@@ -230,13 +232,10 @@ export class ColorEventRouter {
     );
     this.subscriptionIds.push(trackChangedSub);
 
-    // Settings changes that affect color processing
-    const settingsChangedSub = unifiedEventBus.subscribe(
-      "settings:changed",
-      this.handleSettingsChanged.bind(this),
-      "ColorEventOrchestrator"
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = settings.onChange((event) =>
+      void this.handleSettingsChanged(event)
     );
-    this.subscriptionIds.push(settingsChangedSub);
 
     const visualGuideChangedSub = unifiedEventBus.subscribe(
       "settings:visual-guide-changed",
@@ -257,7 +256,9 @@ export class ColorEventRouter {
       "ColorEventOrchestrator",
       "Event subscriptions established",
       {
-        subscriptionCount: this.subscriptionIds.length,
+        subscriptionCount:
+          this.subscriptionIds.length +
+          (this.settingsUnsubscribe !== null ? 1 : 0),
       }
     );
   }
@@ -402,7 +403,7 @@ export class ColorEventRouter {
    * Handle settings changed events
    */
   private async handleSettingsChanged(
-    data: EventData<"settings:changed">
+    data: SettingsChangeEvent
   ): Promise<void> {
     try {
       // Check if setting affects color processing
@@ -812,7 +813,7 @@ export class ColorEventRouter {
       // MusicalOKLABCoordinator now generates ALL CSS variables including metadata
 
       // 🔧 PHASE 3/4: Emit colors:harmonized with processor-generated CSS variables
-      // ColorStateManager (CSS Authority) subscribes to this and handles ALL DOM writes
+      // CSSColorController and handles ALL DOM writes
       unifiedEventBus.emitSync("colors:harmonized", {
         processedColors: colorResult.processedColors,
         cssVariables: musicalResult.cssVariables, // 🔧 PHASE 4: Processor-generated (no duplication)
@@ -860,7 +861,7 @@ export class ColorEventRouter {
   }
 
   // 🔧 PHASE 3: Removed applyColorResult() method
-  // ColorStateManager (CSS Authority) now handles ALL CSS variable writes via colors:harmonized event
+  // CSSColorController (CSS Authority) now handles ALL CSS variable writes via colors:harmonized event
   // This eliminates race conditions and clarifies single-responsibility architecture
 
   /**
@@ -893,6 +894,8 @@ export class ColorEventRouter {
       unifiedEventBus.unsubscribe(id);
     });
     this.subscriptionIds = [];
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = null;
 
     // Destroy components
     this.colorOrchestrator.destroy();

@@ -70,6 +70,8 @@ export type {
   PaletteSystem,
   ArtisticMode,
   HarmonicModeKey,
+  GradientIntensityLevel,
+  GlassmorphismLevel,
   IntensityLevel,
   QualityLevel,
   WebGLQuality,

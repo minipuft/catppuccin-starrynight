@@ -123,12 +123,14 @@ export type PaletteSystem = 'catppuccin' | 'year3000';
 
 // Core theme type definitions for type-safe settings
 export type CatppuccinFlavor = "mocha" | "latte" | "frappe" | "macchiato";
-export type AccentColor = 
+export type AccentColor =
   | "rosewater" | "flamingo" | "pink" | "mauve" | "red" | "maroon"
-  | "peach" | "yellow" | "green" | "teal" | "sky" | "sapphire" 
+  | "peach" | "yellow" | "green" | "teal" | "sky" | "sapphire"
   | "blue" | "lavender" | "text" | "none";
 export type BrightnessMode = "bright" | "balanced" | "dark";
-export type IntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
+export type GradientIntensityLevel = "disabled" | "minimal" | "balanced" | "intense";
+export type IntensityLevel = GradientIntensityLevel;
+export type GlassmorphismLevel = "disabled" | "minimal" | "moderate" | "intense";
 export type QualityLevel = "auto" | "low" | "high";
 export type WebGLQuality = "low" | "medium" | "high";
 

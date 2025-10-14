@@ -8,6 +8,8 @@
 
 import { ViewportManager, type VisibilityState, type ViewportOptions } from "@/utils/performance/ViewportAwarenessManager";
 import { unifiedEventBus, type EventHandler } from "@/core/events/EventBus";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 
 export interface ViewportSystemOptions extends ViewportOptions {
@@ -31,7 +33,7 @@ export abstract class ViewportAwareSystem implements IManagedSystem {
   protected viewportOptions: ViewportSystemOptions;
   protected untrackViewport?: () => void;
   protected resumeTimeoutId?: number;
-  protected settingsSubscriptionId?: string;
+  protected unregisterSettingsListener: (() => void) | null = null;
   
   private animationsPaused = false;
   private settingsUpdatesPaused = false;
@@ -138,22 +140,20 @@ export abstract class ViewportAwareSystem implements IManagedSystem {
   }
 
   private async initializeEventSubscriptions(): Promise<void> {
-    // Subscribe to settings changes using the type-safe UnifiedEventBus
-    this.settingsSubscriptionId = unifiedEventBus.subscribe(
-      'settings:changed',
-      (data) => this.handleUnifiedSettingsChange(data),
-      `ViewportAwareSystem-${this.constructor.name}`
+    this.unregisterSettingsListener?.();
+    this.unregisterSettingsListener = settings.onChange((data) =>
+      this.handleTypedSettingsChange(data)
     );
   }
 
   private cleanupEventSubscriptions(): void {
-    if (this.settingsSubscriptionId) {
-      unifiedEventBus.unsubscribe(this.settingsSubscriptionId);
-      delete this.settingsSubscriptionId;
+    if (this.unregisterSettingsListener) {
+      this.unregisterSettingsListener();
+      this.unregisterSettingsListener = null;
     }
   }
 
-  private handleUnifiedSettingsChange(data: { settingKey: string; oldValue: any; newValue: any; timestamp: number }): void {
+  private handleTypedSettingsChange(data: SettingsChangeEvent): void {
     if (this.shouldSkipSettingsUpdate()) {
       return;
     }

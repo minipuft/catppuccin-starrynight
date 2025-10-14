@@ -608,7 +608,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   // 🔧 PHASE 2: Emit harmony state instead of applying CSS directly
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private _updateCSSVariables(_deltaMs: number): void {
-    // Prepare harmony variables for ColorStateManager
+    // Prepare harmony variables for CSSColorController
     const harmonyVariables: Record<string, string> = {
       "--sn-harmony-energy": this.kineticState.visualMomentum.toFixed(3),
       "--sn-harmony-pulse": this.kineticState.currentPulse.toFixed(3),
@@ -641,7 +641,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     const glow = Math.max(0, Math.min(1, this.kineticState.currentPulse * 1.2));
     harmonyVariables["--sn-text-glow-intensity"] = glow.toFixed(3);
 
-    // 🔧 PHASE 2: Emit harmony CSS event for ColorStateManager to handle
+    // 🔧 PHASE 2: Emit harmony CSS event for CSSColorController to handle
     unifiedEventBus.emit("system:css-variables" as any, {
       source: "ColorHarmonyEngine",
       variables: harmonyVariables,
@@ -1674,7 +1674,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
         // 🔧 PHASE 2: Emit emotional temperature CSS variables instead of applying directly
         if (emotionalTemperature) {
-          // 🔧 PHASE 2: Emit CSS variables for ColorStateManager
+          // 🔧 PHASE 2: Emit CSS variables for CSSColorController
           unifiedEventBus.emit("system:css-variables" as any, {
             source: "ColorHarmonyEngine",
             variables: emotionalTemperature.cssVariables,
@@ -1851,6 +1851,20 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
     this.harmonyMetrics.musicInfluencedAdjustments++;
 
+    const accentCandidate =
+      harmonizedColors.accentHex ||
+      harmonizedColors.VIBRANT ||
+      harmonizedColors.PROMINENT ||
+      Object.values(harmonizedColors)[0] ||
+      '#cba6f7';
+
+    harmonizedColors.accentHex = accentCandidate;
+
+    const accentRgb = this.utils.hexToRgb(accentCandidate);
+    if (accentRgb) {
+      harmonizedColors.accentRgb = `${accentRgb.r},${accentRgb.g},${accentRgb.b}`;
+    }
+
     // 🎨 DEBUG: Log final harmonized result
     if (this.config.enableDebug) {
       console.log("🎨 [ColorHarmonyEngine] Final harmonized result:", {
@@ -1971,7 +1985,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    * 🔧 PHASE 2: Emit CSS variable instead of applying directly
    */
   private applyCSSVariable(property: string, value: string): void {
-    // 🔧 PHASE 2: Emit single CSS variable for ColorStateManager
+    // 🔧 PHASE 2: Emit single CSS variable for CSSColorController
     unifiedEventBus.emit("system:css-variables" as any, {
       source: "ColorHarmonyEngine",
       variables: { [property]: value },
@@ -2292,7 +2306,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     const gravityY = (energy - 0.5) * 2; // -1 to 1
     const gravityStrength = visualIntensity;
 
-    // 🔧 PHASE 2: Emit gravity CSS variables for ColorStateManager
+    // 🔧 PHASE 2: Emit gravity CSS variables for CSSColorController
     unifiedEventBus.emit("system:css-variables" as any, {
       source: "ColorHarmonyEngine",
       variables: {
@@ -3027,8 +3041,8 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
         services.themeLifecycle?.getCoordinator() ||
         null;
 
-      if (coordinator?.updateColorsFromCurrentTrack) {
-        await coordinator.updateColorsFromCurrentTrack();
+      if (coordinator?.applyInitialSettings) {
+        await coordinator.applyInitialSettings("accent");
         return;
       }
 
@@ -3047,7 +3061,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
           variables["--sn-bg-gradient-primary-rgb"] = `${rgb.r},${rgb.g},${rgb.b}`;
         }
 
-        // 🔧 PHASE 2: Emit for ColorStateManager
+        // 🔧 PHASE 2: Emit for CSSColorController
         unifiedEventBus.emit("system:css-variables" as any, {
           source: "ColorHarmonyEngine",
           variables,

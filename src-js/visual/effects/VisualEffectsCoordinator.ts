@@ -29,6 +29,7 @@ import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
+import { MusicBeatSynchronizer } from "@/visual/music/MusicSyncVisualEffects";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
@@ -56,6 +57,8 @@ import { HeaderVisualEffectsController } from "@/visual/effects/HeaderVisualEffe
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { GradientConductor, type GradientConductorConfig } from "@/visual/backbone/GradientConductor";
+import { InteractionTrackingSystem } from "@/visual/ui/InteractionTrackingSystem";
+import { SpotifyUIApplicationSystem } from "@/visual/ui/SpotifyUIApplicationSystem";
 import { settings } from "@/config";
 
 // ===================================================================
@@ -389,7 +392,10 @@ export type VisualSystemKey =
   | "DepthLayers"
   | "IridescentShimmer"
   | "DirectionalFlow"
-  | "GradientConductor";
+  | "GradientConductor"
+  | "MusicBeatSync"
+  | "SpotifyUIApplication"
+  | "InteractionTracking";
 
 export type SystemHealth = "excellent" | "good" | "degraded" | "critical";
 export type IntegrationMode = "progressive" | "performance-first" | "quality-first";
@@ -1934,6 +1940,26 @@ export class VisualEffectsCoordinator implements IManagedSystem {
       "eventBus",
       "cssVariableController",
       "colorHarmonyEngine",
+      "musicSyncService",
+      "performanceAnalyzer"
+    ]);
+
+    this.systemRegistry.set("MusicBeatSync", MusicBeatSynchronizer);
+    this.systemDependencies.set("MusicBeatSync", [
+      "eventBus",
+      "musicSyncService",
+      "performanceAnalyzer"
+    ]);
+
+    this.systemRegistry.set("SpotifyUIApplication", SpotifyUIApplicationSystem);
+    this.systemDependencies.set("SpotifyUIApplication", [
+      "eventBus",
+      "cssVariableController"
+    ]);
+
+    this.systemRegistry.set("InteractionTracking", InteractionTrackingSystem);
+    this.systemDependencies.set("InteractionTracking", [
+      "eventBus",
       "musicSyncService",
       "performanceAnalyzer"
     ]);

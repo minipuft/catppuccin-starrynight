@@ -62,6 +62,7 @@ export async function openSettingsModal() {
     // Subscribe to settings changes for hot-reload behavior
     (useEffect as any)(() => {
       const { settings } = require('@/config');
+      const { getSettingsProvider } = require('@/config');
 
       // Listen to all settings changes and trigger re-render
       const listener = () => {
@@ -70,9 +71,23 @@ export async function openSettingsModal() {
 
       settings.onChange(listener);
 
-      // Cleanup subscription on unmount
+      // Cleanup subscription on unmount and persist settings
       return () => {
         settings.offChange(listener);
+
+        // Force settings persistence when modal closes
+        try {
+          const provider = getSettingsProvider();
+          const storage = provider.getStorage();
+
+          if (typeof storage.persist === 'function') {
+            storage.persist();
+          }
+
+          console.log('[StarryNightSettings] Settings persisted on modal close');
+        } catch (error) {
+          console.error('[StarryNightSettings] Error persisting settings on close:', error);
+        }
       };
     }, []);
 

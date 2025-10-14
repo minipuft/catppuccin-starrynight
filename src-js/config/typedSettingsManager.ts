@@ -116,8 +116,8 @@ export class TypedSettingsManager {
 
       this.notifyChangeListeners(changeEvent);
 
-      // NOTE: Event Bridge removed in Phase 6B - all event listeners migrated to onChange() pattern.
-      // DOM CustomEvent "year3000SystemSettingsChanged" no longer emitted.
+      // Settings changes propagate through the onChange() API; callers that need to
+      // broadcast further should subscribe via onChange instead of relying on legacy bridges.
       // Use onChange() callback API for settings change notifications.
     }
 
@@ -218,8 +218,11 @@ export class TypedSettingsManager {
   /**
    * Add a change listener
    */
-  onChange(listener: (event: SettingsChangeEvent) => void): void {
+  onChange(listener: (event: SettingsChangeEvent) => void): () => void {
     this.changeListeners.add(listener);
+    return () => {
+      this.offChange(listener);
+    };
   }
   
   /**

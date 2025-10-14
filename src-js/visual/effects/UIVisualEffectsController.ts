@@ -24,6 +24,7 @@
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/EventBus";
+import { settings } from "@/config";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type {
@@ -32,7 +33,6 @@ import type {
 } from "@/types/animationCoordination";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult } from "@/types/systems";
-import { settings } from "@/config";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { VisualCoordinatorService } from "@/core/services/SystemServices";
@@ -246,6 +246,7 @@ export class UIEffectsController
 
   // Event subscriptions
   private eventUnsubscribeFunctions: (() => void)[] = [];
+  private settingsUnsubscribe: (() => void) | null = null;
 
   // Performance monitoring (override base performance monitor with custom metrics)
   private customPerformanceMonitor = {
@@ -542,14 +543,14 @@ export class UIEffectsController
     // const interactionUnsubscribe = ...
 
     // Settings change events
-    const settingsUnsubscribe = unifiedEventBus.subscribe(
-      "settings:changed",
-      this.handleSettingsChange.bind(this),
-      "UIVisualEffectsController"
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = settings.onChange((event) =>
+      this.handleSettingsChange(event)
     );
-    this.eventUnsubscribeFunctions.push(() =>
-      unifiedEventBus.unsubscribe(settingsUnsubscribe)
-    );
+    this.eventUnsubscribeFunctions.push(() => {
+      this.settingsUnsubscribe?.();
+      this.settingsUnsubscribe = null;
+    });
 
     Y3KDebug?.debug?.log(
       "UIVisualEffectsController",
@@ -1214,8 +1215,14 @@ export class UIEffectsController
     this.updateNexusState();
   }
 
-  public override handleSettingsChange(event: any): void {
-    const { key, value } = event;
+  public override handleSettingsChange(event: Event): void {
+    const detail = (event as CustomEvent<{ key?: string; value?: unknown }>).detail;
+    const key = detail?.key;
+    const value = detail?.value;
+
+    if (!key) {
+      return;
+    }
 
     // Handle UI effects settings
     if (key.startsWith("sn-ui-effects-")) {

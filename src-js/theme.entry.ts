@@ -176,12 +176,11 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
   // 2. Initialize the system using progressive loading approach
   try {
     if (degradedMode) {
-      // Use the new progressive initialization method
-      await year3000System.initializeWithAvailableAPIs({
+      // Initialize degraded mode while APIs load progressively
+      await year3000System.initializeDegradedMode({
         player: requiredAPIs.player,
         platform: requiredAPIs.platform,
         config: (window as any).Spicetify?.Config,
-        degradedMode: true,
       });
 
       console.log(
@@ -193,7 +192,6 @@ function isHistoryAvailable(platform: any): platform is { History: any } {
     } else {
       // Full initialization if all APIs are available
       await year3000System.initializeAllSystems();
-      year3000System.setupMusicAnalysisAndColorExtraction();
 
       console.log("🌟 [StarryNight] Full initialization complete");
 

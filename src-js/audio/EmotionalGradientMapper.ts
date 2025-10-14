@@ -14,6 +14,8 @@
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { unifiedEventBus } from "@/core/events/EventBus";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 // NOTE: SettingsManager import removed - was dead code, never used
 import {
@@ -95,7 +97,7 @@ export class EmotionalGradientMapper {
   private isActive = false;
   // UnifiedEventBus subscription IDs for cleanup
   private emotionAnalysisSubscriptionId: string | null = null;
-  private settingsSubscriptionId: string | null = null;
+  private settingsUnsubscribe: (() => void) | null = null;
 
   // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
@@ -294,11 +296,9 @@ export class EmotionalGradientMapper {
       'EmotionalGradientMapper'
     );
 
-    // Subscribe to unified settings change events
-    this.settingsSubscriptionId = unifiedEventBus.subscribe(
-      'settings:changed',
-      this.handleSettingsChange.bind(this),
-      'EmotionalGradientMapper'
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = settings.onChange((event) =>
+      this.handleSettingsChange(event)
     );
 
     this.isActive = true;
@@ -864,12 +864,7 @@ export class EmotionalGradientMapper {
     }
   }
 
-  private handleSettingsChange(data: {
-    settingKey: string;
-    oldValue: string | number | boolean;
-    newValue: string | number | boolean;
-    timestamp: number;
-  }): void {
+  private handleSettingsChange(data: SettingsChangeEvent): void {
     const { settingKey, newValue } = data;
 
     if (settingKey.startsWith("sn-emotional-") || settingKey.startsWith("sn-gradient-")) {
@@ -1065,10 +1060,8 @@ export class EmotionalGradientMapper {
       this.emotionAnalysisSubscriptionId = null;
     }
 
-    if (this.settingsSubscriptionId) {
-      unifiedEventBus.unsubscribe(this.settingsSubscriptionId);
-      this.settingsSubscriptionId = null;
-    }
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = null;
 
     Y3KDebug?.debug?.log(
       'EmotionalGradientMapper',

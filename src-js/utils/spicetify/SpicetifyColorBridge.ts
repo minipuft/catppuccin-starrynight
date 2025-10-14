@@ -8,7 +8,7 @@
  * ARCHITECTURE ROLE:
  * - OWNS: --spice-* CSS variable namespace (Spicetify compatibility layer)
  * - GENERATES: 70+ Spicetify-specific variables with advanced color science
- * - COORDINATES: With ColorStateManager (--sn-* namespace) via CSSVariableWriter
+ * - COORDINATES: With CSSColorController (--sn-* namespace) via CSSVariableWriter
  * - INTEGRATES: ColorHarmonyEngine OKLAB output → Spicetify CSS variables
  *
  * CORE FUNCTIONALITY:
@@ -56,7 +56,7 @@
  * - ARCHITECTURE: Clear namespace ownership (--spice-* vs --sn-*)
  *
  * @see ColorHarmonyEngine - Calls updateWithAlbumColors() with OKLAB-processed colors
- * @see ColorStateManager - Coordinates --sn-* namespace variables
+ * @see CSSColorController - Coordinates --sn-* namespace variables
  * @see CSSVariableWriter - Shared CSS variable application authority
  * @see docs/architecture/adr/ADR-001-rename-semantic-color-manager.md
  */
@@ -76,6 +76,8 @@ function isSpicetifyPlatformAvailable(): boolean {
   return !!(spicetify?.Platform);
 }
 import { unifiedEventBus } from "@/core/events/EventBus";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -101,7 +103,7 @@ export interface SemanticColorMapping {
  * SpicetifyColorBridge - Primary Spicetify-to-Year3000 color integration system
  *
  * OWNS: --spice-* CSS variable namespace (96 variables)
- * COORDINATES: With ColorStateManager (--sn-* namespace)
+ * COORDINATES: With CSSColorController (--sn-* namespace)
  * INTEGRATES: ColorHarmonyEngine OKLAB output → Spicetify CSS variables
  */
 export class SpicetifyColorBridge implements IManagedSystem {
@@ -115,6 +117,8 @@ export class SpicetifyColorBridge implements IManagedSystem {
   
   // Event tracking for proper system integration
   private eventSubscriptionIds: string[] = [];
+  private settingsChangeUnsubscribe: (() => void) | null = null;
+  private lastColorPayload: any = null;
   private lastColorUpdate: number = 0;
   private colorUpdateCount: number = 0;
 
@@ -441,6 +445,8 @@ export class SpicetifyColorBridge implements IManagedSystem {
   ): void {
     console.log("🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() CALLED ═══");
 
+    this.lastColorPayload = oklabColorsOrEventData;
+
     // 🔧 PHASE 7.2: Support both legacy (colors only) and new (full event data) formats
     const isEventData = 'processedColors' in oklabColorsOrEventData;
     const oklabColors = isEventData
@@ -508,10 +514,37 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       // === COMPREHENSIVE SPICETIFY VARIABLE UPDATES ===
 
+      const dynamicTextAccentEnabled = settings.get("sn-dynamic-text-accent");
+
+      let spiceAccentHex = colorDistribution.primary;
+      let spiceAccentRgb = rgbDistribution.primary;
+
+      if (!dynamicTextAccentEnabled) {
+        const staticAccent = this.resolveStaticTextAccent();
+        if (staticAccent.hex) {
+          spiceAccentHex = staticAccent.hex;
+        }
+        if (staticAccent.rgb) {
+          spiceAccentRgb = staticAccent.rgb;
+        } else if (staticAccent.hex) {
+          spiceAccentRgb = ColorGen.hexToRgb(staticAccent.hex);
+        }
+
+        if (this.config.enableDebug) {
+          console.log(
+            "🎨 [SpicetifyColorBridge] Dynamic text accent disabled; using static accent",
+            {
+              spiceAccentHex,
+              spiceAccentRgb,
+            }
+          );
+        }
+      }
+
       // Core accent and surface colors (original implementation)
       const coreSpicetifyUpdates = {
-        '--spice-accent': colorDistribution.primary,
-        '--spice-rgb-accent': rgbDistribution.primary,
+        '--spice-accent': spiceAccentHex,
+        '--spice-rgb-accent': spiceAccentRgb,
         '--spice-surface1': colorDistribution.surface1,
         '--spice-rgb-surface1': rgbDistribution.surface1,
         '--spice-button-active': colorDistribution.primary,
@@ -843,6 +876,33 @@ export class SpicetifyColorBridge implements IManagedSystem {
     return SpicetifyColorBridge.SEMANTIC_MAPPINGS;
   }
 
+  private resolveStaticTextAccent(): { hex: string | null; rgb: string | null } {
+    try {
+      if (typeof document === "undefined" || !document.documentElement) {
+        return { hex: null, rgb: null };
+      }
+
+      const root = document.documentElement;
+      if (!root) {
+        return { hex: null, rgb: null };
+      }
+
+      const computed = getComputedStyle(root);
+      const hex = computed.getPropertyValue("--sn-color-accent-hex").trim() || null;
+      const rgb = computed.getPropertyValue("--sn-color-accent-rgb").trim() || null;
+
+      return { hex, rgb };
+    } catch (error) {
+      if (this.config.enableDebug) {
+        console.warn(
+          "🎨 [SpicetifyColorBridge] Failed to resolve static text accent, falling back to dynamic accent",
+          error
+        );
+      }
+      return { hex: null, rgb: null };
+    }
+  }
+
   /**
    * Detect changed variables to avoid redundant DOM updates (Phase 3 optimization)
    * Compares new variables against last applied values
@@ -1059,18 +1119,27 @@ export class SpicetifyColorBridge implements IManagedSystem {
     );
 
     // Listen for settings changes that might affect color processing
-    const settingsChangeId = unifiedEventBus.subscribe(
-      'settings:changed',
-      async (data) => {
-        if (data.settingKey.includes('color') || data.settingKey.includes('theme')) {
-          if (this.config.enableDebug) {
-            console.log('🎨 [SpicetifyColorBridge] Color-related setting changed:', data.settingKey);
-          }
-          this.clearCache();
+    this.settingsChangeUnsubscribe?.();
+    this.settingsChangeUnsubscribe = settings.onChange((data: SettingsChangeEvent) => {
+      const isTextAccentSetting = data.settingKey === 'sn-dynamic-text-accent';
+      if (
+        data.settingKey.includes('color') ||
+        data.settingKey.includes('theme') ||
+        isTextAccentSetting
+      ) {
+        if (this.config.enableDebug) {
+          console.log(
+            '🎨 [SpicetifyColorBridge] Color-related setting changed:',
+            data.settingKey
+          );
         }
-      },
-      'SpicetifyColorBridge'
-    );
+        this.clearCache();
+        if (isTextAccentSetting && this.lastColorPayload) {
+          // Reapply latest colors to reflect updated text accent mode immediately
+          this.updateWithAlbumColors(this.lastColorPayload);
+        }
+      }
+    });
 
     // 🔧 PHASE 5 FIX: Listen for harmonized colors from ColorProcessor
     // This reconnects the pathway broken during Phase 2 consolidation
@@ -1113,7 +1182,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
     );
     console.log("🎨 [SpicetifyColorBridge] ✅ Subscribed to 'colors:harmonized'");
 
-    this.eventSubscriptionIds = [trackChangeId, settingsChangeId, colorsHarmonizedId];
+    this.eventSubscriptionIds = [trackChangeId, colorsHarmonizedId];
 
     if (this.config.enableDebug) {
       console.log('🎨 [SpicetifyColorBridge] Event subscriptions established:', this.eventSubscriptionIds.length);
@@ -1128,6 +1197,8 @@ export class SpicetifyColorBridge implements IManagedSystem {
       unifiedEventBus.unsubscribe(subscriptionId);
     }
     this.eventSubscriptionIds = [];
+    this.settingsChangeUnsubscribe?.();
+    this.settingsChangeUnsubscribe = null;
     
     if (this.config.enableDebug) {
       console.log('🎨 [SpicetifyColorBridge] Event subscriptions cleaned up');
@@ -1149,7 +1220,8 @@ export class SpicetifyColorBridge implements IManagedSystem {
       initialized: this.initialized,
       lastColorUpdate: this.lastColorUpdate,
       colorUpdateCount: this.colorUpdateCount,
-      eventSubscriptions: this.eventSubscriptionIds.length,
+      eventSubscriptions:
+        this.eventSubscriptionIds.length + (this.settingsChangeUnsubscribe ? 1 : 0),
       cacheSize: this.colorCache.size,
       spicetifyAvailable: this.isSpicetifyAvailable()
     };

@@ -225,7 +225,7 @@
   // -------------------------------------------------------------------------
 
   // === CATPPUCCIN THEME DEFAULTS ===
-  // Catppuccin Mocha palette - used as fallbacks, will be dynamically updated by ColorStateManager
+  // Catppuccin Mocha palette - used as fallbacks, will be dynamically updated by CSSVariableWriter
   // These values are replaced at runtime based on flavor + brightness mode selection
   --sn-cosmic-base-hex: #1e1e2e;                    // Catppuccin Mocha base
   --sn-cosmic-base-rgb: 30, 30, 46;                 // Catppuccin Mocha base RGB

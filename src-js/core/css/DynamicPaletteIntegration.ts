@@ -2,7 +2,7 @@
  * DynamicPaletteIntegration - Service Class for Dynamic OKLCH Palette Generation
  *
  * Wraps DynamicOKLCHPaletteGenerator to provide integration layer for:
- * - Palette generation with CSS variables (for ColorStateManager)
+ * - Palette generation with CSS variables (for CSSColorController)
  * - Palette color-only generation (for color strategies)
  * - Performance metrics and caching
  * - Feature flag management
@@ -41,7 +41,7 @@ export class DynamicPaletteIntegration {
   }
 
   /**
-   * Generate full palette with CSS variables (for ColorStateManager CSS writes)
+   * Generate full palette with CSS variables (for CSSColorController CSS writes)
    */
   generatePalette(request: PaletteGenerationRequest): PaletteGenerationResult {
     const startTime = performance.now();

@@ -306,7 +306,7 @@ export const ADVANCED_SYSTEM_CONFIG: AdvancedSystemConfig = {
       }
 
       const themeService = DefaultServiceFactory.getServices().themeLifecycle;
-      themeService?.getCoordinator()?.setGradientParameters?.();
+      themeService?.getCoordinator()?.applyInitialSettings?.("full");
       return true;
     }
     console.warn(

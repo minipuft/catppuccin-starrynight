@@ -19,6 +19,8 @@
  */
 
 import { unifiedEventBus } from "@/core/events/EventBus";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
@@ -48,7 +50,6 @@ import { DynamicGradientStrategy } from "@/visual/strategies/DynamicGradientStra
 import { DynamicPaletteIntegration } from "@/core/css/DynamicPaletteIntegration";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import { settings } from "@/config";
 import { PaletteTransform, type PaletteTransformConfig } from "@/utils/color/PaletteTransform";
 import { AESTHETIC_PROFILES } from "@/utils/color/PaletteConstants";
 
@@ -123,6 +124,23 @@ interface UnifiedProcessingResult extends ColorResult {
     coordinationStrategy: string;
     musicInfluenceStrength: number;
   };
+}
+
+interface OKLABMetadataPayload {
+  sourceKey: string;
+  originalHex: string;
+  originalRgb: string;
+  enhancedHex: string;
+  enhancedRgb: string;
+  shadowHex: string;
+  shadowRgb: string;
+  highlightHex: string;
+  highlightRgb: string;
+  oklabProcessingTime: number;
+  oklchL: number;
+  oklchC: number;
+  oklchH: number;
+  fullOKLABResult: OKLABProcessingResult;
 }
 
 // ============================================================================
@@ -204,6 +222,7 @@ export class ColorProcessor
   private readonly MAX_QUEUE_SIZE = 10;
   private processingCache = new Map<string, UnifiedProcessingResult>();
   private readonly CACHE_TTL_MS = 30000; // 30 seconds
+  private settingsUnsubscribe: (() => void) | null = null;
 
   constructor(
     // NOTE: settingsManager parameter removed - was dead code, never used
@@ -335,6 +354,8 @@ export class ColorProcessor
     this.processingCache.clear();
 
     // Unsubscribe from events
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = null;
     unifiedEventBus.unsubscribeAll("UnifiedColorProcessingEngine");
 
     this.initialized = false;
@@ -364,17 +385,12 @@ export class ColorProcessor
     );
     console.log("🎨 [ColorProcessor] ✅ Subscribed to 'colors:extracted'");
 
-    // Settings changes that affect color processing
-    console.log("🎨 [ColorProcessor] Subscribing to 'settings:changed' event...");
-    unifiedEventBus.subscribe(
-      "settings:changed",
-      (data) => {
-        console.log("🎨 [ColorProcessor] ⚙️ Settings changed:", data?.settingKey);
-        this.handleSettingsChange(data);
-      },
-      "UnifiedColorProcessingEngine"
-    );
-    console.log("🎨 [ColorProcessor] ✅ Subscribed to 'settings:changed'");
+    this.settingsUnsubscribe?.();
+    this.settingsUnsubscribe = settings.onChange((event: SettingsChangeEvent) => {
+      console.log("🎨 [ColorProcessor] ⚙️ Settings changed:", event.settingKey);
+      this.handleSettingsChange(event);
+    });
+    console.log("🎨 [ColorProcessor] ✅ Listening to typed settings changes");
 
     console.log("🎨 [ColorProcessor] Event subscriptions complete");
 
@@ -490,7 +506,7 @@ export class ColorProcessor
       );
 
       // 🔧 PHASE 7.2: Enhanced event emission with full ColorResult metadata
-      // Emit unified event for ColorStateManager (single responsibility)
+      // Emit unified event for CSSColorController (single responsibility)
       console.log("🎨 [ColorProcessor] Broadcasting 'colors:harmonized' to event bus...");
       unifiedEventBus.emit("colors:harmonized" as any, {
         processedColors: result.processedColors,
@@ -873,6 +889,8 @@ export class ColorProcessor
       );
     this.metrics.oklabCoordinations++;
 
+    const oklabMetadata = this.buildOKLABMetadata(oklabResult, strategyResult);
+
     // Enhance strategy result with OKLAB variants of SAME colors
     const enhancedColors = await this.enhanceWithOKLAB(
       strategyResult.processedColors,
@@ -887,14 +905,32 @@ export class ColorProcessor
       });
     }
 
+    const updatedMetadata: ColorResult["metadata"] = {
+      ...strategyResult.metadata,
+      oklabPreset:
+        oklabResult.oklabPreset?.name || this.determineOKLABPreset(context),
+      oklabCoordination: oklabResult,
+    };
+
+    if (oklabMetadata) {
+      updatedMetadata.oklabMetadata = oklabMetadata;
+      if (updatedMetadata.dynamicAccentEnabled === undefined) {
+        updatedMetadata.dynamicAccentEnabled = true;
+      }
+      if (updatedMetadata.baseTransformationEnabled === undefined) {
+        updatedMetadata.baseTransformationEnabled = true;
+      }
+      if (updatedMetadata.visualEffectsIntegrationEnabled === undefined) {
+        updatedMetadata.visualEffectsIntegrationEnabled = true;
+      }
+    }
+
     return {
       ...strategyResult,
       processedColors: enhancedColors,
-      metadata: {
-        ...strategyResult.metadata,
-        oklabPreset: this.determineOKLABPreset(context),
-        oklabCoordination: oklabResult,
-      },
+      accentHex: oklabResult.accentHex || strategyResult.accentHex,
+      accentRgb: oklabResult.accentRgb || strategyResult.accentRgb,
+      metadata: updatedMetadata,
     };
   }
 
@@ -1437,6 +1473,85 @@ export class ColorProcessor
     return enhanced;
   }
 
+  private buildOKLABMetadata(
+    oklabResult: MusicalOKLABResult,
+    strategyResult: ColorResult
+  ): OKLABMetadataPayload | null {
+    const oklabEntries = Object.entries(oklabResult.oklabResults || {});
+    if (oklabEntries.length === 0) {
+      return null;
+    }
+
+    const targetAccent = strategyResult.accentHex?.toLowerCase();
+    const rgbToString = (rgb: { r: number; g: number; b: number } | undefined) =>
+      rgb ? `${rgb.r},${rgb.g},${rgb.b}` : "";
+
+    let selectedKey: string | null = null;
+    let selectedResult: OKLABProcessingResult | null = null;
+
+    if (targetAccent) {
+      const accentMatch = oklabEntries.find(([, details]) =>
+        details.originalHex?.toLowerCase() === targetAccent
+      );
+      if (accentMatch) {
+        selectedKey = accentMatch[0];
+        selectedResult = accentMatch[1];
+      }
+    }
+
+    if (!selectedResult) {
+      const priorityKeys = [
+        "OKLAB_PRIMARY",
+        "PRIMARY",
+        "VIBRANT",
+        "PROMINENT",
+        "VIBRANT_NON_ALARMING",
+        "LIGHT_VIBRANT",
+        "ACCENT",
+        "HIGHLIGHT",
+      ];
+
+      for (const key of priorityKeys) {
+        const candidate = oklabResult.oklabResults?.[key];
+        if (candidate) {
+          selectedKey = key;
+          selectedResult = candidate;
+          break;
+        }
+      }
+    }
+
+    if (!selectedResult) {
+      const fallbackEntry = oklabEntries[0];
+      if (!fallbackEntry) {
+        return null;
+      }
+      selectedKey = fallbackEntry[0];
+      selectedResult = fallbackEntry[1];
+    }
+
+    if (!selectedResult || !selectedKey) {
+      return null;
+    }
+
+    return {
+      sourceKey: selectedKey,
+      originalHex: selectedResult.originalHex,
+      originalRgb: rgbToString(selectedResult.originalRgb),
+      enhancedHex: selectedResult.enhancedHex,
+      enhancedRgb: rgbToString(selectedResult.enhancedRgb),
+      shadowHex: selectedResult.shadowHex,
+      shadowRgb: rgbToString(selectedResult.shadowRgb),
+      highlightHex: selectedResult.highlightHex,
+      highlightRgb: rgbToString(selectedResult.highlightRgb),
+      oklabProcessingTime: selectedResult.processingTime,
+      oklchL: selectedResult.oklchEnhanced.L,
+      oklchC: selectedResult.oklchEnhanced.C,
+      oklchH: selectedResult.oklchEnhanced.H,
+      fullOKLABResult: selectedResult,
+    };
+  }
+
   private classifyEmotionalState(energy: number): string {
     if (energy > 0.8) return "energetic";
     if (energy > 0.6) return "upbeat";
@@ -1595,7 +1710,7 @@ export class ColorProcessor
     }
   }
 
-  private async handleSettingsChange(data: any): Promise<void> {
+  private async handleSettingsChange(data: SettingsChangeEvent): Promise<void> {
     // Clear cache when settings change that affect color processing
     if (
       [

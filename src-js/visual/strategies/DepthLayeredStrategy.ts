@@ -264,6 +264,9 @@ export class DepthLayeredStrategy implements IColorProcessor {
           cacheKey: `depth-layered-${context.trackUri}`,
           harmonicIntensity: this.depthSettings.parallaxStrength,
           layerCount: this.depthState.depthLayers.size,
+          dynamicAccentEnabled: true,
+          visualEffectsIntegrationEnabled: true,
+          baseTransformationEnabled: true,
         },
         context,
       };
@@ -298,6 +301,9 @@ export class DepthLayeredStrategy implements IColorProcessor {
           strategy: this.getStrategyName(),
           processingTime,
           error: error instanceof Error ? error.message : "Unknown error",
+          dynamicAccentEnabled: true,
+          visualEffectsIntegrationEnabled: true,
+          baseTransformationEnabled: true,
         },
         context,
       };

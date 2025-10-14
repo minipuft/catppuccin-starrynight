@@ -6,6 +6,7 @@
 
 import { unifiedEventBus } from '@/core/events/EventBus';
 import { ViewportManager } from '@/utils/performance/ViewportAwarenessManager';
+import { settings } from '@/config';
 
 export interface ViewportOptimizationMetrics {
   timestamp: number;
@@ -161,19 +162,18 @@ Integration Status:
     // Simulate rapid settings changes to test batching and viewport awareness
     const settingsToTest = [
       'sn-glassmorphism-level',
-      'sn-gradient-intensity',
-      'sn-star-density',
-      'sn-flow-gradient'
-    ];
+      'sn-gradient-intensity'
+    ] as const;
     
     for (let i = 0; i < 10; i++) {
       for (const settingKey of settingsToTest) {
-        await unifiedEventBus.emit('settings:changed', {
-          settingKey,
-          oldValue: 'balanced',
-          newValue: i % 2 === 0 ? 'intense' : 'minimal',
-          timestamp: Date.now()
-        });
+        const newValue = i % 2 === 0 ? 'intense' : 'minimal';
+
+        if (settingKey === 'sn-glassmorphism-level') {
+          settings.set('sn-glassmorphism-level', newValue as 'intense' | 'minimal');
+        } else if (settingKey === 'sn-gradient-intensity') {
+          settings.set('sn-gradient-intensity', newValue as 'intense' | 'minimal');
+        }
       }
       
       // Small delay to allow processing

@@ -583,19 +583,24 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       }
     }
 
-    // Listen for music sync updates from existing MusicSyncService
-    if (this.year3000System.musicSyncService) {
-      const originalUpdateFromAnalysis =
-        this.year3000System.updateFromMusicAnalysis.bind(this.year3000System);
-      this.year3000System.updateFromMusicAnalysis = (
-        processedData: any,
-        rawFeatures?: any,
-        trackUri?: string
-      ) => {
-        originalUpdateFromAnalysis(processedData, rawFeatures, trackUri);
-        this.updateMusicIntensity(processedData);
-      };
-    }
+    // Subscribe to music analysis events via unified event bus
+    unifiedEventBus.subscribe(
+      'music:energy',
+      (payload) => {
+        this.updateMusicIntensity({ processedEnergy: payload.energy });
+      },
+      'SpotifyUIApplicationSystem'
+    );
+
+    unifiedEventBus.subscribe(
+      'music:beat',
+      (payload) => {
+        if (typeof payload.intensity === 'number') {
+          this.triggerBeatEffects({ intensity: payload.intensity });
+        }
+      },
+      'SpotifyUIApplicationSystem'
+    );
 
     // Listen for beat detection from existing systems
     if (this.year3000System.beatSyncVisualSystem) {

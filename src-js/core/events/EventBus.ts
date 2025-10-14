@@ -142,6 +142,13 @@ export interface UnifiedEventMap {
     timestamp: number;
   };
 
+  "config:changed": {
+    key: string;
+    newValue: unknown;
+    oldValue: unknown;
+    timestamp: number;
+  };
+
   "settings:visual-guide-changed": {
     oldMode: string;
     newMode: string;

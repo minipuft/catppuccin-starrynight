@@ -36,6 +36,9 @@ describe("TypedSettingsManager", () => {
   beforeEach(() => {
     // Clear storage
     mockSpicetify.LocalStorage.storage.clear();
+    if (typeof localStorage !== "undefined" && localStorage?.clear) {
+      localStorage.clear();
+    }
 
     // Create storage and settings
     storage = new SpicetifyStorageAdapter();
@@ -89,6 +92,20 @@ describe("TypedSettingsManager", () => {
       expect(value).toBe(false);
     });
 
+    test("should toggle dynamic text accent", () => {
+      settings.set("sn-dynamic-text-accent", false);
+
+      const raw = mockSpicetify.LocalStorage.get("sn-dynamic-text-accent");
+      expect(raw).toBe("false");
+
+      const value = settings.get("sn-dynamic-text-accent");
+      expect(typeof value).toBe("boolean");
+      expect(value).toBe(false);
+
+      settings.set("sn-dynamic-text-accent", true);
+      expect(settings.get("sn-dynamic-text-accent")).toBe(true);
+    });
+
     test("should auto-convert number values", () => {
       settings.set("sn-harmonic-intensity", 0.8);
 
@@ -100,6 +117,42 @@ describe("TypedSettingsManager", () => {
       const value = settings.get("sn-harmonic-intensity");
       expect(typeof value).toBe("number");
       expect(value).toBe(0.8);
+    });
+
+    test("should synchronize webgl-enabled boolean values", () => {
+      settings.set("sn-webgl-enabled", false);
+
+      const raw = mockSpicetify.LocalStorage.get("sn-webgl-enabled");
+      expect(raw).toBe("false");
+
+      const value = settings.get("sn-webgl-enabled");
+      expect(typeof value).toBe("boolean");
+      expect(value).toBe(false);
+
+      // Legacy string fallback
+      mockSpicetify.LocalStorage.set("sn-webgl-enabled", "true");
+      settings.clearCache();
+      expect(settings.get("sn-webgl-enabled")).toBe(true);
+    });
+
+    test("should preserve webgl quality preferences", () => {
+      settings.set("sn-webgl-quality", "high");
+
+      const raw = mockSpicetify.LocalStorage.get("sn-webgl-quality");
+      expect(raw).toBe("high");
+
+      const value = settings.get("sn-webgl-quality");
+      expect(value).toBe("high");
+    });
+
+    test("should validate animation quality enum", () => {
+      settings.set("sn-animation-quality", "low");
+
+      const raw = mockSpicetify.LocalStorage.get("sn-animation-quality");
+      expect(raw).toBe("low");
+
+      const value = settings.get("sn-animation-quality");
+      expect(value).toBe("low");
     });
   });
 

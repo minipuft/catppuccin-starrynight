@@ -14,6 +14,8 @@
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
 export type WebGLQuality = 'low' | 'medium' | 'high';
@@ -53,10 +55,12 @@ export class WebGLQualityCoordinator implements IManagedSystem {
   // Performance monitoring
   private lastStateChange = 0;
   private stateChangeHistory: Array<{ state: WebGLState; quality: WebGLQuality; timestamp: number }> = [];
-  
+
   // User preference tracking
   private userExplicitlyDisabled = false;
   private userExplicitQuality: WebGLQuality | null = null;
+  private unregisterSettingsListener: (() => void) | null = null;
+  private performanceTierSubscriptionId: string | null = null;
 
   constructor(deviceCapabilities: DeviceCapabilityDetector) {
     this.deviceCapabilities = deviceCapabilities;
@@ -147,16 +151,20 @@ export class WebGLQualityCoordinator implements IManagedSystem {
   public destroy(): void {
     // Disable all WebGL systems
     this._setState('disabled');
-    
+
     // Clear all registered systems
     this.webglSystems.clear();
-    
+
     // Clean up event listeners
-    unifiedEventBus.unsubscribe("settings:changed");
-    unifiedEventBus.unsubscribe("system:state-changed");
-    
+    if (this.performanceTierSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.performanceTierSubscriptionId);
+      this.performanceTierSubscriptionId = null;
+    }
+    this.unregisterSettingsListener?.();
+    this.unregisterSettingsListener = null;
+
     this.initialized = false;
-    
+
     Y3KDebug?.debug?.log("WebGLQualityCoordinator", "Destroyed - all WebGL systems disabled");
   }
 
@@ -514,22 +522,25 @@ export class WebGLQualityCoordinator implements IManagedSystem {
   }
 
   private _setupEventListeners(): void {
-    // Listen for settings changes
-    unifiedEventBus.subscribe("settings:changed", (data) => {
+    // Listen for settings changes via typed settings manager
+    this.unregisterSettingsListener?.();
+    const handleSettingsChange = (data: SettingsChangeEvent): void => {
       if (data.settingKey === 'sn-webgl-enabled') {
-        this.config.enabled = data.newValue === 'true';
-        this.userExplicitlyDisabled = data.newValue === 'false';
+        const nextValue = data.newValue === true || data.newValue === 'true';
+        this.config.enabled = nextValue;
+        this.userExplicitlyDisabled = !nextValue;
         this._determineAndApplyState();
       } else if (data.settingKey === 'sn-webgl-quality') {
         this.setQuality(data.newValue as WebGLQuality);
-      } else if (data.settingKey === 'sn-webgl-force-enabled') {
-        this.config.forceEnabled = data.newValue === 'true';
-        this._determineAndApplyState();
       }
-    });
+    };
+    this.unregisterSettingsListener = settings.onChange(handleSettingsChange);
 
     // Listen for performance tier changes
-    unifiedEventBus.subscribe("performance:tier-changed", (data) => {
+    if (this.performanceTierSubscriptionId) {
+      unifiedEventBus.unsubscribe(this.performanceTierSubscriptionId);
+    }
+    this.performanceTierSubscriptionId = unifiedEventBus.subscribe("performance:tier-changed", (data) => {
       // Map tier to quality if needed
       const qualityFromTier = data.tier === "excellent" ? "high" :
                             data.tier === "good" ? "medium" : "low";

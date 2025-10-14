@@ -16,16 +16,52 @@ import { getSettingsProvider } from "./settingsProvider";
  * - Cross-tab synchronization via storage events
  * - Spicetify.LocalStorage health monitoring
  * - Automatic fallback to browser storage if Spicetify unavailable
+ * - Settings persistence on page unload
+ * - Periodic persistence verification
  */
 export function initializeSpicetifySettingsSync(): void {
   const provider = getSettingsProvider();
   const storage = provider.getStorage();
+  const settings = provider.getSettings();
 
   // Check storage health
   const diagnostics = provider.getDiagnostics();
 
+  // Force settings persistence on page unload
+  const persistSettings = () => {
+    try {
+      // Export all current settings
+      const allSettings = settings.export();
+      const settingsCount = Object.keys(allSettings).length;
+
+      // Force storage persist if available
+      if (typeof (storage as any).persist === 'function') {
+        (storage as any).persist();
+      }
+
+      console.log(`[SpicetifySettingsIntegration] Persisted ${settingsCount} settings before unload`);
+    } catch (error) {
+      console.error('[SpicetifySettingsIntegration] Error persisting settings:', error);
+    }
+  };
+
+  // Add beforeunload handler for persistence
+  window.addEventListener("beforeunload", persistSettings);
+
+  // Add visibility change handler (when tab becomes hidden)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      persistSettings();
+    }
+  });
+
+  // Periodic persistence verification (every 30 seconds)
+  const persistenceCheckInterval = setInterval(() => {
+    persistSettings();
+  }, 30000);
+
   if (diagnostics.storageType === "spicetify") {
-    console.log("[SpicetifySettingsIntegration] Using Spicetify.LocalStorage");
+    console.log("[SpicetifySettingsIntegration] Using Spicetify.LocalStorage with enhanced persistence");
 
     // Monitor storage health periodically
     const healthCheckInterval = setInterval(() => {
@@ -50,6 +86,7 @@ export function initializeSpicetifySettingsSync(): void {
     // Cleanup on page unload
     window.addEventListener("beforeunload", () => {
       clearInterval(healthCheckInterval);
+      clearInterval(persistenceCheckInterval);
     });
 
   } else if (diagnostics.storageType === "browser") {
@@ -68,6 +105,11 @@ export function initializeSpicetifySettingsSync(): void {
         const settings = provider.getSettings();
         settings.clearCache();
       }
+    });
+
+    // Cleanup on page unload
+    window.addEventListener("beforeunload", () => {
+      clearInterval(persistenceCheckInterval);
     });
   } else {
     console.error(

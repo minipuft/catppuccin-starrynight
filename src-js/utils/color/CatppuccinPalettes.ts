@@ -4,7 +4,7 @@
  * Complete color palettes for all 4 Catppuccin flavors with proper RGB and hex values.
  * Supports brightness-aware color selection and dynamic fallback coordination.
  * 
- * @architecture ColorStateManager integration
+ * @architecture CSSColorController integration
  * @performance Static color definitions for optimal lookup performance
  */
 

@@ -15,6 +15,8 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
+import { settings } from "@/config";
+import type { SettingsChangeEvent } from "@/config";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import {
   BackendCapabilities,
@@ -101,6 +103,7 @@ export class GradientConductor implements IManagedSystem {
   private currentPalette: RGBStop[] = [];
   private currentMusicMetrics: MusicMetrics | null = null;
   private currentConstraints: PerformanceConstraints;
+  private unregisterSettingsListener: (() => void) | null = null;
 
   // Performance monitoring
   private lastFrameTime: number = 0;
@@ -449,6 +452,9 @@ export class GradientConductor implements IManagedSystem {
    * Clean up resources and event listeners
    */
   destroy(): void {
+    this.unregisterSettingsListener?.();
+    this.unregisterSettingsListener = null;
+
     // Stop performance monitoring
     if (this.performanceCheckInterval) {
       clearInterval(this.performanceCheckInterval);
@@ -539,26 +545,35 @@ export class GradientConductor implements IManagedSystem {
       this.setPerformanceConstraints(constraints);
     }, 'GradientConductor');
 
-    // Listen for settings changes (accessibility preferences + gradient settings)
-    this.eventBus.subscribe("settings:changed", (data) => {
-      // Handle accessibility settings
-      if (data.settingKey.includes('accessibility') || data.settingKey.includes('motion')) {
+    this.unregisterSettingsListener?.();
+    const handleSettingsChange = (data: SettingsChangeEvent): void => {
+      if (
+        data.settingKey.includes('accessibility') ||
+        data.settingKey.includes('motion')
+      ) {
         const preferences = {
           reducedMotion: data.settingKey.includes('motion') && data.newValue === 'reduce',
           highContrast: data.settingKey.includes('contrast') && data.newValue === 'high',
-          prefersTransparency: data.settingKey.includes('transparency') && data.newValue === 'reduce'
+          prefersTransparency:
+            data.settingKey.includes('transparency') && data.newValue === 'reduce',
         };
         for (const registration of this.registeredBackends.values()) {
           registration.backend.applyAccessibilityPreferences?.(preferences);
         }
       }
 
-      // 🔧 PHASE 1: Handle gradient-specific settings
-      const gradientSettings = ["sn-webgl-enabled", "sn-webgl-quality", "sn-gradient-intensity", "sn-animation-quality"];
-      if (gradientSettings.some(key => data.settingKey === key)) {
+      const gradientSettings = [
+        'sn-webgl-enabled',
+        'sn-webgl-quality',
+        'sn-gradient-intensity',
+        'sn-animation-quality',
+      ] as const;
+
+      if (gradientSettings.some((key) => data.settingKey === key)) {
         this.handleGradientSettingChange(data.settingKey, data.newValue);
       }
-    }, 'GradientConductor');
+    };
+    this.unregisterSettingsListener = settings.onChange(handleSettingsChange);
 
     // Listen for emotion analysis updates (Year 3000 visual flow)
     this.eventBus.subscribe("music:emotion-analyzed", (emotionData) => {

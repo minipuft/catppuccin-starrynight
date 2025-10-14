@@ -1,6 +1,6 @@
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { unifiedEventBus } from "@/core/events/EventBus";
-import { ThemeLifecycleCoordinator, Year3000System } from "@/core/lifecycle/ThemeLifecycleCoordinator";
+import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SpicetifyAudioFeatures, SpicetifyPlayerData } from "@/types/systems";

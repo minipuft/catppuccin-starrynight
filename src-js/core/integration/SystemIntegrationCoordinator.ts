@@ -189,6 +189,7 @@ export class SystemIntegrationCoordinator {
   // Performance system (simplified tier-based coordination)
   private performanceCoordinator: SimplePerformanceCoordinator | null = null;
   private sharedWebGLSystemsIntegration: WebGLSystemsIntegration | null = null;
+  private performanceSettingsUnsubscribe: (() => void) | null = null;
   // Device detection (for WebGL capabilities only)
   private deviceDetector: DeviceCapabilityDetector | null = null;
   private sharedMusicSyncService: MusicSyncService | null = null;
@@ -1780,6 +1781,9 @@ export class SystemIntegrationCoordinator {
 
   private async cleanup(): Promise<void> {
     // Stop monitoring
+    this.performanceSettingsUnsubscribe?.();
+    this.performanceSettingsUnsubscribe = null;
+
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
@@ -2573,28 +2577,29 @@ export class SystemIntegrationCoordinator {
    */
   private setupSettingsChangeListeners(): void {
     try {
-      const { unifiedEventBus } = require("@/core/events/EventBus");
+      const settingsManager = getSettings();
 
-      // Listen for performance mode changes
-      unifiedEventBus.subscribe("settings:changed", (data: any) => {
-        if (data.key === "sn-performance-mode") {
-          const newMode = data.newValue;
+      this.performanceSettingsUnsubscribe?.();
+      this.performanceSettingsUnsubscribe = settingsManager.onChange((event) => {
+        if (event.settingKey !== "sn-performance-mode") {
+          return;
+        }
 
-          Y3KDebug?.debug?.log(
-            "SystemIntegrationCoordinator",
-            `Performance mode changed to: ${newMode} (via consolidated PerformanceAnalyzer)`
-          );
+        const newMode = event.newValue;
 
-          if (this.performanceCoordinator) {
-            // PerformanceAnalyzer now has applyPerformanceMode from Phase 3 consolidation
-            const performanceSystem =
-              this.performanceCoordinator.getPerformanceSystem();
-            if (
-              performanceSystem &&
-              typeof performanceSystem.applyPerformanceMode === "function"
-            ) {
-              performanceSystem.applyPerformanceMode(newMode);
-            }
+        Y3KDebug?.debug?.log(
+          "SystemIntegrationCoordinator",
+          `Performance mode changed to: ${newMode} (via consolidated PerformanceAnalyzer)`
+        );
+
+        if (this.performanceCoordinator) {
+          const performanceSystem =
+            this.performanceCoordinator.getPerformanceSystem();
+          if (
+            performanceSystem &&
+            typeof performanceSystem.applyPerformanceMode === "function"
+          ) {
+            performanceSystem.applyPerformanceMode(newMode);
           }
         }
       });
