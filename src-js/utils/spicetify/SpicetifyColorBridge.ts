@@ -63,17 +63,22 @@
 
 // Import theme-specific Spicetify type extensions
 /// <reference path="../../types/spicetify-extensions.d.ts" />
-import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import {
+  CSSVariableWriter,
+  getGlobalCSSVariableWriter,
+} from "@/core/css/CSSVariableWriter";
 import * as ColorGen from "@/utils/color/SpicetifyColorGenerators";
 
 // Runtime utilities for safe Spicetify access
 function safeGetSpicetify(): typeof Spicetify | null {
-  return (typeof window !== 'undefined' && window.Spicetify) ? window.Spicetify : null;
+  return typeof window !== "undefined" && window.Spicetify
+    ? window.Spicetify
+    : null;
 }
 
 function isSpicetifyPlatformAvailable(): boolean {
   const spicetify = safeGetSpicetify();
-  return !!(spicetify?.Platform);
+  return !!spicetify?.Platform;
 }
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { settings } from "@/config";
@@ -111,10 +116,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
   private cssController!: CSSVariableWriter;
   private colorCache: Map<Spicetify.SemanticColor, string> = new Map();
   private lastCacheUpdate: number = 0;
-  
+
   // IManagedSystem interface
   public initialized: boolean = false;
-  
+
   // Event tracking for proper system integration
   private eventSubscriptionIds: string[] = [];
   private settingsChangeUnsubscribe: (() => void) | null = null;
@@ -131,34 +136,144 @@ export class SpicetifyColorBridge implements IManagedSystem {
   // Semantic color mappings to our CSS variables
   private static readonly SEMANTIC_MAPPINGS: SemanticColorMapping[] = [
     // Text colors (Catppuccin Macchiato)
-    { semanticColor: "textBase", cssVariable: "--spice-text", fallbackColor: "#cad3f5", description: "Primary text color" },
-    { semanticColor: "textSubdued", cssVariable: "--spice-subtext", fallbackColor: "#a5adcb", description: "Secondary text color" },
-    { semanticColor: "textBrightAccent", cssVariable: "--spice-accent", fallbackColor: "#c6a0f6", description: "Accent text color" },
-    { semanticColor: "textNegative", cssVariable: "--spice-red", fallbackColor: "#ed8796", description: "Error text color" },
-    { semanticColor: "textWarning", cssVariable: "--spice-yellow", fallbackColor: "#eed49f", description: "Warning text color" },
-    { semanticColor: "textPositive", cssVariable: "--spice-green", fallbackColor: "#a6da95", description: "Success text color" },
-    { semanticColor: "textAnnouncement", cssVariable: "--spice-blue", fallbackColor: "#8aadf4", description: "Info text color" },
+    {
+      semanticColor: "textBase",
+      cssVariable: "--spice-text",
+      fallbackColor: "#cad3f5",
+      description: "Primary text color",
+    },
+    {
+      semanticColor: "textSubdued",
+      cssVariable: "--spice-subtext",
+      fallbackColor: "#a5adcb",
+      description: "Secondary text color",
+    },
+    {
+      semanticColor: "textBrightAccent",
+      cssVariable: "--spice-accent",
+      fallbackColor: "#c6a0f6",
+      description: "Accent text color",
+    },
+    {
+      semanticColor: "textNegative",
+      cssVariable: "--spice-red",
+      fallbackColor: "#ed8796",
+      description: "Error text color",
+    },
+    {
+      semanticColor: "textWarning",
+      cssVariable: "--spice-yellow",
+      fallbackColor: "#eed49f",
+      description: "Warning text color",
+    },
+    {
+      semanticColor: "textPositive",
+      cssVariable: "--spice-green",
+      fallbackColor: "#a6da95",
+      description: "Success text color",
+    },
+    {
+      semanticColor: "textAnnouncement",
+      cssVariable: "--spice-blue",
+      fallbackColor: "#8aadf4",
+      description: "Info text color",
+    },
 
     // Essential colors (for icons, controls) - Catppuccin Macchiato
-    { semanticColor: "essentialBase", cssVariable: "--spice-button", fallbackColor: "#cad3f5", description: "Primary button color" },
-    { semanticColor: "essentialSubdued", cssVariable: "--spice-button-disabled", fallbackColor: "#6e738d", description: "Disabled button color" },
-    { semanticColor: "essentialBrightAccent", cssVariable: "--spice-button-active", fallbackColor: "#c6a0f6", description: "Active button color" },
-    { semanticColor: "essentialNegative", cssVariable: "--spice-notification-error", fallbackColor: "#ed8796", description: "Error button color" },
-    { semanticColor: "essentialWarning", cssVariable: "--spice-notification-warning", fallbackColor: "#eed49f", description: "Warning button color" },
-    { semanticColor: "essentialPositive", cssVariable: "--spice-notification-success", fallbackColor: "#a6da95", description: "Success button color" },
+    {
+      semanticColor: "essentialBase",
+      cssVariable: "--spice-button",
+      fallbackColor: "#cad3f5",
+      description: "Primary button color",
+    },
+    {
+      semanticColor: "essentialSubdued",
+      cssVariable: "--spice-button-disabled",
+      fallbackColor: "#6e738d",
+      description: "Disabled button color",
+    },
+    {
+      semanticColor: "essentialBrightAccent",
+      cssVariable: "--spice-button-active",
+      fallbackColor: "#c6a0f6",
+      description: "Active button color",
+    },
+    {
+      semanticColor: "essentialNegative",
+      cssVariable: "--spice-notification-error",
+      fallbackColor: "#ed8796",
+      description: "Error button color",
+    },
+    {
+      semanticColor: "essentialWarning",
+      cssVariable: "--spice-notification-warning",
+      fallbackColor: "#eed49f",
+      description: "Warning button color",
+    },
+    {
+      semanticColor: "essentialPositive",
+      cssVariable: "--spice-notification-success",
+      fallbackColor: "#a6da95",
+      description: "Success button color",
+    },
 
     // Background colors - Catppuccin Macchiato
-    { semanticColor: "backgroundBase", cssVariable: "--spice-main", fallbackColor: "#24273a", description: "Main background color" },
-    { semanticColor: "backgroundHighlight", cssVariable: "--spice-highlight", fallbackColor: "#363a4f", description: "Highlight background color" },
-    { semanticColor: "backgroundPress", cssVariable: "--spice-press", fallbackColor: "#494d64", description: "Press state background color" },
-    { semanticColor: "backgroundElevatedBase", cssVariable: "--spice-card", fallbackColor: "#1e2030", description: "Card background color" },
-    { semanticColor: "backgroundElevatedHighlight", cssVariable: "--spice-card-highlight", fallbackColor: "#363a4f", description: "Card highlight background" },
-    { semanticColor: "backgroundTintedBase", cssVariable: "--spice-sidebar", fallbackColor: "#363a4f", description: "Sidebar background color" },
-    { semanticColor: "backgroundTintedHighlight", cssVariable: "--spice-sidebar-highlight", fallbackColor: "#494d64", description: "Sidebar highlight background" },
+    {
+      semanticColor: "backgroundBase",
+      cssVariable: "--spice-main",
+      fallbackColor: "#24273a",
+      description: "Main background color",
+    },
+    {
+      semanticColor: "backgroundHighlight",
+      cssVariable: "--spice-highlight",
+      fallbackColor: "#363a4f",
+      description: "Highlight background color",
+    },
+    {
+      semanticColor: "backgroundPress",
+      cssVariable: "--spice-press",
+      fallbackColor: "#494d64",
+      description: "Press state background color",
+    },
+    {
+      semanticColor: "backgroundElevatedBase",
+      cssVariable: "--spice-card",
+      fallbackColor: "#1e2030",
+      description: "Card background color",
+    },
+    {
+      semanticColor: "backgroundElevatedHighlight",
+      cssVariable: "--spice-card-highlight",
+      fallbackColor: "#363a4f",
+      description: "Card highlight background",
+    },
+    {
+      semanticColor: "backgroundTintedBase",
+      cssVariable: "--spice-sidebar",
+      fallbackColor: "#363a4f",
+      description: "Sidebar background color",
+    },
+    {
+      semanticColor: "backgroundTintedHighlight",
+      cssVariable: "--spice-sidebar-highlight",
+      fallbackColor: "#494d64",
+      description: "Sidebar highlight background",
+    },
 
     // Decorative colors - Catppuccin Macchiato
-    { semanticColor: "decorativeBase", cssVariable: "--spice-decorative", fallbackColor: "#cad3f5", description: "Decorative element color" },
-    { semanticColor: "decorativeSubdued", cssVariable: "--spice-decorative-subdued", fallbackColor: "#939ab7", description: "Subdued decorative color" },
+    {
+      semanticColor: "decorativeBase",
+      cssVariable: "--spice-decorative",
+      fallbackColor: "#cad3f5",
+      description: "Decorative element color",
+    },
+    {
+      semanticColor: "decorativeSubdued",
+      cssVariable: "--spice-decorative-subdued",
+      fallbackColor: "#939ab7",
+      description: "Subdued decorative color",
+    },
   ];
 
   constructor(config: SpicetifyColorBridgeConfig = {}) {
@@ -166,7 +281,7 @@ export class SpicetifyColorBridge implements IManagedSystem {
       enableDebug: false,
       fallbackToSpiceColors: true,
       cacheDuration: 5000, // 5 seconds
-      ...config
+      ...config,
     };
   }
 
@@ -190,34 +305,36 @@ export class SpicetifyColorBridge implements IManagedSystem {
       await this.applyFallbackColors();
 
       if (this.config.enableDebug) {
-        console.log("🎨 [SpicetifyColorBridge] Initialized as IManagedSystem with", {
-          mappings: SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
-          batcherAvailable: !!this.cssController,
-          spicetifyAvailable: this.isSpicetifyAvailable(),
-          eventSubscriptions: this.eventSubscriptionIds.length,
-          fallbackColorsApplied: true
-        });
+        console.log(
+          "🎨 [SpicetifyColorBridge] Initialized as IManagedSystem with",
+          {
+            mappings: SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
+            batcherAvailable: !!this.cssController,
+            spicetifyAvailable: this.isSpicetifyAvailable(),
+            eventSubscriptions: this.eventSubscriptionIds.length,
+            fallbackColorsApplied: true,
+          }
+        );
       }
 
       // Emit system initialization event
-      unifiedEventBus.emitSync('system:initialized', {
-        systemName: 'SpicetifyColorBridge',
+      unifiedEventBus.emitSync("system:initialized", {
+        systemName: "SpicetifyColorBridge",
         timestamp: Date.now(),
         metadata: {
           mappings: SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
           spicetifyAvailable: this.isSpicetifyAvailable() ? 1 : 0,
-          fallbackColorsApplied: 1
-        }
+          fallbackColorsApplied: 1,
+        },
       });
-
     } catch (error) {
       console.error("[SpicetifyColorBridge] Initialization failed:", error);
 
-      unifiedEventBus.emitSync('system:error', {
-        systemName: 'SpicetifyColorBridge',
-        error: error instanceof Error ? error.message : 'Initialization failed',
-        severity: 'critical',
-        timestamp: Date.now()
+      unifiedEventBus.emitSync("system:error", {
+        systemName: "SpicetifyColorBridge",
+        error: error instanceof Error ? error.message : "Initialization failed",
+        severity: "critical",
+        timestamp: Date.now(),
       });
 
       throw error;
@@ -226,7 +343,9 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
   public async updateSemanticColors(): Promise<void> {
     if (!this.initialized) {
-      console.warn("[SpicetifyColorBridge] Not initialized, cannot update colors");
+      console.warn(
+        "[SpicetifyColorBridge] Not initialized, cannot update colors"
+      );
       return;
     }
 
@@ -246,23 +365,30 @@ export class SpicetifyColorBridge implements IManagedSystem {
       // Collect all color updates first for batching
       for (const mapping of SpicetifyColorBridge.SEMANTIC_MAPPINGS) {
         const color = await this.getSemanticColor(mapping.semanticColor);
-        
+
         // 🎨 CRITICAL: Log each color being applied
         colorUpdateLog[mapping.cssVariable] = {
           semanticColor: mapping.semanticColor,
           retrievedColor: color,
           fallbackColor: mapping.fallbackColor,
-          description: mapping.description
+          description: mapping.description,
         };
 
         semanticColorUpdates[mapping.cssVariable] = color;
-        
+
         // Also create RGB variant for transparency support
         const rgbColor = Utils.hexToRgb(color);
         if (rgbColor) {
-          const rgbVariable = mapping.cssVariable.replace('--spice-', '--spice-rgb-');
-          rgbColorUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
-          colorUpdateLog[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
+          const rgbVariable = mapping.cssVariable.replace(
+            "--spice-",
+            "--spice-rgb-"
+          );
+          rgbColorUpdates[
+            rgbVariable
+          ] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
+          colorUpdateLog[
+            rgbVariable
+          ] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
         }
       }
 
@@ -283,7 +409,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
       );
 
       // 🎨 CRITICAL: Log all color updates
-      console.log("🎨 [SpicetifyColorBridge] Color update complete:", colorUpdateLog);
+      console.log(
+        "🎨 [SpicetifyColorBridge] Color update complete:",
+        colorUpdateLog
+      );
 
       this.lastCacheUpdate = now;
 
@@ -291,14 +420,22 @@ export class SpicetifyColorBridge implements IManagedSystem {
         console.log("🎨 [SpicetifyColorBridge] Updated all semantic colors");
       }
     } catch (error) {
-      console.error("[SpicetifyColorBridge] Failed to update semantic colors:", error);
+      console.error(
+        "[SpicetifyColorBridge] Failed to update semantic colors:",
+        error
+      );
     }
   }
 
-  public async getSemanticColor(semanticColor: Spicetify.SemanticColor): Promise<string> {
+  public async getSemanticColor(
+    semanticColor: Spicetify.SemanticColor
+  ): Promise<string> {
     // Check cache first
     const cached = this.colorCache.get(semanticColor);
-    if (cached && (Date.now() - this.lastCacheUpdate) < (this.config.cacheDuration || 5000)) {
+    if (
+      cached &&
+      Date.now() - this.lastCacheUpdate < (this.config.cacheDuration || 5000)
+    ) {
       return cached;
     }
 
@@ -307,25 +444,37 @@ export class SpicetifyColorBridge implements IManagedSystem {
     try {
       // Try to get color from Spicetify's semantic color system
       const spicetify = safeGetSpicetify();
-      if (this.isSpicetifyAvailable() && spicetify?.Platform?.getSemanticColors) {
+      if (
+        this.isSpicetifyAvailable() &&
+        spicetify?.Platform?.getSemanticColors
+      ) {
         const semanticColors = await spicetify.Platform.getSemanticColors();
         color = semanticColors[semanticColor];
-        
+
         // 🎨 CRITICAL: Log what Spicetify returns
-        console.log(`🎨 [SpicetifyColorBridge] Spicetify returned for ${semanticColor}:`, {
-          rawValue: color,
-          type: typeof color,
-          isWhite: color === '#ffffff' || color === '#fff' || color === 'white',
-          isInvalid: !color || color === 'undefined' || color === 'null'
-        });
+        console.log(
+          `🎨 [SpicetifyColorBridge] Spicetify returned for ${semanticColor}:`,
+          {
+            rawValue: color,
+            type: typeof color,
+            isWhite:
+              color === "#ffffff" || color === "#fff" || color === "white",
+            isInvalid: !color || color === "undefined" || color === "null",
+          }
+        );
       } else {
         // Fallback to mapping logic
-        console.warn(`🎨 [SpicetifyColorBridge] Spicetify not available, using fallback for ${semanticColor}`);
+        console.warn(
+          `🎨 [SpicetifyColorBridge] Spicetify not available, using fallback for ${semanticColor}`
+        );
         color = this.getFallbackColor(semanticColor);
       }
     } catch (error) {
       if (this.config.enableDebug) {
-        console.warn(`[SpicetifyColorBridge] Failed to get semantic color ${semanticColor}:`, error);
+        console.warn(
+          `[SpicetifyColorBridge] Failed to get semantic color ${semanticColor}:`,
+          error
+        );
       }
       color = this.getFallbackColor(semanticColor);
     }
@@ -341,64 +490,83 @@ export class SpicetifyColorBridge implements IManagedSystem {
   /**
    * Validate color to prevent white (#ffffff) or invalid colors from being applied
    */
-  private validateColor(color: string, semanticColor: Spicetify.SemanticColor): string {
+  private validateColor(
+    color: string,
+    semanticColor: Spicetify.SemanticColor
+  ): string {
     // Normalize color format
     const normalizedColor = color?.toLowerCase().trim();
-    
+
     // Check for invalid/problematic colors
     const invalidColors = [
-      '#ffffff', '#fff', 'white',
-      '#000000', '#000', 'black', 
-      '', 'undefined', 'null', 'transparent'
+      "#ffffff",
+      "#fff",
+      "white",
+      "#000000",
+      "#000",
+      "black",
+      "",
+      "undefined",
+      "null",
+      "transparent",
     ];
-    
+
     if (!normalizedColor || invalidColors.includes(normalizedColor)) {
       const fallbackColor = this.getFallbackColor(semanticColor);
-      
+
       if (this.config.enableDebug) {
-        console.warn(`🔧 [SpicetifyColorBridge] Invalid color "${color}" for ${semanticColor}, using fallback: ${fallbackColor}`);
+        console.warn(
+          `🔧 [SpicetifyColorBridge] Invalid color "${color}" for ${semanticColor}, using fallback: ${fallbackColor}`
+        );
       }
-      
+
       return fallbackColor;
     }
-    
+
     // Additional validation: ensure it's a proper hex color
-    if (!normalizedColor.match(/^#[0-9a-f]{6}$/i) && !normalizedColor.match(/^#[0-9a-f]{3}$/i)) {
+    if (
+      !normalizedColor.match(/^#[0-9a-f]{6}$/i) &&
+      !normalizedColor.match(/^#[0-9a-f]{3}$/i)
+    ) {
       const fallbackColor = this.getFallbackColor(semanticColor);
-      
+
       if (this.config.enableDebug) {
-        console.warn(`🔧 [SpicetifyColorBridge] Malformed color "${color}" for ${semanticColor}, using fallback: ${fallbackColor}`);
+        console.warn(
+          `🔧 [SpicetifyColorBridge] Malformed color "${color}" for ${semanticColor}, using fallback: ${fallbackColor}`
+        );
       }
-      
+
       return fallbackColor;
     }
-    
+
     return color;
   }
 
   private getFallbackColor(semanticColor: Spicetify.SemanticColor): string {
-    const mapping = SpicetifyColorBridge.SEMANTIC_MAPPINGS.find(m => m.semanticColor === semanticColor);
+    const mapping = SpicetifyColorBridge.SEMANTIC_MAPPINGS.find(
+      (m) => m.semanticColor === semanticColor
+    );
     if (mapping) {
       return mapping.fallbackColor;
     }
 
     // Ultimate fallback based on semantic color category (Catppuccin Macchiato)
-    if (semanticColor.startsWith('text')) {
-      return '#cad3f5'; // Catppuccin Macchiato text
-    } else if (semanticColor.startsWith('background')) {
-      return '#24273a'; // Catppuccin Macchiato base
-    } else if (semanticColor.startsWith('essential')) {
-      return '#c6a0f6'; // Catppuccin Macchiato mauve
-    } else if (semanticColor.startsWith('decorative')) {
-      return '#939ab7'; // Catppuccin Macchiato overlay2
+    if (semanticColor.startsWith("text")) {
+      return "#cad3f5"; // Catppuccin Macchiato text
+    } else if (semanticColor.startsWith("background")) {
+      return "#24273a"; // Catppuccin Macchiato base
+    } else if (semanticColor.startsWith("essential")) {
+      return "#c6a0f6"; // Catppuccin Macchiato mauve
+    } else if (semanticColor.startsWith("decorative")) {
+      return "#939ab7"; // Catppuccin Macchiato overlay2
     }
 
-    return '#cad3f5'; // Default fallback
+    return "#cad3f5"; // Default fallback
   }
 
   private applyColorToCSS(
-    cssVariable: string, 
-    color: string, 
+    cssVariable: string,
+    color: string,
     priority: "low" | "normal" | "high" | "critical" = "normal",
     source: string = "semantic-color-manager"
   ): void {
@@ -443,12 +611,14 @@ export class SpicetifyColorBridge implements IManagedSystem {
   public updateWithAlbumColors(
     oklabColorsOrEventData: { [key: string]: string } | any
   ): void {
-    console.log("🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() CALLED ═══");
+    console.log(
+      "🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() CALLED ═══"
+    );
 
     this.lastColorPayload = oklabColorsOrEventData;
 
     // 🔧 PHASE 7.2: Support both legacy (colors only) and new (full event data) formats
-    const isEventData = 'processedColors' in oklabColorsOrEventData;
+    const isEventData = "processedColors" in oklabColorsOrEventData;
     const oklabColors = isEventData
       ? oklabColorsOrEventData.processedColors
       : oklabColorsOrEventData;
@@ -460,12 +630,16 @@ export class SpicetifyColorBridge implements IManagedSystem {
       hasOKLABMetadata: !!metadata?.oklabMetadata,
       colorKeys: Object.keys(oklabColors),
       colorCount: Object.keys(oklabColors).length,
-      colors: oklabColors
+      colors: oklabColors,
     });
 
     if (!this.initialized) {
-      console.error("🎨 [SpicetifyColorBridge] ❌ CRITICAL: Not initialized, cannot update with album colors!");
-      console.warn("[SpicetifyColorBridge] Not initialized, cannot update with album colors");
+      console.error(
+        "🎨 [SpicetifyColorBridge] ❌ CRITICAL: Not initialized, cannot update with album colors!"
+      );
+      console.warn(
+        "[SpicetifyColorBridge] Not initialized, cannot update with album colors"
+      );
       return;
     }
 
@@ -474,32 +648,55 @@ export class SpicetifyColorBridge implements IManagedSystem {
       const updateStartTime = performance.now();
 
       // Extract key colors from OKLAB processing result
-      console.log("🎨 [SpicetifyColorBridge] Extracting key colors from OKLAB result...");
-      const primaryColor = oklabColors['OKLAB_PRIMARY'] || oklabColors['VIBRANT'] || oklabColors['PRIMARY'];
-      const accentColor = oklabColors['OKLAB_ACCENT'] || oklabColors['LIGHT_VIBRANT'] || oklabColors['SECONDARY'];
-      const shadowColor = oklabColors['OKLAB_SHADOW'] || oklabColors['DARK_VIBRANT'] || oklabColors['DARK'];
-      const highlightColor = oklabColors['OKLAB_HIGHLIGHT'] || oklabColors['VIBRANT_NON_ALARMING'] || oklabColors['LIGHT'];
+      console.log(
+        "🎨 [SpicetifyColorBridge] Extracting key colors from OKLAB result..."
+      );
+      const primaryColor =
+        oklabColors["OKLAB_PRIMARY"] ||
+        oklabColors["VIBRANT"] ||
+        oklabColors["PRIMARY"];
+      const accentColor =
+        oklabColors["OKLAB_ACCENT"] ||
+        oklabColors["LIGHT_VIBRANT"] ||
+        oklabColors["SECONDARY"];
+      const shadowColor =
+        oklabColors["OKLAB_SHADOW"] ||
+        oklabColors["DARK_VIBRANT"] ||
+        oklabColors["DARK"];
+      const highlightColor =
+        oklabColors["OKLAB_HIGHLIGHT"] ||
+        oklabColors["VIBRANT_NON_ALARMING"] ||
+        oklabColors["LIGHT"];
 
       console.log("🎨 [SpicetifyColorBridge] Extracted colors:", {
         primary: primaryColor,
         accent: accentColor,
         shadow: shadowColor,
-        highlight: highlightColor
+        highlight: highlightColor,
       });
 
       if (!primaryColor) {
-        console.error("🎨 [SpicetifyColorBridge] ❌ CRITICAL: No primary color found in OKLAB result!");
-        console.warn("[SpicetifyColorBridge] No primary color found in OKLAB result, skipping update");
+        console.error(
+          "🎨 [SpicetifyColorBridge] ❌ CRITICAL: No primary color found in OKLAB result!"
+        );
+        console.warn(
+          "[SpicetifyColorBridge] No primary color found in OKLAB result, skipping update"
+        );
         return;
       }
 
       // Generate intelligent color distribution for comprehensive coverage
       const colorDistribution = ColorGen.generateIntelligentColorDistribution(
-        primaryColor, accentColor, shadowColor, highlightColor
+        primaryColor,
+        accentColor,
+        shadowColor,
+        highlightColor
       );
 
       // Convert all colors to RGB for CSS variables
-      const rgbDistribution = ColorGen.convertColorsToRgb(colorDistribution) as Required<Record<keyof typeof colorDistribution, string>>;
+      const rgbDistribution = ColorGen.convertColorsToRgb(
+        colorDistribution
+      ) as Required<Record<keyof typeof colorDistribution, string>>;
 
       // 🔧 PHASE 7.2: Extract OKLAB metadata from strategy (if available)
       const oklabMetadata = metadata?.oklabMetadata;
@@ -543,132 +740,242 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       // Core accent and surface colors (original implementation)
       const coreSpicetifyUpdates = {
-        '--spice-accent': spiceAccentHex,
-        '--spice-rgb-accent': spiceAccentRgb,
-        '--spice-surface1': colorDistribution.surface1,
-        '--spice-rgb-surface1': rgbDistribution.surface1,
-        '--spice-button-active': colorDistribution.primary,
-        '--spice-rgb-button-active': rgbDistribution.primary,
-        '--spice-highlight': colorDistribution.highlight,
-        '--spice-rgb-highlight': rgbDistribution.highlight,
-        '--spice-press': colorDistribution.shadow,
-        '--spice-rgb-press': rgbDistribution.shadow,
+        "--spice-accent": spiceAccentHex,
+        "--spice-rgb-accent": spiceAccentRgb,
+        "--spice-surface1": colorDistribution.surface1,
+        "--spice-rgb-surface1": rgbDistribution.surface1,
+        "--spice-button-active": colorDistribution.primary,
+        "--spice-rgb-button-active": rgbDistribution.primary,
+        "--spice-highlight": colorDistribution.highlight,
+        "--spice-rgb-highlight": rgbDistribution.highlight,
+        "--spice-press": colorDistribution.shadow,
+        "--spice-rgb-press": rgbDistribution.shadow,
       };
 
       // Critical missing variables (HIGH PRIORITY from analysis)
       const criticalSpicetifyUpdates = {
-        '--spice-surface0': colorDistribution.surface0,
-        '--spice-rgb-surface0': rgbDistribution.surface0,
-        '--spice-surface2': colorDistribution.surface2,
-        '--spice-rgb-surface2': rgbDistribution.surface2,
-        '--spice-base': colorDistribution.base,
-        '--spice-rgb-base': rgbDistribution.base,
+        "--spice-surface0": colorDistribution.surface0,
+        "--spice-rgb-surface0": rgbDistribution.surface0,
+        "--spice-surface2": colorDistribution.surface2,
+        "--spice-rgb-surface2": rgbDistribution.surface2,
+        "--spice-base": colorDistribution.base,
+        "--spice-rgb-base": rgbDistribution.base,
       };
 
       // Core layout variables (CRITICAL PRIORITY - Background, Text, Layout)
       const coreLayoutSpicetifyUpdates = {
-        '--spice-main': colorDistribution.base,
-        '--spice-rgb-main': rgbDistribution.base,
-        '--spice-main-elevated': colorDistribution.surface0,
-        '--spice-rgb-main-elevated': rgbDistribution.surface0,
-        '--spice-sidebar': colorDistribution.surface1,
-        '--spice-rgb-sidebar': rgbDistribution.surface1,
-        '--spice-text': ColorGen.generateTextColor(colorDistribution.base),
-        '--spice-rgb-text': ColorGen.hexToRgb(ColorGen.generateTextColor(colorDistribution.base)),
-        '--spice-subtext': ColorGen.generateSubtextColor(colorDistribution.base),
-        '--spice-rgb-subtext': ColorGen.hexToRgb(ColorGen.generateSubtextColor(colorDistribution.base)),
-        '--spice-highlight-elevated': colorDistribution.surface2,
-        '--spice-rgb-highlight-elevated': rgbDistribution.surface2,
+        "--spice-main": colorDistribution.base,
+        "--spice-rgb-main": rgbDistribution.base,
+        "--spice-main-elevated": colorDistribution.surface0,
+        "--spice-rgb-main-elevated": rgbDistribution.surface0,
+        "--spice-sidebar": colorDistribution.surface1,
+        "--spice-rgb-sidebar": rgbDistribution.surface1,
+        "--spice-text": ColorGen.generateTextColor(colorDistribution.base),
+        "--spice-rgb-text": ColorGen.hexToRgb(
+          ColorGen.generateTextColor(colorDistribution.base)
+        ),
+        "--spice-subtext": ColorGen.generateSubtextColor(
+          colorDistribution.base
+        ),
+        "--spice-rgb-subtext": ColorGen.hexToRgb(
+          ColorGen.generateSubtextColor(colorDistribution.base)
+        ),
+        "--spice-highlight-elevated": colorDistribution.surface2,
+        "--spice-rgb-highlight-elevated": rgbDistribution.surface2,
 
         // Missing Catppuccin overlay system (CRITICAL for background hierarchy)
-        '--spice-overlay0': ColorGen.generateOverlayColor(colorDistribution.base, 0.04),
-        '--spice-rgb-overlay0': ColorGen.hexToRgb(ColorGen.generateOverlayColor(colorDistribution.base, 0.04)),
-        '--spice-overlay1': ColorGen.generateOverlayColor(colorDistribution.base, 0.08),
-        '--spice-rgb-overlay1': ColorGen.hexToRgb(ColorGen.generateOverlayColor(colorDistribution.base, 0.08)),
-        '--spice-overlay2': ColorGen.generateOverlayColor(colorDistribution.base, 0.12),
-        '--spice-rgb-overlay2': ColorGen.hexToRgb(ColorGen.generateOverlayColor(colorDistribution.base, 0.12)),
-        '--spice-crust': ColorGen.generateCrustColor(colorDistribution.base),
-        '--spice-rgb-crust': ColorGen.hexToRgb(ColorGen.generateCrustColor(colorDistribution.base)),
-        '--spice-mantle': ColorGen.generateMantleColor(colorDistribution.base),
-        '--spice-rgb-mantle': ColorGen.hexToRgb(ColorGen.generateMantleColor(colorDistribution.base)),
+        "--spice-overlay0": ColorGen.generateOverlayColor(
+          colorDistribution.base,
+          0.04
+        ),
+        "--spice-rgb-overlay0": ColorGen.hexToRgb(
+          ColorGen.generateOverlayColor(colorDistribution.base, 0.04)
+        ),
+        "--spice-overlay1": ColorGen.generateOverlayColor(
+          colorDistribution.base,
+          0.08
+        ),
+        "--spice-rgb-overlay1": ColorGen.hexToRgb(
+          ColorGen.generateOverlayColor(colorDistribution.base, 0.08)
+        ),
+        "--spice-overlay2": ColorGen.generateOverlayColor(
+          colorDistribution.base,
+          0.12
+        ),
+        "--spice-rgb-overlay2": ColorGen.hexToRgb(
+          ColorGen.generateOverlayColor(colorDistribution.base, 0.12)
+        ),
+        "--spice-crust": ColorGen.generateCrustColor(colorDistribution.base),
+        "--spice-rgb-crust": ColorGen.hexToRgb(
+          ColorGen.generateCrustColor(colorDistribution.base)
+        ),
+        "--spice-mantle": ColorGen.generateMantleColor(colorDistribution.base),
+        "--spice-rgb-mantle": ColorGen.hexToRgb(
+          ColorGen.generateMantleColor(colorDistribution.base)
+        ),
       };
 
       // Visual harmony color variables (MEDIUM PRIORITY from analysis)
       const visualHarmonyColorUpdates = {
-        '--spice-blue': colorDistribution.harmonyPrimary,
-        '--spice-rgb-blue': rgbDistribution.harmonyPrimary,
-        '--spice-mauve': colorDistribution.harmonySecondary,
-        '--spice-rgb-mauve': rgbDistribution.harmonySecondary,
-        '--spice-teal': colorDistribution.harmonyTertiary,
-        '--spice-rgb-teal': rgbDistribution.harmonyTertiary,
-        
+        "--spice-blue": colorDistribution.harmonyPrimary,
+        "--spice-rgb-blue": rgbDistribution.harmonyPrimary,
+        "--spice-mauve": colorDistribution.harmonySecondary,
+        "--spice-rgb-mauve": rgbDistribution.harmonySecondary,
+        "--spice-teal": colorDistribution.harmonyTertiary,
+        "--spice-rgb-teal": rgbDistribution.harmonyTertiary,
+
         // ZONE SYSTEM: Context-aware color variables for different UI zones
-        '--spice-flamingo': ColorGen.generateZoneColor(colorDistribution.primary, 'flamingo'), // Zone home secondary
-        '--spice-rgb-flamingo': ColorGen.hexToRgb(ColorGen.generateZoneColor(colorDistribution.primary, 'flamingo')),
-        '--spice-lavender': ColorGen.generateZoneColor(colorDistribution.highlight, 'lavender'), // Zone playlist/search primary
-        '--spice-rgb-lavender': ColorGen.hexToRgb(ColorGen.generateZoneColor(colorDistribution.highlight, 'lavender')),
-        '--spice-peach': ColorGen.generateZoneColor(colorDistribution.surface2, 'peach'), // Zone artist primary
-        '--spice-rgb-peach': ColorGen.hexToRgb(ColorGen.generateZoneColor(colorDistribution.surface2, 'peach')),
-        '--spice-rosewater': ColorGen.generateZoneColor(colorDistribution.surface1, 'rosewater'), // Zone artist/home secondary
-        '--spice-rgb-rosewater': ColorGen.hexToRgb(ColorGen.generateZoneColor(colorDistribution.surface1, 'rosewater')),
-        '--spice-sapphire': ColorGen.generateZoneColor(colorDistribution.harmonyPrimary, 'sapphire'), // Zone search secondary
-        '--spice-rgb-sapphire': ColorGen.hexToRgb(ColorGen.generateZoneColor(colorDistribution.harmonyPrimary, 'sapphire')),
+        "--spice-flamingo": ColorGen.generateZoneColor(
+          colorDistribution.primary,
+          "flamingo"
+        ), // Zone home secondary
+        "--spice-rgb-flamingo": ColorGen.hexToRgb(
+          ColorGen.generateZoneColor(colorDistribution.primary, "flamingo")
+        ),
+        "--spice-lavender": ColorGen.generateZoneColor(
+          colorDistribution.highlight,
+          "lavender"
+        ), // Zone playlist/search primary
+        "--spice-rgb-lavender": ColorGen.hexToRgb(
+          ColorGen.generateZoneColor(colorDistribution.highlight, "lavender")
+        ),
+        "--spice-peach": ColorGen.generateZoneColor(
+          colorDistribution.surface2,
+          "peach"
+        ), // Zone artist primary
+        "--spice-rgb-peach": ColorGen.hexToRgb(
+          ColorGen.generateZoneColor(colorDistribution.surface2, "peach")
+        ),
+        "--spice-rosewater": ColorGen.generateZoneColor(
+          colorDistribution.surface1,
+          "rosewater"
+        ), // Zone artist/home secondary
+        "--spice-rgb-rosewater": ColorGen.hexToRgb(
+          ColorGen.generateZoneColor(colorDistribution.surface1, "rosewater")
+        ),
+        "--spice-sapphire": ColorGen.generateZoneColor(
+          colorDistribution.harmonyPrimary,
+          "sapphire"
+        ), // Zone search secondary
+        "--spice-rgb-sapphire": ColorGen.hexToRgb(
+          ColorGen.generateZoneColor(
+            colorDistribution.harmonyPrimary,
+            "sapphire"
+          )
+        ),
       };
 
       // MISSING CATPPUCCIN PALETTE: Additional colors used in theme
       const paletteSpicetifyUpdates = {
-        '--spice-pink': ColorGen.generatePaletteColor(colorDistribution.primary, 'pink'),
-        '--spice-rgb-pink': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.primary, 'pink')),
-        '--spice-sky': ColorGen.generatePaletteColor(colorDistribution.harmonyPrimary, 'sky'),
-        '--spice-rgb-sky': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.harmonyPrimary, 'sky')),
-        '--spice-red': ColorGen.generatePaletteColor(colorDistribution.highlight, 'red'), // Used for errors
-        '--spice-rgb-red': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.highlight, 'red')),
-        '--spice-maroon': ColorGen.generatePaletteColor(colorDistribution.shadow, 'maroon'),
-        '--spice-rgb-maroon': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.shadow, 'maroon')),
-        '--spice-yellow': ColorGen.generatePaletteColor(colorDistribution.surface2, 'yellow'), // Used for warnings
-        '--spice-rgb-yellow': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.surface2, 'yellow')),
-        '--spice-green': ColorGen.generatePaletteColor(colorDistribution.harmonyTertiary, 'green'), // Used for success
-        '--spice-rgb-green': ColorGen.hexToRgb(ColorGen.generatePaletteColor(colorDistribution.harmonyTertiary, 'green')),
-        '--spice-misc': colorDistribution.surface1, // Neutral grey from palette
-        '--spice-rgb-misc': rgbDistribution.surface1,
+        "--spice-pink": ColorGen.generatePaletteColor(
+          colorDistribution.primary,
+          "pink"
+        ),
+        "--spice-rgb-pink": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(colorDistribution.primary, "pink")
+        ),
+        "--spice-sky": ColorGen.generatePaletteColor(
+          colorDistribution.harmonyPrimary,
+          "sky"
+        ),
+        "--spice-rgb-sky": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(colorDistribution.harmonyPrimary, "sky")
+        ),
+        "--spice-red": ColorGen.generatePaletteColor(
+          colorDistribution.highlight,
+          "red"
+        ), // Used for errors
+        "--spice-rgb-red": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(colorDistribution.highlight, "red")
+        ),
+        "--spice-maroon": ColorGen.generatePaletteColor(
+          colorDistribution.shadow,
+          "maroon"
+        ),
+        "--spice-rgb-maroon": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(colorDistribution.shadow, "maroon")
+        ),
+        "--spice-yellow": ColorGen.generatePaletteColor(
+          colorDistribution.surface2,
+          "yellow"
+        ), // Used for warnings
+        "--spice-rgb-yellow": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(colorDistribution.surface2, "yellow")
+        ),
+        "--spice-green": ColorGen.generatePaletteColor(
+          colorDistribution.harmonyTertiary,
+          "green"
+        ), // Used for success
+        "--spice-rgb-green": ColorGen.hexToRgb(
+          ColorGen.generatePaletteColor(
+            colorDistribution.harmonyTertiary,
+            "green"
+          )
+        ),
+        "--spice-misc": colorDistribution.surface1, // Neutral grey from palette
+        "--spice-rgb-misc": rgbDistribution.surface1,
       };
 
       // 🎨 PHASE 3: Visual Effect System Variables (NEW)
       // Generate effect-specific colors for visual systems currently using hardcoded values
       const effectsSpicetifyUpdates = {
         // Shimmer effect colors (harmony color variations for harmonious shimmer)
-        '--spice-shimmer-primary': colorDistribution.harmonyPrimary,
-        '--spice-rgb-shimmer-primary': rgbDistribution.harmonyPrimary,
-        '--spice-shimmer-secondary': colorDistribution.harmonySecondary,
-        '--spice-rgb-shimmer-secondary': rgbDistribution.harmonySecondary,
-        '--spice-shimmer-tertiary': colorDistribution.harmonyTertiary,
-        '--spice-rgb-shimmer-tertiary': rgbDistribution.harmonyTertiary,
-        '--spice-shimmer-quaternary': colorDistribution.primary,
-        '--spice-rgb-shimmer-quaternary': rgbDistribution.primary,
-        
+        "--spice-shimmer-primary": colorDistribution.harmonyPrimary,
+        "--spice-rgb-shimmer-primary": rgbDistribution.harmonyPrimary,
+        "--spice-shimmer-secondary": colorDistribution.harmonySecondary,
+        "--spice-rgb-shimmer-secondary": rgbDistribution.harmonySecondary,
+        "--spice-shimmer-tertiary": colorDistribution.harmonyTertiary,
+        "--spice-rgb-shimmer-tertiary": rgbDistribution.harmonyTertiary,
+        "--spice-shimmer-quaternary": colorDistribution.primary,
+        "--spice-rgb-shimmer-quaternary": rgbDistribution.primary,
+
         // Particle effect colors
-        '--spice-particle-glow': colorDistribution.highlight,
-        '--spice-rgb-particle-glow': rgbDistribution.highlight,
-        '--spice-particle-core': colorDistribution.primary,
-        '--spice-rgb-particle-core': rgbDistribution.primary,
-        '--spice-particle-trail': colorDistribution.shadow,
-        '--spice-rgb-particle-trail': rgbDistribution.shadow,
-        
+        "--spice-particle-glow": colorDistribution.highlight,
+        "--spice-rgb-particle-glow": rgbDistribution.highlight,
+        "--spice-particle-core": colorDistribution.primary,
+        "--spice-rgb-particle-core": rgbDistribution.primary,
+        "--spice-particle-trail": colorDistribution.shadow,
+        "--spice-rgb-particle-trail": rgbDistribution.shadow,
+
         // Cinematic drama colors (high contrast variants)
-        '--spice-cinematic-red': ColorGen.generateCinematicRed(colorDistribution.primary),
-        '--spice-rgb-cinematic-red': ColorGen.hexToRgb(ColorGen.generateCinematicRed(colorDistribution.primary)),
-        '--spice-cinematic-cyan': ColorGen.generateCinematicCyan(colorDistribution.primary),
-        '--spice-rgb-cinematic-cyan': ColorGen.hexToRgb(ColorGen.generateCinematicCyan(colorDistribution.primary)),
-        '--spice-cinematic-yellow': ColorGen.generateCinematicYellow(colorDistribution.highlight),
-        '--spice-rgb-cinematic-yellow': ColorGen.hexToRgb(ColorGen.generateCinematicYellow(colorDistribution.highlight)),
+        "--spice-cinematic-red": ColorGen.generateCinematicRed(
+          colorDistribution.primary
+        ),
+        "--spice-rgb-cinematic-red": ColorGen.hexToRgb(
+          ColorGen.generateCinematicRed(colorDistribution.primary)
+        ),
+        "--spice-cinematic-cyan": ColorGen.generateCinematicCyan(
+          colorDistribution.primary
+        ),
+        "--spice-rgb-cinematic-cyan": ColorGen.hexToRgb(
+          ColorGen.generateCinematicCyan(colorDistribution.primary)
+        ),
+        "--spice-cinematic-yellow": ColorGen.generateCinematicYellow(
+          colorDistribution.highlight
+        ),
+        "--spice-rgb-cinematic-yellow": ColorGen.hexToRgb(
+          ColorGen.generateCinematicYellow(colorDistribution.highlight)
+        ),
 
         // Holographic UI colors (luminous variants)
-        '--spice-holographic-primary': ColorGen.generateHolographicPrimary(colorDistribution.primary),
-        '--spice-rgb-holographic-primary': ColorGen.hexToRgb(ColorGen.generateHolographicPrimary(colorDistribution.primary)),
-        '--spice-holographic-accent': ColorGen.generateHolographicAccent(colorDistribution.harmonyPrimary),
-        '--spice-rgb-holographic-accent': ColorGen.hexToRgb(ColorGen.generateHolographicAccent(colorDistribution.harmonyPrimary)),
-        '--spice-holographic-glow': ColorGen.generateHolographicGlow(colorDistribution.highlight),
-        '--spice-rgb-holographic-glow': ColorGen.hexToRgb(ColorGen.generateHolographicGlow(colorDistribution.highlight)),
+        "--spice-holographic-primary": ColorGen.generateHolographicPrimary(
+          colorDistribution.primary
+        ),
+        "--spice-rgb-holographic-primary": ColorGen.hexToRgb(
+          ColorGen.generateHolographicPrimary(colorDistribution.primary)
+        ),
+        "--spice-holographic-accent": ColorGen.generateHolographicAccent(
+          colorDistribution.harmonyPrimary
+        ),
+        "--spice-rgb-holographic-accent": ColorGen.hexToRgb(
+          ColorGen.generateHolographicAccent(colorDistribution.harmonyPrimary)
+        ),
+        "--spice-holographic-glow": ColorGen.generateHolographicGlow(
+          colorDistribution.highlight
+        ),
+        "--spice-rgb-holographic-glow": ColorGen.hexToRgb(
+          ColorGen.generateHolographicGlow(colorDistribution.highlight)
+        ),
       };
 
       // Combine all spicetify updates
@@ -683,25 +990,25 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       // Also update our own StarryNight gradient variables to ensure consistency
       const starryNightUpdates = {
-        '--sn-bg-gradient-accent': colorDistribution.primary,
-        '--sn-bg-gradient-accent-rgb': rgbDistribution.primary,
-        '--sn-bg-gradient-primary': colorDistribution.primary,
-        '--sn-bg-gradient-primary-rgb': rgbDistribution.primary,
-        '--sn-bg-gradient-secondary': colorDistribution.surface1,
-        '--sn-bg-gradient-secondary-rgb': rgbDistribution.surface1,
+        "--sn-bg-gradient-accent": colorDistribution.primary,
+        "--sn-bg-gradient-accent-rgb": rgbDistribution.primary,
+        "--sn-bg-gradient-primary": colorDistribution.primary,
+        "--sn-bg-gradient-primary-rgb": rgbDistribution.primary,
+        "--sn-bg-gradient-secondary": colorDistribution.surface1,
+        "--sn-bg-gradient-secondary-rgb": rgbDistribution.surface1,
       };
 
       // Enhanced SN Color Variables (Year 3000 System Integration - NAVBAR/HEADER FIX)
       const snColorUpdates = {
-        '--sn-color-accent-hex': colorDistribution.primary,
-        '--sn-color-accent-rgb': rgbDistribution.primary,
-        '--sn-accent-hex': colorDistribution.primary,
-        '--sn-accent-rgb': rgbDistribution.primary,
-        '--sn-color-extracted-primary-rgb': rgbDistribution.primary,
-        '--sn-color-extracted-secondary-rgb': rgbDistribution.surface1,
-        '--sn-color-harmony-complementary-rgb': rgbDistribution.shadow,
-        '--sn-color-harmony-analogous-rgb': rgbDistribution.highlight,
-        '--sn-color-harmony-triadic-rgb': rgbDistribution.harmonyPrimary,
+        "--sn-color-accent-hex": colorDistribution.primary,
+        "--sn-color-accent-rgb": rgbDistribution.primary,
+        "--sn-accent-hex": colorDistribution.primary,
+        "--sn-accent-rgb": rgbDistribution.primary,
+        "--sn-color-extracted-primary-rgb": rgbDistribution.primary,
+        "--sn-color-extracted-secondary-rgb": rgbDistribution.surface1,
+        "--sn-color-harmony-complementary-rgb": rgbDistribution.shadow,
+        "--sn-color-harmony-analogous-rgb": rgbDistribution.highlight,
+        "--sn-color-harmony-triadic-rgb": rgbDistribution.harmonyPrimary,
       };
 
       // 🔧 PHASE 7.2: Dynamic Accent Variables (from DynamicAccentColorStrategy)
@@ -711,38 +1018,52 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       if (metadata?.dynamicAccentEnabled && oklabMetadata) {
         // Apply OKLAB-enhanced accent colors
-        dynamicAccentUpdates['--sn-dynamic-accent-hex'] = oklabMetadata.enhancedHex;
-        dynamicAccentUpdates['--sn-dynamic-accent-rgb'] = oklabMetadata.enhancedRgb;
-        dynamicAccentUpdates['--sn-dynamic-accent-shadow-hex'] = oklabMetadata.shadowHex;
-        dynamicAccentUpdates['--sn-dynamic-accent-shadow-rgb'] = oklabMetadata.shadowRgb;
+        dynamicAccentUpdates["--sn-dynamic-accent-hex"] =
+          oklabMetadata.enhancedHex;
+        dynamicAccentUpdates["--sn-dynamic-accent-rgb"] =
+          oklabMetadata.enhancedRgb;
+        dynamicAccentUpdates["--sn-dynamic-accent-shadow-hex"] =
+          oklabMetadata.shadowHex;
+        dynamicAccentUpdates["--sn-dynamic-accent-shadow-rgb"] =
+          oklabMetadata.shadowRgb;
 
         // OKLCH coordinate variables for advanced CSS features
-        dynamicAccentUpdates['--sn-oklch-l'] = String(oklabMetadata.oklchL);
-        dynamicAccentUpdates['--sn-oklch-c'] = String(oklabMetadata.oklchC);
-        dynamicAccentUpdates['--sn-oklch-h'] = String(oklabMetadata.oklchH);
+        dynamicAccentUpdates["--sn-oklch-l"] = String(oklabMetadata.oklchL);
+        dynamicAccentUpdates["--sn-oklch-c"] = String(oklabMetadata.oklchC);
+        dynamicAccentUpdates["--sn-oklch-h"] = String(oklabMetadata.oklchH);
 
         // Original color preservation (for comparison/debugging)
-        dynamicAccentUpdates['--sn-dynamic-accent-original-hex'] = oklabMetadata.originalHex;
-        dynamicAccentUpdates['--sn-dynamic-accent-original-rgb'] = oklabMetadata.originalRgb;
+        dynamicAccentUpdates["--sn-dynamic-accent-original-hex"] =
+          oklabMetadata.originalHex;
+        dynamicAccentUpdates["--sn-dynamic-accent-original-rgb"] =
+          oklabMetadata.originalRgb;
 
-        console.log("🎨 [SpicetifyColorBridge] Applied OKLAB dynamic accent variables:", {
-          enhancedHex: oklabMetadata.enhancedHex,
-          shadowHex: oklabMetadata.shadowHex,
-          oklchCoordinates: `L:${oklabMetadata.oklchL} C:${oklabMetadata.oklchC} H:${oklabMetadata.oklchH}`
-        });
+        console.log(
+          "🎨 [SpicetifyColorBridge] Applied OKLAB dynamic accent variables:",
+          {
+            enhancedHex: oklabMetadata.enhancedHex,
+            shadowHex: oklabMetadata.shadowHex,
+            oklchCoordinates: `L:${oklabMetadata.oklchL} C:${oklabMetadata.oklchC} H:${oklabMetadata.oklchH}`,
+          }
+        );
       }
 
       // 🔧 PHASE 7.2: Music Energy Variables (from DynamicAccentColorStrategy)
       const musicEnergyUpdates: Record<string, string> = {};
 
       if (metadata?.musicEnergy !== undefined) {
-        musicEnergyUpdates['--sn-music-energy'] = String(metadata.musicEnergy);
-        musicEnergyUpdates['--sn-energy-response-multiplier'] = String(metadata.energyResponseMultiplier || 1.0);
+        musicEnergyUpdates["--sn-music-energy"] = String(metadata.musicEnergy);
+        musicEnergyUpdates["--sn-energy-response-multiplier"] = String(
+          metadata.energyResponseMultiplier || 1.0
+        );
 
-        console.log("🎨 [SpicetifyColorBridge] Applied music energy variables:", {
-          energy: metadata.musicEnergy,
-          multiplier: metadata.energyResponseMultiplier
-        });
+        console.log(
+          "🎨 [SpicetifyColorBridge] Applied music energy variables:",
+          {
+            energy: metadata.musicEnergy,
+            multiplier: metadata.energyResponseMultiplier,
+          }
+        );
       }
 
       // 🔧 PHASE 7.2: Living Gradient Variables (from DynamicAccentColorStrategy)
@@ -750,10 +1071,14 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       if (metadata?.baseTransformationEnabled && oklabMetadata) {
         // Use OKLAB-enhanced colors for living gradient
-        livingGradientUpdates['--sn-living-base-hex'] = oklabMetadata.enhancedHex;
-        livingGradientUpdates['--sn-living-base-rgb'] = oklabMetadata.enhancedRgb;
+        livingGradientUpdates["--sn-living-base-hex"] =
+          oklabMetadata.enhancedHex;
+        livingGradientUpdates["--sn-living-base-rgb"] =
+          oklabMetadata.enhancedRgb;
 
-        console.log("🎨 [SpicetifyColorBridge] Applied living gradient variables");
+        console.log(
+          "🎨 [SpicetifyColorBridge] Applied living gradient variables"
+        );
       }
 
       // 🔧 PHASE 7.2: Visual Effects Variables (from DynamicAccentColorStrategy)
@@ -761,12 +1086,18 @@ export class SpicetifyColorBridge implements IManagedSystem {
 
       if (metadata?.visualEffectsIntegrationEnabled && oklabMetadata) {
         // Use OKLAB-enhanced colors for visual effects
-        visualEffectsUpdates['--sn-visual-effects-accent-hex'] = oklabMetadata.enhancedHex;
-        visualEffectsUpdates['--sn-visual-effects-accent-rgb'] = oklabMetadata.enhancedRgb;
-        visualEffectsUpdates['--sn-visual-effects-shadow-hex'] = oklabMetadata.shadowHex;
-        visualEffectsUpdates['--sn-visual-effects-shadow-rgb'] = oklabMetadata.shadowRgb;
+        visualEffectsUpdates["--sn-visual-effects-accent-hex"] =
+          oklabMetadata.enhancedHex;
+        visualEffectsUpdates["--sn-visual-effects-accent-rgb"] =
+          oklabMetadata.enhancedRgb;
+        visualEffectsUpdates["--sn-visual-effects-shadow-hex"] =
+          oklabMetadata.shadowHex;
+        visualEffectsUpdates["--sn-visual-effects-shadow-rgb"] =
+          oklabMetadata.shadowRgb;
 
-        console.log("🎨 [SpicetifyColorBridge] Applied visual effects variables");
+        console.log(
+          "🎨 [SpicetifyColorBridge] Applied visual effects variables"
+        );
       }
 
       // Combine ALL variables for change detection (Phase 3 optimization)
@@ -788,7 +1119,9 @@ export class SpicetifyColorBridge implements IManagedSystem {
       if (Object.keys(changedVariables).length === 0) {
         this.skippedUpdateCount++;
         if (this.config.enableDebug) {
-          console.log(`🎨 [SpicetifyColorBridge] No color changes, skipping update (${this.skippedUpdateCount} skipped)`);
+          console.log(
+            `🎨 [SpicetifyColorBridge] No color changes, skipping update (${this.skippedUpdateCount} skipped)`
+          );
         }
         return;
       }
@@ -802,7 +1135,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
       );
 
       // Update cache with all variables (even if not all were applied)
-      this.lastAppliedVariables = { ...this.lastAppliedVariables, ...allVariableUpdates };
+      this.lastAppliedVariables = {
+        ...this.lastAppliedVariables,
+        ...allVariableUpdates,
+      };
 
       // Clear semantic color cache to force refresh
       this.clearCache();
@@ -825,50 +1161,78 @@ export class SpicetifyColorBridge implements IManagedSystem {
       const totalVariablesCalculated = Object.keys(allVariableUpdates).length;
       const totalVariablesApplied = Object.keys(changedVariables).length;
 
-      unifiedEventBus.emitSync('colors:applied', {
+      unifiedEventBus.emitSync("colors:applied", {
         cssVariables: allVariableUpdates, // Emit all variables for external consumers
         accentHex: colorDistribution.primary,
         accentRgb: rgbDistribution.primary,
-        appliedAt: this.lastColorUpdate
+        appliedAt: this.lastColorUpdate,
       });
 
       if (this.config.enableDebug) {
-        console.log("🎨 [SpicetifyColorBridge] Optimized color update with change detection:", {
-          primaryColor: colorDistribution.primary,
-          accentColor: colorDistribution.surface1,
-          shadowColor: colorDistribution.shadow,
-          highlightColor: colorDistribution.highlight,
-          surfaceProgression: [colorDistribution.base, colorDistribution.surface0, colorDistribution.surface1, colorDistribution.surface2],
-          harmonyColors: [colorDistribution.harmonyPrimary, colorDistribution.harmonySecondary, colorDistribution.harmonyTertiary],
-          performanceMetrics: {
-            updateDuration: updateDuration.toFixed(2) + 'ms',
-            totalVariablesCalculated,
-            totalVariablesApplied,
-            skippedVariables: totalVariablesCalculated - totalVariablesApplied,
-            changeDetectionEfficiency: ((totalVariablesCalculated - totalVariablesApplied) / totalVariablesCalculated * 100).toFixed(1) + '%',
-            totalSkippedUpdates: this.skippedUpdateCount
-          },
-          effectColors: {
-            shimmerColors: 4, // primary, secondary, tertiary, quaternary
-            particleColors: 3, // glow, core, trail
-            cinematicColors: 3, // red, cyan, yellow
-            holographicColors: 3, // primary, accent, glow
-          },
-          eventEmitted: true
-        });
+        console.log(
+          "🎨 [SpicetifyColorBridge] Optimized color update with change detection:",
+          {
+            primaryColor: colorDistribution.primary,
+            accentColor: colorDistribution.surface1,
+            shadowColor: colorDistribution.shadow,
+            highlightColor: colorDistribution.highlight,
+            surfaceProgression: [
+              colorDistribution.base,
+              colorDistribution.surface0,
+              colorDistribution.surface1,
+              colorDistribution.surface2,
+            ],
+            harmonyColors: [
+              colorDistribution.harmonyPrimary,
+              colorDistribution.harmonySecondary,
+              colorDistribution.harmonyTertiary,
+            ],
+            performanceMetrics: {
+              updateDuration: updateDuration.toFixed(2) + "ms",
+              totalVariablesCalculated,
+              totalVariablesApplied,
+              skippedVariables:
+                totalVariablesCalculated - totalVariablesApplied,
+              changeDetectionEfficiency:
+                (
+                  ((totalVariablesCalculated - totalVariablesApplied) /
+                    totalVariablesCalculated) *
+                  100
+                ).toFixed(1) + "%",
+              totalSkippedUpdates: this.skippedUpdateCount,
+            },
+            effectColors: {
+              shimmerColors: 4, // primary, secondary, tertiary, quaternary
+              particleColors: 3, // glow, core, trail
+              cinematicColors: 3, // red, cyan, yellow
+              holographicColors: 3, // primary, accent, glow
+            },
+            eventEmitted: true,
+          }
+        );
       }
 
-      console.log("🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() COMPLETE ═══");
-      console.log("🎨 [SpicetifyColorBridge] ✅ Successfully updated CSS variables:", {
-        updateDuration: `${updateDuration.toFixed(2)}ms`,
-        totalVariablesCalculated,
-        totalVariablesApplied,
-        primaryColor: colorDistribution.primary
-      });
-
+      console.log(
+        "🎨 [SpicetifyColorBridge] ═══ updateWithAlbumColors() COMPLETE ═══"
+      );
+      console.log(
+        "🎨 [SpicetifyColorBridge] ✅ Successfully updated CSS variables:",
+        {
+          updateDuration: `${updateDuration.toFixed(2)}ms`,
+          totalVariablesCalculated,
+          totalVariablesApplied,
+          primaryColor: colorDistribution.primary,
+        }
+      );
     } catch (error) {
-      console.error("🎨 [SpicetifyColorBridge] ❌ FAILED to update with album colors:", error);
-      console.error("[SpicetifyColorBridge] Failed to update with album colors:", error);
+      console.error(
+        "🎨 [SpicetifyColorBridge] ❌ FAILED to update with album colors:",
+        error
+      );
+      console.error(
+        "[SpicetifyColorBridge] Failed to update with album colors:",
+        error
+      );
     }
   }
 
@@ -876,7 +1240,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
     return SpicetifyColorBridge.SEMANTIC_MAPPINGS;
   }
 
-  private resolveStaticTextAccent(): { hex: string | null; rgb: string | null } {
+  private resolveStaticTextAccent(): {
+    hex: string | null;
+    rgb: string | null;
+  } {
     try {
       if (typeof document === "undefined" || !document.documentElement) {
         return { hex: null, rgb: null };
@@ -888,8 +1255,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
       }
 
       const computed = getComputedStyle(root);
-      const hex = computed.getPropertyValue("--sn-color-accent-hex").trim() || null;
-      const rgb = computed.getPropertyValue("--sn-color-accent-rgb").trim() || null;
+      const hex =
+        computed.getPropertyValue("--sn-color-accent-hex").trim() || null;
+      const rgb =
+        computed.getPropertyValue("--sn-color-accent-rgb").trim() || null;
 
       return { hex, rgb };
     } catch (error) {
@@ -910,7 +1279,9 @@ export class SpicetifyColorBridge implements IManagedSystem {
    * @param newVariables - New CSS variable values to apply
    * @returns Only the variables that have changed
    */
-  private detectChangedVariables(newVariables: Record<string, string>): Record<string, string> {
+  private detectChangedVariables(
+    newVariables: Record<string, string>
+  ): Record<string, string> {
     const changed: Record<string, string> = {};
     let changeCount = 0;
 
@@ -922,7 +1293,11 @@ export class SpicetifyColorBridge implements IManagedSystem {
     });
 
     if (this.config.enableDebug && changeCount === 0) {
-      console.log(`🎨 [SpicetifyColorBridge] No changes detected in ${Object.keys(newVariables).length} variables`);
+      console.log(
+        `🎨 [SpicetifyColorBridge] No changes detected in ${
+          Object.keys(newVariables).length
+        } variables`
+      );
     }
 
     return changed;
@@ -934,12 +1309,16 @@ export class SpicetifyColorBridge implements IManagedSystem {
    */
   private async applyFallbackColors(): Promise<void> {
     if (!this.cssController) {
-      console.warn("[SpicetifyColorBridge] Cannot apply fallback colors - no CSS controller");
+      console.warn(
+        "[SpicetifyColorBridge] Cannot apply fallback colors - no CSS controller"
+      );
       return;
     }
 
     try {
-      console.log("🎨 [SpicetifyColorBridge] Applying Catppuccin Macchiato fallback colors...");
+      console.log(
+        "🎨 [SpicetifyColorBridge] Applying Catppuccin Macchiato fallback colors..."
+      );
 
       const fallbackUpdates: Record<string, string> = {};
       const rgbFallbackUpdates: Record<string, string> = {};
@@ -951,8 +1330,13 @@ export class SpicetifyColorBridge implements IManagedSystem {
         // Create RGB variant for transparency support
         const rgbColor = Utils.hexToRgb(mapping.fallbackColor);
         if (rgbColor) {
-          const rgbVariable = mapping.cssVariable.replace('--spice-', '--spice-rgb-');
-          rgbFallbackUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
+          const rgbVariable = mapping.cssVariable.replace(
+            "--spice-",
+            "--spice-rgb-"
+          );
+          rgbFallbackUpdates[
+            rgbVariable
+          ] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
         }
       }
 
@@ -971,10 +1355,16 @@ export class SpicetifyColorBridge implements IManagedSystem {
         "fallback-rgb-colors"
       );
 
-      console.log(`🎨 [SpicetifyColorBridge] Applied ${Object.keys(fallbackUpdates).length} fallback colors`);
-
+      console.log(
+        `🎨 [SpicetifyColorBridge] Applied ${
+          Object.keys(fallbackUpdates).length
+        } fallback colors`
+      );
     } catch (error) {
-      console.error("[SpicetifyColorBridge] Failed to apply fallback colors:", error);
+      console.error(
+        "[SpicetifyColorBridge] Failed to apply fallback colors:",
+        error
+      );
     }
   }
 
@@ -999,21 +1389,22 @@ export class SpicetifyColorBridge implements IManagedSystem {
       this.skippedUpdateCount = 0;
 
       // Emit system destruction event
-      unifiedEventBus.emitSync('system:destroyed', {
-        systemName: 'SpicetifyColorBridge',
+      unifiedEventBus.emitSync("system:destroyed", {
+        systemName: "SpicetifyColorBridge",
         timestamp: Date.now(),
-        reason: 'Manual destruction'
+        reason: "Manual destruction",
       });
 
       if (this.config.enableDebug) {
-        console.log("🎨 [SpicetifyColorBridge] System destroyed and cleaned up");
+        console.log(
+          "🎨 [SpicetifyColorBridge] System destroyed and cleaned up"
+        );
       }
-
     } catch (error) {
       console.error("[SpicetifyColorBridge] Error during destruction:", error);
     }
   }
-  
+
   /**
    * IManagedSystem interface implementation
    */
@@ -1021,26 +1412,27 @@ export class SpicetifyColorBridge implements IManagedSystem {
     // SpicetifyColorBridge doesn't need animation updates
     // This is here to satisfy the IManagedSystem interface
   }
-  
+
   /**
    * IManagedSystem health check implementation
    */
   public async healthCheck(): Promise<HealthCheckResult> {
     // Calculate average update duration
-    const avgUpdateDuration = this.updateDurations.length > 0
-      ? this.updateDurations.reduce((sum, d) => sum + d, 0) / this.updateDurations.length
-      : 0;
+    const avgUpdateDuration =
+      this.updateDurations.length > 0
+        ? this.updateDurations.reduce((sum, d) => sum + d, 0) /
+          this.updateDurations.length
+        : 0;
 
     // Calculate change detection efficiency
     const totalUpdates = this.colorUpdateCount + this.skippedUpdateCount;
-    const changeDetectionEfficiency = totalUpdates > 0
-      ? (this.skippedUpdateCount / totalUpdates * 100)
-      : 0;
+    const changeDetectionEfficiency =
+      totalUpdates > 0 ? (this.skippedUpdateCount / totalUpdates) * 100 : 0;
 
     const healthResult: HealthCheckResult = {
-      system: 'SpicetifyColorBridge',
+      system: "SpicetifyColorBridge",
       healthy: true,
-      details: 'SpicetifyColorBridge operational',
+      details: "SpicetifyColorBridge operational",
       issues: [],
       metrics: {
         initialized: this.initialized,
@@ -1055,140 +1447,190 @@ export class SpicetifyColorBridge implements IManagedSystem {
         lastUpdateDuration: parseFloat(this.lastUpdateDuration.toFixed(2)),
         averageUpdateDuration: parseFloat(avgUpdateDuration.toFixed(2)),
         skippedUpdateCount: this.skippedUpdateCount,
-        changeDetectionEfficiency: parseFloat(changeDetectionEfficiency.toFixed(1)),
+        changeDetectionEfficiency: parseFloat(
+          changeDetectionEfficiency.toFixed(1)
+        ),
         cssVariablesManaged: 96, // Total CSS variables managed by this system
-        updatePerformanceStatus: avgUpdateDuration < 50 ? 'optimal' : avgUpdateDuration < 100 ? 'acceptable' : 'needs-optimization'
-      }
+        updatePerformanceStatus:
+          avgUpdateDuration < 50
+            ? "optimal"
+            : avgUpdateDuration < 100
+            ? "acceptable"
+            : "needs-optimization",
+      },
     };
-    
+
     // Check for issues
     if (!this.initialized) {
       healthResult.healthy = false;
-      healthResult.issues!.push('System not initialized');
+      healthResult.issues!.push("System not initialized");
     }
-    
+
     if (!this.isSpicetifyAvailable()) {
       healthResult.healthy = false;
-      healthResult.issues!.push('Spicetify API not available');
+      healthResult.issues!.push("Spicetify API not available");
     }
-    
+
     if (this.colorUpdateCount === 0 && this.initialized) {
-      healthResult.issues!.push('No color updates performed since initialization');
+      healthResult.issues!.push(
+        "No color updates performed since initialization"
+      );
     }
-    
+
     if (this.eventSubscriptionIds.length === 0 && this.initialized) {
-      healthResult.issues!.push('No event subscriptions active');
+      healthResult.issues!.push("No event subscriptions active");
     }
 
     // Performance health checks (Phase 3)
     if (avgUpdateDuration > 100 && this.colorUpdateCount > 5) {
-      healthResult.issues!.push(`Average update duration ${avgUpdateDuration.toFixed(2)}ms exceeds 100ms threshold`);
+      healthResult.issues!.push(
+        `Average update duration ${avgUpdateDuration.toFixed(
+          2
+        )}ms exceeds 100ms threshold`
+      );
     }
 
-    if (avgUpdateDuration > 50 && avgUpdateDuration <= 100 && this.colorUpdateCount > 5) {
-      healthResult.issues!.push(`Average update duration ${avgUpdateDuration.toFixed(2)}ms exceeds optimal 50ms target (acceptable)`);
+    if (
+      avgUpdateDuration > 50 &&
+      avgUpdateDuration <= 100 &&
+      this.colorUpdateCount > 5
+    ) {
+      healthResult.issues!.push(
+        `Average update duration ${avgUpdateDuration.toFixed(
+          2
+        )}ms exceeds optimal 50ms target (acceptable)`
+      );
     }
 
     // Update health status based on issues
     if (healthResult.issues!.length > 0) {
-      healthResult.details = `Issues detected: ${healthResult.issues!.join(', ')}`;
+      healthResult.details = `Issues detected: ${healthResult.issues!.join(
+        ", "
+      )}`;
 
       if (healthResult.issues!.length >= 2) {
         healthResult.healthy = false;
       }
     }
-    
+
     return healthResult;
   }
-  
+
   /**
    * Setup event subscriptions for system integration
    */
   private setupEventSubscriptions(): void {
     // Listen for track changes to automatically update colors
     const trackChangeId = unifiedEventBus.subscribe(
-      'music:track-changed',
+      "music:track-changed",
       async (data) => {
         if (this.config.enableDebug) {
-          console.log('🎨 [SpicetifyColorBridge] Track changed, preparing for color refresh:', data.trackUri);
+          console.log(
+            "🎨 [SpicetifyColorBridge] Track changed, preparing for color refresh:",
+            data.trackUri
+          );
         }
         // Clear cache to ensure fresh colors on track change
         this.clearCache();
       },
-      'SpicetifyColorBridge'
+      "SpicetifyColorBridge"
     );
 
     // Listen for settings changes that might affect color processing
     this.settingsChangeUnsubscribe?.();
-    this.settingsChangeUnsubscribe = settings.onChange((data: SettingsChangeEvent) => {
-      const isTextAccentSetting = data.settingKey === 'sn-dynamic-text-accent';
-      if (
-        data.settingKey.includes('color') ||
-        data.settingKey.includes('theme') ||
-        isTextAccentSetting
-      ) {
-        if (this.config.enableDebug) {
-          console.log(
-            '🎨 [SpicetifyColorBridge] Color-related setting changed:',
-            data.settingKey
-          );
-        }
-        this.clearCache();
-        if (isTextAccentSetting && this.lastColorPayload) {
-          // Reapply latest colors to reflect updated text accent mode immediately
-          this.updateWithAlbumColors(this.lastColorPayload);
+    this.settingsChangeUnsubscribe = settings.onChange(
+      (data: SettingsChangeEvent) => {
+        const isTextAccentSetting =
+          data.settingKey === "sn-dynamic-text-accent";
+        if (
+          data.settingKey.includes("color") ||
+          data.settingKey.includes("theme") ||
+          isTextAccentSetting
+        ) {
+          if (this.config.enableDebug) {
+            console.log(
+              "🎨 [SpicetifyColorBridge] Color-related setting changed:",
+              data.settingKey
+            );
+          }
+          this.clearCache();
+          if (isTextAccentSetting && this.lastColorPayload) {
+            // Reapply latest colors to reflect updated text accent mode immediately
+            this.updateWithAlbumColors(this.lastColorPayload);
+          }
         }
       }
-    });
+    );
 
     // 🔧 PHASE 5 FIX: Listen for harmonized colors from ColorProcessor
     // This reconnects the pathway broken during Phase 2 consolidation
     // ColorProcessor processes colors:extracted → emits colors:harmonized → SpicetifyColorBridge updates
-    console.log("🎨 [SpicetifyColorBridge] Subscribing to 'colors:harmonized' event...");
+    console.log(
+      "🎨 [SpicetifyColorBridge] Subscribing to 'colors:harmonized' event..."
+    );
     const colorsHarmonizedId = unifiedEventBus.subscribe(
-      'colors:harmonized',
+      "colors:harmonized",
       (data: any) => {
-        console.log("🎨 [SpicetifyColorBridge] ═══ RECEIVED 'colors:harmonized' EVENT ═══");
+        console.log(
+          "🎨 [SpicetifyColorBridge] ═══ RECEIVED 'colors:harmonized' EVENT ═══"
+        );
         console.log("🎨 [SpicetifyColorBridge] Event data:", {
           hasProcessedColors: !!data?.processedColors,
-          colorCount: data?.processedColors ? Object.keys(data.processedColors).length : 0,
+          colorCount: data?.processedColors
+            ? Object.keys(data.processedColors).length
+            : 0,
           accentHex: data?.accentHex,
           accentRgb: data?.accentRgb,
           strategies: data?.strategies,
-          processingTime: data?.processingTime
+          processingTime: data?.processingTime,
         });
 
         if (data.processedColors) {
-          console.log("🎨 [SpicetifyColorBridge] Processed colors received:", data.processedColors);
+          console.log(
+            "🎨 [SpicetifyColorBridge] Processed colors received:",
+            data.processedColors
+          );
 
           if (this.config.enableDebug) {
-            console.log('🎨 [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:', {
-              colorCount: Object.keys(data.processedColors).length,
-              strategies: data.strategies,
-              processingTime: data.processingTime
-            });
+            console.log(
+              "🎨 [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:",
+              {
+                colorCount: Object.keys(data.processedColors).length,
+                strategies: data.strategies,
+                processingTime: data.processingTime,
+              }
+            );
           }
 
           // 🔧 PHASE 7.2: Pass full event data including metadata
           // Update Spicetify variables with OKLAB-processed colors
-          console.log("🎨 [SpicetifyColorBridge] Updating CSS variables with album colors...");
+          console.log(
+            "🎨 [SpicetifyColorBridge] Updating CSS variables with album colors..."
+          );
           this.updateWithAlbumColors(data); // Pass full event data
           console.log("🎨 [SpicetifyColorBridge] ✅ CSS variables updated");
         } else {
-          console.warn("🎨 [SpicetifyColorBridge] ⚠️ No processed colors in event data!");
+          console.warn(
+            "🎨 [SpicetifyColorBridge] ⚠️ No processed colors in event data!"
+          );
         }
       },
-      'SpicetifyColorBridge'
+      "SpicetifyColorBridge"
     );
-    console.log("🎨 [SpicetifyColorBridge] ✅ Subscribed to 'colors:harmonized'");
+    console.log(
+      "🎨 [SpicetifyColorBridge] ✅ Subscribed to 'colors:harmonized'"
+    );
 
     this.eventSubscriptionIds = [trackChangeId, colorsHarmonizedId];
 
     if (this.config.enableDebug) {
-      console.log('🎨 [SpicetifyColorBridge] Event subscriptions established:', this.eventSubscriptionIds.length);
+      console.log(
+        "🎨 [SpicetifyColorBridge] Event subscriptions established:",
+        this.eventSubscriptionIds.length
+      );
     }
   }
-  
+
   /**
    * Clean up event subscriptions
    */
@@ -1199,12 +1641,12 @@ export class SpicetifyColorBridge implements IManagedSystem {
     this.eventSubscriptionIds = [];
     this.settingsChangeUnsubscribe?.();
     this.settingsChangeUnsubscribe = null;
-    
+
     if (this.config.enableDebug) {
-      console.log('🎨 [SpicetifyColorBridge] Event subscriptions cleaned up');
+      console.log("🎨 [SpicetifyColorBridge] Event subscriptions cleaned up");
     }
   }
-  
+
   /**
    * Get system metrics for monitoring
    */
@@ -1221,9 +1663,10 @@ export class SpicetifyColorBridge implements IManagedSystem {
       lastColorUpdate: this.lastColorUpdate,
       colorUpdateCount: this.colorUpdateCount,
       eventSubscriptions:
-        this.eventSubscriptionIds.length + (this.settingsChangeUnsubscribe ? 1 : 0),
+        this.eventSubscriptionIds.length +
+        (this.settingsChangeUnsubscribe ? 1 : 0),
       cacheSize: this.colorCache.size,
-      spicetifyAvailable: this.isSpicetifyAvailable()
+      spicetifyAvailable: this.isSpicetifyAvailable(),
     };
   }
 }

@@ -57,6 +57,7 @@ import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { PaletteTransform, type PaletteTransformConfig } from "@/utils/color/PaletteTransform";
 import { AESTHETIC_PROFILES } from "@/utils/color/PaletteConstants";
+import { GenreType } from "@/types/genre";
 
 // ============================================================================
 // Unified Processing Interfaces (Enhanced with ColorCoordinator features)
@@ -123,7 +124,7 @@ interface UnifiedProcessingResult extends ColorResult {
   error?: string;
   timestamp: number;
   coordinationMetrics: {
-    detectedGenre: string;
+    detectedGenre: GenreType;
     emotionalState: string;
     oklabPreset: string;
     coordinationStrategy: string;
@@ -488,7 +489,7 @@ export class ColorProcessor
         success: true,
         timestamp: Date.now(),
         coordinationMetrics: {
-          detectedGenre: context.musicData?.genre || "unknown",
+          detectedGenre: context.musicData?.genre ?? GenreType.UNKNOWN,
           emotionalState: context.musicData?.energy
             ? this.classifyEmotionalState(context.musicData.energy)
             : "neutral",

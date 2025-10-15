@@ -24,6 +24,7 @@ import {
   type EmotionalTemperatureResult,
   type MusicAnalysisData,
 } from "@/utils/color/EmotionalTemperatureMapper";
+import { GenreType } from "@/types/genre";
 
 export interface EmotionalProfile {
   // Core emotional dimensions (0-1 range)
@@ -361,7 +362,7 @@ export class EmotionalGradientMapper {
       speechiness: data.emotion.musicalCharacteristics.speechiness,
       mode: 1, // Default major, could be enhanced
       key: 0, // Default
-      genre: data.emotion.primary, // Use primary emotion as genre hint
+      genre: GenreType.DEFAULT,
     };
 
     // Process the music data using existing logic
@@ -953,40 +954,40 @@ export class EmotionalGradientMapper {
   /**
    * 🌡️ Infer genre from emotional profile for temperature mapping
    */
-  private inferGenreFromProfile(profile: EmotionalProfile): string {
+  private inferGenreFromProfile(profile: EmotionalProfile): GenreType {
     const { mood, energy, valence, tension, arousal, mode } = profile;
 
     // Map mood and characteristics to likely genre
     if (mood === "aggressive" || (energy > 0.8 && valence < 0.4)) {
-      return tension > 0.7 ? "metal" : "hard-rock";
+      return tension > 0.7 ? GenreType.METAL : GenreType.ROCK;
     }
 
     if (mood === "euphoric" || (energy > 0.7 && valence > 0.7)) {
-      return arousal > 0.8 ? "edm" : "pop";
+      return arousal > 0.8 ? GenreType.ELECTRONIC : GenreType.POP;
     }
 
     if (mood === "melancholic" || (energy < 0.4 && valence < 0.4)) {
-      return mode === "minor" ? "blues" : "folk";
+      return mode === "minor" ? GenreType.BLUES : GenreType.FOLK;
     }
 
     if (mood === "peaceful" || (energy < 0.3 && valence > 0.6)) {
-      return "ambient";
+      return GenreType.AMBIENT;
     }
 
     if (mood === "dramatic" || (tension > 0.6 && energy > 0.5)) {
-      return "classical";
+      return GenreType.CLASSICAL;
     }
 
     if (mood === "mysterious" || (valence < 0.5 && tension > 0.5)) {
-      return "jazz";
+      return GenreType.JAZZ;
     }
 
     if (mood === "heroic" || (mode === "major" && energy > 0.6)) {
-      return "soundtrack";
+      return GenreType.CLASSICAL;
     }
 
     // Default to indie for neutral/contemplative moods
-    return "indie-pop";
+    return GenreType.INDIE;
   }
 
   /**
@@ -1008,7 +1009,7 @@ export class EmotionalGradientMapper {
       const mockMusicData: MusicAnalysisData = {
         energy: intensity,
         valence: intensity > 0.5 ? 0.7 : 0.3, // High intensity usually positive
-        genre: "override",
+        genre: GenreType.DEFAULT,
       };
 
       const overrideTemperature =

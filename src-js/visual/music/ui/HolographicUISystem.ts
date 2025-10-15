@@ -43,6 +43,7 @@ import {
   getStandardOKLABProcessor,
   OKLABProcessorSingleton,
 } from "@/utils/color/OKLABProcessorSingleton";
+import { GenreType } from "@/types/genre";
 
 export interface HolographicState {
   flickerIntensity: number; // 0-1 holographic flicker intensity
@@ -1937,12 +1938,21 @@ export class HolographicUISystem
     try {
       const {
         coordinatedColors,
-        detectedGenre,
+        detectedGenre: rawDetectedGenre,
         emotionalResult,
         oklabPreset,
         musicInfluenceStrength,
         coordinationStrategy,
-      } = data;
+      } = data as {
+        coordinatedColors?: Record<string, string>;
+        detectedGenre?: GenreType;
+        emotionalResult?: any;
+        oklabPreset?: EnhancementPreset;
+        musicInfluenceStrength?: number;
+        coordinationStrategy?: string;
+      };
+
+      const detectedGenre = rawDetectedGenre ?? GenreType.DEFAULT;
 
       // Store musical context for holographic responsiveness
       this.lastMusicalContext = {
@@ -2063,7 +2073,17 @@ export class HolographicUISystem
    */
   private async handleGenreDetectionEvent(data: any): Promise<void> {
     try {
-      const { detectedGenre, confidence, audioFeatures } = data;
+      const {
+        detectedGenre: rawDetectedGenre,
+        confidence,
+        audioFeatures,
+      } = data as {
+        detectedGenre?: GenreType;
+        confidence?: number;
+        audioFeatures?: any;
+      };
+
+      const detectedGenre = rawDetectedGenre ?? GenreType.DEFAULT;
 
       // Get genre-specific OKLAB preset
       const genrePreset =
@@ -2295,14 +2315,17 @@ export class HolographicUISystem
    * Adjust holographic effects for detected genre
    */
   private async adjustHolographicEffectsForGenre(
-    genre: string,
+    genre: GenreType,
     audioFeatures?: any
   ): Promise<void> {
     try {
       // Genre-specific holographic effect adjustments
-      switch (genre.toLowerCase()) {
-        case "electronic":
-        case "techno":
+      const normalizedGenre = genre.toLowerCase();
+
+      switch (normalizedGenre) {
+        case GenreType.ELECTRONIC:
+        case GenreType.TECHNO:
+        case GenreType.TRANCE:
         case "edm":
           this.holographicState.dataStreamFlow = 0.8;
           this.holographicState.scanlineIntensity = 0.7;
@@ -2310,7 +2333,7 @@ export class HolographicUISystem
           this.scanlineEffect.speed = 0.8;
           break;
 
-        case "classical":
+        case GenreType.CLASSICAL:
         case "orchestral":
           this.holographicState.transparency = 0.9;
           this.holographicState.energyStability = 0.8;
@@ -2318,15 +2341,15 @@ export class HolographicUISystem
           this.scanlineEffect.dynamic = true;
           break;
 
-        case "rock":
-        case "metal":
+        case GenreType.ROCK:
+        case GenreType.METAL:
           this.holographicState.flickerIntensity = 0.6;
           this.holographicState.chromatic = 0.5;
           this.holographicState.interferenceLevel = 0.5;
           this.scanlineEffect.animation = true;
           break;
 
-        case "ambient":
+        case GenreType.AMBIENT:
         case "atmospheric":
           this.holographicState.transparency = 0.95;
           this.holographicState.dataStreamFlow = 0.3;
@@ -2407,23 +2430,23 @@ export class HolographicUISystem
    * Apply genre-specific holographic effects
    */
   private async applyGenreSpecificHolographicEffects(
-    genre: string,
+    genre: GenreType,
     emotion?: string
   ): Promise<void> {
     try {
       // Combine genre and emotion for nuanced holographic effects
-      const effectKey = `${genre.toLowerCase()}-${emotion || "neutral"}`;
+      const effectKey = `${genre}-${emotion || "neutral"}`;
 
       // Apply custom holographic presets based on genre-emotion combination
-      if (genre === "electronic" && emotion === "energetic") {
+      if (genre === GenreType.ELECTRONIC && emotion === "energetic") {
         this.setHolographicPreset("blade-runner");
         this.holographicState.dataStreamFlow = 1.0;
         this.holographicState.interferenceLevel = 0.6;
-      } else if (genre === "classical" && emotion === "calm") {
+      } else if (genre === GenreType.CLASSICAL && emotion === "calm") {
         this.setHolographicPreset("dynamic-visualEffects");
         this.holographicState.transparency = 0.95;
         this.holographicState.energyStability = 0.9;
-      } else if (genre === "rock" && emotion === "aggressive") {
+      } else if (genre === GenreType.ROCK && emotion === "aggressive") {
         this.setHolographicPreset("star-wars");
         this.holographicState.flickerIntensity = 0.8;
         this.holographicState.chromatic = 0.6;
@@ -2669,7 +2692,7 @@ export class HolographicUISystem
             energy: 0.5,
             valence: 0.5,
             tempo: 120,
-            genre: musicalContext.genre || "default",
+            genre: musicalContext.genre || GenreType.DEFAULT,
           });
 
         if (emotionalResult.perceptualColorHex) {

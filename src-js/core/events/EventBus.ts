@@ -10,6 +10,7 @@
 
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { VisualEffectsState } from "@/types/colorTypes";
+import type { GenreType } from "@/types/genre";
 
 // ============================================================================
 // Event Type Definitions with Unified Naming Convention
@@ -25,7 +26,7 @@ export interface UnifiedEventMap {
       energy?: number;
       valence?: number;
       tempo?: number;
-      genre?: string;
+      genre?: GenreType;
     };
   };
 
@@ -40,7 +41,7 @@ export interface UnifiedEventMap {
     timestamp?: number; // 🔧 PHASE 2: Event timestamp for tracking (optional for backward compat)
     processingMode?: string;
     coordinationMetrics?: {
-      detectedGenre?: string;
+      detectedGenre?: GenreType;
       emotionalState?: string;
       oklabPreset?: string;
       coordinationStrategy?: string;

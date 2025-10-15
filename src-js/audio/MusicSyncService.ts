@@ -4,6 +4,7 @@ import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordi
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SpicetifyAudioFeatures, SpicetifyPlayerData } from "@/types/systems";
+import { GenreType } from "@/types/genre";
 
 // Runtime utilities for safe Spicetify access
 function safeGetSpicetify(): typeof Spicetify | null {
@@ -166,7 +167,7 @@ interface SpicetifyAudioTatum {
 
 interface ProcessedMusicData {
   enhancedBPM: number;
-  genre: string;
+  genre: GenreType;
   mood?: string;
   energy: number;
   valence: number;

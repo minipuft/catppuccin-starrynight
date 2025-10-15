@@ -4,11 +4,8 @@ import {
 } from "@/config/settingKeys";
 // EmergentChoreographyEngine consolidated into AnimationFrameCoordinator
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
-import type {
-  GenreCharacteristics,
-  GenreVisualStyle,
-  GenreType as MusicGenre,
-} from "@/types/genre";
+import { GenreType } from "@/types/genre";
+import type { GenreCharacteristics, GenreVisualStyle } from "@/types/genre";
 import type { AnimationFrameCoordinator } from "@/core/animation/AnimationFrameCoordinator";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
@@ -39,6 +36,7 @@ import { ServiceSystemBase } from "@/core/services/SystemServiceBridge";
 import type {
   CSSVariableService,
   EventSubscriptionService,
+  GenreSystemService,
   MusicSyncLifecycleService,
   PerformanceProfileService,
   PerformanceTrackingService,
@@ -222,10 +220,10 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
   // Musical genre state for aesthetic-aware color processing
   private genreState: {
-    currentGenre: MusicGenre;
+    currentGenre: GenreType;
     genreConfidence: number;
     genreHistory: {
-      genre: MusicGenre;
+      genre: GenreType;
       confidence: number;
       timestamp: number;
     }[];
@@ -245,7 +243,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   private _pendingPaletteRefresh: NodeJS.Timeout | null = null;
 
   // Track last applied genre to avoid redundant palette refreshes
-  private _lastGenre: string | null = null;
+  private _lastGenre: GenreType | null = null;
 
   private readonly utils: typeof ThemeUtilities;
   private cssService: CSSVariableService | null = null;
@@ -254,6 +252,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   private themingStateService: ThemingStateService | null = null;
   private performanceService: PerformanceTrackingService | null = null;
   private performanceProfileService: PerformanceProfileService | null = null;
+  private genreService: GenreSystemService | null = null;
   private readonly fallbackDomCleanup: Array<() => void> = [];
 
   constructor(
@@ -512,7 +511,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
     // Initialize genre state for aesthetic-aware processing
     this.genreState = {
-      currentGenre: "unknown" as MusicGenre,
+      currentGenre: GenreType.UNKNOWN,
       genreConfidence: 0.0,
       genreHistory: [],
       lastGenreUpdate: 0,
@@ -533,6 +532,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     this.themingStateService = services.themingState ?? null;
     this.performanceService = services.performance ?? null;
     this.performanceProfileService = services.performanceProfile ?? null;
+    this.genreService = services.genre ?? null;
   }
 
   public override getOptionalServices(): (keyof ServiceContainer)[] {
@@ -542,6 +542,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       "themingState",
       "performance",
       "performanceProfile",
+      "genre",
     ];
   }
 
@@ -1322,7 +1323,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
   // TODO: Phase 3 - New method to get genre-aware palette
   private async _getGenreAwarePalette(
-    genre?: string
+    genre?: GenreType
   ): Promise<CatppuccinPalette> {
     const basePalette = this.getCurrentActivePalette();
 
@@ -2159,7 +2160,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     if (!processedMusicData) return;
 
     // Phase 3 – genre-aware palette morphing
-    const g = processedMusicData.genre as string | undefined;
+    const g = processedMusicData.genre as GenreType | undefined;
     if (g && g !== this._lastGenre) {
       this._applyGenrePalette(g).then(() => {
         this._lastGenre = g;
@@ -3079,7 +3080,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    * Swap Catppuccin palette accents & neutrals based on detected genre.
    * Executes asynchronously to avoid blocking audio thread.
    */
-  private async _applyGenrePalette(genre: string): Promise<void> {
+  private async _applyGenrePalette(genre: GenreType): Promise<void> {
     try {
       const palette = await this._getGenreAwarePalette(genre);
       if (!palette) return;
@@ -3832,7 +3833,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     musicData: any,
     emotionalTemperature: EmotionalTemperatureResult | null,
     genreData?: {
-      genre: MusicGenre;
+      genre: GenreType;
       confidence: number;
       characteristics: GenreCharacteristics;
       visualStyle: GenreVisualStyle;
@@ -4715,19 +4716,17 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     musicData: any,
     albumArtColors?: Record<string, string>
   ): Promise<{
-    genre: MusicGenre;
+    genre: GenreType;
     confidence: number;
     characteristics: GenreCharacteristics;
     visualStyle: GenreVisualStyle;
   } | null> {
     try {
-      if (!this.genreProfileManager) {
-        return null;
-      }
+      const genreProvider = this.genreService ?? this.genreProfileManager;
 
-      // Get current genre from GenreProfileManager
-      const currentGenre = this.genreProfileManager.getCurrentGenre();
-      const genreConfidence = this.genreProfileManager.getGenreConfidence();
+      // Get current genre from GenreService or local manager
+      const currentGenre = genreProvider.getCurrentGenre();
+      const genreConfidence = genreProvider.getGenreConfidence();
 
       // Only proceed if we have decent confidence
       if (genreConfidence < 0.3) {
@@ -4735,10 +4734,8 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       }
 
       // Get genre characteristics and visual style
-      const genreCharacteristics =
-        this.genreProfileManager.getCharacteristics(currentGenre);
-      const genreVisualStyle =
-        this.genreProfileManager.getVisualStyle(currentGenre);
+      const genreCharacteristics = genreProvider.getCharacteristics(currentGenre);
+      const genreVisualStyle = genreProvider.getVisualStyle(currentGenre);
 
       // 🎨 PHASE 2.1: Album Color Enhancement - Use album colors to validate and enhance genre detection
       let albumGenreHarmonyScore = 1.0; // Default confidence multiplier
@@ -4749,7 +4746,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
           // Analyze album color harmony with detected genre
           const albumColorAnalysis = this._analyzeAlbumGenreHarmony(
             albumArtColors,
-            currentGenre as MusicGenre,
+            currentGenre,
             genreCharacteristics
           );
           albumGenreHarmonyScore = albumColorAnalysis.harmonyScore;
@@ -4780,13 +4777,13 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       }
 
       // Update our internal genre state with album-validated confidence
-      this.genreState.currentGenre = currentGenre as MusicGenre;
+      this.genreState.currentGenre = currentGenre;
       this.genreState.genreConfidence = genreValidatedByAlbumColors; // Use album-enhanced confidence
       this.genreState.lastGenreUpdate = Date.now();
 
       // Add to genre history with album-enhanced confidence
       this.genreState.genreHistory.unshift({
-        genre: currentGenre as MusicGenre,
+        genre: currentGenre,
         confidence: genreValidatedByAlbumColors, // Use album-enhanced confidence
         timestamp: Date.now(),
       });
@@ -4808,7 +4805,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       }
 
       return {
-        genre: currentGenre as MusicGenre,
+        genre: currentGenre,
         confidence: genreValidatedByAlbumColors, // Return album-enhanced confidence
         characteristics: genreCharacteristics,
         visualStyle: genreVisualStyle,
@@ -4828,7 +4825,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   private applyGenreColorAesthetics(
     basePreset: EnhancementPreset,
     genreData: {
-      genre: MusicGenre;
+      genre: GenreType;
       confidence: number;
       characteristics: GenreCharacteristics;
       visualStyle: GenreVisualStyle;
@@ -4929,7 +4926,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    */
   private _analyzeAlbumGenreHarmony(
     albumArtColors: Record<string, string>,
-    genre: MusicGenre,
+    genre: GenreType,
     genreCharacteristics: any
   ): { harmonyScore: number; explanation: string } {
     try {

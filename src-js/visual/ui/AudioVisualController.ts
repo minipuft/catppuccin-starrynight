@@ -20,13 +20,14 @@ import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerforman
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { BeatPayload } from "@/types/systems";
 import { UserGenreHistory } from "@/utils/platform/UserHistory";
+import { GenreType } from "@/types/genre";
 
 // -----------------------------
 // Payload typings (lightweight) – kept in-file to avoid tight coupling.
 // -----------------------------
 
 interface GenreChangePayload {
-  genre: string;
+  genre: GenreType;
   palette?: Record<string, string>;
 }
 
@@ -146,7 +147,7 @@ export class AudioVisualController {
       unifiedEventBus.subscribe("music:track-changed", (data) => {
         // Simulate genre change for track changes - could be enhanced with genre detection
         this._handleGenreChange({
-          genre: 'unknown' // Could be enhanced with actual genre detection
+          genre: GenreType.UNKNOWN
         });
       }, 'AudioVisualController'),
       

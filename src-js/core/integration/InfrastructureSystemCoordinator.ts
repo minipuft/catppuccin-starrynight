@@ -347,11 +347,7 @@ export class InfrastructureSystemCoordinator {
       "performanceCoordinator",
     ]);
 
-    this.systemRegistry.set(
-      "PerformanceAnalyzer",
-      PerformanceAnalyzer
-    );
-    this.systemDependencies.set("PerformanceAnalyzer", []);
+    // NOTE: Legacy PerformanceAnalyzer key is kept as an alias below to SimplePerformanceCoordinator
 
     this.systemRegistry.set(
       "DeviceCapabilityDetector",
@@ -387,13 +383,7 @@ export class InfrastructureSystemCoordinator {
     this.systemRegistry.set("UnifiedPerformanceCoordinator", SimplePerformanceCoordinator);
     this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
 
-    this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
-    this.systemDependencies.set("SimplePerformanceCoordinator", [
-      "performanceAnalyzer",
-      "performanceCoordinator",
-      "deviceCapabilityDetector",
-      "performanceBudgetManager",
-    ]);
+    // SimplePerformanceCoordinator is self-contained; no DI required for construction
 
     // QualityScalingManager functionality absorbed into SimplePerformanceCoordinator (Phase 3 consolidation)
     // this.systemRegistry.set('QualityScalingManager', QualityScalingManager);

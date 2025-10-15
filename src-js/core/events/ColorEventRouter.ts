@@ -925,34 +925,3 @@ export class ColorEventRouter {
 
 // Export singleton instance
 export const colorEventRouter = ColorEventRouter.getInstance();
-
-// 🔧 PHASE 4: Backward compatibility aliases
-/**
- * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const colorEventManager = colorEventRouter;
-
-/**
- * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const colorEventOrchestrator = colorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const ColorEventManager = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const ColorEventOrchestrator = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter type instead.
- */
-export type ColorEventManager = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter type instead.
- */
-export type ColorEventOrchestrator = ColorEventRouter;

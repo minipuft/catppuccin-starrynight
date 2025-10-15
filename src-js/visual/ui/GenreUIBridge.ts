@@ -17,6 +17,7 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import type { AdvancedSystemConfig } from "@/types/models";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { GenreType } from "@/types/genre";
 
 export class GenreUIBridge implements IManagedSystem {
   public initialized = false;
@@ -25,7 +26,7 @@ export class GenreUIBridge implements IManagedSystem {
   private genreProfileManager: GenreProfileManager;
   private musicSyncService: MusicSyncService | null = null;
 
-  private currentGenre: string | null = null;
+  private currentGenre: GenreType | null = null;
   private lastUpdateTime: number = 0;
   private readonly throttleMs = 300; // Throttle DOM updates to 300ms
 
@@ -111,7 +112,7 @@ export class GenreUIBridge implements IManagedSystem {
   }
 
 
-  private updateGenreUI(genre: string): void {
+  private updateGenreUI(genre: GenreType): void {
     // Throttle updates
     const now = Date.now();
     if (now - this.lastUpdateTime < this.throttleMs) {
@@ -139,7 +140,7 @@ export class GenreUIBridge implements IManagedSystem {
     }
   }
 
-  private applyGenreAttributes(genre: string): void {
+  private applyGenreAttributes(genre: GenreType): void {
     this.genreAwareSelectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
@@ -163,7 +164,7 @@ export class GenreUIBridge implements IManagedSystem {
     });
   }
 
-  private updateGenreVisualVariables(genre: string): void {
+  private updateGenreVisualVariables(genre: GenreType): void {
     // Get visual style from GenreProfileManager
     const visualStyle = this.genreProfileManager.getVisualStyle(genre);
     const characteristics = this.genreProfileManager.getCharacteristics(genre);
@@ -197,14 +198,14 @@ export class GenreUIBridge implements IManagedSystem {
   /**
    * Manually trigger genre UI update (for testing or manual control)
    */
-  public forceGenreUpdate(genre: string): void {
+  public forceGenreUpdate(genre: GenreType): void {
     this.updateGenreUI(genre);
   }
 
   /**
    * Get current genre applied to UI
    */
-  public getCurrentGenre(): string | null {
+  public getCurrentGenre(): GenreType | null {
     return this.currentGenre;
   }
 }

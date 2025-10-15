@@ -30,6 +30,7 @@ import {
   getStandardOKLABProcessor,
   OKLABProcessorSingleton,
 } from "@/utils/color/OKLABProcessorSingleton";
+import { GenreType } from "@/types/genre";
 import {
   HolographicUISystem,
   type HolographicElement,
@@ -708,19 +709,20 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     // Adjust cinematic intensity based on genre
     if (detectedGenre) {
       switch (detectedGenre) {
-        case "electronic":
-        case "dance":
-        case "techno":
+        case GenreType.ELECTRONIC:
+        case GenreType.TECHNO:
+        case GenreType.HOUSE:
+        case GenreType.TRANCE:
           this.cinematicPreset = OKLABColorProcessor.getPreset("COSMIC");
           this.cinematicConfig.bladeRunnerMode = true;
           break;
-        case "rock":
-        case "metal":
+        case GenreType.ROCK:
+        case GenreType.METAL:
           this.cinematicPreset = OKLABColorProcessor.getPreset("VIBRANT");
           this.cinematicConfig.energyActivationThreshold = 0.6; // Lower threshold for aggressive music
           break;
-        case "ambient":
-        case "classical":
+        case GenreType.AMBIENT:
+        case GenreType.CLASSICAL:
           this.cinematicPreset = OKLABColorProcessor.getPreset("SUBTLE");
           this.cinematicConfig.energyActivationThreshold = 0.8; // Higher threshold for subtle music
           break;

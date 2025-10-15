@@ -28,6 +28,7 @@ import {
   getStandardOKLABProcessor,
   OKLABProcessorSingleton,
 } from "./OKLABProcessorSingleton";
+import { GenreType } from "@/types/genre";
 
 export interface MusicalColorContext {
   musicData: MusicAnalysisData;
@@ -48,7 +49,7 @@ export interface MusicalOKLABResult {
   oklabResults: Record<string, OKLABProcessingResult>;
 
   // Musical context
-  detectedGenre: string;
+  detectedGenre: GenreType;
   emotionalResult: EmotionalTemperatureResult;
   genreCharacteristics: any;
 
@@ -275,7 +276,7 @@ export class MusicalOKLABProcessor {
 
     // If we have a clear genre detection, prefer genre-based processing
     const detectedGenre = this.genreManager.detectGenre(musicData);
-    if (detectedGenre !== "default") {
+    if (detectedGenre !== GenreType.DEFAULT) {
       return "genre-primary";
     }
 
@@ -418,7 +419,8 @@ export class MusicalOKLABProcessor {
     if (musicData.tempo && musicData.tempo > 0) contextBoost += 0.1;
     if (musicData.danceability && musicData.danceability > 0.7)
       contextBoost += 0.1;
-    if (musicData.genre && musicData.genre !== "default") contextBoost += 0.1;
+    if (musicData.genre && musicData.genre !== GenreType.DEFAULT)
+      contextBoost += 0.1;
 
     return Math.min(1.0, baseInfluence * contextBoost);
   }
@@ -432,7 +434,7 @@ export class MusicalOKLABProcessor {
     emotionalResult: EmotionalTemperatureResult,
     genreCharacteristics: any,
     preset: EnhancementPreset,
-    detectedGenre: string,
+    detectedGenre: GenreType,
     processingStrategy: string
   ): Record<string, string> {
     const variables: Record<string, string> = {};
@@ -539,7 +541,7 @@ export class MusicalOKLABProcessor {
       accentRgb: "203,166,247",
       oklabPreset: fallbackPreset,
       oklabResults: {},
-      detectedGenre: "default",
+      detectedGenre: GenreType.DEFAULT,
       emotionalResult: {
         primaryEmotion: "calm",
         intensity: 0.5,

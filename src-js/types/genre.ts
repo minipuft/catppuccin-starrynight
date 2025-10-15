@@ -186,36 +186,6 @@ export interface AudioFeatures {
   timeSignature?: number;
 }
 
-/**
- * Type guard to check if a string is a valid GenreType
- */
-export function isGenreType(value: string): value is GenreType {
-  return Object.values(GenreType).includes(value as GenreType);
-}
-
-/**
- * Convert GenreType enum to string for backward compatibility
- */
-export function genreTypeToString(genre: GenreType): string {
-  return genre as string;
-}
-
-/**
- * Convert string to GenreType with fallback to DEFAULT
- */
-export function stringToGenreType(genre: string): GenreType {
-  if (isGenreType(genre)) {
-    return genre as GenreType;
-  }
-  return GenreType.DEFAULT;
-}
-
-/**
- * Legacy type alias for backward compatibility
- * @deprecated Use GenreType instead
- */
-export type MusicGenre = GenreType;
-
 // ===================================================================
 // ALGORITHMIC GENRE SYSTEM - Core Parameter Definitions
 // ===================================================================

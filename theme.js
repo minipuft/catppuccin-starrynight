@@ -2967,2546 +2967,6 @@
     }
   });
 
-  // src-js/utils/animation/visualPerformance.ts
-  function selectPerformanceProfile(quality, performanceProfiles, opts = {}) {
-    const { trace } = opts;
-    if (!performanceProfiles || typeof performanceProfiles !== "object") {
-      trace?.(
-        "[visualPerformance] No performanceProfiles provided \u2013 skipping selection"
-      );
-      return null;
-    }
-    let selected = performanceProfiles[quality];
-    if (!selected) {
-      trace?.(
-        `[visualPerformance] Profile '${quality}' not found, falling back to 'balanced'`
-      );
-      selected = performanceProfiles["balanced"];
-    }
-    if (!selected) {
-      const firstKey = Object.keys(
-        performanceProfiles
-      )[0];
-      selected = performanceProfiles[firstKey];
-      trace?.(
-        `[visualPerformance] Using first available profile '${firstKey}' as fallback`
-      );
-    }
-    return selected;
-  }
-  var init_visualPerformance = __esm({
-    "src-js/utils/animation/visualPerformance.ts"() {
-      "use strict";
-      __name(selectPerformanceProfile, "selectPerformanceProfile");
-    }
-  });
-
-  // src-js/core/css/CSSVariableWriter.ts
-  var CSSVariableWriter_exports = {};
-  __export(CSSVariableWriter_exports, {
-    CSSVariableWriter: () => CSSVariableWriter,
-    getGlobalCSSVariableWriter: () => getGlobalCSSVariableWriter,
-    getGlobalCSSVariableWriterSafe: () => getGlobalCSSVariableWriterSafe,
-    setGlobalCSSVariableWriter: () => setGlobalCSSVariableWriter
-  });
-  function setGlobalCSSVariableWriter(instance2) {
-    if (globalCSSVariableWriter && globalCSSVariableWriter !== instance2) {
-      console.warn(
-        "[CSSVariableWriter] Replacing existing global instance. This may indicate multiple SystemIntegrationCoordinator initializations."
-      );
-    }
-    globalCSSVariableWriter = instance2;
-  }
-  function getGlobalCSSVariableWriter() {
-    if (!globalCSSVariableWriter) {
-      throw new Error(
-        "[CSSVariableWriter] Global instance not initialized. SystemIntegrationCoordinator must call setGlobalCSSVariableWriter() during initialization."
-      );
-    }
-    return globalCSSVariableWriter;
-  }
-  function getGlobalCSSVariableWriterSafe() {
-    return globalCSSVariableWriter;
-  }
-  var CRITICAL_NOW_PLAYING_VARS, _CSSVariableWriter, CSSVariableWriter, globalCSSVariableWriter;
-  var init_CSSVariableWriter = __esm({
-    "src-js/core/css/CSSVariableWriter.ts"() {
-      "use strict";
-      init_EventBus();
-      CRITICAL_NOW_PLAYING_VARS = /* @__PURE__ */ new Set([
-        // Legacy variables (Phase 1 migration)
-        "--sn-beat-pulse-intensity",
-        "--sn-animation-scale",
-        "--sn-accent-hex",
-        "--sn-accent-rgb",
-        // New namespaced variables (Phase 2+)
-        "--sn.music.beat.pulse.intensity",
-        "--sn.music.animation.scale",
-        "--sn.music.rhythm.phase",
-        "--sn.music.spectrum.phase",
-        "--sn.color.accent.hex",
-        "--sn.color.accent.rgb",
-        "--sn.bg.webgl.ready",
-        "--sn.bg.active-backend"
-      ]);
-      _CSSVariableWriter = class _CSSVariableWriter {
-        constructor(config, performanceCoordinator) {
-          this.initialized = false;
-          // === BATCHING LAYER (from CSSVariableWriter) ===
-          this.cssVariableQueue = /* @__PURE__ */ new Map();
-          this.batchUpdateTimer = null;
-          this.rafHandle = null;
-          this.microtaskScheduled = false;
-          // === MANAGEMENT LAYER (from CSSVariableWriter) ===
-          this.pendingTransactions = /* @__PURE__ */ new Map();
-          this.transactionCounter = 0;
-          this.updateQueue = /* @__PURE__ */ new Map();
-          this.flushTimer = null;
-          // === PERFORMANCE LAYER (from CSSVariableWriter) ===
-          this.currentDeviceCapabilities = null;
-          this.currentPerformanceMode = null;
-          this.lastCSSUpdate = 0;
-          this.cssUpdateThrottle = 100;
-          // Update CSS at most every 100ms
-          this.appliedClasses = /* @__PURE__ */ new Set();
-          // === CONSCIOUSNESS LAYER (new integration) ===
-          this.visualEffectsState = null;
-          this.visualEffectsUpdateTimer = null;
-          this.lastVisualEffectsUpdate = 0;
-          // === ENHANCED OPTIMIZATION LAYER (from OptimizedCSSVariableManager) ===
-          this.optimizedConfig = {};
-          this.lastFPSCheck = 0;
-          this.currentPerformanceLevel = "good";
-          this.adaptiveThrottleLevel = 1;
-          this.priorityQueues = /* @__PURE__ */ new Map();
-          this.adaptiveMonitoringInterval = null;
-          // === FRAME CONTEXT INTEGRATION (from CDFVariableBridge) ===
-          this.frameContextUnsubscribe = null;
-          this.reduceMotionMQ = null;
-          this.mqHandler = null;
-          // Performance tracking
-          this.performanceMetrics = {
-            totalBatches: 0,
-            totalUpdates: 0,
-            totalBatchTime: 0,
-            maxBatchTime: 0,
-            averageBatchSize: 0,
-            overBudgetBatches: 0,
-            conflictResolutions: 0,
-            transactionCount: 0,
-            visualEffectsUpdates: 0
-          };
-          // Priority weights for conflict resolution
-          this.PRIORITY_WEIGHTS = {
-            low: 1,
-            normal: 2,
-            high: 3,
-            critical: 4
-          };
-          this.config = config;
-          this.performanceCoordinator = performanceCoordinator;
-          this.eventBus = unifiedEventBus;
-          this.cssConfig = {
-            // Batching configuration
-            batchIntervalMs: 0,
-            // 0 = coalesced; scheduling handled via rAF/microtask
-            maxBatchSize: 50,
-            enableDebug: config.enableDebug,
-            useCssTextFastPath: false,
-            autoHijack: true,
-            // Performance configuration
-            enableAdaptiveOptimization: true,
-            enableThermalThrottling: true,
-            enableBatteryOptimization: true,
-            enableDeviceTierOptimization: true,
-            debugPerformanceClasses: config.enableDebug,
-            // Consciousness configuration
-            enableVisualEffectsIntegration: true,
-            visualEffectsUpdateInterval: 16,
-            // 60fps
-            enableMusicVisualEffects: true,
-            enableAestheticVisualEffects: true,
-            // Enhanced optimization features (from OptimizedCSSVariableManager)
-            enableAdaptiveThrottling: true,
-            priorityMappings: {
-              critical: ["--sn-rs-glow-alpha", "--sn-rs-beat-intensity", "--sn-rs-hue-shift"],
-              high: ["--sn-gradient-primary", "--sn-gradient-secondary", "--sn-gradient-accent"],
-              normal: ["--sn-gradient-", "--sn-rs-"],
-              low: ["--sn-debug-", "--sn-dev-"]
-            },
-            thresholds: {
-              excellentFPS: 55,
-              // 55+ FPS = excellent
-              goodFPS: 45,
-              // 45+ FPS = good
-              poorFPS: 30
-              // <30 FPS = poor
-            }
-          };
-          this.optimizedConfig = this.cssConfig;
-          this.currentDeviceCapabilities = this.performanceCoordinator.getDeviceCapabilities();
-          this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [CSSVariableWriter] Created with visual-effects-driven CSS management"
-            );
-          }
-        }
-        // Deprecated getInstance() method removed - use dependency injection through SystemIntegrationCoordinator
-        // or getGlobalOptimizedCSSController() for simple utility usage
-        // ===================================================================
-        // IMANAGEDYSTEM INTERFACE IMPLEMENTATION
-        // ===================================================================
-        async initialize() {
-          if (this.initialized) return;
-          this.subscribeToEvents();
-          this.applyInitialOptimizations();
-          if (this.cssConfig.enableVisualEffectsIntegration) {
-            this.startVisualEffectsIntegration();
-          }
-          if (this.cssConfig.autoHijack) {
-            this.enableGlobalHijack();
-          }
-          this.initializeOptimizedFeatures();
-          this.initializeFrameContextIntegration();
-          this.initialized = true;
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [CSSVariableWriter] Initialized with device tier:",
-              this.currentDeviceCapabilities?.performanceTier
-            );
-          }
-        }
-        updateAnimation(deltaTime) {
-        }
-        async healthCheck() {
-          const queueSize = this.cssVariableQueue.size + this.updateQueue.size;
-          const pendingTransactions = this.pendingTransactions.size;
-          const isHealthy = queueSize <= 1e3 && pendingTransactions <= 100;
-          return {
-            system: "CSSVariableWriter",
-            healthy: isHealthy,
-            ok: isHealthy,
-            details: isHealthy ? "CSS visual-effects controller operating normally" : "High queue size or pending transactions",
-            metrics: {
-              queueSize,
-              pendingTransactions,
-              performanceMetrics: this.performanceMetrics,
-              visualEffectsActive: this.visualEffectsState !== null,
-              deviceTier: this.currentDeviceCapabilities?.performanceTier,
-              performanceMode: this.currentPerformanceMode?.name
-            }
-          };
-        }
-        forceRepaint(reason) {
-          this.flushCSSVariableBatch();
-          if (this.config.enableDebug && reason) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Force repaint: ${reason}`
-            );
-          }
-        }
-        // ===================================================================
-        // PUBLIC API - UNIFIED CSS VARIABLE OPERATIONS
-        // ===================================================================
-        /**
-         * Queue a CSS variable update with priority and visual-effects awareness
-         * Enhanced with adaptive throttling and priority queue management
-         */
-        queueCSSVariableUpdate(property, value, element = null, priority = "normal", source = "unknown") {
-          const targetElement = element || document.documentElement;
-          const effectivePriority = this.optimizedConfig.enableAdaptiveThrottling ? this.determineVariablePriority(property, priority) : priority;
-          if (effectivePriority === "critical" || CRITICAL_NOW_PLAYING_VARS.has(property)) {
-            this.applyCriticalUpdate(property, value, targetElement);
-            return;
-          }
-          if (this.optimizedConfig.enableAdaptiveThrottling && this.priorityQueues.size > 0) {
-            this.queueByPriority(property, value, targetElement, effectivePriority, source);
-            return;
-          }
-          const elementKey = element ? `element_${element.id || element.className || "unnamed"}` : "root";
-          const updateKey = `${elementKey}:${property}`;
-          const update = {
-            element: targetElement,
-            property,
-            value,
-            timestamp: performance.now(),
-            priority: effectivePriority,
-            source
-          };
-          const existingUpdate = this.cssVariableQueue.get(updateKey);
-          if (existingUpdate) {
-            if (this.shouldReplaceUpdate(existingUpdate, update)) {
-              this.cssVariableQueue.set(updateKey, update);
-              this.performanceMetrics.conflictResolutions++;
-            }
-          } else {
-            this.cssVariableQueue.set(updateKey, update);
-          }
-          this.performanceMetrics.totalUpdates++;
-          this.scheduleFlush(effectivePriority);
-          if (effectivePriority === "critical" || this.cssVariableQueue.size >= this.cssConfig.maxBatchSize) {
-            this.flushCSSVariableBatch();
-          }
-        }
-        /**
-         * Update multiple CSS variables in a transaction
-         */
-        updateVariables(variables, priority = "normal", source = "unknown") {
-          const transactionId = `tx_${++this.transactionCounter}`;
-          const variableMap = new Map(Object.entries(variables));
-          const transaction = {
-            id: transactionId,
-            variables: variableMap,
-            timestamp: performance.now(),
-            priority,
-            completed: false
-          };
-          this.pendingTransactions.set(transactionId, transaction);
-          for (const [property, value] of variableMap) {
-            this.queueCSSVariableUpdate(
-              property,
-              value,
-              null,
-              priority,
-              `${source}:${transactionId}`
-            );
-          }
-          this.performanceMetrics.transactionCount++;
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
-            );
-          }
-        }
-        /**
-         * Update visual-effects-driven CSS variables
-         */
-        updateVisualEffectsVariables(visualEffectsState) {
-          if (!this.cssConfig.enableVisualEffectsIntegration) return;
-          this.visualEffectsState = visualEffectsState;
-          this.performanceMetrics.visualEffectsUpdates++;
-          const variables = {};
-          if (visualEffectsState.musicState && this.cssConfig.enableMusicVisualEffects) {
-            variables["--sn.music.beat.pulse.intensity"] = visualEffectsState.musicState.intensity.toString();
-            variables["--sn.music.tempo.bpm"] = visualEffectsState.musicState.bpm.toString();
-            variables["--sn.music.rhythm.phase"] = `${visualEffectsState.musicState.rhythmPhase}deg`;
-            variables["--sn.music.animation.scale"] = visualEffectsState.musicState.animationScale.toString();
-            variables["--sn.music.energy.level"] = visualEffectsState.musicState.energy.toString();
-            variables["--sn.music.valence"] = visualEffectsState.musicState.valence.toString();
-          }
-          if (visualEffectsState.aestheticState && this.cssConfig.enableAestheticVisualEffects) {
-            variables["--sn.aesthetic.harmony.level"] = visualEffectsState.aestheticState.harmonyLevel.toString();
-            variables["--sn.aesthetic.evolution.factor"] = visualEffectsState.aestheticState.evolutionFactor.toString();
-            variables["--sn.color.temperature"] = visualEffectsState.aestheticState.colorTemperature.toString();
-          }
-          if (visualEffectsState.performanceState) {
-            variables["--sn.performance.mode"] = visualEffectsState.performanceState.mode;
-            variables["--sn.device.tier"] = visualEffectsState.performanceState.deviceTier;
-            variables["--sn.performance.optimization.level"] = visualEffectsState.performanceState.optimizationLevel.toString();
-          }
-          this.updateVariables(variables, "high", "visual-effects-system");
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Consciousness state updated with ${Object.keys(variables).length} variables`
-            );
-          }
-        }
-        /**
-         * Apply performance-based optimizations
-         */
-        applyPerformanceOptimizations(performanceMode) {
-          if (!this.cssConfig.enableAdaptiveOptimization) return;
-          this.currentPerformanceMode = performanceMode;
-          const variables = {
-            "--sn.performance.mode": performanceMode.name,
-            "--sn.performance.quality.level": performanceMode.qualityLevel.toString(),
-            "--sn.performance.fps.target": performanceMode.frameRate.toString(),
-            "--sn.performance.frame.budget": (1e3 / performanceMode.frameRate).toString(),
-            "--sn.performance.optimization.level": performanceMode.optimizationLevel.toString(),
-            "--sn.performance.blur.quality": performanceMode.blurQuality.toString(),
-            "--sn.performance.shadow.quality": performanceMode.shadowQuality.toString(),
-            "--sn.performance.animation.quality": performanceMode.animationQuality.toString(),
-            "--sn.performance.effect.quality": performanceMode.effectQuality.toString()
-          };
-          this.updateVariables(variables, "high", "performance-coordinator");
-          this.applyPerformanceModeOptimizations();
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Performance optimizations applied for mode: ${performanceMode.name}`
-            );
-          }
-        }
-        /**
-         * Get a CSS variable value
-         */
-        getVariable(key) {
-          const computedStyle = getComputedStyle(document.documentElement);
-          return computedStyle.getPropertyValue(key).trim() || null;
-        }
-        /**
-         * Force immediate flush of all pending updates
-         */
-        flushUpdates() {
-          this.flushCSSVariableBatch();
-        }
-        /**
-         * Optimized CSS variable batch flush with efficient DOM operations
-         */
-        flushCSSVariableBatch() {
-          if (this.cssVariableQueue.size === 0) return;
-          const startTime = performance.now();
-          const FRAME_BUDGET = 8;
-          const updates = Array.from(this.cssVariableQueue.values());
-          this.cssVariableQueue.clear();
-          if (this.rafHandle !== null) {
-            cancelAnimationFrame(this.rafHandle);
-            this.rafHandle = null;
-          }
-          this.microtaskScheduled = false;
-          try {
-            const updatesByElement = /* @__PURE__ */ new Map();
-            for (const update of updates) {
-              if (!updatesByElement.has(update.element)) {
-                updatesByElement.set(update.element, []);
-              }
-              updatesByElement.get(update.element).push(update);
-            }
-            for (const [element, elementUpdates] of updatesByElement.entries()) {
-              if (performance.now() - startTime > FRAME_BUDGET) {
-                for (const update of elementUpdates) {
-                  const updateKey = `${update.element.id || "root"}:${update.property}`;
-                  this.cssVariableQueue.set(updateKey, update);
-                }
-                this.scheduleFlush("high");
-                break;
-              }
-              if (elementUpdates.length >= 3) {
-                this.applyCSSTextBatch(element, elementUpdates);
-              } else {
-                for (const update of elementUpdates) {
-                  if (_CSSVariableWriter.nativeSetProperty) {
-                    _CSSVariableWriter.nativeSetProperty.call(
-                      element.style,
-                      update.property,
-                      update.value
-                    );
-                  } else {
-                    element.style.setProperty(update.property, update.value);
-                  }
-                }
-              }
-            }
-            const batchTime = performance.now() - startTime;
-            this.updatePerformanceMetrics(batchTime, updates.length);
-            if (batchTime > FRAME_BUDGET && this.config.enableDebug) {
-              console.warn(
-                `\u{1F30C} [CSSVariableWriter] CSS batch exceeded frame budget: ${batchTime.toFixed(
-                  2
-                )}ms (${updates.length} updates)`
-              );
-            } else if (this.config.enableDebug && Math.random() < 0.05) {
-              console.log(
-                `\u{1F30C} [CSSVariableWriter] Efficient CSS batch: ${updates.length} updates in ${batchTime.toFixed(2)}ms`
-              );
-            }
-          } catch (error) {
-            console.error(
-              "[CSSVariableWriter] Error in optimized CSS batch processing:",
-              error
-            );
-            this.applyUpdatesWithFallback(updates);
-          }
-        }
-        /**
-         * Optimized cssText batching using efficient string building
-         */
-        applyCSSTextBatch(element, updates) {
-          try {
-            const currentStyle = element.style.cssText;
-            const propertyMap = /* @__PURE__ */ new Map();
-            if (currentStyle) {
-              const declarations = currentStyle.split(";");
-              for (const declaration of declarations) {
-                const colonIndex = declaration.indexOf(":");
-                if (colonIndex > 0) {
-                  const property = declaration.slice(0, colonIndex).trim();
-                  const value = declaration.slice(colonIndex + 1).trim();
-                  if (property && value) {
-                    propertyMap.set(property, value);
-                  }
-                }
-              }
-            }
-            for (const update of updates) {
-              propertyMap.set(update.property, update.value);
-            }
-            const cssDeclarations = [];
-            for (const [property, value] of propertyMap) {
-              cssDeclarations.push(`${property}:${value}`);
-            }
-            element.style.cssText = cssDeclarations.join(";");
-          } catch (error) {
-            for (const update of updates) {
-              try {
-                element.style.setProperty(update.property, update.value);
-              } catch (e) {
-                console.warn(`Failed to apply ${update.property}:`, e);
-              }
-            }
-          }
-        }
-        /**
-         * Fallback update application with error recovery
-         */
-        applyUpdatesWithFallback(updates) {
-          for (const update of updates) {
-            try {
-              if (_CSSVariableWriter.nativeSetProperty) {
-                _CSSVariableWriter.nativeSetProperty.call(
-                  update.element.style,
-                  update.property,
-                  update.value
-                );
-              } else {
-                update.element.style.setProperty(update.property, update.value);
-              }
-            } catch (e) {
-              console.warn(
-                `[CSSVariableWriter] Failed to apply CSS property ${update.property}:`,
-                e
-              );
-            }
-          }
-        }
-        // ===================================================================
-        // CONVENIENCE METHODS FOR COMMON CSS UPDATES
-        // ===================================================================
-        /**
-         * Set music synchronization variables
-         */
-        setMusicMetrics(metrics) {
-          const variables = {};
-          if (metrics.beatIntensity !== void 0) {
-            variables["--sn.music.beat.pulse.intensity"] = metrics.beatIntensity.toString();
-          }
-          if (metrics.rhythmPhase !== void 0) {
-            variables["--sn.music.rhythm.phase"] = `${metrics.rhythmPhase}deg`;
-          }
-          if (metrics.animationScale !== void 0) {
-            variables["--sn.music.animation.scale"] = metrics.animationScale.toString();
-          }
-          if (metrics.spectrumPhase !== void 0) {
-            variables["--sn.music.spectrum.phase"] = `${metrics.spectrumPhase}deg`;
-          }
-          if (metrics.energy !== void 0) {
-            variables["--sn.music.energy.level"] = metrics.energy.toString();
-          }
-          if (metrics.valence !== void 0) {
-            variables["--sn.music.valence"] = metrics.valence.toString();
-          }
-          if (metrics.bpm !== void 0) {
-            variables["--sn.music.tempo.bpm"] = metrics.bpm.toString();
-          }
-          this.updateVariables(variables, "critical", "music-system");
-        }
-        /**
-         * Set color variables
-         */
-        setColorTokens(colors) {
-          const variables = {};
-          if (colors.accentHex) {
-            variables["--sn.color.accent.hex"] = colors.accentHex;
-          }
-          if (colors.accentRgb) {
-            variables["--sn.color.accent.rgb"] = colors.accentRgb;
-          }
-          if (colors.primaryRgb) {
-            variables["--sn.bg.gradient.primary.rgb"] = colors.primaryRgb;
-          }
-          if (colors.secondaryRgb) {
-            variables["--sn.bg.gradient.secondary.rgb"] = colors.secondaryRgb;
-          }
-          if (colors.gradientOpacity !== void 0) {
-            variables["--sn.bg.gradient.opacity"] = colors.gradientOpacity.toString();
-          }
-          if (colors.gradientBlur) {
-            variables["--sn.bg.gradient.blur"] = colors.gradientBlur;
-          }
-          this.updateVariables(variables, "high", "color-system");
-        }
-        /**
-         * Set performance variables
-         */
-        setPerformanceTokens(perf) {
-          const variables = {};
-          if (perf.webglReady !== void 0) {
-            variables["--sn.bg.webgl.ready"] = perf.webglReady ? "1" : "0";
-          }
-          if (perf.activeBackend) {
-            variables["--sn.bg.active-backend"] = perf.activeBackend;
-          }
-          if (perf.qualityLevel) {
-            variables["--sn.perf.quality.level"] = perf.qualityLevel;
-          }
-          if (perf.reducedMotion !== void 0) {
-            variables["--sn.anim.motion.reduced"] = perf.reducedMotion ? "1" : "0";
-          }
-          if (perf.gpuAcceleration !== void 0) {
-            variables["--sn.perf.gpu.acceleration.enabled"] = perf.gpuAcceleration ? "1" : "0";
-          }
-          this.updateVariables(variables, "high", "performance-system");
-        }
-        /**
-         * Direct property setter (convenience API)
-         */
-        setProperty(property, value, element = null) {
-          if (property.startsWith("--spice-") && this.config.enableSpiceVariableDebug) {
-            const caller = new Error().stack?.split("\n")[2]?.trim().replace(/^\s*at\s+/, "") || "unknown";
-            console.log(
-              `\u{1F527} [CSS Debug] Setting ${property} = ${value} (from: ${caller})`
-            );
-          }
-          this.queueCSSVariableUpdate(property, value, element);
-        }
-        // ===================================================================
-        // PERFORMANCE AND DEVICE OPTIMIZATION METHODS
-        // ===================================================================
-        /**
-         * Apply device-specific CSS classes
-         */
-        applyDeviceOptimizations() {
-          if (!this.cssConfig.enableDeviceTierOptimization || !this.currentDeviceCapabilities)
-            return;
-          this.removeClassesByPrefix("device-tier-");
-          this.removeClassesByPrefix("device-mobile-");
-          this.removeClassesByPrefix("device-gpu-");
-          const tierClass = `device-tier-${this.currentDeviceCapabilities.performanceTier}`;
-          this.addCSSClass(tierClass);
-          if (this.currentDeviceCapabilities.isMobile) {
-            this.addCSSClass("device-mobile-optimized");
-          }
-          if (this.currentDeviceCapabilities.gpuAcceleration) {
-            this.addCSSClass("device-gpu-accelerated");
-          } else {
-            this.addCSSClass("device-gpu-fallback");
-          }
-          const memoryTier = this.getMemoryTier(
-            this.currentDeviceCapabilities.memoryGB
-          );
-          this.addCSSClass(`device-memory-${memoryTier}`);
-        }
-        /**
-         * Apply performance mode CSS classes
-         */
-        applyPerformanceModeOptimizations() {
-          if (!this.currentPerformanceMode) return;
-          this.removeClassesByPrefix("performance-mode-");
-          const modeClass = `performance-mode-${this.currentPerformanceMode.name}`;
-          this.addCSSClass(modeClass);
-          const optimizationClass = `optimization-level-${this.currentPerformanceMode.optimizationLevel}`;
-          this.addCSSClass(optimizationClass);
-        }
-        /**
-         * Get performance report
-         */
-        getPerformanceReport() {
-          const averageBatchTime = this.performanceMetrics.totalBatches > 0 ? this.performanceMetrics.totalBatchTime / this.performanceMetrics.totalBatches : 0;
-          return {
-            enabled: true,
-            pendingUpdates: this.cssVariableQueue.size + this.updateQueue.size,
-            totalUpdates: this.performanceMetrics.totalUpdates,
-            totalBatches: this.performanceMetrics.totalBatches,
-            averageBatchSize: Math.round(this.performanceMetrics.averageBatchSize * 10) / 10,
-            averageBatchTime: Math.round(averageBatchTime * 100) / 100,
-            maxBatchTime: Math.round(this.performanceMetrics.maxBatchTime * 100) / 100,
-            overBudgetBatches: this.performanceMetrics.overBudgetBatches,
-            conflictResolutions: this.performanceMetrics.conflictResolutions,
-            transactionCount: this.performanceMetrics.transactionCount,
-            visualEffectsUpdates: this.performanceMetrics.visualEffectsUpdates,
-            visualEffectsActive: this.visualEffectsState !== null,
-            deviceTier: this.currentDeviceCapabilities?.performanceTier,
-            performanceMode: this.currentPerformanceMode?.name
-          };
-        }
-        // ===================================================================
-        // PRIVATE METHODS
-        // ===================================================================
-        subscribeToEvents() {
-          this.eventBus.subscribe("performance:tier-changed", (payload) => {
-            this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
-            this.applyPerformanceModeOptimizations();
-            this.updateCSSPerformanceVariables();
-          }, "CSSVariableWriter");
-        }
-        applyInitialOptimizations() {
-          try {
-            this.applyDeviceOptimizations();
-            this.applyPerformanceModeOptimizations();
-            this.updateCSSPerformanceVariables();
-            if (this.cssConfig.debugPerformanceClasses) {
-              this.addCSSClass("debug-performance");
-            }
-          } catch (error) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "[CSSVariableWriter] Error applying initial optimizations:",
-                error
-              );
-            }
-          }
-        }
-        applyCurrentOptimizations() {
-          this.applyDeviceOptimizations();
-          this.applyPerformanceModeOptimizations();
-        }
-        updateCSSPerformanceVariables() {
-          const now = Date.now();
-          if (now - this.lastCSSUpdate < this.cssUpdateThrottle) return;
-          this.lastCSSUpdate = now;
-          if (!this.currentPerformanceMode || !this.currentDeviceCapabilities) return;
-          try {
-            const variables = {
-              "--sn.performance.mode": this.currentPerformanceMode.name || "balanced",
-              "--sn.performance.quality.level": (this.currentPerformanceMode.qualityLevel ?? 0.8).toString(),
-              "--sn.performance.fps.target": (this.currentPerformanceMode.frameRate ?? 60).toString(),
-              "--sn.performance.frame.budget": (1e3 / (this.currentPerformanceMode.frameRate ?? 60)).toString(),
-              "--sn.performance.optimization.level": (this.currentPerformanceMode.optimizationLevel ?? 1).toString(),
-              "--sn.device.tier": this.currentDeviceCapabilities.performanceTier ?? "mid",
-              "--sn.device.memory": (this.currentDeviceCapabilities.memoryGB ?? 8).toString(),
-              "--sn.device.gpu": this.currentDeviceCapabilities.gpuAcceleration ?? true ? "1" : "0",
-              "--sn.device.mobile": this.currentDeviceCapabilities.isMobile ?? false ? "1" : "0",
-              "--sn.performance.blur.quality": (this.currentPerformanceMode.blurQuality ?? 0.8).toString(),
-              "--sn.performance.shadow.quality": (this.currentPerformanceMode.shadowQuality ?? 0.8).toString(),
-              "--sn.performance.animation.quality": (this.currentPerformanceMode.animationQuality ?? 0.8).toString(),
-              "--sn.performance.effect.quality": (this.currentPerformanceMode.effectQuality ?? 0.8).toString()
-            };
-            this.updateVariables(variables, "high", "performance-coordinator");
-          } catch (error) {
-            if (this.config.enableDebug) {
-              console.warn(
-                "[CSSVariableWriter] Error updating CSS performance variables:",
-                error
-              );
-            }
-          }
-        }
-        startVisualEffectsIntegration() {
-          if (this.visualEffectsUpdateTimer) return;
-          const updateVisualEffects = /* @__PURE__ */ __name(() => {
-            const now = performance.now();
-            if (now - this.lastVisualEffectsUpdate >= this.cssConfig.visualEffectsUpdateInterval) {
-              this.lastVisualEffectsUpdate = now;
-              if (this.visualEffectsState) {
-                this.updateVisualEffectsVariables(this.visualEffectsState);
-              }
-            }
-            this.visualEffectsUpdateTimer = setTimeout(
-              updateVisualEffects,
-              this.cssConfig.visualEffectsUpdateInterval
-            );
-          }, "updateVisualEffects");
-          updateVisualEffects();
-        }
-        shouldReplaceUpdate(existing, incoming) {
-          const existingWeight = this.PRIORITY_WEIGHTS[existing.priority];
-          const incomingWeight = this.PRIORITY_WEIGHTS[incoming.priority];
-          if (incomingWeight > existingWeight) {
-            return true;
-          }
-          if (incomingWeight === existingWeight) {
-            return incoming.timestamp > existing.timestamp;
-          }
-          return false;
-        }
-        scheduleFlush(priority) {
-          if (this.rafHandle !== null || this.microtaskScheduled) {
-            return;
-          }
-          const flushCallback = /* @__PURE__ */ __name(() => {
-            this.rafHandle = null;
-            this.microtaskScheduled = false;
-            this.flushCSSVariableBatch();
-          }, "flushCallback");
-          if (typeof document !== "undefined" && document.visibilityState === "hidden") {
-            this.microtaskScheduled = true;
-            queueMicrotask(flushCallback);
-          } else if (typeof requestAnimationFrame === "function") {
-            this.rafHandle = requestAnimationFrame(flushCallback);
-          } else {
-            setTimeout(flushCallback, 0);
-          }
-        }
-        updatePerformanceMetrics(batchTime, batchSize) {
-          this.performanceMetrics.totalBatches++;
-          this.performanceMetrics.totalBatchTime += batchTime;
-          this.performanceMetrics.maxBatchTime = Math.max(
-            this.performanceMetrics.maxBatchTime,
-            batchTime
-          );
-          this.performanceMetrics.averageBatchSize = (this.performanceMetrics.averageBatchSize * (this.performanceMetrics.totalBatches - 1) + batchSize) / this.performanceMetrics.totalBatches;
-          if (batchTime > 8) {
-            this.performanceMetrics.overBudgetBatches++;
-            if (this.config.enableDebug) {
-              console.warn(
-                `[CSSVariableWriter] CSS batch took ${batchTime.toFixed(
-                  2
-                )}ms for ${batchSize} updates`
-              );
-            }
-          }
-        }
-        enableGlobalHijack() {
-          if (_CSSVariableWriter.hijackEnabled) return;
-          const original = CSSStyleDeclaration.prototype.setProperty;
-          _CSSVariableWriter.nativeSetProperty = original;
-          const controllerInstance = this;
-          CSSStyleDeclaration.prototype.setProperty = function(prop, value, priority) {
-            if (prop && (prop.startsWith("--sn-") || prop.startsWith("--sn.")) && controllerInstance) {
-              controllerInstance.queueCSSVariableUpdate(prop, String(value ?? ""));
-            } else {
-              original.call(this, prop, value, priority);
-            }
-          };
-          _CSSVariableWriter.hijackEnabled = true;
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [CSSVariableWriter] Global setProperty hijack enabled (--sn- and --sn. namespaces)"
-            );
-          }
-        }
-        addCSSClass(className) {
-          if (!this.appliedClasses.has(className)) {
-            document.body.classList.add(className);
-            this.appliedClasses.add(className);
-          }
-        }
-        removeCSSClass(className) {
-          if (this.appliedClasses.has(className)) {
-            document.body.classList.remove(className);
-            this.appliedClasses.delete(className);
-          }
-        }
-        removeClassesByPrefix(prefix) {
-          const classesToRemove = Array.from(this.appliedClasses).filter(
-            (className) => className.startsWith(prefix)
-          );
-          for (const className of classesToRemove) {
-            this.removeCSSClass(className);
-          }
-        }
-        getMemoryTier(memoryGB) {
-          if (memoryGB >= 16) return "high";
-          if (memoryGB >= 8) return "medium";
-          if (memoryGB >= 4) return "low";
-          return "minimal";
-        }
-        // ===================================================================
-        // CONVENIENCE METHODS FROM UNIFIEDCSSVARIABLEMANAGER
-        // ===================================================================
-        /**
-         * Update music system variables (from CSSVariableWriter)
-         */
-        updateMusicVariables(variables) {
-          const updates = {};
-          for (const [key, value] of Object.entries(variables)) {
-            if (value !== void 0) {
-              const fullKey = `--sn-music-${key.replace(/\./g, "-")}`;
-              updates[fullKey] = String(value);
-            }
-          }
-          this.updateVariables(updates, "critical", "music-system");
-        }
-        /**
-         * Update color system variables (from CSSVariableWriter)
-         */
-        updateColorVariables(variables) {
-          const updates = {};
-          for (const [key, value] of Object.entries(variables)) {
-            if (value !== void 0) {
-              const fullKey = `--sn-color-${key.replace(/\./g, "-")}`;
-              updates[fullKey] = String(value);
-            }
-          }
-          this.updateVariables(updates, "high", "color-system");
-        }
-        /**
-         * Update animation system variables (from CSSVariableWriter)
-         */
-        updateAnimationVariables(variables) {
-          const updates = {};
-          for (const [key, value] of Object.entries(variables)) {
-            if (value !== void 0) {
-              const fullKey = `--sn-anim-${key.replace(/\./g, "-")}`;
-              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
-            }
-          }
-          this.updateVariables(updates, "normal", "animation-system");
-        }
-        /**
-         * Update performance system variables (from CSSVariableWriter)
-         */
-        updatePerformanceVariables(variables) {
-          const updates = {};
-          for (const [key, value] of Object.entries(variables)) {
-            if (value !== void 0) {
-              const fullKey = `--sn-performance-${key.replace(/\./g, "-")}`;
-              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
-            }
-          }
-          this.updateVariables(updates, "high", "performance-system");
-        }
-        /**
-         * Update utility system variables (from CSSVariableWriter)
-         */
-        updateUtilityVariables(variables) {
-          const updates = {};
-          for (const [key, value] of Object.entries(variables)) {
-            if (value !== void 0) {
-              const fullKey = `--sn-${key.replace(/\./g, "-")}`;
-              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
-            }
-          }
-          this.updateVariables(updates, "low", "utility-system");
-        }
-        /**
-         * Queue a CSS variable update (from CSSVariableWriter compatibility)
-         */
-        queueUpdate(property, value, priority = "normal", source = "unknown") {
-          this.queueCSSVariableUpdate(property, value, null, priority, source);
-        }
-        /**
-         * Queue multiple CSS variable updates in a transaction (from CSSVariableWriter)
-         */
-        queueTransaction(variables, priority = "normal", source = "unknown") {
-          const transactionId = `tx_${++this.transactionCounter}`;
-          const variableMap = new Map(Object.entries(variables));
-          const transaction = {
-            id: transactionId,
-            variables: variableMap,
-            timestamp: performance.now(),
-            priority,
-            completed: false
-          };
-          this.pendingTransactions.set(transactionId, transaction);
-          for (const [property, value] of variableMap) {
-            this.queueUpdate(property, value, priority, `${source}:${transactionId}`);
-          }
-          this.performanceMetrics.transactionCount++;
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
-            );
-          }
-          return transactionId;
-        }
-        /**
-         * Force immediate flush (from CSSVariableWriter)
-         */
-        forceFlush() {
-          this.flushCSSVariableBatch();
-        }
-        /**
-         * Register a variable group (from CSSVariableWriter compatibility)
-         */
-        registerVariableGroup(name, priority = "normal", batchSize = 50, flushInterval = 16) {
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Variable group registration: ${name} (handled internally)`
-            );
-          }
-        }
-        /**
-         * Update variables in a specific group (from CSSVariableWriter compatibility)
-         */
-        updateVariableGroup(groupName, variables, source = "unknown") {
-          this.updateVariables(variables, "normal", `group:${groupName}:${source}`);
-        }
-        /**
-         * Update configuration (from CSSVariableBatcher compatibility)
-         */
-        updateConfig(newConfig) {
-          this.cssConfig = { ...this.cssConfig, ...newConfig };
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F30C} [CSSVariableWriter] Configuration updated:",
-              newConfig
-            );
-          }
-        }
-        // ===================================================================
-        // LEGACY COMPATIBILITY METHODS
-        // ===================================================================
-        // For backwards compatibility with CSSVariableWriter API
-        flushNow() {
-          this.flushCSSVariableBatch();
-        }
-        setBatchingEnabled(enabled) {
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Batching ${enabled ? "enabled" : "disabled"}`
-            );
-          }
-        }
-        addCriticalVariable(variable) {
-          CRITICAL_NOW_PLAYING_VARS.add(variable);
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Added critical variable: ${variable}`
-            );
-          }
-        }
-        removeCriticalVariable(variable) {
-          CRITICAL_NOW_PLAYING_VARS.delete(variable);
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Removed critical variable: ${variable}`
-            );
-          }
-        }
-        isCriticalVariable(variable) {
-          return CRITICAL_NOW_PLAYING_VARS.has(variable);
-        }
-        getCriticalVariables() {
-          return Array.from(CRITICAL_NOW_PLAYING_VARS);
-        }
-        // ===================================================================
-        // SIMPLIFIED COORDINATION PATTERNS (Extracted from SharedVariableCoordination.ts)
-        // ===================================================================
-        /**
-         * Update visual-effects intensity with simplified coordination through UnifiedEventBus
-         * Replaces the complex ConsciousnessIntensityCoordinator pattern with a simple subscription-based approach
-         */
-        updateVisualEffectsIntensity(intensity, sourceStrategy, musicEnergy) {
-          const clampedIntensity = Math.max(0, Math.min(1, intensity));
-          this.queueCSSVariableUpdate(
-            "--visual-effects-intensity",
-            clampedIntensity.toString(),
-            null,
-            "high",
-            `visual-effects-${sourceStrategy}`
-          );
-          if (this.eventBus) {
-            this.eventBus.emitSync("visual-effects:intensity-changed", {
-              intensity: clampedIntensity,
-              userEngagement: 0.5,
-              // Default engagement level
-              timestamp: Date.now(),
-              sourceStrategy,
-              musicEnergy: musicEnergy ?? 0
-            });
-          }
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Consciousness intensity updated by ${sourceStrategy}: ${clampedIntensity}`
-            );
-          }
-        }
-        /**
-         * Update crossfade opacity with simplified coordination through UnifiedEventBus
-         * Replaces the complex CrossfadeOpacityCoordinator pattern with a simple subscription-based approach
-         */
-        updateCrossfadeOpacity(opacity, sourceStrategy, webglEnabled) {
-          let finalOpacity = Math.max(0, Math.min(1, opacity));
-          if (!webglEnabled) {
-            finalOpacity = 0;
-          }
-          this.queueCSSVariableUpdate(
-            "--sn-gradient-crossfade-opacity",
-            finalOpacity.toString(),
-            null,
-            "high",
-            `crossfade-${sourceStrategy}`
-          );
-          if (this.eventBus) {
-            this.eventBus.emitSync("gradient:crossfade-changed", {
-              opacity: finalOpacity,
-              sourceStrategy,
-              webglEnabled,
-              timestamp: Date.now()
-            });
-          }
-          if (this.config.enableDebug) {
-            console.log(
-              `\u{1F30C} [CSSVariableWriter] Crossfade opacity updated by ${sourceStrategy}: ${finalOpacity} (WebGL: ${webglEnabled})`
-            );
-          }
-        }
-        /**
-         * Subscribe to visual-effects intensity changes from other strategies
-         */
-        subscribeToVisualEffectsChanges(callback) {
-          if (!this.eventBus) {
-            console.warn(
-              "[CSSVariableWriter] No UnifiedEventBus available for visual-effects subscriptions"
-            );
-            return () => {
-            };
-          }
-          const subscriptionId = this.eventBus.subscribe(
-            "visual-effects:intensity-changed",
-            callback,
-            "CSSVariableWriter"
-          );
-          return () => this.eventBus?.unsubscribe(subscriptionId);
-        }
-        /**
-         * Subscribe to crossfade opacity changes from other strategies
-         */
-        subscribeToCrossfadeChanges(callback) {
-          if (!this.eventBus) {
-            console.warn(
-              "[CSSVariableWriter] No UnifiedEventBus available for crossfade subscriptions"
-            );
-            return () => {
-            };
-          }
-          const subscriptionId = this.eventBus.subscribe(
-            "gradient:crossfade-changed",
-            callback,
-            "CSSVariableWriter"
-          );
-          return () => this.eventBus?.unsubscribe(subscriptionId);
-        }
-        // ===============================================================================
-        // LEGACY API METHODS (for backward compatibility with OptimizedCSSVariableManager)
-        // ===============================================================================
-        /**
-         * Set single variable (legacy API compatibility)
-         * Supports both old interface: (source, property, value, priority, description)
-         * and new interface: (name, value, priority)
-         */
-        setVariable(sourceOrName, propertyOrValue, valueOrPriority, priority, description) {
-          let finalProperty;
-          let finalValue;
-          let finalPriority;
-          let finalSource;
-          if (arguments.length >= 4) {
-            finalProperty = propertyOrValue;
-            finalValue = valueOrPriority;
-            finalPriority = priority || "normal";
-            finalSource = `${sourceOrName}${description ? `:${description}` : ""}`;
-          } else {
-            finalProperty = sourceOrName;
-            finalValue = propertyOrValue;
-            finalPriority = valueOrPriority || "normal";
-            finalSource = "legacy-api";
-          }
-          const normalizedPriority = finalPriority || "normal";
-          this.queueCSSVariableUpdate(finalProperty, finalValue, null, normalizedPriority, finalSource);
-        }
-        /**
-         * Batch set variables (legacy API compatibility)
-         * Supports both old interface: (source, variables, priority, description)
-         * and new interface: (variables, priority)
-         */
-        batchSetVariables(sourceOrVariables, variablesOrPriority, priority, description) {
-          let finalVariables;
-          let finalPriority;
-          let finalSource;
-          if (typeof sourceOrVariables === "string") {
-            finalVariables = variablesOrPriority;
-            finalPriority = priority || "normal";
-            finalSource = `${sourceOrVariables}${description ? `:${description}` : ""}`;
-          } else {
-            finalVariables = sourceOrVariables;
-            finalPriority = variablesOrPriority || "normal";
-            finalSource = "legacy-batch-api";
-          }
-          const normalizedPriority = finalPriority || "normal";
-          this.updateVariables(finalVariables, normalizedPriority, finalSource);
-        }
-        // ========================================================================
-        // PRIVATE IMPLEMENTATION - CONSOLIDATED OPTIMIZATION FEATURES
-        // ========================================================================
-        /**
-         * Initialize optimized features (from OptimizedCSSVariableManager consolidation)
-         */
-        initializeOptimizedFeatures() {
-          if (this.currentDeviceCapabilities?.performanceTier === "low") {
-          }
-          if (this.config.enableDebug) {
-            console.log("[CSSVariableWriter] Optimized features initialized");
-          }
-        }
-        /**
-         * Initialize frame context integration (replaces CDFVariableBridge)
-         */
-        initializeFrameContextIntegration() {
-          if (this.config.enableDebug) {
-            console.log("[CSSVariableWriter] Frame context integration initialized");
-          }
-        }
-        /**
-         * Determine variable priority based on property and context
-         */
-        determineVariablePriority(property, requestedPriority) {
-          if (property.includes("sn-critical") || property.includes("spice-main")) {
-            return "critical";
-          }
-          if (property.includes("music") || property.includes("beat") || property.includes("energy")) {
-            return "high";
-          }
-          if (property.includes("color") || property.includes("accent")) {
-            return "normal";
-          }
-          return requestedPriority || "low";
-        }
-        /**
-         * Apply critical updates immediately bypassing queue
-         */
-        applyCriticalUpdate(property, value, targetElement) {
-          const element = targetElement || document.documentElement;
-          try {
-            if (_CSSVariableWriter.nativeSetProperty) {
-              _CSSVariableWriter.nativeSetProperty.call(
-                element.style,
-                property,
-                value
-              );
-            } else {
-              element.style.setProperty(property, value);
-            }
-            if (this.config.enableDebug) {
-              console.log(`[CSSVariableWriter] Critical update applied: ${property} = ${value}`);
-            }
-          } catch (error) {
-            console.warn("[CSSVariableWriter] Critical update failed:", error);
-          }
-        }
-        /**
-         * Queue update by priority level
-         */
-        queueByPriority(property, value, targetElement, priority, source) {
-          if (!this.priorityQueues.has(priority)) {
-            this.priorityQueues.set(priority, /* @__PURE__ */ new Map());
-          }
-          const queue = this.priorityQueues.get(priority);
-          queue.set(property, { property, value, timestamp: Date.now() });
-          if (priority === "critical" || priority === "high") {
-            this.flushCSSVariableBatch();
-          }
-        }
-        /**
-         * Destroy frame context integration
-         */
-        destroyFrameContextIntegration() {
-          if (this.config.enableDebug) {
-            console.log("[CSSVariableWriter] Frame context integration destroyed");
-          }
-        }
-        /**
-         * Cleanup and destroy the manager
-         */
-        destroy() {
-          if (this.adaptiveMonitoringInterval) {
-            clearInterval(this.adaptiveMonitoringInterval);
-            this.adaptiveMonitoringInterval = null;
-          }
-          this.destroyFrameContextIntegration();
-          this.priorityQueues.clear();
-          if (this.visualEffectsUpdateTimer) {
-            clearTimeout(this.visualEffectsUpdateTimer);
-            this.visualEffectsUpdateTimer = null;
-          }
-          this.cssVariableQueue.clear();
-          unifiedEventBus.unsubscribeAll("CSSVariableWriter");
-          this.initialized = false;
-        }
-      };
-      __name(_CSSVariableWriter, "CSSVariableWriter");
-      _CSSVariableWriter.hijackEnabled = false;
-      CSSVariableWriter = _CSSVariableWriter;
-      globalCSSVariableWriter = null;
-      __name(setGlobalCSSVariableWriter, "setGlobalCSSVariableWriter");
-      __name(getGlobalCSSVariableWriter, "getGlobalCSSVariableWriter");
-      __name(getGlobalCSSVariableWriterSafe, "getGlobalCSSVariableWriterSafe");
-    }
-  });
-
-  // src-js/core/services/CoreServiceProviders.ts
-  var CoreServiceProviders_exports = {};
-  __export(CoreServiceProviders_exports, {
-    DefaultCSSVariableService: () => DefaultCSSVariableService,
-    DefaultCanvasManagementService: () => DefaultCanvasManagementService,
-    DefaultEventSubscriptionService: () => DefaultEventSubscriptionService,
-    DefaultMusicSyncLifecycleService: () => DefaultMusicSyncLifecycleService,
-    DefaultPerformanceProfileService: () => DefaultPerformanceProfileService,
-    DefaultPerformanceTrackingService: () => DefaultPerformanceTrackingService,
-    DefaultServiceFactory: () => DefaultServiceFactory,
-    DefaultSettingsService: () => DefaultSettingsService,
-    DefaultSystemLifecycleService: () => DefaultSystemLifecycleService,
-    DefaultThemeLifecycleService: () => DefaultThemeLifecycleService,
-    DefaultThemingStateService: () => DefaultThemingStateService,
-    DefaultVisualCoordinatorService: () => DefaultVisualCoordinatorService
-  });
-  var _DefaultSystemLifecycleService, DefaultSystemLifecycleService, _DefaultPerformanceTrackingService, DefaultPerformanceTrackingService, _DefaultCSSVariableService, DefaultCSSVariableService, _DefaultEventSubscriptionService, DefaultEventSubscriptionService, _DefaultCanvasManagementService, DefaultCanvasManagementService, _DefaultServiceFactory, DefaultServiceFactory, _DefaultPerformanceProfileService, DefaultPerformanceProfileService, _DefaultMusicSyncLifecycleService, DefaultMusicSyncLifecycleService, _DefaultSettingsService, DefaultSettingsService, _DefaultThemeLifecycleService, DefaultThemeLifecycleService, _DefaultThemingStateService, DefaultThemingStateService, _DefaultVisualCoordinatorService, DefaultVisualCoordinatorService;
-  var init_CoreServiceProviders = __esm({
-    "src-js/core/services/CoreServiceProviders.ts"() {
-      "use strict";
-      init_DebugCoordinator();
-      init_VisualCanvasFactory();
-      init_EventBus();
-      init_visualPerformance();
-      init_config();
-      init_CSSVariableWriter();
-      _DefaultSystemLifecycleService = class _DefaultSystemLifecycleService {
-        constructor() {
-          this.systems = /* @__PURE__ */ new Map();
-        }
-        async initializeSystem(systemName, config, initFn) {
-          const existing = this.systems.get(systemName);
-          if (existing?.initialized) {
-            Y3KDebug?.debug?.warn("SystemLifecycle", `System ${systemName} already initialized`);
-            return;
-          }
-          const startTime = performance.now();
-          try {
-            Y3KDebug?.debug?.log("SystemLifecycle", `Initializing system: ${systemName}`);
-            await initFn();
-            const initializationTime = performance.now() - startTime;
-            const now = Date.now();
-            this.systems.set(systemName, {
-              initialized: true,
-              initializationTime,
-              lastInitialized: now,
-              initializationCount: (existing?.initializationCount || 0) + 1
-            });
-            Y3KDebug?.debug?.log(
-              "SystemLifecycle",
-              `System ${systemName} initialized in ${initializationTime.toFixed(2)}ms`
-            );
-          } catch (error) {
-            Y3KDebug?.debug?.error(
-              "SystemLifecycle",
-              `Failed to initialize system ${systemName}:`,
-              error
-            );
-            throw error;
-          }
-        }
-        destroySystem(systemName, cleanupFn) {
-          const system = this.systems.get(systemName);
-          if (!system?.initialized) {
-            Y3KDebug?.debug?.warn("SystemLifecycle", `System ${systemName} not initialized`);
-            return;
-          }
-          try {
-            Y3KDebug?.debug?.log("SystemLifecycle", `Destroying system: ${systemName}`);
-            cleanupFn();
-            this.systems.set(systemName, {
-              ...system,
-              initialized: false
-            });
-          } catch (error) {
-            Y3KDebug?.debug?.error(
-              "SystemLifecycle",
-              `Failed to destroy system ${systemName}:`,
-              error
-            );
-          }
-        }
-        isSystemInitialized(systemName) {
-          return this.systems.get(systemName)?.initialized ?? false;
-        }
-        getSystemMetrics(systemName) {
-          const system = this.systems.get(systemName);
-          if (!system) return null;
-          return {
-            initializationTime: system.initializationTime,
-            lastInitialized: system.lastInitialized,
-            initializationCount: system.initializationCount
-          };
-        }
-      };
-      __name(_DefaultSystemLifecycleService, "DefaultSystemLifecycleService");
-      DefaultSystemLifecycleService = _DefaultSystemLifecycleService;
-      _DefaultPerformanceTrackingService = class _DefaultPerformanceTrackingService {
-        constructor() {
-          this.systemMetrics = /* @__PURE__ */ new Map();
-        }
-        trackOperation(systemName, operationName, operation) {
-          const startTime = performance.now();
-          try {
-            const result = operation();
-            const duration = performance.now() - startTime;
-            this.recordOperationTime(systemName, operationName, duration);
-            return result;
-          } catch (error) {
-            const duration = performance.now() - startTime;
-            this.recordOperationTime(systemName, operationName, duration);
-            throw error;
-          }
-        }
-        async trackOperationAsync(systemName, operationName, operation) {
-          const startTime = performance.now();
-          try {
-            const result = await operation();
-            const duration = performance.now() - startTime;
-            this.recordOperationTime(systemName, operationName, duration);
-            return result;
-          } catch (error) {
-            const duration = performance.now() - startTime;
-            this.recordOperationTime(systemName, operationName, duration);
-            throw error;
-          }
-        }
-        recordMetric(systemName, metricName, value) {
-          const system = this.systemMetrics.get(systemName) || {
-            operationTimes: {},
-            metrics: {}
-          };
-          system.metrics[metricName] = value;
-          this.systemMetrics.set(systemName, system);
-        }
-        recordOperationTime(systemName, operationName, duration) {
-          const system = this.systemMetrics.get(systemName) || {
-            operationTimes: {},
-            metrics: {}
-          };
-          if (!system.operationTimes[operationName]) {
-            system.operationTimes[operationName] = [];
-          }
-          system.operationTimes[operationName].push(duration);
-          if (system.operationTimes[operationName].length > 100) {
-            system.operationTimes[operationName].shift();
-          }
-          this.systemMetrics.set(systemName, system);
-        }
-        getMetrics(systemName) {
-          const system = this.systemMetrics.get(systemName);
-          if (!system) return null;
-          const allTimes = [];
-          Object.values(system.operationTimes).forEach((times) => allTimes.push(...times));
-          return {
-            operationTimes: { ...system.operationTimes },
-            metrics: { ...system.metrics },
-            averageOperationTime: allTimes.length > 0 ? allTimes.reduce((a, b) => a + b, 0) / allTimes.length : 0,
-            lastOperationTime: allTimes[allTimes.length - 1] || 0
-          };
-        }
-      };
-      __name(_DefaultPerformanceTrackingService, "DefaultPerformanceTrackingService");
-      DefaultPerformanceTrackingService = _DefaultPerformanceTrackingService;
-      _DefaultCSSVariableService = class _DefaultCSSVariableService {
-        constructor() {
-          this.updateQueue = /* @__PURE__ */ new Map();
-          this.flushScheduled = false;
-          this.lastFlushTime = 0;
-        }
-        queueUpdate(variable, value) {
-          this.updateQueue.set(variable, value);
-          this.scheduleFlush();
-        }
-        queueBatchUpdate(updates) {
-          Object.entries(updates).forEach(([variable, value]) => {
-            this.updateQueue.set(variable, value);
-          });
-          this.scheduleFlush();
-        }
-        flushUpdates() {
-          if (this.updateQueue.size === 0) return;
-          const root = document.documentElement;
-          const startTime = performance.now();
-          for (const [variable, value] of this.updateQueue) {
-            root.style.setProperty(variable, value);
-          }
-          const flushTime = performance.now() - startTime;
-          this.updateQueue.clear();
-          this.lastFlushTime = Date.now();
-          this.flushScheduled = false;
-          Y3KDebug?.debug?.log(
-            "CSSVariableService",
-            `Flushed ${this.updateQueue.size} CSS updates in ${flushTime.toFixed(2)}ms`
-          );
-        }
-        scheduleFlush() {
-          if (this.flushScheduled) return;
-          this.flushScheduled = true;
-          requestAnimationFrame(() => {
-            this.flushUpdates();
-          });
-        }
-        getCurrentValue(variable) {
-          return getComputedStyle(document.documentElement).getPropertyValue(variable) || null;
-        }
-        getQueueStatus() {
-          return {
-            queueSize: this.updateQueue.size,
-            lastFlushTime: this.lastFlushTime,
-            pendingUpdates: Array.from(this.updateQueue.keys())
-          };
-        }
-      };
-      __name(_DefaultCSSVariableService, "DefaultCSSVariableService");
-      DefaultCSSVariableService = _DefaultCSSVariableService;
-      _DefaultEventSubscriptionService = class _DefaultEventSubscriptionService {
-        constructor() {
-          this.systemSubscriptions = /* @__PURE__ */ new Map();
-        }
-        subscribe(systemName, eventName, handler) {
-          const system = this.systemSubscriptions.get(systemName) || {
-            eventUnsubscribers: [],
-            domUnsubscribers: []
-          };
-          if (unifiedEventBus?.subscribe) {
-            const subscriptionId = unifiedEventBus.subscribe(
-              eventName,
-              handler,
-              systemName
-            );
-            system.eventUnsubscribers.push(
-              () => unifiedEventBus.unsubscribe(subscriptionId)
-            );
-          } else {
-            const wrappedHandler = /* @__PURE__ */ __name((event) => {
-              const customEvent = event;
-              handler(customEvent.detail);
-            }, "wrappedHandler");
-            document.addEventListener(eventName, wrappedHandler);
-            system.domUnsubscribers.push(() => {
-              document.removeEventListener(eventName, wrappedHandler);
-            });
-          }
-          this.systemSubscriptions.set(systemName, system);
-        }
-        subscribeToDOM(systemName, element, eventType, handler, options) {
-          const system = this.systemSubscriptions.get(systemName) || {
-            eventUnsubscribers: [],
-            domUnsubscribers: []
-          };
-          element.addEventListener(eventType, handler, options);
-          system.domUnsubscribers.push(() => {
-            element.removeEventListener(eventType, handler, options);
-          });
-          this.systemSubscriptions.set(systemName, system);
-        }
-        unsubscribe(systemName, eventName) {
-          this.cleanupSystem(systemName);
-        }
-        cleanupSystem(systemName) {
-          const system = this.systemSubscriptions.get(systemName);
-          if (!system) return;
-          system.eventUnsubscribers.forEach((unsubscribe) => {
-            try {
-              unsubscribe();
-            } catch (error) {
-              Y3KDebug?.debug?.warn(
-                "EventSubscriptionService",
-                `Error unsubscribing for ${systemName}:`,
-                error
-              );
-            }
-          });
-          system.domUnsubscribers.forEach((unsubscribe) => {
-            try {
-              unsubscribe();
-            } catch (error) {
-              Y3KDebug?.debug?.warn(
-                "EventSubscriptionService",
-                `Error removing DOM listener for ${systemName}:`,
-                error
-              );
-            }
-          });
-          this.systemSubscriptions.delete(systemName);
-        }
-        getSubscriptionStatus(systemName) {
-          const system = this.systemSubscriptions.get(systemName);
-          if (!system) {
-            return { eventSubscriptions: [], domSubscriptions: 0, totalSubscriptions: 0 };
-          }
-          return {
-            eventSubscriptions: [],
-            // Would need more tracking to provide specific event names
-            domSubscriptions: system.domUnsubscribers.length,
-            totalSubscriptions: system.eventUnsubscribers.length + system.domUnsubscribers.length
-          };
-        }
-      };
-      __name(_DefaultEventSubscriptionService, "DefaultEventSubscriptionService");
-      DefaultEventSubscriptionService = _DefaultEventSubscriptionService;
-      _DefaultCanvasManagementService = class _DefaultCanvasManagementService {
-        constructor() {
-          this.systemCanvases = /* @__PURE__ */ new Map();
-          this.capabilities = detectRenderingCapabilities();
-        }
-        async createCanvas(systemName, canvasId, options) {
-          const systemCanvasMap = this.systemCanvases.get(systemName) || /* @__PURE__ */ new Map();
-          const existing = systemCanvasMap.get(canvasId);
-          if (existing) {
-            Y3KDebug?.debug?.warn(
-              "CanvasManagement",
-              `Canvas ${canvasId} already exists for system ${systemName}`
-            );
-            return existing;
-          }
-          try {
-            const canvasResult = await createOptimizedCanvas({
-              id: canvasId,
-              width: options.width || 800,
-              height: options.height || 600,
-              alpha: options.alpha ?? true,
-              preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
-              preferredType: options.contextType
-            });
-            systemCanvasMap.set(canvasId, canvasResult);
-            this.systemCanvases.set(systemName, systemCanvasMap);
-            Y3KDebug?.debug?.log(
-              "CanvasManagement",
-              `Created ${options.contextType} canvas ${canvasId} for system ${systemName} (${options.width}x${options.height})`
-            );
-            return canvasResult;
-          } catch (error) {
-            Y3KDebug?.debug?.error(
-              "CanvasManagement",
-              `Failed to create canvas ${canvasId} for system ${systemName}:`,
-              error
-            );
-            throw error;
-          }
-        }
-        getCanvas(systemName, canvasId) {
-          return this.systemCanvases.get(systemName)?.get(canvasId) || null;
-        }
-        resizeCanvas(systemName, canvasId, width, height) {
-          const canvas = this.getCanvas(systemName, canvasId);
-          if (!canvas) return false;
-          try {
-            canvas.canvas.width = width;
-            canvas.canvas.height = height;
-            if (canvas.ctx && "viewport" in canvas.ctx) {
-              canvas.ctx.viewport(0, 0, width, height);
-            }
-            return true;
-          } catch (error) {
-            Y3KDebug?.debug?.error(
-              "CanvasManagement",
-              `Failed to resize canvas ${canvasId} for system ${systemName}:`,
-              error
-            );
-            return false;
-          }
-        }
-        destroyCanvas(systemName, canvasId) {
-          const systemCanvasMap = this.systemCanvases.get(systemName);
-          if (!systemCanvasMap) return;
-          const canvas = systemCanvasMap.get(canvasId);
-          if (canvas) {
-            if (canvas.ctx && "getExtension" in canvas.ctx) {
-              const gl = canvas.ctx;
-              const loseContext = gl.getExtension("WEBGL_lose_context");
-              if (loseContext) {
-                loseContext.loseContext();
-              }
-            }
-            if (canvas.canvas.parentNode) {
-              canvas.canvas.parentNode.removeChild(canvas.canvas);
-            }
-            systemCanvasMap.delete(canvasId);
-            Y3KDebug?.debug?.log(
-              "CanvasManagement",
-              `Destroyed canvas ${canvasId} for system ${systemName}`
-            );
-          }
-        }
-        cleanupSystem(systemName) {
-          const systemCanvasMap = this.systemCanvases.get(systemName);
-          if (!systemCanvasMap) return;
-          for (const canvasId of systemCanvasMap.keys()) {
-            this.destroyCanvas(systemName, canvasId);
-          }
-          this.systemCanvases.delete(systemName);
-        }
-        getCanvasCapabilities() {
-          return {
-            webgl2: this.capabilities.webgl2,
-            webgl: false,
-            // WebGL 1 support not tracked in current capabilities
-            recommendedType: this.capabilities.recommendedType,
-            maxTextureSize: 2048,
-            // Default value since not tracked in current capabilities
-            maxViewportDims: [2048, 2048]
-            // Default value since not tracked in current capabilities
-          };
-        }
-        getCanvasStats(systemName) {
-          const systemCanvasMap = this.systemCanvases.get(systemName);
-          if (!systemCanvasMap) return null;
-          const contexts = [];
-          let totalMemoryUsage = 0;
-          for (const canvas of systemCanvasMap.values()) {
-            contexts.push(canvas.type);
-            totalMemoryUsage += canvas.canvas.width * canvas.canvas.height * 4;
-          }
-          return {
-            activeCanvases: systemCanvasMap.size,
-            totalMemoryUsage,
-            contexts
-          };
-        }
-      };
-      __name(_DefaultCanvasManagementService, "DefaultCanvasManagementService");
-      DefaultCanvasManagementService = _DefaultCanvasManagementService;
-      _DefaultServiceFactory = class _DefaultServiceFactory {
-        static getServices() {
-          if (!_DefaultServiceFactory.services) {
-            _DefaultServiceFactory.services = {
-              lifecycle: new DefaultSystemLifecycleService(),
-              performance: new DefaultPerformanceTrackingService(),
-              cssVariables: new DefaultCSSVariableService(),
-              events: new DefaultEventSubscriptionService(),
-              canvas: new DefaultCanvasManagementService(),
-              performanceProfile: new DefaultPerformanceProfileService(null, null, unifiedEventBus),
-              musicSyncLifecycle: new DefaultMusicSyncLifecycleService(),
-              themingState: new DefaultThemingStateService(),
-              settings: new DefaultSettingsService(),
-              themeLifecycle: new DefaultThemeLifecycleService(),
-              visualCoordinator: new DefaultVisualCoordinatorService()
-            };
-          }
-          if (_DefaultServiceFactory.overrides) {
-            _DefaultServiceFactory.services = {
-              ..._DefaultServiceFactory.services,
-              ..._DefaultServiceFactory.overrides
-            };
-          }
-          return _DefaultServiceFactory.services;
-        }
-        static resetServices() {
-          _DefaultServiceFactory.services = null;
-        }
-        static registerOverrides(overrides) {
-          _DefaultServiceFactory.overrides = {
-            ..._DefaultServiceFactory.overrides,
-            ...overrides
-          };
-          if (_DefaultServiceFactory.services) {
-            _DefaultServiceFactory.services = {
-              ..._DefaultServiceFactory.services,
-              ..._DefaultServiceFactory.overrides
-            };
-          }
-        }
-      };
-      __name(_DefaultServiceFactory, "DefaultServiceFactory");
-      _DefaultServiceFactory.services = null;
-      _DefaultServiceFactory.overrides = {};
-      DefaultServiceFactory = _DefaultServiceFactory;
-      _DefaultPerformanceProfileService = class _DefaultPerformanceProfileService {
-        constructor(config = null, performanceCoordinator = null, eventBus = unifiedEventBus) {
-          this.config = config;
-          this.performanceCoordinator = performanceCoordinator;
-          this.eventBus = eventBus;
-          this.snapshot = {
-            quality: "auto",
-            profile: null,
-            performanceMode: null,
-            timestamp: Date.now()
-          };
-          this.listeners = /* @__PURE__ */ new Set();
-          this.tierSubscriptionId = null;
-          this.qualityLevelSubscriptionId = null;
-          this.refreshSnapshot();
-          this.bindEventListeners();
-        }
-        setDependencies(config, performanceCoordinator) {
-          this.config = config;
-          this.performanceCoordinator = performanceCoordinator;
-          this.refreshSnapshot();
-        }
-        getCurrentSnapshot() {
-          return this.snapshot;
-        }
-        subscribe(listener) {
-          this.listeners.add(listener);
-          listener(this.snapshot);
-          return () => {
-            this.listeners.delete(listener);
-          };
-        }
-        updateSnapshot(snapshot) {
-          this.snapshot = { ...snapshot, timestamp: Date.now() };
-          this.emitUpdate();
-        }
-        destroy() {
-          if (this.tierSubscriptionId) {
-            this.eventBus.unsubscribe(this.tierSubscriptionId);
-            this.tierSubscriptionId = null;
-          }
-          if (this.qualityLevelSubscriptionId) {
-            this.eventBus.unsubscribe(this.qualityLevelSubscriptionId);
-            this.qualityLevelSubscriptionId = null;
-          }
-          this.listeners.clear();
-        }
-        bindEventListeners() {
-          this.tierSubscriptionId = this.eventBus.subscribe(
-            "performance:tier-changed",
-            (data) => {
-              const quality = this.mapTierToQuality(data?.tier);
-              if (quality) {
-                this.applyQualityOverride(quality);
-              } else {
-                this.refreshSnapshot();
-              }
-            },
-            "PerformanceProfileService"
-          );
-          this.qualityLevelSubscriptionId = this.eventBus.subscribe(
-            "quality:level-changed",
-            (data) => {
-              const quality = this.mapQualityLevelToQuality(data?.level);
-              this.applyQualityOverride(quality);
-            },
-            "PerformanceProfileService"
-          );
-        }
-        applyQualityOverride(quality) {
-          const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
-          const profile = this.resolveProfile(quality, mode);
-          this.updateSnapshot({
-            quality,
-            profile,
-            performanceMode: mode,
-            timestamp: Date.now()
-          });
-        }
-        refreshSnapshot() {
-          const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
-          const quality = this.mapModeToQuality(mode);
-          const profile = this.resolveProfile(quality, mode);
-          this.snapshot = {
-            quality,
-            profile,
-            performanceMode: mode,
-            timestamp: Date.now()
-          };
-          this.emitUpdate();
-        }
-        resolveProfile(quality, mode) {
-          const profiles = this.config?.performanceProfiles;
-          if (!profiles) return null;
-          const key = quality === "auto" ? this.mapModeToQuality(mode, "balanced") : quality;
-          const selected = selectPerformanceProfile(key, profiles, {
-            trace: /* @__PURE__ */ __name((msg) => {
-              if (this.config?.enableDebug) {
-                Y3KDebug?.debug?.log("PerformanceProfileService", msg);
-              }
-            }, "trace")
-          });
-          return selected ?? null;
-        }
-        mapModeToQuality(mode, fallback = "balanced") {
-          if (!mode) return fallback;
-          switch (mode.name) {
-            case "performance":
-              return "high";
-            case "auto":
-              return mode.qualityLevel >= 0.75 ? "high" : mode.qualityLevel <= 0.4 ? "low" : "balanced";
-            default:
-              return mode.qualityLevel <= 0.4 ? "low" : mode.qualityLevel >= 0.75 ? "high" : "balanced";
-          }
-        }
-        mapTierToQuality(tier) {
-          switch (tier) {
-            case "low":
-            case "degraded":
-            case "critical":
-              return "low";
-            case "high":
-            case "excellent":
-            case "premium":
-              return "high";
-            case "medium":
-            case "good":
-            default:
-              return "balanced";
-          }
-        }
-        mapQualityLevelToQuality(level) {
-          if (typeof level !== "number") return "balanced";
-          if (level <= 0.33) return "low";
-          if (level >= 0.66) return "high";
-          return "balanced";
-        }
-        emitUpdate() {
-          for (const listener of this.listeners) {
-            try {
-              listener(this.snapshot);
-            } catch (error) {
-              Y3KDebug?.debug?.warn(
-                "PerformanceProfileService",
-                "Listener error",
-                error
-              );
-            }
-          }
-        }
-      };
-      __name(_DefaultPerformanceProfileService, "DefaultPerformanceProfileService");
-      DefaultPerformanceProfileService = _DefaultPerformanceProfileService;
-      _DefaultMusicSyncLifecycleService = class _DefaultMusicSyncLifecycleService {
-        constructor() {
-          this.musicSyncService = null;
-          this.pendingSubscribers = /* @__PURE__ */ new Map();
-        }
-        attach(service) {
-          this.musicSyncService = service;
-          for (const [name, subscriber] of this.pendingSubscribers.entries()) {
-            service.subscribe(subscriber, name);
-          }
-          this.pendingSubscribers.clear();
-        }
-        subscribe(systemName, subscriber) {
-          if (this.musicSyncService) {
-            this.musicSyncService.subscribe(subscriber, systemName);
-          } else {
-            this.pendingSubscribers.set(systemName, subscriber);
-          }
-        }
-        unsubscribe(systemName) {
-          this.pendingSubscribers.delete(systemName);
-          this.musicSyncService?.unsubscribe(systemName);
-        }
-        getLatestProcessedData() {
-          return this.musicSyncService?.getLatestProcessedData?.() ?? null;
-        }
-        getCurrentBeatVector() {
-          return this.musicSyncService ? this.musicSyncService.getCurrentBeatVector() : null;
-        }
-      };
-      __name(_DefaultMusicSyncLifecycleService, "DefaultMusicSyncLifecycleService");
-      DefaultMusicSyncLifecycleService = _DefaultMusicSyncLifecycleService;
-      _DefaultSettingsService = class _DefaultSettingsService {
-        constructor(manager = null) {
-          this.manager = manager;
-        }
-        setManager(manager) {
-          this.manager = manager;
-        }
-        resolveManager() {
-          if (this.manager) {
-            return this.manager;
-          }
-          try {
-            const resolved = getSettings();
-            this.manager = resolved;
-            return resolved;
-          } catch (error) {
-            Y3KDebug?.debug?.error(
-              "SettingsService",
-              "Unable to resolve TypedSettingsManager",
-              error
-            );
-            throw error;
-          }
-        }
-        get(key) {
-          return this.resolveManager().get(key);
-        }
-        set(key, value) {
-          return this.resolveManager().set(key, value);
-        }
-        reset(key) {
-          return this.resolveManager().reset(key);
-        }
-        onChange(listener) {
-          const manager = this.resolveManager();
-          manager.onChange(listener);
-          return () => manager.offChange(listener);
-        }
-        export() {
-          return this.resolveManager().export();
-        }
-        import(settings2) {
-          return this.resolveManager().import(settings2);
-        }
-        getManager() {
-          return this.resolveManager();
-        }
-      };
-      __name(_DefaultSettingsService, "DefaultSettingsService");
-      DefaultSettingsService = _DefaultSettingsService;
-      _DefaultThemeLifecycleService = class _DefaultThemeLifecycleService {
-        constructor(coordinator = null, facade = null) {
-          this.coordinator = coordinator;
-          this.facade = facade ?? coordinator?.facadeCoordinator ?? null;
-        }
-        setCoordinator(coordinator) {
-          this.coordinator = coordinator;
-          if (coordinator?.facadeCoordinator) {
-            this.facade = coordinator.facadeCoordinator;
-          }
-        }
-        setFacadeCoordinator(facade) {
-          this.facade = facade;
-        }
-        getCoordinator() {
-          return this.coordinator;
-        }
-        getFacadeCoordinator() {
-          return this.facade ?? this.coordinator?.facadeCoordinator ?? null;
-        }
-        getCssController() {
-          return this.coordinator?.cssVariableController || getGlobalCSSVariableWriterSafe();
-        }
-        getTimerConsolidationSystem() {
-          return this.coordinator?.timerConsolidationSystem ?? null;
-        }
-        getAnimationCoordinator() {
-          return this.coordinator?.enhancedMasterAnimationCoordinator ?? null;
-        }
-        getMusicSyncService() {
-          return this.coordinator?.musicSyncService ?? null;
-        }
-        getPerformanceCoordinator() {
-          return this.coordinator?.simplePerformanceCoordinator || this.coordinator?.performanceCoordinator || null;
-        }
-        async applyInitialSettings(trigger) {
-          if (!this.coordinator) {
-            return;
-          }
-          await this.coordinator.applyInitialSettings(trigger);
-        }
-      };
-      __name(_DefaultThemeLifecycleService, "DefaultThemeLifecycleService");
-      DefaultThemeLifecycleService = _DefaultThemeLifecycleService;
-      _DefaultThemingStateService = class _DefaultThemingStateService {
-        constructor() {
-          this.defaultState = {
-            energy: 0.5,
-            valence: 0.5,
-            bpm: 120,
-            tempoMultiplier: 1,
-            beatPhase: 0,
-            beatPulse: 0
-          };
-        }
-        getKineticState() {
-          if (typeof document === "undefined") {
-            return { ...this.defaultState };
-          }
-          const root = document.documentElement;
-          const style = getComputedStyle(root);
-          const readNumber = /* @__PURE__ */ __name((variable, fallback) => {
-            const value = parseFloat(style.getPropertyValue(variable));
-            return Number.isFinite(value) ? value : fallback;
-          }, "readNumber");
-          return {
-            energy: readNumber("--sn-kinetic-energy", this.defaultState.energy),
-            valence: readNumber("--sn-kinetic-valence", this.defaultState.valence),
-            bpm: readNumber("--sn-kinetic-bpm", this.defaultState.bpm),
-            tempoMultiplier: readNumber(
-              "--sn-kinetic-tempo-multiplier",
-              this.defaultState.tempoMultiplier
-            ),
-            beatPhase: readNumber("--sn-kinetic-beat-phase", this.defaultState.beatPhase),
-            beatPulse: readNumber("--sn-kinetic-beat-pulse", this.defaultState.beatPulse)
-          };
-        }
-        getCSSVariable(variable) {
-          if (typeof document === "undefined") {
-            return null;
-          }
-          const value = getComputedStyle(document.documentElement).getPropertyValue(variable);
-          return value || null;
-        }
-      };
-      __name(_DefaultThemingStateService, "DefaultThemingStateService");
-      DefaultThemingStateService = _DefaultThemingStateService;
-      _DefaultVisualCoordinatorService = class _DefaultVisualCoordinatorService {
-        constructor(coordinator = null) {
-          this.coordinator = coordinator;
-        }
-        setCoordinator(coordinator) {
-          this.coordinator = coordinator;
-        }
-        ensureCoordinator() {
-          if (!this.coordinator) {
-            Y3KDebug?.debug?.warn(
-              "VisualCoordinatorService",
-              "VisualEffectsCoordinator not initialized"
-            );
-            return null;
-          }
-          return this.coordinator;
-        }
-        async getVisualSystem(key) {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator) return null;
-          return await coordinator.getVisualSystem(key) || null;
-        }
-        getCachedVisualSystem(key) {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator) return null;
-          return coordinator.getCachedVisualSystem(key);
-        }
-        getCurrentVisualEffectsState() {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator) return null;
-          return coordinator.getCurrentVisualEffectsState();
-        }
-        getMetrics() {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator) return null;
-          return coordinator.getMetrics();
-        }
-        getCoordinatorInstance() {
-          return this.ensureCoordinator();
-        }
-        registerVisualEffectsParticipant(participant) {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator?.registerVisualEffectsParticipant) return false;
-          const result = coordinator.registerVisualEffectsParticipant(participant);
-          return !!result?.success;
-        }
-        unregisterVisualEffectsParticipant(systemName) {
-          const coordinator = this.ensureCoordinator();
-          if (!coordinator?.unregisterVisualEffectsParticipant) return;
-          coordinator.unregisterVisualEffectsParticipant(systemName);
-        }
-      };
-      __name(_DefaultVisualCoordinatorService, "DefaultVisualCoordinatorService");
-      DefaultVisualCoordinatorService = _DefaultVisualCoordinatorService;
-    }
-  });
-
-  // src-js/config/globalConfig.ts
-  var globalConfig_exports = {};
-  __export(globalConfig_exports, {
-    ADVANCED_SYSTEM_CONFIG: () => ADVANCED_SYSTEM_CONFIG,
-    ARTISTIC_MODE_PROFILES: () => ARTISTIC_MODE_PROFILES2,
-    COLOR_HARMONY_MODES: () => COLOR_HARMONY_MODES2,
-    HARMONIC_MODES: () => HARMONIC_MODES2
-  });
-  var COLOR_HARMONY_MODES2, HARMONIC_MODES2, ARTISTIC_MODE_PROFILES2, ADVANCED_SYSTEM_CONFIG;
-  var init_globalConfig = __esm({
-    "src-js/config/globalConfig.ts"() {
-      "use strict";
-      init_config();
-      init_CoreServiceProviders();
-      init_harmonicModes();
-      init_artisticProfiles();
-      init_performanceProfiles();
-      COLOR_HARMONY_MODES2 = COLOR_HARMONY_MODES;
-      HARMONIC_MODES2 = HARMONIC_MODES;
-      ARTISTIC_MODE_PROFILES2 = ARTISTIC_MODE_PROFILES;
-      ADVANCED_SYSTEM_CONFIG = {
-        enableDebug: true,
-        enableContextualIntelligence: true,
-        paletteSystem: "catppuccin",
-        // Default to maintain compatibility
-        // Phase 2: OKLCH Dynamic Palette System
-        useDynamicPalettes: false,
-        // Feature flag for gradual rollout
-        // Phase 4B: Palette transform now ALWAYS applied (primary implementation)
-        // No flag needed - this is the correct architecture
-        // Phase 4C: Strategic Color Variable Architecture - OKLAB Variant Tiers
-        enableTier2OKLABVariants: true,
-        // Atmospheric enhancement colors (teal, sapphire, lavender, surface1, overlay1)
-        enableTier3OKLABVariants: true,
-        // Feedback state colors (red, yellow, green)
-        performanceProfiles: PERFORMANCE_PROFILES,
-        // Enhanced logging configuration
-        logging: DEFAULT_LOGGING_CONFIG,
-        healthCheckInterval: 1e4,
-        visual: {
-          lightweightParticleSystem: { mode: "artist-vision" },
-          spatialNexusSystem: { mode: "artist-vision" },
-          dataGlyphSystem: { mode: "artist-vision" },
-          beatSyncVisualSystem: { mode: "artist-vision" },
-          behavioralPredictionEngine: { mode: "artist-vision" },
-          predictiveMaterializationSystem: { mode: "artist-vision" },
-          sidebarVisualStateSystem: { mode: "artist-vision" }
-        },
-        enableColorExtraction: true,
-        enableMusicAnalysis: true,
-        enableAdvancedSync: true,
-        // NEW: Music-driven visual intensity
-        musicModulationIntensity: 0.4,
-        // Increased for dynamic gradient responsiveness
-        // Active artistic mode for UX / visual presets
-        artisticMode: "artist-vision",
-        // "corporate-safe" | "artist-vision" | "advanced-maximum"
-        // Context-bound method references for external calling
-        boundGetCurrentMultipliers: null,
-        boundGetCurrentFeatures: null,
-        boundGetCurrentPerformanceSettings: null,
-        // Pending artistic mode for deferred application
-        _pendingArtisticMode: null,
-        // Initialize bound methods to preserve context
-        init() {
-          this.boundGetCurrentMultipliers = this.getCurrentMultipliers.bind(this);
-          this.boundGetCurrentFeatures = this.getCurrentFeatures.bind(this);
-          this.boundGetCurrentPerformanceSettings = this.getCurrentPerformanceSettings.bind(this);
-          const needsPreferenceLoad = !this.artisticMode || !this.paletteSystem;
-          if (needsPreferenceLoad) {
-            if (this.enableDebug) {
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Loading preferences (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
-              );
-            }
-            this.loadArtisticPreference();
-          } else if (this.enableDebug) {
-            console.log(
-              `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Skipping preference load (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
-            );
-          }
-          if (this._pendingArtisticMode && this.isFullyInitialized()) {
-            if (this.enableDebug) {
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Applying pending artistic mode: ${this._pendingArtisticMode}`
-              );
-            }
-            this.setArtisticMode(this._pendingArtisticMode);
-            this._pendingArtisticMode = null;
-          }
-          if (this.enableDebug) {
-            console.log(
-              "\u{1F527} [ADVANCED_SYSTEM_CONFIG] Initialized with context-bound methods"
-            );
-          }
-          return this;
-        },
-        currentColorHarmonyMode: "analogous-flow",
-        colorHarmonyBaseColor: null,
-        colorHarmonyIntensity: 0.85,
-        // Enhanced for cinematic gradient harmonies
-        colorHarmonyEvolution: true,
-        // Music sync configuration imported from modular harmonic modes
-        musicVisualSync: {
-          ...MUSIC_VISUAL_SYNC,
-          enhancedBPM: ENHANCED_BPM_CONFIG
-        },
-        // Enhanced: Get current mode profile with full Year3000 parameters
-        getCurrentModeProfile() {
-          const mode = this.artisticMode || "artist-vision";
-          return ARTISTIC_MODE_PROFILES2[mode] || ARTISTIC_MODE_PROFILES2["artist-vision"];
-        },
-        // Enhanced: Get current multipliers from active mode profile
-        getCurrentMultipliers() {
-          try {
-            if (typeof this.getCurrentModeProfile !== "function") {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
-              );
-              return this["artisticMultipliers"];
-            }
-            const currentProfile = this.getCurrentModeProfile();
-            if (!currentProfile || !currentProfile.multipliers) {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing multipliers, using fallback"
-              );
-              return this["artisticMultipliers"];
-            }
-            return currentProfile.multipliers;
-          } catch (error) {
-            console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentMultipliers:", error);
-            return this["artisticMultipliers"];
-          }
-        },
-        // Enhanced: Get current features from active mode profile
-        getCurrentFeatures() {
-          try {
-            if (typeof this.getCurrentModeProfile !== "function") {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback features"
-              );
-              return {
-                enableAdvancedEffects: true,
-                enableHarmony: true,
-                beatSync: true,
-                colorHarmony: true
-              };
-            }
-            const currentProfile = this.getCurrentModeProfile();
-            if (!currentProfile || !currentProfile.features) {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing features, using fallback"
-              );
-              return {
-                enableAdvancedEffects: true,
-                enableHarmony: true,
-                beatSync: true,
-                colorHarmony: true
-              };
-            }
-            return currentProfile.features;
-          } catch (error) {
-            console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentFeatures:", error);
-            return {
-              enableAdvancedEffects: true,
-              enableHarmony: true,
-              beatSync: true,
-              colorHarmony: true
-            };
-          }
-        },
-        // Enhanced: Get current performance settings from active mode profile
-        getCurrentPerformanceSettings() {
-          try {
-            if (typeof this.getCurrentModeProfile !== "function") {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback performance settings"
-              );
-              return {
-                maxParticles: 20,
-                animationThrottle: 16,
-                enableGPUAcceleration: true,
-                reducedMotion: false
-              };
-            }
-            const currentProfile = this.getCurrentModeProfile();
-            if (!currentProfile || !currentProfile.performance) {
-              console.warn(
-                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing performance settings, using fallback"
-              );
-              return {
-                maxParticles: 20,
-                animationThrottle: 16,
-                enableGPUAcceleration: true,
-                reducedMotion: false
-              };
-            }
-            return currentProfile.performance;
-          } catch (error) {
-            console.error(
-              "[ADVANCED_SYSTEM_CONFIG] Error in getCurrentPerformanceSettings:",
-              error
-            );
-            return {
-              maxParticles: 20,
-              animationThrottle: 16,
-              enableGPUAcceleration: true,
-              reducedMotion: false
-            };
-          }
-        },
-        // Check if ADVANCED_SYSTEM_CONFIG is fully initialized with all required methods
-        isFullyInitialized() {
-          const requiredMethods = [
-            "setArtisticMode",
-            "getCurrentModeProfile",
-            "getCurrentMultipliers",
-            "getCurrentFeatures",
-            "getCurrentPerformanceSettings"
-          ];
-          return requiredMethods.every(
-            (method) => typeof this[method] === "function"
-          );
-        },
-        // Safe setArtisticMode wrapper that validates state
-        safeSetArtisticMode(mode) {
-          if (!this.isFullyInitialized()) {
-            console.warn(
-              "[ADVANCED_SYSTEM_CONFIG] Not fully initialized, deferring artistic mode change"
-            );
-            this._pendingArtisticMode = mode;
-            return false;
-          }
-          return this.setArtisticMode(mode);
-        },
-        setArtisticMode(mode) {
-          const validModes = Object.keys(ARTISTIC_MODE_PROFILES2);
-          if (validModes.includes(mode)) {
-            const previousMode = this.artisticMode;
-            this.artisticMode = mode;
-            if (this.enableDebug) {
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Artistic mode changed: ${previousMode} \u2192 ${mode}`
-              );
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] New profile:`,
-                this.getCurrentModeProfile()
-              );
-            }
-            if (typeof document !== "undefined") {
-              document.dispatchEvent(
-                new CustomEvent("year3000ArtisticModeChanged", {
-                  detail: {
-                    previousMode,
-                    newMode: mode,
-                    profile: this.getCurrentModeProfile()
-                  }
-                })
-              );
-            }
-            const themeService = DefaultServiceFactory.getServices().themeLifecycle;
-            themeService?.getCoordinator()?.applyInitialSettings?.("full");
-            return true;
-          }
-          console.warn(
-            `[ADVANCED_SYSTEM_CONFIG] Invalid artistic mode: ${mode}. Valid modes:`,
-            validModes
-          );
-          return false;
-        },
-        // ===========================================
-        // 🔧 LOGGING & PERFORMANCE CONFIGURATION HELPERS
-        // ===========================================
-        // Set logging level for all Year 3000 systems
-        setLoggingLevel(level) {
-          const validLevels = ["off", "error", "warn", "info", "debug", "verbose"];
-          if (validLevels.includes(level)) {
-            this.logging.level = level;
-            if (level !== "off") {
-              console.log(`\u{1F527} [ADVANCED_SYSTEM_CONFIG] Logging level set to: ${level}`);
-            }
-            return true;
-          }
-          console.warn(
-            `[ADVANCED_SYSTEM_CONFIG] Invalid logging level: ${level}. Valid levels:`,
-            validLevels
-          );
-          return false;
-        },
-        // Disable performance warnings (useful for production or when performance is acceptable)
-        disablePerformanceWarnings() {
-          this.logging.performance.enableFrameBudgetWarnings = false;
-          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warnings disabled");
-        },
-        // Enable performance warnings
-        enablePerformanceWarnings() {
-          this.logging.performance.enableFrameBudgetWarnings = true;
-          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warnings enabled");
-        },
-        // Set performance warning throttle interval (ms)
-        setPerformanceWarningThrottle(intervalMs) {
-          if (typeof intervalMs === "number" && intervalMs >= 0) {
-            this.logging.performance.throttleInterval = intervalMs;
-            this.logging.performance.throttleWarnings = intervalMs > 0;
-            console.log(
-              `\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warning throttle set to: ${intervalMs}ms`
-            );
-            return true;
-          }
-          console.warn(
-            "[ADVANCED_SYSTEM_CONFIG] Invalid throttle interval. Must be a non-negative number."
-          );
-          return false;
-        },
-        // Quick setup for different environments
-        setupForProduction() {
-          this.setLoggingLevel("warn");
-          this.disablePerformanceWarnings();
-          this.logging.performance.enableAdaptiveDegradation = true;
-          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for production environment");
-        },
-        setupForDevelopment() {
-          this.setLoggingLevel("debug");
-          this.enablePerformanceWarnings();
-          this.setPerformanceWarningThrottle(2e3);
-          this.logging.performance.enableAdaptiveDegradation = true;
-          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for development environment");
-        },
-        setupForDebugging() {
-          this.setLoggingLevel("verbose");
-          this.enablePerformanceWarnings();
-          this.setPerformanceWarningThrottle(500);
-          this.logging.performance.enableAdaptiveDegradation = false;
-          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for debugging environment");
-        },
-        // Validate configuration health and functionality
-        validateConfigHealth() {
-          const detailedIssues = [];
-          const healthReport = {
-            healthy: true,
-            system: "AdvancedSystemConfig",
-            details: "Configuration health validation",
-            issues: [],
-            metrics: {}
-          };
-          const configKeys = Object.keys(this);
-          const functionProperties = configKeys.filter(
-            (key) => typeof this[key] === "function"
-          );
-          for (const key of functionProperties) {
-            if (!this.hasOwnProperty(key)) {
-              detailedIssues.push({
-                key: String(key),
-                severity: "warning",
-                message: `Method ${key} is not an own property, may indicate prototype chain issues.`
-              });
-            }
-          }
-          const checkProfile = /* @__PURE__ */ __name((mode) => {
-            if (!ARTISTIC_MODE_PROFILES2[mode]) {
-              detailedIssues.push({
-                key: `artisticMode:${mode}`,
-                severity: "critical",
-                message: `Artistic mode profile for '${mode}' is missing.`
-              });
-              return;
-            }
-            healthReport.metrics[`${mode}Profile`] = "ok";
-          }, "checkProfile");
-          checkProfile(this.artisticMode);
-          checkProfile("artist-vision");
-          checkProfile("corporate-safe");
-          if (detailedIssues.length > 0) {
-            healthReport.healthy = false;
-            healthReport.issues = detailedIssues.map(
-              (issue) => `[${issue.severity.toUpperCase()}] ${issue.key}: ${issue.message}`
-            );
-            healthReport.details = detailedIssues.some((i) => i.severity === "critical") ? "Critical configuration issues detected" : "Configuration issues detected";
-          }
-          if (this.enableDebug) {
-            console.log("[ADVANCED_SYSTEM_CONFIG] Health Check Report:", healthReport);
-          }
-          return healthReport;
-        },
-        loadArtisticPreference() {
-          try {
-            const saved = settings.get("sn-artistic-mode");
-            const validModes = Object.keys(ARTISTIC_MODE_PROFILES2);
-            if (saved && validModes.includes(String(saved)) && this.artisticMode !== saved) {
-              this.artisticMode = String(saved);
-              if (this.enableDebug) {
-                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Updated artistic mode from storage: ${saved}`);
-              }
-            } else if (!saved && this.artisticMode !== "artist-vision") {
-              this.artisticMode = "artist-vision";
-              if (this.enableDebug) {
-                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Reset artistic mode to default: artist-vision`);
-              }
-            }
-            const savedPalette = settings.get("sn-palette-system");
-            const validPaletteSystems = ["catppuccin", "year3000"];
-            if (savedPalette && validPaletteSystems.includes(String(savedPalette)) && this.paletteSystem !== savedPalette) {
-              this.paletteSystem = String(savedPalette);
-              if (this.enableDebug) {
-                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Updated palette system from storage: ${savedPalette}`);
-              }
-            } else if (!savedPalette && this.paletteSystem !== "catppuccin") {
-              this.paletteSystem = "catppuccin";
-              if (this.enableDebug) {
-                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Reset palette system to default: catppuccin`);
-              }
-            }
-            if (this.enableDebug) {
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Current artistic preference: ${this.artisticMode}`
-              );
-              console.log(
-                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Current palette system: ${this.paletteSystem}`
-              );
-            }
-          } catch (error) {
-            if (this.enableDebug) {
-              console.warn(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Failed to load preferences:`, error);
-            }
-            this.artisticMode = "artist-vision";
-            this.paletteSystem = "catppuccin";
-          }
-        }
-      };
-      if (typeof ADVANCED_SYSTEM_CONFIG.init === "function") {
-        ADVANCED_SYSTEM_CONFIG.init();
-      }
-    }
-  });
-
   // src-js/types/signature.ts
   var createDefaultSignature;
   var init_signature = __esm({
@@ -7692,6 +5152,7 @@
          * Process a color through OKLAB space with enhancement preset
          */
         processColor(hexColor, preset = _OKLABColorProcessor.PRESETS.STANDARD) {
+          const resolvedPreset = this.resolvePreset(preset);
           const startTime = performance.now();
           let originalRgb = null;
           try {
@@ -7704,9 +5165,9 @@
               originalRgb.g,
               originalRgb.b
             );
-            const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, preset);
-            const oklabShadow = this.generateShadowColor(oklabOriginal, preset);
-            const oklabHighlight = this.generateHighlightColor(oklabOriginal, preset);
+            const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, resolvedPreset);
+            const oklabShadow = this.generateShadowColor(oklabOriginal, resolvedPreset);
+            const oklabHighlight = this.generateHighlightColor(oklabOriginal, resolvedPreset);
             const enhancedRgb = this.utils.oklabToRgb(
               oklabEnhanced.L,
               oklabEnhanced.a,
@@ -7761,7 +5222,7 @@
                 enhanced: enhancedHex,
                 shadow: shadowHex,
                 highlight: highlightHex,
-                preset: preset.name,
+                preset: resolvedPreset.name,
                 processingTime: `${processingTime.toFixed(2)}ms`
               });
             }
@@ -7777,6 +5238,15 @@
             const fallbackRgb = originalRgb || { r: 124, g: 58, b: 237 };
             return this.createFallbackResult(hexColor, fallbackRgb);
           }
+        }
+        resolvePreset(preset) {
+          if (typeof preset === "string") {
+            return _OKLABColorProcessor.getPreset(preset);
+          }
+          if (preset && typeof preset.lightnessBoost === "number" && typeof preset.chromaBoost === "number" && typeof preset.shadowReduction === "number" && typeof preset.vibrantThreshold === "number") {
+            return preset;
+          }
+          return _OKLABColorProcessor.PRESETS.STANDARD;
         }
         /**
          * Process multiple colors with consistent enhancement
@@ -7872,6 +5342,22 @@
           const enhancedB = oklab.b * chromaMultiplier;
           return { L: enhancedL, a: enhancedA, b: enhancedB };
         }
+        calculateBalancedLightness(oklab, preset) {
+          const minLightness = 0.02;
+          const maxLightness = 1;
+          const baseShadowL = Math.max(minLightness, oklab.L * preset.shadowReduction);
+          const baseHighlightL = Math.min(
+            maxLightness,
+            oklab.L * (2 - preset.shadowReduction)
+          );
+          const shadowDelta = oklab.L - baseShadowL;
+          const highlightDelta = baseHighlightL - oklab.L;
+          const balancedDelta = Math.max(0, Math.min(shadowDelta, highlightDelta));
+          return {
+            shadowL: Math.max(minLightness, oklab.L - balancedDelta),
+            highlightL: Math.min(maxLightness, oklab.L + balancedDelta)
+          };
+        }
         /**
          * Generate shadow color by reducing lightness while preserving hue
          *
@@ -7897,8 +5383,9 @@
          * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
          */
         generateShadowColor(oklab, preset) {
+          const { shadowL } = this.calculateBalancedLightness(oklab, preset);
           return {
-            L: Math.max(0.02, oklab.L * preset.shadowReduction),
+            L: shadowL,
             a: oklab.a * 0.8,
             // Slightly desaturate shadows
             b: oklab.b * 0.8
@@ -7933,9 +5420,9 @@
          * @see plans/oklab-color-architecture-consolidation.md - Phase 1 implementation
          */
         generateHighlightColor(oklab, preset) {
-          const highlightBoost = 2 - preset.shadowReduction;
+          const { highlightL } = this.calculateBalancedLightness(oklab, preset);
           return {
-            L: Math.min(1, oklab.L * highlightBoost),
+            L: highlightL,
             a: oklab.a * 0.9,
             b: oklab.b * 0.9
           };
@@ -8035,6 +5522,13 @@
         }
       };
       OKLABColorProcessor = _OKLABColorProcessor;
+    }
+  });
+
+  // src-js/types/genre.ts
+  var init_genre = __esm({
+    "src-js/types/genre.ts"() {
+      "use strict";
     }
   });
 
@@ -8474,6 +5968,7 @@
       "use strict";
       init_globalConfig();
       init_OKLABColorProcessor();
+      init_genre();
       init_GenreCalculator();
       GENRE_PROFILES = {
         // Electronic genres - high energy, vibrant colors with dynamic range
@@ -8672,7 +6167,7 @@
       _GenreProfileManager = class _GenreProfileManager {
         constructor(dependencies = {}) {
           // State tracking for current genre detection
-          this.currentGenre = "default";
+          this.currentGenre = "default" /* DEFAULT */;
           this.genreConfidence = 0.5;
           this.genreHistory = [];
           this.historyMaxLength = 10;
@@ -8682,7 +6177,7 @@
           }
         }
         _getGenreFromAudioFeatures(features) {
-          if (!features) return "default";
+          if (!features) return "default" /* DEFAULT */;
           const {
             danceability = 0.5,
             energy = 0.5,
@@ -8691,17 +6186,16 @@
             tempo = 120
           } = features;
           if (instrumentalness > 0.6 && acousticness < 0.2 && energy > 0.6) {
-            if (tempo > 120) return "techno";
-            return "electronic";
+            return tempo > 120 ? "techno" /* TECHNO */ : "electronic" /* ELECTRONIC */;
           }
-          if (danceability > 0.7 && energy > 0.7) return "dance";
-          if (acousticness > 0.7 && energy < 0.4) return "classical";
-          if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz";
+          if (danceability > 0.7 && energy > 0.7) return "house" /* HOUSE */;
+          if (acousticness > 0.7 && energy < 0.4) return "classical" /* CLASSICAL */;
+          if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz" /* JAZZ */;
           if (energy > 0.7 && instrumentalness < 0.1 && danceability > 0.5)
-            return "rock";
+            return "rock" /* ROCK */;
           if (danceability > 0.7 && instrumentalness < 0.2 && energy > 0.5 && tempo < 110)
-            return "hiphop";
-          return "default";
+            return "hiphop" /* HIPHOP */;
+          return "default" /* DEFAULT */;
         }
         getProfileForTrack(audioFeatures) {
           const genre = this._getGenreFromAudioFeatures(audioFeatures);
@@ -8753,12 +6247,18 @@
           if (!features || !genre) return 0.5;
           const { energy = 0.5, danceability = 0.5, acousticness = 0.5 } = features;
           let confidence = 0.5;
-          if (genre === "electronic" && energy > 0.7 && acousticness < 0.3) confidence = 0.9;
-          else if (genre === "rock" && energy > 0.7 && acousticness < 0.5) confidence = 0.85;
-          else if (genre === "classical" && acousticness > 0.7 && energy < 0.4) confidence = 0.9;
-          else if (genre === "jazz" && acousticness > 0.5) confidence = 0.8;
-          else if (genre === "hiphop" && danceability > 0.7) confidence = 0.85;
-          else if (genre === "ambient" && energy < 0.3) confidence = 0.8;
+          if (genre === "electronic" /* ELECTRONIC */ && energy > 0.7 && acousticness < 0.3)
+            confidence = 0.9;
+          else if (genre === "rock" /* ROCK */ && energy > 0.7 && acousticness < 0.5)
+            confidence = 0.85;
+          else if (genre === "classical" /* CLASSICAL */ && acousticness > 0.7 && energy < 0.4)
+            confidence = 0.9;
+          else if (genre === "jazz" /* JAZZ */ && acousticness > 0.5)
+            confidence = 0.8;
+          else if (genre === "hiphop" /* HIPHOP */ && danceability > 0.7)
+            confidence = 0.85;
+          else if (genre === "ambient" /* AMBIENT */ && energy < 0.3)
+            confidence = 0.8;
           else confidence = 0.6;
           return Math.min(1, Math.max(0, confidence));
         }
@@ -8948,12 +6448,3276 @@
     }
   });
 
+  // src-js/audio/GenreService.ts
+  var _GenreService, GenreService;
+  var init_GenreService = __esm({
+    "src-js/audio/GenreService.ts"() {
+      "use strict";
+      init_globalConfig();
+      init_GenreProfileManager();
+      _GenreService = class _GenreService {
+        constructor(dependencies = {}) {
+          this.initialized = false;
+          this.lastDetection = null;
+          this.subscribers = /* @__PURE__ */ new Map();
+          this.subscriberSeed = 0;
+          this.config = dependencies.config ?? ADVANCED_SYSTEM_CONFIG;
+          this.manager = dependencies.manager ?? new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG: this.config });
+        }
+        async initialize() {
+          if (this.initialized) {
+            return;
+          }
+          this.initialized = true;
+        }
+        updateAnimation(_deltaTime) {
+        }
+        async healthCheck() {
+          return {
+            system: "GenreService",
+            healthy: true,
+            details: this.lastDetection ? `Last genre ${this.lastDetection.genre} (${(this.lastDetection.confidence * 100).toFixed(0)}% confidence)` : "No genre detections yet",
+            metrics: {
+              initialized: this.initialized,
+              totalOperations: this.manager.getGenreHistory().length,
+              ...this.lastDetection ? { lastUpdate: this.lastDetection.timestamp } : {}
+            }
+          };
+        }
+        destroy() {
+          this.initialized = false;
+          this.subscribers.clear();
+          this.lastDetection = null;
+        }
+        getCurrentGenre() {
+          return this.manager.getCurrentGenre();
+        }
+        getGenreConfidence() {
+          return this.manager.getGenreConfidence();
+        }
+        getGenreHistory() {
+          return this.manager.getGenreHistory();
+        }
+        detectGenre(features) {
+          const genre = this.manager.detectGenre(features);
+          const profile = { ...this.manager.getProfileForTrack(features) };
+          const characteristics = this.manager.getCharacteristics(genre);
+          const visualStyle = this.manager.getVisualStyle(genre);
+          const oklabPreset = this.manager.getOKLABPresetForGenre(genre);
+          if (!profile.oklabPreset && oklabPreset) {
+            profile.oklabPreset = oklabPreset.name;
+          }
+          profile.characteristics = characteristics;
+          profile.visualStyle = visualStyle;
+          const detection = {
+            genre,
+            confidence: this.manager.getGenreConfidence(),
+            characteristics,
+            profile,
+            oklabPreset,
+            timestamp: Date.now()
+          };
+          this.lastDetection = detection;
+          this.notifySubscribers(detection);
+          return detection;
+        }
+        getProfileForTrack(features) {
+          return this.manager.getProfileForTrack(features);
+        }
+        getColorCharacteristicsForGenre(genre) {
+          return this.manager.getColorCharacteristicsForGenre(genre);
+        }
+        getCharacteristics(genre) {
+          return this.manager.getCharacteristics(genre);
+        }
+        getVisualStyle(genre) {
+          return this.manager.getVisualStyle(genre);
+        }
+        getLastDetection() {
+          return this.lastDetection;
+        }
+        subscribe(listener) {
+          const id = `genre-listener-${this.subscriberSeed++}`;
+          this.subscribers.set(id, listener);
+          if (this.lastDetection) {
+            try {
+              listener(this.lastDetection);
+            } catch (error) {
+              console.warn("[GenreService] Subscriber threw during immediate replay", error);
+            }
+          }
+          return () => {
+            this.subscribers.delete(id);
+          };
+        }
+        getOKLABPresetForGenre(genre) {
+          return this.manager.getOKLABPresetForGenre(genre);
+        }
+        getManager() {
+          return this.manager;
+        }
+        notifySubscribers(result) {
+          for (const listener of this.subscribers.values()) {
+            try {
+              listener(result);
+            } catch (error) {
+              console.warn("[GenreService] Subscriber handler failed", error);
+            }
+          }
+        }
+      };
+      __name(_GenreService, "GenreService");
+      GenreService = _GenreService;
+    }
+  });
+
+  // src-js/utils/animation/visualPerformance.ts
+  function selectPerformanceProfile(quality, performanceProfiles, opts = {}) {
+    const { trace } = opts;
+    if (!performanceProfiles || typeof performanceProfiles !== "object") {
+      trace?.(
+        "[visualPerformance] No performanceProfiles provided \u2013 skipping selection"
+      );
+      return null;
+    }
+    let selected = performanceProfiles[quality];
+    if (!selected) {
+      trace?.(
+        `[visualPerformance] Profile '${quality}' not found, falling back to 'balanced'`
+      );
+      selected = performanceProfiles["balanced"];
+    }
+    if (!selected) {
+      const firstKey = Object.keys(
+        performanceProfiles
+      )[0];
+      selected = performanceProfiles[firstKey];
+      trace?.(
+        `[visualPerformance] Using first available profile '${firstKey}' as fallback`
+      );
+    }
+    return selected;
+  }
+  var init_visualPerformance = __esm({
+    "src-js/utils/animation/visualPerformance.ts"() {
+      "use strict";
+      __name(selectPerformanceProfile, "selectPerformanceProfile");
+    }
+  });
+
+  // src-js/core/css/CSSVariableWriter.ts
+  var CSSVariableWriter_exports = {};
+  __export(CSSVariableWriter_exports, {
+    CSSVariableWriter: () => CSSVariableWriter,
+    getGlobalCSSVariableWriter: () => getGlobalCSSVariableWriter,
+    getGlobalCSSVariableWriterSafe: () => getGlobalCSSVariableWriterSafe,
+    setGlobalCSSVariableWriter: () => setGlobalCSSVariableWriter
+  });
+  function setGlobalCSSVariableWriter(instance2) {
+    if (globalCSSVariableWriter && globalCSSVariableWriter !== instance2) {
+      console.warn(
+        "[CSSVariableWriter] Replacing existing global instance. This may indicate multiple SystemIntegrationCoordinator initializations."
+      );
+    }
+    globalCSSVariableWriter = instance2;
+  }
+  function getGlobalCSSVariableWriter() {
+    if (!globalCSSVariableWriter) {
+      throw new Error(
+        "[CSSVariableWriter] Global instance not initialized. SystemIntegrationCoordinator must call setGlobalCSSVariableWriter() during initialization."
+      );
+    }
+    return globalCSSVariableWriter;
+  }
+  function getGlobalCSSVariableWriterSafe() {
+    return globalCSSVariableWriter;
+  }
+  var CRITICAL_NOW_PLAYING_VARS, _CSSVariableWriter, CSSVariableWriter, globalCSSVariableWriter;
+  var init_CSSVariableWriter = __esm({
+    "src-js/core/css/CSSVariableWriter.ts"() {
+      "use strict";
+      init_EventBus();
+      CRITICAL_NOW_PLAYING_VARS = /* @__PURE__ */ new Set([
+        // Legacy variables (Phase 1 migration)
+        "--sn-beat-pulse-intensity",
+        "--sn-animation-scale",
+        "--sn-accent-hex",
+        "--sn-accent-rgb",
+        // New namespaced variables (Phase 2+)
+        "--sn.music.beat.pulse.intensity",
+        "--sn.music.animation.scale",
+        "--sn.music.rhythm.phase",
+        "--sn.music.spectrum.phase",
+        "--sn.color.accent.hex",
+        "--sn.color.accent.rgb",
+        "--sn.bg.webgl.ready",
+        "--sn.bg.active-backend"
+      ]);
+      _CSSVariableWriter = class _CSSVariableWriter {
+        constructor(config, performanceCoordinator) {
+          this.initialized = false;
+          // === BATCHING LAYER (from CSSVariableWriter) ===
+          this.cssVariableQueue = /* @__PURE__ */ new Map();
+          this.batchUpdateTimer = null;
+          this.rafHandle = null;
+          this.microtaskScheduled = false;
+          // === MANAGEMENT LAYER (from CSSVariableWriter) ===
+          this.pendingTransactions = /* @__PURE__ */ new Map();
+          this.transactionCounter = 0;
+          this.updateQueue = /* @__PURE__ */ new Map();
+          this.flushTimer = null;
+          // === PERFORMANCE LAYER (from CSSVariableWriter) ===
+          this.currentDeviceCapabilities = null;
+          this.currentPerformanceMode = null;
+          this.lastCSSUpdate = 0;
+          this.cssUpdateThrottle = 100;
+          // Update CSS at most every 100ms
+          this.appliedClasses = /* @__PURE__ */ new Set();
+          // === CONSCIOUSNESS LAYER (new integration) ===
+          this.visualEffectsState = null;
+          this.visualEffectsUpdateTimer = null;
+          this.lastVisualEffectsUpdate = 0;
+          // === ENHANCED OPTIMIZATION LAYER (from OptimizedCSSVariableManager) ===
+          this.optimizedConfig = {};
+          this.lastFPSCheck = 0;
+          this.currentPerformanceLevel = "good";
+          this.adaptiveThrottleLevel = 1;
+          this.priorityQueues = /* @__PURE__ */ new Map();
+          this.adaptiveMonitoringInterval = null;
+          // === FRAME CONTEXT INTEGRATION (from CDFVariableBridge) ===
+          this.frameContextUnsubscribe = null;
+          this.reduceMotionMQ = null;
+          this.mqHandler = null;
+          // Performance tracking
+          this.performanceMetrics = {
+            totalBatches: 0,
+            totalUpdates: 0,
+            totalBatchTime: 0,
+            maxBatchTime: 0,
+            averageBatchSize: 0,
+            overBudgetBatches: 0,
+            conflictResolutions: 0,
+            transactionCount: 0,
+            visualEffectsUpdates: 0
+          };
+          // Priority weights for conflict resolution
+          this.PRIORITY_WEIGHTS = {
+            low: 1,
+            normal: 2,
+            high: 3,
+            critical: 4
+          };
+          this.config = config;
+          this.performanceCoordinator = performanceCoordinator;
+          this.eventBus = unifiedEventBus;
+          this.cssConfig = {
+            // Batching configuration
+            batchIntervalMs: 0,
+            // 0 = coalesced; scheduling handled via rAF/microtask
+            maxBatchSize: 50,
+            enableDebug: config.enableDebug,
+            useCssTextFastPath: false,
+            autoHijack: true,
+            // Performance configuration
+            enableAdaptiveOptimization: true,
+            enableThermalThrottling: true,
+            enableBatteryOptimization: true,
+            enableDeviceTierOptimization: true,
+            debugPerformanceClasses: config.enableDebug,
+            // Consciousness configuration
+            enableVisualEffectsIntegration: true,
+            visualEffectsUpdateInterval: 16,
+            // 60fps
+            enableMusicVisualEffects: true,
+            enableAestheticVisualEffects: true,
+            // Enhanced optimization features (from OptimizedCSSVariableManager)
+            enableAdaptiveThrottling: true,
+            priorityMappings: {
+              critical: ["--sn-rs-glow-alpha", "--sn-rs-beat-intensity", "--sn-rs-hue-shift"],
+              high: ["--sn-gradient-primary", "--sn-gradient-secondary", "--sn-gradient-accent"],
+              normal: ["--sn-gradient-", "--sn-rs-"],
+              low: ["--sn-debug-", "--sn-dev-"]
+            },
+            thresholds: {
+              excellentFPS: 55,
+              // 55+ FPS = excellent
+              goodFPS: 45,
+              // 45+ FPS = good
+              poorFPS: 30
+              // <30 FPS = poor
+            }
+          };
+          this.optimizedConfig = this.cssConfig;
+          this.currentDeviceCapabilities = this.performanceCoordinator.getDeviceCapabilities();
+          this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [CSSVariableWriter] Created with visual-effects-driven CSS management"
+            );
+          }
+        }
+        // Deprecated getInstance() method removed - use dependency injection through SystemIntegrationCoordinator
+        // or getGlobalOptimizedCSSController() for simple utility usage
+        // ===================================================================
+        // IMANAGEDYSTEM INTERFACE IMPLEMENTATION
+        // ===================================================================
+        async initialize() {
+          if (this.initialized) return;
+          this.subscribeToEvents();
+          this.applyInitialOptimizations();
+          if (this.cssConfig.enableVisualEffectsIntegration) {
+            this.startVisualEffectsIntegration();
+          }
+          if (this.cssConfig.autoHijack) {
+            this.enableGlobalHijack();
+          }
+          this.initializeOptimizedFeatures();
+          this.initializeFrameContextIntegration();
+          this.initialized = true;
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [CSSVariableWriter] Initialized with device tier:",
+              this.currentDeviceCapabilities?.performanceTier
+            );
+          }
+        }
+        updateAnimation(deltaTime) {
+        }
+        async healthCheck() {
+          const queueSize = this.cssVariableQueue.size + this.updateQueue.size;
+          const pendingTransactions = this.pendingTransactions.size;
+          const isHealthy = queueSize <= 1e3 && pendingTransactions <= 100;
+          return {
+            system: "CSSVariableWriter",
+            healthy: isHealthy,
+            ok: isHealthy,
+            details: isHealthy ? "CSS visual-effects controller operating normally" : "High queue size or pending transactions",
+            metrics: {
+              queueSize,
+              pendingTransactions,
+              performanceMetrics: this.performanceMetrics,
+              visualEffectsActive: this.visualEffectsState !== null,
+              deviceTier: this.currentDeviceCapabilities?.performanceTier,
+              performanceMode: this.currentPerformanceMode?.name
+            }
+          };
+        }
+        forceRepaint(reason) {
+          this.flushCSSVariableBatch();
+          if (this.config.enableDebug && reason) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Force repaint: ${reason}`
+            );
+          }
+        }
+        // ===================================================================
+        // PUBLIC API - UNIFIED CSS VARIABLE OPERATIONS
+        // ===================================================================
+        /**
+         * Queue a CSS variable update with priority and visual-effects awareness
+         * Enhanced with adaptive throttling and priority queue management
+         */
+        queueCSSVariableUpdate(property, value, element = null, priority = "normal", source = "unknown") {
+          const targetElement = element || document.documentElement;
+          const effectivePriority = this.optimizedConfig.enableAdaptiveThrottling ? this.determineVariablePriority(property, priority) : priority;
+          if (effectivePriority === "critical" || CRITICAL_NOW_PLAYING_VARS.has(property)) {
+            this.applyCriticalUpdate(property, value, targetElement);
+            return;
+          }
+          if (this.optimizedConfig.enableAdaptiveThrottling && this.priorityQueues.size > 0) {
+            this.queueByPriority(property, value, targetElement, effectivePriority, source);
+            return;
+          }
+          const elementKey = element ? `element_${element.id || element.className || "unnamed"}` : "root";
+          const updateKey = `${elementKey}:${property}`;
+          const update = {
+            element: targetElement,
+            property,
+            value,
+            timestamp: performance.now(),
+            priority: effectivePriority,
+            source
+          };
+          const existingUpdate = this.cssVariableQueue.get(updateKey);
+          if (existingUpdate) {
+            if (this.shouldReplaceUpdate(existingUpdate, update)) {
+              this.cssVariableQueue.set(updateKey, update);
+              this.performanceMetrics.conflictResolutions++;
+            }
+          } else {
+            this.cssVariableQueue.set(updateKey, update);
+          }
+          this.performanceMetrics.totalUpdates++;
+          this.scheduleFlush(effectivePriority);
+          if (effectivePriority === "critical" || this.cssVariableQueue.size >= this.cssConfig.maxBatchSize) {
+            this.flushCSSVariableBatch();
+          }
+        }
+        /**
+         * Update multiple CSS variables in a transaction
+         */
+        updateVariables(variables, priority = "normal", source = "unknown") {
+          const transactionId = `tx_${++this.transactionCounter}`;
+          const variableMap = new Map(Object.entries(variables));
+          const transaction = {
+            id: transactionId,
+            variables: variableMap,
+            timestamp: performance.now(),
+            priority,
+            completed: false
+          };
+          this.pendingTransactions.set(transactionId, transaction);
+          for (const [property, value] of variableMap) {
+            this.queueCSSVariableUpdate(
+              property,
+              value,
+              null,
+              priority,
+              `${source}:${transactionId}`
+            );
+          }
+          this.performanceMetrics.transactionCount++;
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
+            );
+          }
+        }
+        /**
+         * Update visual-effects-driven CSS variables
+         */
+        updateVisualEffectsVariables(visualEffectsState) {
+          if (!this.cssConfig.enableVisualEffectsIntegration) return;
+          this.visualEffectsState = visualEffectsState;
+          this.performanceMetrics.visualEffectsUpdates++;
+          const variables = {};
+          if (visualEffectsState.musicState && this.cssConfig.enableMusicVisualEffects) {
+            variables["--sn.music.beat.pulse.intensity"] = visualEffectsState.musicState.intensity.toString();
+            variables["--sn.music.tempo.bpm"] = visualEffectsState.musicState.bpm.toString();
+            variables["--sn.music.rhythm.phase"] = `${visualEffectsState.musicState.rhythmPhase}deg`;
+            variables["--sn.music.animation.scale"] = visualEffectsState.musicState.animationScale.toString();
+            variables["--sn.music.energy.level"] = visualEffectsState.musicState.energy.toString();
+            variables["--sn.music.valence"] = visualEffectsState.musicState.valence.toString();
+          }
+          if (visualEffectsState.aestheticState && this.cssConfig.enableAestheticVisualEffects) {
+            variables["--sn.aesthetic.harmony.level"] = visualEffectsState.aestheticState.harmonyLevel.toString();
+            variables["--sn.aesthetic.evolution.factor"] = visualEffectsState.aestheticState.evolutionFactor.toString();
+            variables["--sn.color.temperature"] = visualEffectsState.aestheticState.colorTemperature.toString();
+          }
+          if (visualEffectsState.performanceState) {
+            variables["--sn.performance.mode"] = visualEffectsState.performanceState.mode;
+            variables["--sn.device.tier"] = visualEffectsState.performanceState.deviceTier;
+            variables["--sn.performance.optimization.level"] = visualEffectsState.performanceState.optimizationLevel.toString();
+          }
+          this.updateVariables(variables, "high", "visual-effects-system");
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Consciousness state updated with ${Object.keys(variables).length} variables`
+            );
+          }
+        }
+        /**
+         * Apply performance-based optimizations
+         */
+        applyPerformanceOptimizations(performanceMode) {
+          if (!this.cssConfig.enableAdaptiveOptimization) return;
+          this.currentPerformanceMode = performanceMode;
+          const variables = {
+            "--sn.performance.mode": performanceMode.name,
+            "--sn.performance.quality.level": performanceMode.qualityLevel.toString(),
+            "--sn.performance.fps.target": performanceMode.frameRate.toString(),
+            "--sn.performance.frame.budget": (1e3 / performanceMode.frameRate).toString(),
+            "--sn.performance.optimization.level": performanceMode.optimizationLevel.toString(),
+            "--sn.performance.blur.quality": performanceMode.blurQuality.toString(),
+            "--sn.performance.shadow.quality": performanceMode.shadowQuality.toString(),
+            "--sn.performance.animation.quality": performanceMode.animationQuality.toString(),
+            "--sn.performance.effect.quality": performanceMode.effectQuality.toString()
+          };
+          this.updateVariables(variables, "high", "performance-coordinator");
+          this.applyPerformanceModeOptimizations();
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Performance optimizations applied for mode: ${performanceMode.name}`
+            );
+          }
+        }
+        /**
+         * Get a CSS variable value
+         */
+        getVariable(key) {
+          const computedStyle = getComputedStyle(document.documentElement);
+          return computedStyle.getPropertyValue(key).trim() || null;
+        }
+        /**
+         * Force immediate flush of all pending updates
+         */
+        flushUpdates() {
+          this.flushCSSVariableBatch();
+        }
+        /**
+         * Optimized CSS variable batch flush with efficient DOM operations
+         */
+        flushCSSVariableBatch() {
+          if (this.cssVariableQueue.size === 0) return;
+          const startTime = performance.now();
+          const FRAME_BUDGET = 8;
+          const updates = Array.from(this.cssVariableQueue.values());
+          this.cssVariableQueue.clear();
+          if (this.rafHandle !== null) {
+            cancelAnimationFrame(this.rafHandle);
+            this.rafHandle = null;
+          }
+          this.microtaskScheduled = false;
+          try {
+            const updatesByElement = /* @__PURE__ */ new Map();
+            for (const update of updates) {
+              if (!updatesByElement.has(update.element)) {
+                updatesByElement.set(update.element, []);
+              }
+              updatesByElement.get(update.element).push(update);
+            }
+            for (const [element, elementUpdates] of updatesByElement.entries()) {
+              if (performance.now() - startTime > FRAME_BUDGET) {
+                for (const update of elementUpdates) {
+                  const updateKey = `${update.element.id || "root"}:${update.property}`;
+                  this.cssVariableQueue.set(updateKey, update);
+                }
+                this.scheduleFlush("high");
+                break;
+              }
+              if (elementUpdates.length >= 3) {
+                this.applyCSSTextBatch(element, elementUpdates);
+              } else {
+                for (const update of elementUpdates) {
+                  if (_CSSVariableWriter.nativeSetProperty) {
+                    _CSSVariableWriter.nativeSetProperty.call(
+                      element.style,
+                      update.property,
+                      update.value
+                    );
+                  } else {
+                    element.style.setProperty(update.property, update.value);
+                  }
+                }
+              }
+            }
+            const batchTime = performance.now() - startTime;
+            this.updatePerformanceMetrics(batchTime, updates.length);
+            if (batchTime > FRAME_BUDGET && this.config.enableDebug) {
+              console.warn(
+                `\u{1F30C} [CSSVariableWriter] CSS batch exceeded frame budget: ${batchTime.toFixed(
+                  2
+                )}ms (${updates.length} updates)`
+              );
+            } else if (this.config.enableDebug && Math.random() < 0.05) {
+              console.log(
+                `\u{1F30C} [CSSVariableWriter] Efficient CSS batch: ${updates.length} updates in ${batchTime.toFixed(2)}ms`
+              );
+            }
+          } catch (error) {
+            console.error(
+              "[CSSVariableWriter] Error in optimized CSS batch processing:",
+              error
+            );
+            this.applyUpdatesWithFallback(updates);
+          }
+        }
+        /**
+         * Optimized cssText batching using efficient string building
+         */
+        applyCSSTextBatch(element, updates) {
+          try {
+            const currentStyle = element.style.cssText;
+            const propertyMap = /* @__PURE__ */ new Map();
+            if (currentStyle) {
+              const declarations = currentStyle.split(";");
+              for (const declaration of declarations) {
+                const colonIndex = declaration.indexOf(":");
+                if (colonIndex > 0) {
+                  const property = declaration.slice(0, colonIndex).trim();
+                  const value = declaration.slice(colonIndex + 1).trim();
+                  if (property && value) {
+                    propertyMap.set(property, value);
+                  }
+                }
+              }
+            }
+            for (const update of updates) {
+              propertyMap.set(update.property, update.value);
+            }
+            const cssDeclarations = [];
+            for (const [property, value] of propertyMap) {
+              cssDeclarations.push(`${property}:${value}`);
+            }
+            element.style.cssText = cssDeclarations.join(";");
+          } catch (error) {
+            for (const update of updates) {
+              try {
+                element.style.setProperty(update.property, update.value);
+              } catch (e) {
+                console.warn(`Failed to apply ${update.property}:`, e);
+              }
+            }
+          }
+        }
+        /**
+         * Fallback update application with error recovery
+         */
+        applyUpdatesWithFallback(updates) {
+          for (const update of updates) {
+            try {
+              if (_CSSVariableWriter.nativeSetProperty) {
+                _CSSVariableWriter.nativeSetProperty.call(
+                  update.element.style,
+                  update.property,
+                  update.value
+                );
+              } else {
+                update.element.style.setProperty(update.property, update.value);
+              }
+            } catch (e) {
+              console.warn(
+                `[CSSVariableWriter] Failed to apply CSS property ${update.property}:`,
+                e
+              );
+            }
+          }
+        }
+        // ===================================================================
+        // CONVENIENCE METHODS FOR COMMON CSS UPDATES
+        // ===================================================================
+        /**
+         * Set music synchronization variables
+         */
+        setMusicMetrics(metrics) {
+          const variables = {};
+          if (metrics.beatIntensity !== void 0) {
+            variables["--sn.music.beat.pulse.intensity"] = metrics.beatIntensity.toString();
+          }
+          if (metrics.rhythmPhase !== void 0) {
+            variables["--sn.music.rhythm.phase"] = `${metrics.rhythmPhase}deg`;
+          }
+          if (metrics.animationScale !== void 0) {
+            variables["--sn.music.animation.scale"] = metrics.animationScale.toString();
+          }
+          if (metrics.spectrumPhase !== void 0) {
+            variables["--sn.music.spectrum.phase"] = `${metrics.spectrumPhase}deg`;
+          }
+          if (metrics.energy !== void 0) {
+            variables["--sn.music.energy.level"] = metrics.energy.toString();
+          }
+          if (metrics.valence !== void 0) {
+            variables["--sn.music.valence"] = metrics.valence.toString();
+          }
+          if (metrics.bpm !== void 0) {
+            variables["--sn.music.tempo.bpm"] = metrics.bpm.toString();
+          }
+          this.updateVariables(variables, "critical", "music-system");
+        }
+        /**
+         * Set color variables
+         */
+        setColorTokens(colors) {
+          const variables = {};
+          if (colors.accentHex) {
+            variables["--sn.color.accent.hex"] = colors.accentHex;
+          }
+          if (colors.accentRgb) {
+            variables["--sn.color.accent.rgb"] = colors.accentRgb;
+          }
+          if (colors.primaryRgb) {
+            variables["--sn.bg.gradient.primary.rgb"] = colors.primaryRgb;
+          }
+          if (colors.secondaryRgb) {
+            variables["--sn.bg.gradient.secondary.rgb"] = colors.secondaryRgb;
+          }
+          if (colors.gradientOpacity !== void 0) {
+            variables["--sn.bg.gradient.opacity"] = colors.gradientOpacity.toString();
+          }
+          if (colors.gradientBlur) {
+            variables["--sn.bg.gradient.blur"] = colors.gradientBlur;
+          }
+          this.updateVariables(variables, "high", "color-system");
+        }
+        /**
+         * Set performance variables
+         */
+        setPerformanceTokens(perf) {
+          const variables = {};
+          if (perf.webglReady !== void 0) {
+            variables["--sn.bg.webgl.ready"] = perf.webglReady ? "1" : "0";
+          }
+          if (perf.activeBackend) {
+            variables["--sn.bg.active-backend"] = perf.activeBackend;
+          }
+          if (perf.qualityLevel) {
+            variables["--sn.perf.quality.level"] = perf.qualityLevel;
+          }
+          if (perf.reducedMotion !== void 0) {
+            variables["--sn.anim.motion.reduced"] = perf.reducedMotion ? "1" : "0";
+          }
+          if (perf.gpuAcceleration !== void 0) {
+            variables["--sn.perf.gpu.acceleration.enabled"] = perf.gpuAcceleration ? "1" : "0";
+          }
+          this.updateVariables(variables, "high", "performance-system");
+        }
+        /**
+         * Direct property setter (convenience API)
+         */
+        setProperty(property, value, element = null) {
+          if (property.startsWith("--spice-") && this.config.enableSpiceVariableDebug) {
+            const caller = new Error().stack?.split("\n")[2]?.trim().replace(/^\s*at\s+/, "") || "unknown";
+            console.log(
+              `\u{1F527} [CSS Debug] Setting ${property} = ${value} (from: ${caller})`
+            );
+          }
+          this.queueCSSVariableUpdate(property, value, element);
+        }
+        // ===================================================================
+        // PERFORMANCE AND DEVICE OPTIMIZATION METHODS
+        // ===================================================================
+        /**
+         * Apply device-specific CSS classes
+         */
+        applyDeviceOptimizations() {
+          if (!this.cssConfig.enableDeviceTierOptimization || !this.currentDeviceCapabilities)
+            return;
+          this.removeClassesByPrefix("device-tier-");
+          this.removeClassesByPrefix("device-mobile-");
+          this.removeClassesByPrefix("device-gpu-");
+          const tierClass = `device-tier-${this.currentDeviceCapabilities.performanceTier}`;
+          this.addCSSClass(tierClass);
+          if (this.currentDeviceCapabilities.isMobile) {
+            this.addCSSClass("device-mobile-optimized");
+          }
+          if (this.currentDeviceCapabilities.gpuAcceleration) {
+            this.addCSSClass("device-gpu-accelerated");
+          } else {
+            this.addCSSClass("device-gpu-fallback");
+          }
+          const memoryTier = this.getMemoryTier(
+            this.currentDeviceCapabilities.memoryGB
+          );
+          this.addCSSClass(`device-memory-${memoryTier}`);
+        }
+        /**
+         * Apply performance mode CSS classes
+         */
+        applyPerformanceModeOptimizations() {
+          if (!this.currentPerformanceMode) return;
+          this.removeClassesByPrefix("performance-mode-");
+          const modeClass = `performance-mode-${this.currentPerformanceMode.name}`;
+          this.addCSSClass(modeClass);
+          const optimizationClass = `optimization-level-${this.currentPerformanceMode.optimizationLevel}`;
+          this.addCSSClass(optimizationClass);
+        }
+        /**
+         * Get performance report
+         */
+        getPerformanceReport() {
+          const averageBatchTime = this.performanceMetrics.totalBatches > 0 ? this.performanceMetrics.totalBatchTime / this.performanceMetrics.totalBatches : 0;
+          return {
+            enabled: true,
+            pendingUpdates: this.cssVariableQueue.size + this.updateQueue.size,
+            totalUpdates: this.performanceMetrics.totalUpdates,
+            totalBatches: this.performanceMetrics.totalBatches,
+            averageBatchSize: Math.round(this.performanceMetrics.averageBatchSize * 10) / 10,
+            averageBatchTime: Math.round(averageBatchTime * 100) / 100,
+            maxBatchTime: Math.round(this.performanceMetrics.maxBatchTime * 100) / 100,
+            overBudgetBatches: this.performanceMetrics.overBudgetBatches,
+            conflictResolutions: this.performanceMetrics.conflictResolutions,
+            transactionCount: this.performanceMetrics.transactionCount,
+            visualEffectsUpdates: this.performanceMetrics.visualEffectsUpdates,
+            visualEffectsActive: this.visualEffectsState !== null,
+            deviceTier: this.currentDeviceCapabilities?.performanceTier,
+            performanceMode: this.currentPerformanceMode?.name
+          };
+        }
+        // ===================================================================
+        // PRIVATE METHODS
+        // ===================================================================
+        subscribeToEvents() {
+          this.eventBus.subscribe("performance:tier-changed", (payload) => {
+            this.currentPerformanceMode = this.performanceCoordinator.getCurrentPerformanceMode();
+            this.applyPerformanceModeOptimizations();
+            this.updateCSSPerformanceVariables();
+          }, "CSSVariableWriter");
+        }
+        applyInitialOptimizations() {
+          try {
+            this.applyDeviceOptimizations();
+            this.applyPerformanceModeOptimizations();
+            this.updateCSSPerformanceVariables();
+            if (this.cssConfig.debugPerformanceClasses) {
+              this.addCSSClass("debug-performance");
+            }
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "[CSSVariableWriter] Error applying initial optimizations:",
+                error
+              );
+            }
+          }
+        }
+        applyCurrentOptimizations() {
+          this.applyDeviceOptimizations();
+          this.applyPerformanceModeOptimizations();
+        }
+        updateCSSPerformanceVariables() {
+          const now = Date.now();
+          if (now - this.lastCSSUpdate < this.cssUpdateThrottle) return;
+          this.lastCSSUpdate = now;
+          if (!this.currentPerformanceMode || !this.currentDeviceCapabilities) return;
+          try {
+            const variables = {
+              "--sn.performance.mode": this.currentPerformanceMode.name || "balanced",
+              "--sn.performance.quality.level": (this.currentPerformanceMode.qualityLevel ?? 0.8).toString(),
+              "--sn.performance.fps.target": (this.currentPerformanceMode.frameRate ?? 60).toString(),
+              "--sn.performance.frame.budget": (1e3 / (this.currentPerformanceMode.frameRate ?? 60)).toString(),
+              "--sn.performance.optimization.level": (this.currentPerformanceMode.optimizationLevel ?? 1).toString(),
+              "--sn.device.tier": this.currentDeviceCapabilities.performanceTier ?? "mid",
+              "--sn.device.memory": (this.currentDeviceCapabilities.memoryGB ?? 8).toString(),
+              "--sn.device.gpu": this.currentDeviceCapabilities.gpuAcceleration ?? true ? "1" : "0",
+              "--sn.device.mobile": this.currentDeviceCapabilities.isMobile ?? false ? "1" : "0",
+              "--sn.performance.blur.quality": (this.currentPerformanceMode.blurQuality ?? 0.8).toString(),
+              "--sn.performance.shadow.quality": (this.currentPerformanceMode.shadowQuality ?? 0.8).toString(),
+              "--sn.performance.animation.quality": (this.currentPerformanceMode.animationQuality ?? 0.8).toString(),
+              "--sn.performance.effect.quality": (this.currentPerformanceMode.effectQuality ?? 0.8).toString()
+            };
+            this.updateVariables(variables, "high", "performance-coordinator");
+          } catch (error) {
+            if (this.config.enableDebug) {
+              console.warn(
+                "[CSSVariableWriter] Error updating CSS performance variables:",
+                error
+              );
+            }
+          }
+        }
+        startVisualEffectsIntegration() {
+          if (this.visualEffectsUpdateTimer) return;
+          const updateVisualEffects = /* @__PURE__ */ __name(() => {
+            const now = performance.now();
+            if (now - this.lastVisualEffectsUpdate >= this.cssConfig.visualEffectsUpdateInterval) {
+              this.lastVisualEffectsUpdate = now;
+              if (this.visualEffectsState) {
+                this.updateVisualEffectsVariables(this.visualEffectsState);
+              }
+            }
+            this.visualEffectsUpdateTimer = setTimeout(
+              updateVisualEffects,
+              this.cssConfig.visualEffectsUpdateInterval
+            );
+          }, "updateVisualEffects");
+          updateVisualEffects();
+        }
+        shouldReplaceUpdate(existing, incoming) {
+          const existingWeight = this.PRIORITY_WEIGHTS[existing.priority];
+          const incomingWeight = this.PRIORITY_WEIGHTS[incoming.priority];
+          if (incomingWeight > existingWeight) {
+            return true;
+          }
+          if (incomingWeight === existingWeight) {
+            return incoming.timestamp > existing.timestamp;
+          }
+          return false;
+        }
+        scheduleFlush(priority) {
+          if (this.rafHandle !== null || this.microtaskScheduled) {
+            return;
+          }
+          const flushCallback = /* @__PURE__ */ __name(() => {
+            this.rafHandle = null;
+            this.microtaskScheduled = false;
+            this.flushCSSVariableBatch();
+          }, "flushCallback");
+          if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+            this.microtaskScheduled = true;
+            queueMicrotask(flushCallback);
+          } else if (typeof requestAnimationFrame === "function") {
+            this.rafHandle = requestAnimationFrame(flushCallback);
+          } else {
+            setTimeout(flushCallback, 0);
+          }
+        }
+        updatePerformanceMetrics(batchTime, batchSize) {
+          this.performanceMetrics.totalBatches++;
+          this.performanceMetrics.totalBatchTime += batchTime;
+          this.performanceMetrics.maxBatchTime = Math.max(
+            this.performanceMetrics.maxBatchTime,
+            batchTime
+          );
+          this.performanceMetrics.averageBatchSize = (this.performanceMetrics.averageBatchSize * (this.performanceMetrics.totalBatches - 1) + batchSize) / this.performanceMetrics.totalBatches;
+          if (batchTime > 8) {
+            this.performanceMetrics.overBudgetBatches++;
+            if (this.config.enableDebug) {
+              console.warn(
+                `[CSSVariableWriter] CSS batch took ${batchTime.toFixed(
+                  2
+                )}ms for ${batchSize} updates`
+              );
+            }
+          }
+        }
+        enableGlobalHijack() {
+          if (_CSSVariableWriter.hijackEnabled) return;
+          const original = CSSStyleDeclaration.prototype.setProperty;
+          _CSSVariableWriter.nativeSetProperty = original;
+          const controllerInstance = this;
+          CSSStyleDeclaration.prototype.setProperty = function(prop, value, priority) {
+            if (prop && (prop.startsWith("--sn-") || prop.startsWith("--sn.")) && controllerInstance) {
+              controllerInstance.queueCSSVariableUpdate(prop, String(value ?? ""));
+            } else {
+              original.call(this, prop, value, priority);
+            }
+          };
+          _CSSVariableWriter.hijackEnabled = true;
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [CSSVariableWriter] Global setProperty hijack enabled (--sn- and --sn. namespaces)"
+            );
+          }
+        }
+        addCSSClass(className) {
+          if (!this.appliedClasses.has(className)) {
+            document.body.classList.add(className);
+            this.appliedClasses.add(className);
+          }
+        }
+        removeCSSClass(className) {
+          if (this.appliedClasses.has(className)) {
+            document.body.classList.remove(className);
+            this.appliedClasses.delete(className);
+          }
+        }
+        removeClassesByPrefix(prefix) {
+          const classesToRemove = Array.from(this.appliedClasses).filter(
+            (className) => className.startsWith(prefix)
+          );
+          for (const className of classesToRemove) {
+            this.removeCSSClass(className);
+          }
+        }
+        getMemoryTier(memoryGB) {
+          if (memoryGB >= 16) return "high";
+          if (memoryGB >= 8) return "medium";
+          if (memoryGB >= 4) return "low";
+          return "minimal";
+        }
+        // ===================================================================
+        // CONVENIENCE METHODS FROM UNIFIEDCSSVARIABLEMANAGER
+        // ===================================================================
+        /**
+         * Update music system variables (from CSSVariableWriter)
+         */
+        updateMusicVariables(variables) {
+          const updates = {};
+          for (const [key, value] of Object.entries(variables)) {
+            if (value !== void 0) {
+              const fullKey = `--sn-music-${key.replace(/\./g, "-")}`;
+              updates[fullKey] = String(value);
+            }
+          }
+          this.updateVariables(updates, "critical", "music-system");
+        }
+        /**
+         * Update color system variables (from CSSVariableWriter)
+         */
+        updateColorVariables(variables) {
+          const updates = {};
+          for (const [key, value] of Object.entries(variables)) {
+            if (value !== void 0) {
+              const fullKey = `--sn-color-${key.replace(/\./g, "-")}`;
+              updates[fullKey] = String(value);
+            }
+          }
+          this.updateVariables(updates, "high", "color-system");
+        }
+        /**
+         * Update animation system variables (from CSSVariableWriter)
+         */
+        updateAnimationVariables(variables) {
+          const updates = {};
+          for (const [key, value] of Object.entries(variables)) {
+            if (value !== void 0) {
+              const fullKey = `--sn-anim-${key.replace(/\./g, "-")}`;
+              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
+            }
+          }
+          this.updateVariables(updates, "normal", "animation-system");
+        }
+        /**
+         * Update performance system variables (from CSSVariableWriter)
+         */
+        updatePerformanceVariables(variables) {
+          const updates = {};
+          for (const [key, value] of Object.entries(variables)) {
+            if (value !== void 0) {
+              const fullKey = `--sn-performance-${key.replace(/\./g, "-")}`;
+              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
+            }
+          }
+          this.updateVariables(updates, "high", "performance-system");
+        }
+        /**
+         * Update utility system variables (from CSSVariableWriter)
+         */
+        updateUtilityVariables(variables) {
+          const updates = {};
+          for (const [key, value] of Object.entries(variables)) {
+            if (value !== void 0) {
+              const fullKey = `--sn-${key.replace(/\./g, "-")}`;
+              updates[fullKey] = typeof value === "boolean" ? value ? "1" : "0" : String(value);
+            }
+          }
+          this.updateVariables(updates, "low", "utility-system");
+        }
+        /**
+         * Queue a CSS variable update (from CSSVariableWriter compatibility)
+         */
+        queueUpdate(property, value, priority = "normal", source = "unknown") {
+          this.queueCSSVariableUpdate(property, value, null, priority, source);
+        }
+        /**
+         * Queue multiple CSS variable updates in a transaction (from CSSVariableWriter)
+         */
+        queueTransaction(variables, priority = "normal", source = "unknown") {
+          const transactionId = `tx_${++this.transactionCounter}`;
+          const variableMap = new Map(Object.entries(variables));
+          const transaction = {
+            id: transactionId,
+            variables: variableMap,
+            timestamp: performance.now(),
+            priority,
+            completed: false
+          };
+          this.pendingTransactions.set(transactionId, transaction);
+          for (const [property, value] of variableMap) {
+            this.queueUpdate(property, value, priority, `${source}:${transactionId}`);
+          }
+          this.performanceMetrics.transactionCount++;
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Transaction ${transactionId} queued with ${variableMap.size} variables`
+            );
+          }
+          return transactionId;
+        }
+        /**
+         * Force immediate flush (from CSSVariableWriter)
+         */
+        forceFlush() {
+          this.flushCSSVariableBatch();
+        }
+        /**
+         * Register a variable group (from CSSVariableWriter compatibility)
+         */
+        registerVariableGroup(name, priority = "normal", batchSize = 50, flushInterval = 16) {
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Variable group registration: ${name} (handled internally)`
+            );
+          }
+        }
+        /**
+         * Update variables in a specific group (from CSSVariableWriter compatibility)
+         */
+        updateVariableGroup(groupName, variables, source = "unknown") {
+          this.updateVariables(variables, "normal", `group:${groupName}:${source}`);
+        }
+        /**
+         * Update configuration (from CSSVariableBatcher compatibility)
+         */
+        updateConfig(newConfig) {
+          this.cssConfig = { ...this.cssConfig, ...newConfig };
+          if (this.config.enableDebug) {
+            console.log(
+              "\u{1F30C} [CSSVariableWriter] Configuration updated:",
+              newConfig
+            );
+          }
+        }
+        // ===================================================================
+        // LEGACY COMPATIBILITY METHODS
+        // ===================================================================
+        // For backwards compatibility with CSSVariableWriter API
+        flushNow() {
+          this.flushCSSVariableBatch();
+        }
+        setBatchingEnabled(enabled) {
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Batching ${enabled ? "enabled" : "disabled"}`
+            );
+          }
+        }
+        addCriticalVariable(variable) {
+          CRITICAL_NOW_PLAYING_VARS.add(variable);
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Added critical variable: ${variable}`
+            );
+          }
+        }
+        removeCriticalVariable(variable) {
+          CRITICAL_NOW_PLAYING_VARS.delete(variable);
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Removed critical variable: ${variable}`
+            );
+          }
+        }
+        isCriticalVariable(variable) {
+          return CRITICAL_NOW_PLAYING_VARS.has(variable);
+        }
+        getCriticalVariables() {
+          return Array.from(CRITICAL_NOW_PLAYING_VARS);
+        }
+        // ===================================================================
+        // SIMPLIFIED COORDINATION PATTERNS (Extracted from SharedVariableCoordination.ts)
+        // ===================================================================
+        /**
+         * Update visual-effects intensity with simplified coordination through UnifiedEventBus
+         * Replaces the complex ConsciousnessIntensityCoordinator pattern with a simple subscription-based approach
+         */
+        updateVisualEffectsIntensity(intensity, sourceStrategy, musicEnergy) {
+          const clampedIntensity = Math.max(0, Math.min(1, intensity));
+          this.queueCSSVariableUpdate(
+            "--visual-effects-intensity",
+            clampedIntensity.toString(),
+            null,
+            "high",
+            `visual-effects-${sourceStrategy}`
+          );
+          if (this.eventBus) {
+            this.eventBus.emitSync("visual-effects:intensity-changed", {
+              intensity: clampedIntensity,
+              userEngagement: 0.5,
+              // Default engagement level
+              timestamp: Date.now(),
+              sourceStrategy,
+              musicEnergy: musicEnergy ?? 0
+            });
+          }
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Consciousness intensity updated by ${sourceStrategy}: ${clampedIntensity}`
+            );
+          }
+        }
+        /**
+         * Update crossfade opacity with simplified coordination through UnifiedEventBus
+         * Replaces the complex CrossfadeOpacityCoordinator pattern with a simple subscription-based approach
+         */
+        updateCrossfadeOpacity(opacity, sourceStrategy, webglEnabled) {
+          let finalOpacity = Math.max(0, Math.min(1, opacity));
+          if (!webglEnabled) {
+            finalOpacity = 0;
+          }
+          this.queueCSSVariableUpdate(
+            "--sn-gradient-crossfade-opacity",
+            finalOpacity.toString(),
+            null,
+            "high",
+            `crossfade-${sourceStrategy}`
+          );
+          if (this.eventBus) {
+            this.eventBus.emitSync("gradient:crossfade-changed", {
+              opacity: finalOpacity,
+              sourceStrategy,
+              webglEnabled,
+              timestamp: Date.now()
+            });
+          }
+          if (this.config.enableDebug) {
+            console.log(
+              `\u{1F30C} [CSSVariableWriter] Crossfade opacity updated by ${sourceStrategy}: ${finalOpacity} (WebGL: ${webglEnabled})`
+            );
+          }
+        }
+        /**
+         * Subscribe to visual-effects intensity changes from other strategies
+         */
+        subscribeToVisualEffectsChanges(callback) {
+          if (!this.eventBus) {
+            console.warn(
+              "[CSSVariableWriter] No UnifiedEventBus available for visual-effects subscriptions"
+            );
+            return () => {
+            };
+          }
+          const subscriptionId = this.eventBus.subscribe(
+            "visual-effects:intensity-changed",
+            callback,
+            "CSSVariableWriter"
+          );
+          return () => this.eventBus?.unsubscribe(subscriptionId);
+        }
+        /**
+         * Subscribe to crossfade opacity changes from other strategies
+         */
+        subscribeToCrossfadeChanges(callback) {
+          if (!this.eventBus) {
+            console.warn(
+              "[CSSVariableWriter] No UnifiedEventBus available for crossfade subscriptions"
+            );
+            return () => {
+            };
+          }
+          const subscriptionId = this.eventBus.subscribe(
+            "gradient:crossfade-changed",
+            callback,
+            "CSSVariableWriter"
+          );
+          return () => this.eventBus?.unsubscribe(subscriptionId);
+        }
+        // ===============================================================================
+        // LEGACY API METHODS (for backward compatibility with OptimizedCSSVariableManager)
+        // ===============================================================================
+        /**
+         * Set single variable (legacy API compatibility)
+         * Supports both old interface: (source, property, value, priority, description)
+         * and new interface: (name, value, priority)
+         */
+        setVariable(sourceOrName, propertyOrValue, valueOrPriority, priority, description) {
+          let finalProperty;
+          let finalValue;
+          let finalPriority;
+          let finalSource;
+          if (arguments.length >= 4) {
+            finalProperty = propertyOrValue;
+            finalValue = valueOrPriority;
+            finalPriority = priority || "normal";
+            finalSource = `${sourceOrName}${description ? `:${description}` : ""}`;
+          } else {
+            finalProperty = sourceOrName;
+            finalValue = propertyOrValue;
+            finalPriority = valueOrPriority || "normal";
+            finalSource = "legacy-api";
+          }
+          const normalizedPriority = finalPriority || "normal";
+          this.queueCSSVariableUpdate(finalProperty, finalValue, null, normalizedPriority, finalSource);
+        }
+        /**
+         * Batch set variables (legacy API compatibility)
+         * Supports both old interface: (source, variables, priority, description)
+         * and new interface: (variables, priority)
+         */
+        batchSetVariables(sourceOrVariables, variablesOrPriority, priority, description) {
+          let finalVariables;
+          let finalPriority;
+          let finalSource;
+          if (typeof sourceOrVariables === "string") {
+            finalVariables = variablesOrPriority;
+            finalPriority = priority || "normal";
+            finalSource = `${sourceOrVariables}${description ? `:${description}` : ""}`;
+          } else {
+            finalVariables = sourceOrVariables;
+            finalPriority = variablesOrPriority || "normal";
+            finalSource = "legacy-batch-api";
+          }
+          const normalizedPriority = finalPriority || "normal";
+          this.updateVariables(finalVariables, normalizedPriority, finalSource);
+        }
+        // ========================================================================
+        // PRIVATE IMPLEMENTATION - CONSOLIDATED OPTIMIZATION FEATURES
+        // ========================================================================
+        /**
+         * Initialize optimized features (from OptimizedCSSVariableManager consolidation)
+         */
+        initializeOptimizedFeatures() {
+          if (this.currentDeviceCapabilities?.performanceTier === "low") {
+          }
+          if (this.config.enableDebug) {
+            console.log("[CSSVariableWriter] Optimized features initialized");
+          }
+        }
+        /**
+         * Initialize frame context integration (replaces CDFVariableBridge)
+         */
+        initializeFrameContextIntegration() {
+          if (this.config.enableDebug) {
+            console.log("[CSSVariableWriter] Frame context integration initialized");
+          }
+        }
+        /**
+         * Determine variable priority based on property and context
+         */
+        determineVariablePriority(property, requestedPriority) {
+          if (property.includes("sn-critical") || property.includes("spice-main")) {
+            return "critical";
+          }
+          if (property.includes("music") || property.includes("beat") || property.includes("energy")) {
+            return "high";
+          }
+          if (property.includes("color") || property.includes("accent")) {
+            return "normal";
+          }
+          return requestedPriority || "low";
+        }
+        /**
+         * Apply critical updates immediately bypassing queue
+         */
+        applyCriticalUpdate(property, value, targetElement) {
+          const element = targetElement || document.documentElement;
+          try {
+            if (_CSSVariableWriter.nativeSetProperty) {
+              _CSSVariableWriter.nativeSetProperty.call(
+                element.style,
+                property,
+                value
+              );
+            } else {
+              element.style.setProperty(property, value);
+            }
+            if (this.config.enableDebug) {
+              console.log(`[CSSVariableWriter] Critical update applied: ${property} = ${value}`);
+            }
+          } catch (error) {
+            console.warn("[CSSVariableWriter] Critical update failed:", error);
+          }
+        }
+        /**
+         * Queue update by priority level
+         */
+        queueByPriority(property, value, targetElement, priority, source) {
+          if (!this.priorityQueues.has(priority)) {
+            this.priorityQueues.set(priority, /* @__PURE__ */ new Map());
+          }
+          const queue = this.priorityQueues.get(priority);
+          queue.set(property, { property, value, timestamp: Date.now() });
+          if (priority === "critical" || priority === "high") {
+            this.flushCSSVariableBatch();
+          }
+        }
+        /**
+         * Destroy frame context integration
+         */
+        destroyFrameContextIntegration() {
+          if (this.config.enableDebug) {
+            console.log("[CSSVariableWriter] Frame context integration destroyed");
+          }
+        }
+        /**
+         * Cleanup and destroy the manager
+         */
+        destroy() {
+          if (this.adaptiveMonitoringInterval) {
+            clearInterval(this.adaptiveMonitoringInterval);
+            this.adaptiveMonitoringInterval = null;
+          }
+          this.destroyFrameContextIntegration();
+          this.priorityQueues.clear();
+          if (this.visualEffectsUpdateTimer) {
+            clearTimeout(this.visualEffectsUpdateTimer);
+            this.visualEffectsUpdateTimer = null;
+          }
+          this.cssVariableQueue.clear();
+          unifiedEventBus.unsubscribeAll("CSSVariableWriter");
+          this.initialized = false;
+        }
+      };
+      __name(_CSSVariableWriter, "CSSVariableWriter");
+      _CSSVariableWriter.hijackEnabled = false;
+      CSSVariableWriter = _CSSVariableWriter;
+      globalCSSVariableWriter = null;
+      __name(setGlobalCSSVariableWriter, "setGlobalCSSVariableWriter");
+      __name(getGlobalCSSVariableWriter, "getGlobalCSSVariableWriter");
+      __name(getGlobalCSSVariableWriterSafe, "getGlobalCSSVariableWriterSafe");
+    }
+  });
+
+  // src-js/core/services/CoreServiceProviders.ts
+  var CoreServiceProviders_exports = {};
+  __export(CoreServiceProviders_exports, {
+    DefaultCSSVariableService: () => DefaultCSSVariableService,
+    DefaultCanvasManagementService: () => DefaultCanvasManagementService,
+    DefaultEventSubscriptionService: () => DefaultEventSubscriptionService,
+    DefaultMusicSyncLifecycleService: () => DefaultMusicSyncLifecycleService,
+    DefaultPerformanceProfileService: () => DefaultPerformanceProfileService,
+    DefaultPerformanceTrackingService: () => DefaultPerformanceTrackingService,
+    DefaultServiceFactory: () => DefaultServiceFactory,
+    DefaultSettingsService: () => DefaultSettingsService,
+    DefaultSystemLifecycleService: () => DefaultSystemLifecycleService,
+    DefaultThemeLifecycleService: () => DefaultThemeLifecycleService,
+    DefaultThemingStateService: () => DefaultThemingStateService,
+    DefaultVisualCoordinatorService: () => DefaultVisualCoordinatorService
+  });
+  var _DefaultSystemLifecycleService, DefaultSystemLifecycleService, _DefaultPerformanceTrackingService, DefaultPerformanceTrackingService, _DefaultCSSVariableService, DefaultCSSVariableService, _DefaultEventSubscriptionService, DefaultEventSubscriptionService, _DefaultCanvasManagementService, DefaultCanvasManagementService, _DefaultServiceFactory, DefaultServiceFactory, _DefaultPerformanceProfileService, DefaultPerformanceProfileService, _DefaultMusicSyncLifecycleService, DefaultMusicSyncLifecycleService, _DefaultSettingsService, DefaultSettingsService, _DefaultThemeLifecycleService, DefaultThemeLifecycleService, _DefaultThemingStateService, DefaultThemingStateService, _DefaultVisualCoordinatorService, DefaultVisualCoordinatorService;
+  var init_CoreServiceProviders = __esm({
+    "src-js/core/services/CoreServiceProviders.ts"() {
+      "use strict";
+      init_DebugCoordinator();
+      init_VisualCanvasFactory();
+      init_EventBus();
+      init_GenreService();
+      init_visualPerformance();
+      init_config();
+      init_CSSVariableWriter();
+      _DefaultSystemLifecycleService = class _DefaultSystemLifecycleService {
+        constructor() {
+          this.systems = /* @__PURE__ */ new Map();
+        }
+        async initializeSystem(systemName, config, initFn) {
+          const existing = this.systems.get(systemName);
+          if (existing?.initialized) {
+            Y3KDebug?.debug?.warn("SystemLifecycle", `System ${systemName} already initialized`);
+            return;
+          }
+          const startTime = performance.now();
+          try {
+            Y3KDebug?.debug?.log("SystemLifecycle", `Initializing system: ${systemName}`);
+            await initFn();
+            const initializationTime = performance.now() - startTime;
+            const now = Date.now();
+            this.systems.set(systemName, {
+              initialized: true,
+              initializationTime,
+              lastInitialized: now,
+              initializationCount: (existing?.initializationCount || 0) + 1
+            });
+            Y3KDebug?.debug?.log(
+              "SystemLifecycle",
+              `System ${systemName} initialized in ${initializationTime.toFixed(2)}ms`
+            );
+          } catch (error) {
+            Y3KDebug?.debug?.error(
+              "SystemLifecycle",
+              `Failed to initialize system ${systemName}:`,
+              error
+            );
+            throw error;
+          }
+        }
+        destroySystem(systemName, cleanupFn) {
+          const system = this.systems.get(systemName);
+          if (!system?.initialized) {
+            Y3KDebug?.debug?.warn("SystemLifecycle", `System ${systemName} not initialized`);
+            return;
+          }
+          try {
+            Y3KDebug?.debug?.log("SystemLifecycle", `Destroying system: ${systemName}`);
+            cleanupFn();
+            this.systems.set(systemName, {
+              ...system,
+              initialized: false
+            });
+          } catch (error) {
+            Y3KDebug?.debug?.error(
+              "SystemLifecycle",
+              `Failed to destroy system ${systemName}:`,
+              error
+            );
+          }
+        }
+        isSystemInitialized(systemName) {
+          return this.systems.get(systemName)?.initialized ?? false;
+        }
+        getSystemMetrics(systemName) {
+          const system = this.systems.get(systemName);
+          if (!system) return null;
+          return {
+            initializationTime: system.initializationTime,
+            lastInitialized: system.lastInitialized,
+            initializationCount: system.initializationCount
+          };
+        }
+      };
+      __name(_DefaultSystemLifecycleService, "DefaultSystemLifecycleService");
+      DefaultSystemLifecycleService = _DefaultSystemLifecycleService;
+      _DefaultPerformanceTrackingService = class _DefaultPerformanceTrackingService {
+        constructor() {
+          this.systemMetrics = /* @__PURE__ */ new Map();
+        }
+        trackOperation(systemName, operationName, operation) {
+          const startTime = performance.now();
+          try {
+            const result = operation();
+            const duration = performance.now() - startTime;
+            this.recordOperationTime(systemName, operationName, duration);
+            return result;
+          } catch (error) {
+            const duration = performance.now() - startTime;
+            this.recordOperationTime(systemName, operationName, duration);
+            throw error;
+          }
+        }
+        async trackOperationAsync(systemName, operationName, operation) {
+          const startTime = performance.now();
+          try {
+            const result = await operation();
+            const duration = performance.now() - startTime;
+            this.recordOperationTime(systemName, operationName, duration);
+            return result;
+          } catch (error) {
+            const duration = performance.now() - startTime;
+            this.recordOperationTime(systemName, operationName, duration);
+            throw error;
+          }
+        }
+        recordMetric(systemName, metricName, value) {
+          const system = this.systemMetrics.get(systemName) || {
+            operationTimes: {},
+            metrics: {}
+          };
+          system.metrics[metricName] = value;
+          this.systemMetrics.set(systemName, system);
+        }
+        recordOperationTime(systemName, operationName, duration) {
+          const system = this.systemMetrics.get(systemName) || {
+            operationTimes: {},
+            metrics: {}
+          };
+          if (!system.operationTimes[operationName]) {
+            system.operationTimes[operationName] = [];
+          }
+          system.operationTimes[operationName].push(duration);
+          if (system.operationTimes[operationName].length > 100) {
+            system.operationTimes[operationName].shift();
+          }
+          this.systemMetrics.set(systemName, system);
+        }
+        getMetrics(systemName) {
+          const system = this.systemMetrics.get(systemName);
+          if (!system) return null;
+          const allTimes = [];
+          Object.values(system.operationTimes).forEach((times) => allTimes.push(...times));
+          return {
+            operationTimes: { ...system.operationTimes },
+            metrics: { ...system.metrics },
+            averageOperationTime: allTimes.length > 0 ? allTimes.reduce((a, b) => a + b, 0) / allTimes.length : 0,
+            lastOperationTime: allTimes[allTimes.length - 1] || 0
+          };
+        }
+      };
+      __name(_DefaultPerformanceTrackingService, "DefaultPerformanceTrackingService");
+      DefaultPerformanceTrackingService = _DefaultPerformanceTrackingService;
+      _DefaultCSSVariableService = class _DefaultCSSVariableService {
+        constructor() {
+          this.updateQueue = /* @__PURE__ */ new Map();
+          this.flushScheduled = false;
+          this.lastFlushTime = 0;
+        }
+        queueUpdate(variable, value) {
+          this.updateQueue.set(variable, value);
+          this.scheduleFlush();
+        }
+        queueBatchUpdate(updates) {
+          Object.entries(updates).forEach(([variable, value]) => {
+            this.updateQueue.set(variable, value);
+          });
+          this.scheduleFlush();
+        }
+        flushUpdates() {
+          if (this.updateQueue.size === 0) return;
+          const root = document.documentElement;
+          const startTime = performance.now();
+          for (const [variable, value] of this.updateQueue) {
+            root.style.setProperty(variable, value);
+          }
+          const flushTime = performance.now() - startTime;
+          this.updateQueue.clear();
+          this.lastFlushTime = Date.now();
+          this.flushScheduled = false;
+          Y3KDebug?.debug?.log(
+            "CSSVariableService",
+            `Flushed ${this.updateQueue.size} CSS updates in ${flushTime.toFixed(2)}ms`
+          );
+        }
+        scheduleFlush() {
+          if (this.flushScheduled) return;
+          this.flushScheduled = true;
+          requestAnimationFrame(() => {
+            this.flushUpdates();
+          });
+        }
+        getCurrentValue(variable) {
+          return getComputedStyle(document.documentElement).getPropertyValue(variable) || null;
+        }
+        getQueueStatus() {
+          return {
+            queueSize: this.updateQueue.size,
+            lastFlushTime: this.lastFlushTime,
+            pendingUpdates: Array.from(this.updateQueue.keys())
+          };
+        }
+      };
+      __name(_DefaultCSSVariableService, "DefaultCSSVariableService");
+      DefaultCSSVariableService = _DefaultCSSVariableService;
+      _DefaultEventSubscriptionService = class _DefaultEventSubscriptionService {
+        constructor() {
+          this.systemSubscriptions = /* @__PURE__ */ new Map();
+        }
+        subscribe(systemName, eventName, handler) {
+          const system = this.systemSubscriptions.get(systemName) || {
+            eventUnsubscribers: [],
+            domUnsubscribers: []
+          };
+          if (unifiedEventBus?.subscribe) {
+            const subscriptionId = unifiedEventBus.subscribe(
+              eventName,
+              handler,
+              systemName
+            );
+            system.eventUnsubscribers.push(
+              () => unifiedEventBus.unsubscribe(subscriptionId)
+            );
+          } else {
+            const wrappedHandler = /* @__PURE__ */ __name((event) => {
+              const customEvent = event;
+              handler(customEvent.detail);
+            }, "wrappedHandler");
+            document.addEventListener(eventName, wrappedHandler);
+            system.domUnsubscribers.push(() => {
+              document.removeEventListener(eventName, wrappedHandler);
+            });
+          }
+          this.systemSubscriptions.set(systemName, system);
+        }
+        subscribeToDOM(systemName, element, eventType, handler, options) {
+          const system = this.systemSubscriptions.get(systemName) || {
+            eventUnsubscribers: [],
+            domUnsubscribers: []
+          };
+          element.addEventListener(eventType, handler, options);
+          system.domUnsubscribers.push(() => {
+            element.removeEventListener(eventType, handler, options);
+          });
+          this.systemSubscriptions.set(systemName, system);
+        }
+        unsubscribe(systemName, eventName) {
+          this.cleanupSystem(systemName);
+        }
+        cleanupSystem(systemName) {
+          const system = this.systemSubscriptions.get(systemName);
+          if (!system) return;
+          system.eventUnsubscribers.forEach((unsubscribe) => {
+            try {
+              unsubscribe();
+            } catch (error) {
+              Y3KDebug?.debug?.warn(
+                "EventSubscriptionService",
+                `Error unsubscribing for ${systemName}:`,
+                error
+              );
+            }
+          });
+          system.domUnsubscribers.forEach((unsubscribe) => {
+            try {
+              unsubscribe();
+            } catch (error) {
+              Y3KDebug?.debug?.warn(
+                "EventSubscriptionService",
+                `Error removing DOM listener for ${systemName}:`,
+                error
+              );
+            }
+          });
+          this.systemSubscriptions.delete(systemName);
+        }
+        getSubscriptionStatus(systemName) {
+          const system = this.systemSubscriptions.get(systemName);
+          if (!system) {
+            return { eventSubscriptions: [], domSubscriptions: 0, totalSubscriptions: 0 };
+          }
+          return {
+            eventSubscriptions: [],
+            // Would need more tracking to provide specific event names
+            domSubscriptions: system.domUnsubscribers.length,
+            totalSubscriptions: system.eventUnsubscribers.length + system.domUnsubscribers.length
+          };
+        }
+      };
+      __name(_DefaultEventSubscriptionService, "DefaultEventSubscriptionService");
+      DefaultEventSubscriptionService = _DefaultEventSubscriptionService;
+      _DefaultCanvasManagementService = class _DefaultCanvasManagementService {
+        constructor() {
+          this.systemCanvases = /* @__PURE__ */ new Map();
+          this.capabilities = detectRenderingCapabilities();
+        }
+        async createCanvas(systemName, canvasId, options) {
+          const systemCanvasMap = this.systemCanvases.get(systemName) || /* @__PURE__ */ new Map();
+          const existing = systemCanvasMap.get(canvasId);
+          if (existing) {
+            Y3KDebug?.debug?.warn(
+              "CanvasManagement",
+              `Canvas ${canvasId} already exists for system ${systemName}`
+            );
+            return existing;
+          }
+          try {
+            const canvasResult = await createOptimizedCanvas({
+              id: canvasId,
+              width: options.width || 800,
+              height: options.height || 600,
+              alpha: options.alpha ?? true,
+              preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
+              preferredType: options.contextType
+            });
+            systemCanvasMap.set(canvasId, canvasResult);
+            this.systemCanvases.set(systemName, systemCanvasMap);
+            Y3KDebug?.debug?.log(
+              "CanvasManagement",
+              `Created ${options.contextType} canvas ${canvasId} for system ${systemName} (${options.width}x${options.height})`
+            );
+            return canvasResult;
+          } catch (error) {
+            Y3KDebug?.debug?.error(
+              "CanvasManagement",
+              `Failed to create canvas ${canvasId} for system ${systemName}:`,
+              error
+            );
+            throw error;
+          }
+        }
+        getCanvas(systemName, canvasId) {
+          return this.systemCanvases.get(systemName)?.get(canvasId) || null;
+        }
+        resizeCanvas(systemName, canvasId, width, height) {
+          const canvas = this.getCanvas(systemName, canvasId);
+          if (!canvas) return false;
+          try {
+            canvas.canvas.width = width;
+            canvas.canvas.height = height;
+            if (canvas.ctx && "viewport" in canvas.ctx) {
+              canvas.ctx.viewport(0, 0, width, height);
+            }
+            return true;
+          } catch (error) {
+            Y3KDebug?.debug?.error(
+              "CanvasManagement",
+              `Failed to resize canvas ${canvasId} for system ${systemName}:`,
+              error
+            );
+            return false;
+          }
+        }
+        destroyCanvas(systemName, canvasId) {
+          const systemCanvasMap = this.systemCanvases.get(systemName);
+          if (!systemCanvasMap) return;
+          const canvas = systemCanvasMap.get(canvasId);
+          if (canvas) {
+            if (canvas.ctx && "getExtension" in canvas.ctx) {
+              const gl = canvas.ctx;
+              const loseContext = gl.getExtension("WEBGL_lose_context");
+              if (loseContext) {
+                loseContext.loseContext();
+              }
+            }
+            if (canvas.canvas.parentNode) {
+              canvas.canvas.parentNode.removeChild(canvas.canvas);
+            }
+            systemCanvasMap.delete(canvasId);
+            Y3KDebug?.debug?.log(
+              "CanvasManagement",
+              `Destroyed canvas ${canvasId} for system ${systemName}`
+            );
+          }
+        }
+        cleanupSystem(systemName) {
+          const systemCanvasMap = this.systemCanvases.get(systemName);
+          if (!systemCanvasMap) return;
+          for (const canvasId of systemCanvasMap.keys()) {
+            this.destroyCanvas(systemName, canvasId);
+          }
+          this.systemCanvases.delete(systemName);
+        }
+        getCanvasCapabilities() {
+          return {
+            webgl2: this.capabilities.webgl2,
+            webgl: false,
+            // WebGL 1 support not tracked in current capabilities
+            recommendedType: this.capabilities.recommendedType,
+            maxTextureSize: 2048,
+            // Default value since not tracked in current capabilities
+            maxViewportDims: [2048, 2048]
+            // Default value since not tracked in current capabilities
+          };
+        }
+        getCanvasStats(systemName) {
+          const systemCanvasMap = this.systemCanvases.get(systemName);
+          if (!systemCanvasMap) return null;
+          const contexts = [];
+          let totalMemoryUsage = 0;
+          for (const canvas of systemCanvasMap.values()) {
+            contexts.push(canvas.type);
+            totalMemoryUsage += canvas.canvas.width * canvas.canvas.height * 4;
+          }
+          return {
+            activeCanvases: systemCanvasMap.size,
+            totalMemoryUsage,
+            contexts
+          };
+        }
+      };
+      __name(_DefaultCanvasManagementService, "DefaultCanvasManagementService");
+      DefaultCanvasManagementService = _DefaultCanvasManagementService;
+      _DefaultServiceFactory = class _DefaultServiceFactory {
+        static getServices() {
+          if (!_DefaultServiceFactory.services) {
+            _DefaultServiceFactory.services = {
+              lifecycle: new DefaultSystemLifecycleService(),
+              performance: new DefaultPerformanceTrackingService(),
+              cssVariables: new DefaultCSSVariableService(),
+              events: new DefaultEventSubscriptionService(),
+              canvas: new DefaultCanvasManagementService(),
+              performanceProfile: new DefaultPerformanceProfileService(null, null, unifiedEventBus),
+              musicSyncLifecycle: new DefaultMusicSyncLifecycleService(),
+              themingState: new DefaultThemingStateService(),
+              settings: new DefaultSettingsService(),
+              themeLifecycle: new DefaultThemeLifecycleService(),
+              visualCoordinator: new DefaultVisualCoordinatorService(),
+              genre: new GenreService()
+            };
+          }
+          if (_DefaultServiceFactory.overrides) {
+            _DefaultServiceFactory.services = {
+              ..._DefaultServiceFactory.services,
+              ..._DefaultServiceFactory.overrides
+            };
+          }
+          return _DefaultServiceFactory.services;
+        }
+        static resetServices() {
+          _DefaultServiceFactory.services = null;
+        }
+        static registerOverrides(overrides) {
+          _DefaultServiceFactory.overrides = {
+            ..._DefaultServiceFactory.overrides,
+            ...overrides
+          };
+          if (_DefaultServiceFactory.services) {
+            _DefaultServiceFactory.services = {
+              ..._DefaultServiceFactory.services,
+              ..._DefaultServiceFactory.overrides
+            };
+          }
+        }
+      };
+      __name(_DefaultServiceFactory, "DefaultServiceFactory");
+      _DefaultServiceFactory.services = null;
+      _DefaultServiceFactory.overrides = {};
+      DefaultServiceFactory = _DefaultServiceFactory;
+      _DefaultPerformanceProfileService = class _DefaultPerformanceProfileService {
+        constructor(config = null, performanceCoordinator = null, eventBus = unifiedEventBus) {
+          this.config = config;
+          this.performanceCoordinator = performanceCoordinator;
+          this.eventBus = eventBus;
+          this.snapshot = {
+            quality: "auto",
+            profile: null,
+            performanceMode: null,
+            timestamp: Date.now()
+          };
+          this.listeners = /* @__PURE__ */ new Set();
+          this.tierSubscriptionId = null;
+          this.qualityLevelSubscriptionId = null;
+          this.refreshSnapshot();
+          this.bindEventListeners();
+        }
+        setDependencies(config, performanceCoordinator) {
+          this.config = config;
+          this.performanceCoordinator = performanceCoordinator;
+          this.refreshSnapshot();
+        }
+        getCurrentSnapshot() {
+          return this.snapshot;
+        }
+        subscribe(listener) {
+          this.listeners.add(listener);
+          listener(this.snapshot);
+          return () => {
+            this.listeners.delete(listener);
+          };
+        }
+        updateSnapshot(snapshot) {
+          this.snapshot = { ...snapshot, timestamp: Date.now() };
+          this.emitUpdate();
+        }
+        destroy() {
+          if (this.tierSubscriptionId) {
+            this.eventBus.unsubscribe(this.tierSubscriptionId);
+            this.tierSubscriptionId = null;
+          }
+          if (this.qualityLevelSubscriptionId) {
+            this.eventBus.unsubscribe(this.qualityLevelSubscriptionId);
+            this.qualityLevelSubscriptionId = null;
+          }
+          this.listeners.clear();
+        }
+        bindEventListeners() {
+          this.tierSubscriptionId = this.eventBus.subscribe(
+            "performance:tier-changed",
+            (data) => {
+              const quality = this.mapTierToQuality(data?.tier);
+              if (quality) {
+                this.applyQualityOverride(quality);
+              } else {
+                this.refreshSnapshot();
+              }
+            },
+            "PerformanceProfileService"
+          );
+          this.qualityLevelSubscriptionId = this.eventBus.subscribe(
+            "quality:level-changed",
+            (data) => {
+              const quality = this.mapQualityLevelToQuality(data?.level);
+              this.applyQualityOverride(quality);
+            },
+            "PerformanceProfileService"
+          );
+        }
+        applyQualityOverride(quality) {
+          const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
+          const profile = this.resolveProfile(quality, mode);
+          this.updateSnapshot({
+            quality,
+            profile,
+            performanceMode: mode,
+            timestamp: Date.now()
+          });
+        }
+        refreshSnapshot() {
+          const mode = this.performanceCoordinator?.getCurrentPerformanceMode?.() ?? null;
+          const quality = this.mapModeToQuality(mode);
+          const profile = this.resolveProfile(quality, mode);
+          this.snapshot = {
+            quality,
+            profile,
+            performanceMode: mode,
+            timestamp: Date.now()
+          };
+          this.emitUpdate();
+        }
+        resolveProfile(quality, mode) {
+          const profiles = this.config?.performanceProfiles;
+          if (!profiles) return null;
+          const key = quality === "auto" ? this.mapModeToQuality(mode, "balanced") : quality;
+          const selected = selectPerformanceProfile(key, profiles, {
+            trace: /* @__PURE__ */ __name((msg) => {
+              if (this.config?.enableDebug) {
+                Y3KDebug?.debug?.log("PerformanceProfileService", msg);
+              }
+            }, "trace")
+          });
+          return selected ?? null;
+        }
+        mapModeToQuality(mode, fallback = "balanced") {
+          if (!mode) return fallback;
+          switch (mode.name) {
+            case "performance":
+              return "high";
+            case "auto":
+              return mode.qualityLevel >= 0.75 ? "high" : mode.qualityLevel <= 0.4 ? "low" : "balanced";
+            default:
+              return mode.qualityLevel <= 0.4 ? "low" : mode.qualityLevel >= 0.75 ? "high" : "balanced";
+          }
+        }
+        mapTierToQuality(tier) {
+          switch (tier) {
+            case "low":
+            case "degraded":
+            case "critical":
+              return "low";
+            case "high":
+            case "excellent":
+            case "premium":
+              return "high";
+            case "medium":
+            case "good":
+            default:
+              return "balanced";
+          }
+        }
+        mapQualityLevelToQuality(level) {
+          if (typeof level !== "number") return "balanced";
+          if (level <= 0.33) return "low";
+          if (level >= 0.66) return "high";
+          return "balanced";
+        }
+        emitUpdate() {
+          for (const listener of this.listeners) {
+            try {
+              listener(this.snapshot);
+            } catch (error) {
+              Y3KDebug?.debug?.warn(
+                "PerformanceProfileService",
+                "Listener error",
+                error
+              );
+            }
+          }
+        }
+      };
+      __name(_DefaultPerformanceProfileService, "DefaultPerformanceProfileService");
+      DefaultPerformanceProfileService = _DefaultPerformanceProfileService;
+      _DefaultMusicSyncLifecycleService = class _DefaultMusicSyncLifecycleService {
+        constructor() {
+          this.musicSyncService = null;
+          this.pendingSubscribers = /* @__PURE__ */ new Map();
+        }
+        attach(service) {
+          this.musicSyncService = service;
+          for (const [name, subscriber] of this.pendingSubscribers.entries()) {
+            service.subscribe(subscriber, name);
+          }
+          this.pendingSubscribers.clear();
+        }
+        subscribe(systemName, subscriber) {
+          if (this.musicSyncService) {
+            this.musicSyncService.subscribe(subscriber, systemName);
+          } else {
+            this.pendingSubscribers.set(systemName, subscriber);
+          }
+        }
+        unsubscribe(systemName) {
+          this.pendingSubscribers.delete(systemName);
+          this.musicSyncService?.unsubscribe(systemName);
+        }
+        getLatestProcessedData() {
+          return this.musicSyncService?.getLatestProcessedData?.() ?? null;
+        }
+        getCurrentBeatVector() {
+          return this.musicSyncService ? this.musicSyncService.getCurrentBeatVector() : null;
+        }
+      };
+      __name(_DefaultMusicSyncLifecycleService, "DefaultMusicSyncLifecycleService");
+      DefaultMusicSyncLifecycleService = _DefaultMusicSyncLifecycleService;
+      _DefaultSettingsService = class _DefaultSettingsService {
+        constructor(manager = null) {
+          this.manager = manager;
+        }
+        setManager(manager) {
+          this.manager = manager;
+        }
+        resolveManager() {
+          if (this.manager) {
+            return this.manager;
+          }
+          try {
+            const resolved = getSettings();
+            this.manager = resolved;
+            return resolved;
+          } catch (error) {
+            Y3KDebug?.debug?.error(
+              "SettingsService",
+              "Unable to resolve TypedSettingsManager",
+              error
+            );
+            throw error;
+          }
+        }
+        get(key) {
+          return this.resolveManager().get(key);
+        }
+        set(key, value) {
+          return this.resolveManager().set(key, value);
+        }
+        reset(key) {
+          return this.resolveManager().reset(key);
+        }
+        onChange(listener) {
+          const manager = this.resolveManager();
+          manager.onChange(listener);
+          return () => manager.offChange(listener);
+        }
+        export() {
+          return this.resolveManager().export();
+        }
+        import(settings2) {
+          return this.resolveManager().import(settings2);
+        }
+        getManager() {
+          return this.resolveManager();
+        }
+      };
+      __name(_DefaultSettingsService, "DefaultSettingsService");
+      DefaultSettingsService = _DefaultSettingsService;
+      _DefaultThemeLifecycleService = class _DefaultThemeLifecycleService {
+        constructor(coordinator = null, facade = null) {
+          this.coordinator = coordinator;
+          this.facade = facade ?? coordinator?.facadeCoordinator ?? null;
+        }
+        setCoordinator(coordinator) {
+          this.coordinator = coordinator;
+          if (coordinator?.facadeCoordinator) {
+            this.facade = coordinator.facadeCoordinator;
+          }
+        }
+        setFacadeCoordinator(facade) {
+          this.facade = facade;
+        }
+        getCoordinator() {
+          return this.coordinator;
+        }
+        getFacadeCoordinator() {
+          return this.facade ?? this.coordinator?.facadeCoordinator ?? null;
+        }
+        getCssController() {
+          return this.coordinator?.cssVariableController || getGlobalCSSVariableWriterSafe();
+        }
+        getTimerConsolidationSystem() {
+          return this.coordinator?.timerConsolidationSystem ?? null;
+        }
+        getAnimationCoordinator() {
+          return this.coordinator?.enhancedMasterAnimationCoordinator ?? null;
+        }
+        getMusicSyncService() {
+          return this.coordinator?.musicSyncService ?? null;
+        }
+        getPerformanceCoordinator() {
+          return this.coordinator?.simplePerformanceCoordinator || this.coordinator?.performanceCoordinator || null;
+        }
+        async applyInitialSettings(trigger) {
+          if (!this.coordinator) {
+            return;
+          }
+          await this.coordinator.applyInitialSettings(trigger);
+        }
+      };
+      __name(_DefaultThemeLifecycleService, "DefaultThemeLifecycleService");
+      DefaultThemeLifecycleService = _DefaultThemeLifecycleService;
+      _DefaultThemingStateService = class _DefaultThemingStateService {
+        constructor() {
+          this.defaultState = {
+            energy: 0.5,
+            valence: 0.5,
+            bpm: 120,
+            tempoMultiplier: 1,
+            beatPhase: 0,
+            beatPulse: 0
+          };
+        }
+        getKineticState() {
+          if (typeof document === "undefined") {
+            return { ...this.defaultState };
+          }
+          const root = document.documentElement;
+          const style = getComputedStyle(root);
+          const readNumber = /* @__PURE__ */ __name((variable, fallback) => {
+            const value = parseFloat(style.getPropertyValue(variable));
+            return Number.isFinite(value) ? value : fallback;
+          }, "readNumber");
+          return {
+            energy: readNumber("--sn-kinetic-energy", this.defaultState.energy),
+            valence: readNumber("--sn-kinetic-valence", this.defaultState.valence),
+            bpm: readNumber("--sn-kinetic-bpm", this.defaultState.bpm),
+            tempoMultiplier: readNumber(
+              "--sn-kinetic-tempo-multiplier",
+              this.defaultState.tempoMultiplier
+            ),
+            beatPhase: readNumber("--sn-kinetic-beat-phase", this.defaultState.beatPhase),
+            beatPulse: readNumber("--sn-kinetic-beat-pulse", this.defaultState.beatPulse)
+          };
+        }
+        getCSSVariable(variable) {
+          if (typeof document === "undefined") {
+            return null;
+          }
+          const value = getComputedStyle(document.documentElement).getPropertyValue(variable);
+          return value || null;
+        }
+      };
+      __name(_DefaultThemingStateService, "DefaultThemingStateService");
+      DefaultThemingStateService = _DefaultThemingStateService;
+      _DefaultVisualCoordinatorService = class _DefaultVisualCoordinatorService {
+        constructor(coordinator = null) {
+          this.coordinator = coordinator;
+        }
+        setCoordinator(coordinator) {
+          this.coordinator = coordinator;
+        }
+        ensureCoordinator() {
+          if (!this.coordinator) {
+            Y3KDebug?.debug?.warn(
+              "VisualCoordinatorService",
+              "VisualEffectsCoordinator not initialized"
+            );
+            return null;
+          }
+          return this.coordinator;
+        }
+        async getVisualSystem(key) {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator) return null;
+          return await coordinator.getVisualSystem(key) || null;
+        }
+        getCachedVisualSystem(key) {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator) return null;
+          return coordinator.getCachedVisualSystem(key);
+        }
+        getCurrentVisualEffectsState() {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator) return null;
+          return coordinator.getCurrentVisualEffectsState();
+        }
+        getMetrics() {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator) return null;
+          return coordinator.getMetrics();
+        }
+        getCoordinatorInstance() {
+          return this.ensureCoordinator();
+        }
+        registerVisualEffectsParticipant(participant) {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator?.registerVisualEffectsParticipant) return false;
+          const result = coordinator.registerVisualEffectsParticipant(participant);
+          return !!result?.success;
+        }
+        unregisterVisualEffectsParticipant(systemName) {
+          const coordinator = this.ensureCoordinator();
+          if (!coordinator?.unregisterVisualEffectsParticipant) return;
+          coordinator.unregisterVisualEffectsParticipant(systemName);
+        }
+      };
+      __name(_DefaultVisualCoordinatorService, "DefaultVisualCoordinatorService");
+      DefaultVisualCoordinatorService = _DefaultVisualCoordinatorService;
+    }
+  });
+
+  // src-js/config/globalConfig.ts
+  var globalConfig_exports = {};
+  __export(globalConfig_exports, {
+    ADVANCED_SYSTEM_CONFIG: () => ADVANCED_SYSTEM_CONFIG,
+    ARTISTIC_MODE_PROFILES: () => ARTISTIC_MODE_PROFILES2,
+    COLOR_HARMONY_MODES: () => COLOR_HARMONY_MODES2,
+    HARMONIC_MODES: () => HARMONIC_MODES2
+  });
+  var COLOR_HARMONY_MODES2, HARMONIC_MODES2, ARTISTIC_MODE_PROFILES2, ADVANCED_SYSTEM_CONFIG;
+  var init_globalConfig = __esm({
+    "src-js/config/globalConfig.ts"() {
+      "use strict";
+      init_config();
+      init_CoreServiceProviders();
+      init_harmonicModes();
+      init_artisticProfiles();
+      init_performanceProfiles();
+      COLOR_HARMONY_MODES2 = COLOR_HARMONY_MODES;
+      HARMONIC_MODES2 = HARMONIC_MODES;
+      ARTISTIC_MODE_PROFILES2 = ARTISTIC_MODE_PROFILES;
+      ADVANCED_SYSTEM_CONFIG = {
+        enableDebug: true,
+        enableContextualIntelligence: true,
+        paletteSystem: "catppuccin",
+        // Default to maintain compatibility
+        // Phase 2: OKLCH Dynamic Palette System
+        useDynamicPalettes: false,
+        // Feature flag for gradual rollout
+        // Phase 4B: Palette transform now ALWAYS applied (primary implementation)
+        // No flag needed - this is the correct architecture
+        // Phase 4C: Strategic Color Variable Architecture - OKLAB Variant Tiers
+        enableTier2OKLABVariants: true,
+        // Atmospheric enhancement colors (teal, sapphire, lavender, surface1, overlay1)
+        enableTier3OKLABVariants: true,
+        // Feedback state colors (red, yellow, green)
+        performanceProfiles: PERFORMANCE_PROFILES,
+        // Enhanced logging configuration
+        logging: DEFAULT_LOGGING_CONFIG,
+        healthCheckInterval: 1e4,
+        visual: {
+          lightweightParticleSystem: { mode: "artist-vision" },
+          spatialNexusSystem: { mode: "artist-vision" },
+          dataGlyphSystem: { mode: "artist-vision" },
+          beatSyncVisualSystem: { mode: "artist-vision" },
+          behavioralPredictionEngine: { mode: "artist-vision" },
+          predictiveMaterializationSystem: { mode: "artist-vision" },
+          sidebarVisualStateSystem: { mode: "artist-vision" }
+        },
+        enableColorExtraction: true,
+        enableMusicAnalysis: true,
+        enableAdvancedSync: true,
+        // NEW: Music-driven visual intensity
+        musicModulationIntensity: 0.4,
+        // Increased for dynamic gradient responsiveness
+        // Active artistic mode for UX / visual presets
+        artisticMode: "artist-vision",
+        // "corporate-safe" | "artist-vision" | "advanced-maximum"
+        // Context-bound method references for external calling
+        boundGetCurrentMultipliers: null,
+        boundGetCurrentFeatures: null,
+        boundGetCurrentPerformanceSettings: null,
+        // Pending artistic mode for deferred application
+        _pendingArtisticMode: null,
+        // Initialize bound methods to preserve context
+        init() {
+          this.boundGetCurrentMultipliers = this.getCurrentMultipliers.bind(this);
+          this.boundGetCurrentFeatures = this.getCurrentFeatures.bind(this);
+          this.boundGetCurrentPerformanceSettings = this.getCurrentPerformanceSettings.bind(this);
+          const needsPreferenceLoad = !this.artisticMode || !this.paletteSystem;
+          if (needsPreferenceLoad) {
+            if (this.enableDebug) {
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Loading preferences (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+              );
+            }
+            this.loadArtisticPreference();
+          } else if (this.enableDebug) {
+            console.log(
+              `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Skipping preference load (current: artistic=${this.artisticMode}, palette=${this.paletteSystem})`
+            );
+          }
+          if (this._pendingArtisticMode && this.isFullyInitialized()) {
+            if (this.enableDebug) {
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Applying pending artistic mode: ${this._pendingArtisticMode}`
+              );
+            }
+            this.setArtisticMode(this._pendingArtisticMode);
+            this._pendingArtisticMode = null;
+          }
+          if (this.enableDebug) {
+            console.log(
+              "\u{1F527} [ADVANCED_SYSTEM_CONFIG] Initialized with context-bound methods"
+            );
+          }
+          return this;
+        },
+        currentColorHarmonyMode: "analogous-flow",
+        colorHarmonyBaseColor: null,
+        colorHarmonyIntensity: 0.85,
+        // Enhanced for cinematic gradient harmonies
+        colorHarmonyEvolution: true,
+        // Music sync configuration imported from modular harmonic modes
+        musicVisualSync: {
+          ...MUSIC_VISUAL_SYNC,
+          enhancedBPM: ENHANCED_BPM_CONFIG
+        },
+        // Enhanced: Get current mode profile with full Year3000 parameters
+        getCurrentModeProfile() {
+          const mode = this.artisticMode || "artist-vision";
+          return ARTISTIC_MODE_PROFILES2[mode] || ARTISTIC_MODE_PROFILES2["artist-vision"];
+        },
+        // Enhanced: Get current multipliers from active mode profile
+        getCurrentMultipliers() {
+          try {
+            if (typeof this.getCurrentModeProfile !== "function") {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback multipliers"
+              );
+              return this["artisticMultipliers"];
+            }
+            const currentProfile = this.getCurrentModeProfile();
+            if (!currentProfile || !currentProfile.multipliers) {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing multipliers, using fallback"
+              );
+              return this["artisticMultipliers"];
+            }
+            return currentProfile.multipliers;
+          } catch (error) {
+            console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentMultipliers:", error);
+            return this["artisticMultipliers"];
+          }
+        },
+        // Enhanced: Get current features from active mode profile
+        getCurrentFeatures() {
+          try {
+            if (typeof this.getCurrentModeProfile !== "function") {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback features"
+              );
+              return {
+                enableAdvancedEffects: true,
+                enableHarmony: true,
+                beatSync: true,
+                colorHarmony: true
+              };
+            }
+            const currentProfile = this.getCurrentModeProfile();
+            if (!currentProfile || !currentProfile.features) {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing features, using fallback"
+              );
+              return {
+                enableAdvancedEffects: true,
+                enableHarmony: true,
+                beatSync: true,
+                colorHarmony: true
+              };
+            }
+            return currentProfile.features;
+          } catch (error) {
+            console.error("[ADVANCED_SYSTEM_CONFIG] Error in getCurrentFeatures:", error);
+            return {
+              enableAdvancedEffects: true,
+              enableHarmony: true,
+              beatSync: true,
+              colorHarmony: true
+            };
+          }
+        },
+        // Enhanced: Get current performance settings from active mode profile
+        getCurrentPerformanceSettings() {
+          try {
+            if (typeof this.getCurrentModeProfile !== "function") {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] getCurrentModeProfile method not available, using fallback performance settings"
+              );
+              return {
+                maxParticles: 20,
+                animationThrottle: 16,
+                enableGPUAcceleration: true,
+                reducedMotion: false
+              };
+            }
+            const currentProfile = this.getCurrentModeProfile();
+            if (!currentProfile || !currentProfile.performance) {
+              console.warn(
+                "[ADVANCED_SYSTEM_CONFIG] Invalid profile or missing performance settings, using fallback"
+              );
+              return {
+                maxParticles: 20,
+                animationThrottle: 16,
+                enableGPUAcceleration: true,
+                reducedMotion: false
+              };
+            }
+            return currentProfile.performance;
+          } catch (error) {
+            console.error(
+              "[ADVANCED_SYSTEM_CONFIG] Error in getCurrentPerformanceSettings:",
+              error
+            );
+            return {
+              maxParticles: 20,
+              animationThrottle: 16,
+              enableGPUAcceleration: true,
+              reducedMotion: false
+            };
+          }
+        },
+        // Check if ADVANCED_SYSTEM_CONFIG is fully initialized with all required methods
+        isFullyInitialized() {
+          const requiredMethods = [
+            "setArtisticMode",
+            "getCurrentModeProfile",
+            "getCurrentMultipliers",
+            "getCurrentFeatures",
+            "getCurrentPerformanceSettings"
+          ];
+          return requiredMethods.every(
+            (method) => typeof this[method] === "function"
+          );
+        },
+        // Safe setArtisticMode wrapper that validates state
+        safeSetArtisticMode(mode) {
+          if (!this.isFullyInitialized()) {
+            console.warn(
+              "[ADVANCED_SYSTEM_CONFIG] Not fully initialized, deferring artistic mode change"
+            );
+            this._pendingArtisticMode = mode;
+            return false;
+          }
+          return this.setArtisticMode(mode);
+        },
+        setArtisticMode(mode) {
+          const validModes = Object.keys(ARTISTIC_MODE_PROFILES2);
+          if (validModes.includes(mode)) {
+            const previousMode = this.artisticMode;
+            this.artisticMode = mode;
+            if (this.enableDebug) {
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Artistic mode changed: ${previousMode} \u2192 ${mode}`
+              );
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] New profile:`,
+                this.getCurrentModeProfile()
+              );
+            }
+            if (typeof document !== "undefined") {
+              document.dispatchEvent(
+                new CustomEvent("year3000ArtisticModeChanged", {
+                  detail: {
+                    previousMode,
+                    newMode: mode,
+                    profile: this.getCurrentModeProfile()
+                  }
+                })
+              );
+            }
+            const themeService = DefaultServiceFactory.getServices().themeLifecycle;
+            themeService?.getCoordinator()?.applyInitialSettings?.("full");
+            return true;
+          }
+          console.warn(
+            `[ADVANCED_SYSTEM_CONFIG] Invalid artistic mode: ${mode}. Valid modes:`,
+            validModes
+          );
+          return false;
+        },
+        // ===========================================
+        // 🔧 LOGGING & PERFORMANCE CONFIGURATION HELPERS
+        // ===========================================
+        // Set logging level for all Year 3000 systems
+        setLoggingLevel(level) {
+          const validLevels = ["off", "error", "warn", "info", "debug", "verbose"];
+          if (validLevels.includes(level)) {
+            this.logging.level = level;
+            if (level !== "off") {
+              console.log(`\u{1F527} [ADVANCED_SYSTEM_CONFIG] Logging level set to: ${level}`);
+            }
+            return true;
+          }
+          console.warn(
+            `[ADVANCED_SYSTEM_CONFIG] Invalid logging level: ${level}. Valid levels:`,
+            validLevels
+          );
+          return false;
+        },
+        // Disable performance warnings (useful for production or when performance is acceptable)
+        disablePerformanceWarnings() {
+          this.logging.performance.enableFrameBudgetWarnings = false;
+          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warnings disabled");
+        },
+        // Enable performance warnings
+        enablePerformanceWarnings() {
+          this.logging.performance.enableFrameBudgetWarnings = true;
+          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warnings enabled");
+        },
+        // Set performance warning throttle interval (ms)
+        setPerformanceWarningThrottle(intervalMs) {
+          if (typeof intervalMs === "number" && intervalMs >= 0) {
+            this.logging.performance.throttleInterval = intervalMs;
+            this.logging.performance.throttleWarnings = intervalMs > 0;
+            console.log(
+              `\u{1F527} [ADVANCED_SYSTEM_CONFIG] Performance warning throttle set to: ${intervalMs}ms`
+            );
+            return true;
+          }
+          console.warn(
+            "[ADVANCED_SYSTEM_CONFIG] Invalid throttle interval. Must be a non-negative number."
+          );
+          return false;
+        },
+        // Quick setup for different environments
+        setupForProduction() {
+          this.setLoggingLevel("warn");
+          this.disablePerformanceWarnings();
+          this.logging.performance.enableAdaptiveDegradation = true;
+          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for production environment");
+        },
+        setupForDevelopment() {
+          this.setLoggingLevel("debug");
+          this.enablePerformanceWarnings();
+          this.setPerformanceWarningThrottle(2e3);
+          this.logging.performance.enableAdaptiveDegradation = true;
+          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for development environment");
+        },
+        setupForDebugging() {
+          this.setLoggingLevel("verbose");
+          this.enablePerformanceWarnings();
+          this.setPerformanceWarningThrottle(500);
+          this.logging.performance.enableAdaptiveDegradation = false;
+          console.log("\u{1F527} [ADVANCED_SYSTEM_CONFIG] Configured for debugging environment");
+        },
+        // Validate configuration health and functionality
+        validateConfigHealth() {
+          const detailedIssues = [];
+          const healthReport = {
+            healthy: true,
+            system: "AdvancedSystemConfig",
+            details: "Configuration health validation",
+            issues: [],
+            metrics: {}
+          };
+          const configKeys = Object.keys(this);
+          const functionProperties = configKeys.filter(
+            (key) => typeof this[key] === "function"
+          );
+          for (const key of functionProperties) {
+            if (!this.hasOwnProperty(key)) {
+              detailedIssues.push({
+                key: String(key),
+                severity: "warning",
+                message: `Method ${key} is not an own property, may indicate prototype chain issues.`
+              });
+            }
+          }
+          const checkProfile = /* @__PURE__ */ __name((mode) => {
+            if (!ARTISTIC_MODE_PROFILES2[mode]) {
+              detailedIssues.push({
+                key: `artisticMode:${mode}`,
+                severity: "critical",
+                message: `Artistic mode profile for '${mode}' is missing.`
+              });
+              return;
+            }
+            healthReport.metrics[`${mode}Profile`] = "ok";
+          }, "checkProfile");
+          checkProfile(this.artisticMode);
+          checkProfile("artist-vision");
+          checkProfile("corporate-safe");
+          if (detailedIssues.length > 0) {
+            healthReport.healthy = false;
+            healthReport.issues = detailedIssues.map(
+              (issue) => `[${issue.severity.toUpperCase()}] ${issue.key}: ${issue.message}`
+            );
+            healthReport.details = detailedIssues.some((i) => i.severity === "critical") ? "Critical configuration issues detected" : "Configuration issues detected";
+          }
+          if (this.enableDebug) {
+            console.log("[ADVANCED_SYSTEM_CONFIG] Health Check Report:", healthReport);
+          }
+          return healthReport;
+        },
+        loadArtisticPreference() {
+          try {
+            const saved = settings.get("sn-artistic-mode");
+            const validModes = Object.keys(ARTISTIC_MODE_PROFILES2);
+            if (saved && validModes.includes(String(saved)) && this.artisticMode !== saved) {
+              this.artisticMode = String(saved);
+              if (this.enableDebug) {
+                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Updated artistic mode from storage: ${saved}`);
+              }
+            } else if (!saved && this.artisticMode !== "artist-vision") {
+              this.artisticMode = "artist-vision";
+              if (this.enableDebug) {
+                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Reset artistic mode to default: artist-vision`);
+              }
+            }
+            const savedPalette = settings.get("sn-palette-system");
+            const validPaletteSystems = ["catppuccin", "year3000"];
+            if (savedPalette && validPaletteSystems.includes(String(savedPalette)) && this.paletteSystem !== savedPalette) {
+              this.paletteSystem = String(savedPalette);
+              if (this.enableDebug) {
+                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Updated palette system from storage: ${savedPalette}`);
+              }
+            } else if (!savedPalette && this.paletteSystem !== "catppuccin") {
+              this.paletteSystem = "catppuccin";
+              if (this.enableDebug) {
+                console.log(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Reset palette system to default: catppuccin`);
+              }
+            }
+            if (this.enableDebug) {
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Current artistic preference: ${this.artisticMode}`
+              );
+              console.log(
+                `\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Current palette system: ${this.paletteSystem}`
+              );
+            }
+          } catch (error) {
+            if (this.enableDebug) {
+              console.warn(`\u{1F3A8} [ADVANCED_SYSTEM_CONFIG] Failed to load preferences:`, error);
+            }
+            this.artisticMode = "artist-vision";
+            this.paletteSystem = "catppuccin";
+          }
+        }
+      };
+      if (typeof ADVANCED_SYSTEM_CONFIG.init === "function") {
+        ADVANCED_SYSTEM_CONFIG.init();
+      }
+    }
+  });
+
+  // src-js/utils/color/MusicalOKLABCoordinator.ts
+  var MusicalOKLABCoordinator_exports = {};
+  __export(MusicalOKLABCoordinator_exports, {
+    MusicalOKLABCoordinator: () => MusicalOKLABCoordinator,
+    MusicalOKLABProcessor: () => MusicalOKLABProcessor
+  });
+  var _MusicalOKLABProcessor, MusicalOKLABProcessor, MusicalOKLABCoordinator;
+  var init_MusicalOKLABCoordinator = __esm({
+    "src-js/utils/color/MusicalOKLABCoordinator.ts"() {
+      "use strict";
+      init_GenreProfileManager();
+      init_globalConfig();
+      init_DebugCoordinator();
+      init_EmotionalTemperatureMapper();
+      init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
+      init_genre();
+      _MusicalOKLABProcessor = class _MusicalOKLABProcessor {
+        // 5 minutes
+        constructor(enableDebug = ADVANCED_SYSTEM_CONFIG.enableDebug) {
+          this.coordinationCache = /* @__PURE__ */ new Map();
+          this.cacheMaxSize = 20;
+          this.cacheTimeoutMs = 3e5;
+          this.enableDebug = enableDebug;
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "MusicalOKLABProcessor",
+            enableDebug,
+            reason: "constructor"
+          });
+          this.emotionalMapper = new EmotionalTemperatureMapper(enableDebug);
+          this.genreManager = new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG });
+          if (this.enableDebug) {
+            Y3KDebug?.debug?.log(
+              "MusicalOKLABProcessor",
+              "Unified music-to-OKLAB coordinator initialized"
+            );
+          }
+        }
+        /**
+         * Main processing method - transforms musical context through complete OKLAB pipeline
+         */
+        async processMusicalColors(context, options = {}) {
+          const startTime = performance.now();
+          const cacheKey = this.generateCacheKey(context);
+          const cachedResult = this.coordinationCache.get(cacheKey);
+          if (cachedResult) {
+            if (this.enableDebug) {
+              Y3KDebug?.debug?.log(
+                "MusicalOKLABProcessor",
+                "Using cached processing result",
+                { cacheKey }
+              );
+            }
+            return cachedResult;
+          }
+          try {
+            const processingStrategy = this.determineProcessingStrategy(
+              context,
+              options
+            );
+            const oklabPreset = await this.getOptimalOKLABPreset(
+              context,
+              processingStrategy,
+              options
+            );
+            const colorProcessingResult = await this.processColorsWithMusicalContext(
+              context.rawColors,
+              context.musicData,
+              oklabPreset
+            );
+            const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(context.musicData);
+            const detectedGenre = this.genreManager.detectGenre(context.musicData);
+            const genreCharacteristics = this.genreManager.getColorCharacteristicsForGenre(detectedGenre);
+            const musicInfluenceStrength = this.calculateMusicInfluenceStrength(
+              context.musicData,
+              emotionalResult
+            );
+            const cssVariables = this.generateUnifiedCSSVariables(
+              colorProcessingResult,
+              emotionalResult,
+              genreCharacteristics,
+              oklabPreset,
+              detectedGenre,
+              processingStrategy
+            );
+            const { accentHex, accentRgb } = this.selectOptimalAccentColor(
+              colorProcessingResult
+            );
+            cssVariables["--sn-accent-hex"] = accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)";
+            cssVariables["--sn-accent-rgb"] = accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)";
+            const processingTime = performance.now() - startTime;
+            const result = {
+              enhancedColors: Object.fromEntries(
+                Object.entries(colorProcessingResult).map(([key, oklabResult]) => [
+                  key,
+                  oklabResult.enhancedHex
+                ])
+              ),
+              accentHex,
+              accentRgb,
+              oklabPreset,
+              oklabResults: colorProcessingResult,
+              detectedGenre,
+              emotionalResult,
+              genreCharacteristics,
+              processingTime,
+              musicInfluenceStrength,
+              processingStrategy,
+              cssVariables
+            };
+            this.cacheResult(cacheKey, result);
+            if (this.enableDebug) {
+              Y3KDebug?.debug?.log(
+                "MusicalOKLABProcessor",
+                "Musical OKLAB processing completed",
+                {
+                  genre: detectedGenre,
+                  emotion: emotionalResult.primaryEmotion,
+                  strategy: processingStrategy,
+                  preset: oklabPreset.name,
+                  processingTime,
+                  colorCount: Object.keys(colorProcessingResult).length
+                }
+              );
+            }
+            return result;
+          } catch (error) {
+            if (this.enableDebug) {
+              Y3KDebug?.debug?.error(
+                "MusicalOKLABProcessor",
+                "Musical processing failed:",
+                error
+              );
+            }
+            return this.createFallbackResult(context, performance.now() - startTime);
+          }
+        }
+        /**
+         * Determine the optimal processing strategy based on musical context
+         */
+        determineProcessingStrategy(context, options) {
+          const { musicData } = context;
+          if (!musicData || typeof musicData.energy !== "number" || typeof musicData.valence !== "number") {
+            return "fallback";
+          }
+          if (options.preferGenreOverEmotion === true) {
+            return "genre-primary";
+          } else if (options.preferGenreOverEmotion === false) {
+            return "emotion-primary";
+          }
+          const energyExtremity = Math.abs(musicData.energy - 0.5) * 2;
+          const valenceExtremity = Math.abs(musicData.valence - 0.5) * 2;
+          const emotionalExtremity = (energyExtremity + valenceExtremity) / 2;
+          if (emotionalExtremity > 0.6) {
+            return "emotion-primary";
+          }
+          const detectedGenre = this.genreManager.detectGenre(musicData);
+          if (detectedGenre !== "default" /* DEFAULT */) {
+            return "genre-primary";
+          }
+          return "balanced";
+        }
+        /**
+         * Get optimal OKLAB preset considering both genre and emotional context
+         */
+        async getOptimalOKLABPreset(context, strategy, options) {
+          const { musicData } = context;
+          try {
+            let preset;
+            switch (strategy) {
+              case "genre-primary":
+                preset = this.genreManager.getOKLABPresetForTrack(musicData);
+                break;
+              case "emotion-primary":
+                const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
+                preset = emotionalResult.oklabPreset;
+                break;
+              case "balanced":
+                const genrePreset = this.genreManager.getOKLABPresetForTrack(musicData);
+                const emotionalResult2 = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
+                preset = this.processBlendedPresets(
+                  genrePreset,
+                  emotionalResult2.oklabPreset,
+                  options.intensityMultiplier || 1
+                );
+                break;
+              default:
+                preset = OKLABColorProcessor.getPreset("STANDARD");
+            }
+            return preset;
+          } catch (error) {
+            if (this.enableDebug) {
+              Y3KDebug?.debug?.warn(
+                "MusicalOKLABProcessor",
+                "Failed to get optimal preset, using STANDARD:",
+                error
+              );
+            }
+            return OKLABColorProcessor.getPreset("STANDARD");
+          }
+        }
+        /**
+         * Process two OKLAB presets for balanced processing strategy
+         */
+        processBlendedPresets(genrePreset, emotionalPreset, intensityMultiplier) {
+          const blendedChromaBoost = (genrePreset.chromaBoost + emotionalPreset.chromaBoost) / 2 * intensityMultiplier;
+          const blendedLightnessBoost = (genrePreset.lightnessBoost + emotionalPreset.lightnessBoost) / 2;
+          const blendedShadowReduction = (genrePreset.shadowReduction + emotionalPreset.shadowReduction) / 2;
+          const blendedVibrantThreshold = (genrePreset.vibrantThreshold + emotionalPreset.vibrantThreshold) / 2;
+          return OKLABColorProcessor.createCustomPreset(
+            "blended-genre-emotion",
+            `Blended ${genrePreset.name} + ${emotionalPreset.name}`,
+            blendedLightnessBoost,
+            blendedChromaBoost,
+            blendedShadowReduction,
+            blendedVibrantThreshold
+          );
+        }
+        /**
+         * Process all colors through OKLAB with musical context
+         */
+        async processColorsWithMusicalContext(rawColors, musicData, preset) {
+          const results = {};
+          for (const [key, color3] of Object.entries(rawColors)) {
+            if (!color3 || typeof color3 !== "string" || !color3.startsWith("#")) {
+              continue;
+            }
+            try {
+              const oklabResult = this.oklabProcessor.processColor(color3, preset);
+              results[key] = oklabResult;
+            } catch (error) {
+              if (this.enableDebug) {
+                Y3KDebug?.debug?.warn(
+                  "MusicalOKLABProcessor",
+                  `Failed to process color ${key}:`,
+                  error
+                );
+              }
+            }
+          }
+          return results;
+        }
+        /**
+         * Calculate music influence strength for processing
+         */
+        calculateMusicInfluenceStrength(musicData, emotionalResult) {
+          const energyInfluence = musicData.energy || 0.5;
+          const valenceExtremity = Math.abs((musicData.valence || 0.5) - 0.5) * 2;
+          const emotionalIntensity = emotionalResult.intensity;
+          const baseInfluence = (energyInfluence + valenceExtremity + emotionalIntensity) / 3;
+          let contextBoost = 1;
+          if (musicData.tempo && musicData.tempo > 0) contextBoost += 0.1;
+          if (musicData.danceability && musicData.danceability > 0.7)
+            contextBoost += 0.1;
+          if (musicData.genre && musicData.genre !== "default" /* DEFAULT */)
+            contextBoost += 0.1;
+          return Math.min(1, baseInfluence * contextBoost);
+        }
+        /**
+         * Generate comprehensive CSS variables for all visual systems
+         * 🔧 PHASE 4: Enhanced to include metadata variables (detectedGenre, processingStrategy)
+         */
+        generateUnifiedCSSVariables(oklabResults, emotionalResult, genreCharacteristics, preset, detectedGenre, processingStrategy) {
+          const variables = {};
+          Object.entries(oklabResults).forEach(([key, result]) => {
+            variables[`--sn-${key.toLowerCase()}-enhanced`] = result.enhancedHex;
+            variables[`--sn-${key.toLowerCase()}-oklab-l`] = result.oklabEnhanced.L.toFixed(3);
+            variables[`--sn-${key.toLowerCase()}-oklab-a`] = result.oklabEnhanced.a.toFixed(3);
+            variables[`--sn-${key.toLowerCase()}-oklab-b`] = result.oklabEnhanced.b.toFixed(3);
+            variables[`--sn-${key.toLowerCase()}-oklch-c`] = result.oklchEnhanced.C.toFixed(3);
+            variables[`--sn-${key.toLowerCase()}-oklch-h`] = result.oklchEnhanced.H.toFixed(1);
+            variables[`--sn-${key.toLowerCase()}-shadow`] = result.shadowHex;
+          });
+          Object.entries(emotionalResult.cssVariables).forEach(([key, value]) => {
+            variables[key] = value;
+          });
+          variables["--sn-color-processing-strategy"] = processingStrategy;
+          variables["--sn-detected-genre"] = detectedGenre;
+          variables["--sn-emotional-state"] = emotionalResult.primaryEmotion;
+          variables["--sn-active-oklab-preset"] = preset.name;
+          variables["--sn-color-temperature"] = genreCharacteristics ? genreCharacteristics.colorTemperature : "neutral";
+          variables["--sn-emotional-range"] = genreCharacteristics ? genreCharacteristics.emotionalRange : "moderate";
+          variables["--sn-oklab-preset-name"] = preset.name;
+          variables["--sn-oklab-chroma-boost"] = preset.chromaBoost.toString();
+          variables["--sn-oklab-lightness-boost"] = preset.lightnessBoost.toString();
+          variables["--sn-musical-oklab-processing"] = "enabled";
+          variables["--sn-color-processing-mode"] = "unified-musical-oklab";
+          return variables;
+        }
+        /**
+         * Select optimal accent color from enhanced palette
+         */
+        selectOptimalAccentColor(oklabResults) {
+          const priorityKeys = [
+            "VIBRANT",
+            "PROMINENT",
+            "DARK_VIBRANT",
+            "LIGHT_VIBRANT"
+          ];
+          for (const key of priorityKeys) {
+            if (oklabResults[key]) {
+              const result = oklabResults[key];
+              return {
+                accentHex: result.enhancedHex,
+                accentRgb: `${result.enhancedRgb.r},${result.enhancedRgb.g},${result.enhancedRgb.b}`
+              };
+            }
+          }
+          const firstResult = Object.values(oklabResults)[0];
+          if (firstResult) {
+            return {
+              accentHex: firstResult.enhancedHex,
+              accentRgb: `${firstResult.enhancedRgb.r},${firstResult.enhancedRgb.g},${firstResult.enhancedRgb.b}`
+            };
+          }
+          return {
+            accentHex: "#cba6f7",
+            // Catppuccin mauve
+            accentRgb: "203,166,247"
+          };
+        }
+        /**
+         * Create fallback result when coordination fails
+         */
+        createFallbackResult(context, processingTime) {
+          const fallbackPreset = OKLABColorProcessor.getPreset("STANDARD");
+          return {
+            enhancedColors: context.rawColors,
+            accentHex: "#cba6f7",
+            accentRgb: "203,166,247",
+            oklabPreset: fallbackPreset,
+            oklabResults: {},
+            detectedGenre: "default" /* DEFAULT */,
+            emotionalResult: {
+              primaryEmotion: "calm",
+              intensity: 0.5,
+              temperature: 3500,
+              blendRatio: 1,
+              cssClass: "smooth-emotion-calm",
+              cssVariables: {},
+              oklabPreset: fallbackPreset
+            },
+            genreCharacteristics: {
+              vibrancyLevel: "standard",
+              emotionalRange: "moderate",
+              colorTemperature: "neutral"
+            },
+            processingTime,
+            musicInfluenceStrength: 0.5,
+            processingStrategy: "fallback",
+            cssVariables: {
+              "--sn-musical-oklab-processing": "fallback",
+              "--sn-oklab-preset-name": "STANDARD"
+            }
+          };
+        }
+        // Utility methods
+        generateCacheKey(context) {
+          return `${context.trackUri}-${context.timestamp}-${JSON.stringify(
+            context.musicData
+          )}`;
+        }
+        cacheResult(cacheKey, result) {
+          if (this.coordinationCache.size >= this.cacheMaxSize) {
+            const firstKey = this.coordinationCache.keys().next().value;
+            if (firstKey) this.coordinationCache.delete(firstKey);
+          }
+          this.coordinationCache.set(cacheKey, result);
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "MusicalOKLABProcessor.coordinationCache",
+            this.coordinationCache.size,
+            { accent: result.accentHex, type: "musical" }
+          );
+          setTimeout(() => {
+            this.coordinationCache.delete(cacheKey);
+            OKLABProcessorSingleton.reportCacheFootprint(
+              "MusicalOKLABProcessor.coordinationCache",
+              this.coordinationCache.size,
+              { reason: "ttl" }
+            );
+          }, this.cacheTimeoutMs);
+        }
+        /**
+         * Convert MusicalOKLABResult to ColorResult for integration with existing systems
+         */
+        convertToColorResult(musicalResult, context) {
+          return {
+            processedColors: {
+              ...musicalResult.enhancedColors,
+              ...musicalResult.cssVariables
+            },
+            accentHex: musicalResult.accentHex,
+            accentRgb: musicalResult.accentRgb,
+            metadata: {
+              strategy: "musical-oklab-processor",
+              processingTime: musicalResult.processingTime,
+              detectedGenre: musicalResult.detectedGenre,
+              emotionalState: musicalResult.emotionalResult.primaryEmotion,
+              oklabPreset: musicalResult.oklabPreset.name,
+              processingStrategy: musicalResult.processingStrategy,
+              musicInfluenceStrength: musicalResult.musicInfluenceStrength
+            },
+            context: {
+              rawColors: context.rawColors,
+              trackUri: context.trackUri,
+              timestamp: context.timestamp,
+              harmonicMode: context.harmonicMode || "musical-oklab-processing",
+              musicData: context.musicData
+            }
+          };
+        }
+        /**
+         * Clear processing cache
+         */
+        clearProcessingCache() {
+          this.coordinationCache.clear();
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "MusicalOKLABProcessor.coordinationCache",
+            0,
+            { reason: "manual-clear" }
+          );
+          if (this.enableDebug) {
+            Y3KDebug?.debug?.log(
+              "MusicalOKLABProcessor",
+              "Processing cache cleared"
+            );
+          }
+        }
+        /**
+         * Get processing metrics for monitoring
+         */
+        getProcessingMetrics() {
+          return {
+            cacheSize: this.coordinationCache.size,
+            maxCacheSize: this.cacheMaxSize,
+            cacheTimeoutMs: this.cacheTimeoutMs,
+            enableDebug: this.enableDebug
+          };
+        }
+      };
+      __name(_MusicalOKLABProcessor, "MusicalOKLABProcessor");
+      MusicalOKLABProcessor = _MusicalOKLABProcessor;
+      MusicalOKLABCoordinator = MusicalOKLABProcessor;
+    }
+  });
+
+  // src-js/utils/color/OKLABProcessorSingleton.ts
+  function resolveMusicalProcessorCtor() {
+    if (!musicalProcessorCtor) {
+      const module = (init_MusicalOKLABCoordinator(), __toCommonJS(MusicalOKLABCoordinator_exports));
+      musicalProcessorCtor = module.MusicalOKLABProcessor;
+    }
+    return musicalProcessorCtor;
+  }
+  function cloneMetrics(metrics) {
+    return {
+      totalRequests: metrics.totalRequests,
+      perRequester: Object.fromEntries(metrics.perRequester.entries()),
+      recentRequests: metrics.recentRequests.slice(),
+      instances: { ...metrics.instances },
+      cacheFootprint: Object.fromEntries(metrics.cacheFootprint.entries())
+    };
+  }
+  var MAX_RECENT_REQUESTS, musicalProcessorCtor, _OKLABProcessorSingleton, OKLABProcessorSingleton, getStandardOKLABProcessor, getMusicalOKLABProcessor;
+  var init_OKLABProcessorSingleton = __esm({
+    "src-js/utils/color/OKLABProcessorSingleton.ts"() {
+      "use strict";
+      init_globalConfig();
+      init_DebugCoordinator();
+      init_OKLABColorProcessor();
+      MAX_RECENT_REQUESTS = 25;
+      musicalProcessorCtor = null;
+      __name(resolveMusicalProcessorCtor, "resolveMusicalProcessorCtor");
+      __name(cloneMetrics, "cloneMetrics");
+      _OKLABProcessorSingleton = class _OKLABProcessorSingleton {
+        static getStandardOKLABProcessor(options = {}) {
+          if (!_OKLABProcessorSingleton.standardInstance) {
+            _OKLABProcessorSingleton.standardInstance = new OKLABColorProcessor(
+              options.enableDebug ?? ADVANCED_SYSTEM_CONFIG.enableDebug
+            );
+            _OKLABProcessorSingleton.metrics.instances.standard = true;
+          }
+          _OKLABProcessorSingleton.registerRequest("standard", options);
+          return _OKLABProcessorSingleton.standardInstance;
+        }
+        static getMusicalOKLABProcessor(options = {}) {
+          if (!_OKLABProcessorSingleton.musicalInstance) {
+            const MusicalCtor = resolveMusicalProcessorCtor();
+            _OKLABProcessorSingleton.musicalInstance = new MusicalCtor(
+              options.enableDebug ?? ADVANCED_SYSTEM_CONFIG.enableDebug
+            );
+            _OKLABProcessorSingleton.metrics.instances.musical = true;
+          }
+          _OKLABProcessorSingleton.registerRequest("musical", options);
+          return _OKLABProcessorSingleton.musicalInstance;
+        }
+        static reportCacheFootprint(name, size, metadata) {
+          const cacheMetrics = {
+            name,
+            size,
+            updatedAt: Date.now()
+          };
+          if (metadata) {
+            cacheMetrics.metadata = metadata;
+          }
+          _OKLABProcessorSingleton.metrics.cacheFootprint.set(name, cacheMetrics);
+        }
+        static getProcessingMetrics() {
+          return cloneMetrics(_OKLABProcessorSingleton.metrics);
+        }
+        static getMemoryStats() {
+          return {
+            standardInstances: _OKLABProcessorSingleton.standardInstance ? 1 : 0,
+            musicalInstances: _OKLABProcessorSingleton.musicalInstance ? 1 : 0,
+            trackedCaches: _OKLABProcessorSingleton.metrics.cacheFootprint.size
+          };
+        }
+        static ensureAvailability(kind, requester) {
+          const instance2 = kind === "standard" ? _OKLABProcessorSingleton.standardInstance : _OKLABProcessorSingleton.musicalInstance;
+          if (!instance2) {
+            const message = kind === "standard" ? "Standard OKLABColorProcessor singleton has not been initialized" : "Musical OKLABColorProcessor singleton has not been initialized";
+            console.warn(`[OKLABProcessorSingleton] ${message}`, {
+              requester
+            });
+            return false;
+          }
+          return true;
+        }
+        static resetForTests() {
+          _OKLABProcessorSingleton.standardInstance = null;
+          _OKLABProcessorSingleton.musicalInstance = null;
+          _OKLABProcessorSingleton.metrics = {
+            totalRequests: 0,
+            perRequester: /* @__PURE__ */ new Map(),
+            recentRequests: [],
+            instances: {
+              standard: false,
+              musical: false
+            },
+            cacheFootprint: /* @__PURE__ */ new Map()
+          };
+        }
+        static registerRequest(kind, options) {
+          const requester = options.requester ?? "unknown";
+          const timestamp = Date.now();
+          _OKLABProcessorSingleton.metrics.totalRequests += 1;
+          _OKLABProcessorSingleton.metrics.perRequester.set(
+            requester,
+            (_OKLABProcessorSingleton.metrics.perRequester.get(requester) ?? 0) + 1
+          );
+          _OKLABProcessorSingleton.metrics.recentRequests.unshift({
+            requester,
+            kind,
+            timestamp
+          });
+          if (_OKLABProcessorSingleton.metrics.recentRequests.length > MAX_RECENT_REQUESTS) {
+            _OKLABProcessorSingleton.metrics.recentRequests.length = MAX_RECENT_REQUESTS;
+          }
+          const shouldDebugLog = options.enableDebug ?? ADVANCED_SYSTEM_CONFIG.enableDebug;
+          if (shouldDebugLog) {
+            Y3KDebug?.debug?.log(
+              "OKLABProcessorSingleton",
+              `Singleton request registered for ${kind} processor`,
+              {
+                requester,
+                reason: options.reason,
+                metrics: {
+                  totalRequests: _OKLABProcessorSingleton.metrics.totalRequests,
+                  cacheFootprint: _OKLABProcessorSingleton.metrics.cacheFootprint.size
+                }
+              }
+            );
+          }
+        }
+      };
+      __name(_OKLABProcessorSingleton, "OKLABProcessorSingleton");
+      _OKLABProcessorSingleton.standardInstance = null;
+      _OKLABProcessorSingleton.musicalInstance = null;
+      _OKLABProcessorSingleton.metrics = {
+        totalRequests: 0,
+        perRequester: /* @__PURE__ */ new Map(),
+        recentRequests: [],
+        instances: {
+          standard: false,
+          musical: false
+        },
+        cacheFootprint: /* @__PURE__ */ new Map()
+      };
+      OKLABProcessorSingleton = _OKLABProcessorSingleton;
+      getStandardOKLABProcessor = OKLABProcessorSingleton.getStandardOKLABProcessor.bind(
+        OKLABProcessorSingleton
+      );
+      getMusicalOKLABProcessor = OKLABProcessorSingleton.getMusicalOKLABProcessor.bind(
+        OKLABProcessorSingleton
+      );
+    }
+  });
+
   // src-js/utils/color/EmotionalTemperatureMapper.ts
   var EMOTIONAL_TEMPERATURE_MAP, _EmotionalTemperatureMapper, EmotionalTemperatureMapper;
   var init_EmotionalTemperatureMapper = __esm({
     "src-js/utils/color/EmotionalTemperatureMapper.ts"() {
       "use strict";
       init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
       EMOTIONAL_TEMPERATURE_MAP = {
         calm: {
           temperatureRange: [2700, 4e3],
@@ -9157,7 +9921,11 @@
       _EmotionalTemperatureMapper = class _EmotionalTemperatureMapper {
         constructor(enableDebug = false) {
           this.enableDebug = enableDebug;
-          this.oklabProcessor = new OKLABColorProcessor(enableDebug);
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "EmotionalTemperatureMapper",
+            enableDebug,
+            reason: "constructor"
+          });
         }
         /**
          * Analyzes music data and returns the appropriate emotional temperature configuration
@@ -13178,424 +13946,6 @@ void main() {
     }
   });
 
-  // src-js/utils/color/MusicalOKLABCoordinator.ts
-  var _MusicalOKLABProcessor, MusicalOKLABProcessor;
-  var init_MusicalOKLABCoordinator = __esm({
-    "src-js/utils/color/MusicalOKLABCoordinator.ts"() {
-      "use strict";
-      init_GenreProfileManager();
-      init_globalConfig();
-      init_DebugCoordinator();
-      init_EmotionalTemperatureMapper();
-      init_OKLABColorProcessor();
-      _MusicalOKLABProcessor = class _MusicalOKLABProcessor {
-        // 5 minutes
-        constructor(enableDebug = ADVANCED_SYSTEM_CONFIG.enableDebug) {
-          this.coordinationCache = /* @__PURE__ */ new Map();
-          this.cacheMaxSize = 20;
-          this.cacheTimeoutMs = 3e5;
-          this.enableDebug = enableDebug;
-          this.oklabProcessor = new OKLABColorProcessor(enableDebug);
-          this.emotionalMapper = new EmotionalTemperatureMapper(enableDebug);
-          this.genreManager = new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG });
-          if (this.enableDebug) {
-            Y3KDebug?.debug?.log(
-              "MusicalOKLABProcessor",
-              "Unified music-to-OKLAB coordinator initialized"
-            );
-          }
-        }
-        /**
-         * Main processing method - transforms musical context through complete OKLAB pipeline
-         */
-        async processMusicalColors(context, options = {}) {
-          const startTime = performance.now();
-          const cacheKey = this.generateCacheKey(context);
-          const cachedResult = this.coordinationCache.get(cacheKey);
-          if (cachedResult) {
-            if (this.enableDebug) {
-              Y3KDebug?.debug?.log(
-                "MusicalOKLABProcessor",
-                "Using cached processing result",
-                { cacheKey }
-              );
-            }
-            return cachedResult;
-          }
-          try {
-            const processingStrategy = this.determineProcessingStrategy(
-              context,
-              options
-            );
-            const oklabPreset = await this.getOptimalOKLABPreset(
-              context,
-              processingStrategy,
-              options
-            );
-            const colorProcessingResult = await this.processColorsWithMusicalContext(
-              context.rawColors,
-              context.musicData,
-              oklabPreset
-            );
-            const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(context.musicData);
-            const detectedGenre = this.genreManager.detectGenre(context.musicData);
-            const genreCharacteristics = this.genreManager.getColorCharacteristicsForGenre(detectedGenre);
-            const musicInfluenceStrength = this.calculateMusicInfluenceStrength(
-              context.musicData,
-              emotionalResult
-            );
-            const cssVariables = this.generateUnifiedCSSVariables(
-              colorProcessingResult,
-              emotionalResult,
-              genreCharacteristics,
-              oklabPreset,
-              detectedGenre,
-              processingStrategy
-            );
-            const { accentHex, accentRgb } = this.selectOptimalAccentColor(
-              colorProcessingResult
-            );
-            cssVariables["--sn-accent-hex"] = accentHex || "var(--sn-brightness-adjusted-accent-hex, #cba6f7)";
-            cssVariables["--sn-accent-rgb"] = accentRgb || "var(--sn-brightness-adjusted-accent-rgb, 203, 166, 247)";
-            const processingTime = performance.now() - startTime;
-            const result = {
-              enhancedColors: Object.fromEntries(
-                Object.entries(colorProcessingResult).map(([key, oklabResult]) => [
-                  key,
-                  oklabResult.enhancedHex
-                ])
-              ),
-              accentHex,
-              accentRgb,
-              oklabPreset,
-              oklabResults: colorProcessingResult,
-              detectedGenre,
-              emotionalResult,
-              genreCharacteristics,
-              processingTime,
-              musicInfluenceStrength,
-              processingStrategy,
-              cssVariables
-            };
-            this.cacheResult(cacheKey, result);
-            if (this.enableDebug) {
-              Y3KDebug?.debug?.log(
-                "MusicalOKLABProcessor",
-                "Musical OKLAB processing completed",
-                {
-                  genre: detectedGenre,
-                  emotion: emotionalResult.primaryEmotion,
-                  strategy: processingStrategy,
-                  preset: oklabPreset.name,
-                  processingTime,
-                  colorCount: Object.keys(colorProcessingResult).length
-                }
-              );
-            }
-            return result;
-          } catch (error) {
-            if (this.enableDebug) {
-              Y3KDebug?.debug?.error(
-                "MusicalOKLABProcessor",
-                "Musical processing failed:",
-                error
-              );
-            }
-            return this.createFallbackResult(context, performance.now() - startTime);
-          }
-        }
-        /**
-         * Determine the optimal processing strategy based on musical context
-         */
-        determineProcessingStrategy(context, options) {
-          const { musicData } = context;
-          if (!musicData || typeof musicData.energy !== "number" || typeof musicData.valence !== "number") {
-            return "fallback";
-          }
-          if (options.preferGenreOverEmotion === true) {
-            return "genre-primary";
-          } else if (options.preferGenreOverEmotion === false) {
-            return "emotion-primary";
-          }
-          const energyExtremity = Math.abs(musicData.energy - 0.5) * 2;
-          const valenceExtremity = Math.abs(musicData.valence - 0.5) * 2;
-          const emotionalExtremity = (energyExtremity + valenceExtremity) / 2;
-          if (emotionalExtremity > 0.6) {
-            return "emotion-primary";
-          }
-          const detectedGenre = this.genreManager.detectGenre(musicData);
-          if (detectedGenre !== "default") {
-            return "genre-primary";
-          }
-          return "balanced";
-        }
-        /**
-         * Get optimal OKLAB preset considering both genre and emotional context
-         */
-        async getOptimalOKLABPreset(context, strategy, options) {
-          const { musicData } = context;
-          try {
-            let preset;
-            switch (strategy) {
-              case "genre-primary":
-                preset = this.genreManager.getOKLABPresetForTrack(musicData);
-                break;
-              case "emotion-primary":
-                const emotionalResult = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
-                preset = emotionalResult.oklabPreset;
-                break;
-              case "balanced":
-                const genrePreset = this.genreManager.getOKLABPresetForTrack(musicData);
-                const emotionalResult2 = this.emotionalMapper.mapMusicToEmotionalTemperature(musicData);
-                preset = this.processBlendedPresets(
-                  genrePreset,
-                  emotionalResult2.oklabPreset,
-                  options.intensityMultiplier || 1
-                );
-                break;
-              default:
-                preset = OKLABColorProcessor.getPreset("STANDARD");
-            }
-            return preset;
-          } catch (error) {
-            if (this.enableDebug) {
-              Y3KDebug?.debug?.warn(
-                "MusicalOKLABProcessor",
-                "Failed to get optimal preset, using STANDARD:",
-                error
-              );
-            }
-            return OKLABColorProcessor.getPreset("STANDARD");
-          }
-        }
-        /**
-         * Process two OKLAB presets for balanced processing strategy
-         */
-        processBlendedPresets(genrePreset, emotionalPreset, intensityMultiplier) {
-          const blendedChromaBoost = (genrePreset.chromaBoost + emotionalPreset.chromaBoost) / 2 * intensityMultiplier;
-          const blendedLightnessBoost = (genrePreset.lightnessBoost + emotionalPreset.lightnessBoost) / 2;
-          const blendedShadowReduction = (genrePreset.shadowReduction + emotionalPreset.shadowReduction) / 2;
-          const blendedVibrantThreshold = (genrePreset.vibrantThreshold + emotionalPreset.vibrantThreshold) / 2;
-          return OKLABColorProcessor.createCustomPreset(
-            "blended-genre-emotion",
-            `Blended ${genrePreset.name} + ${emotionalPreset.name}`,
-            blendedLightnessBoost,
-            blendedChromaBoost,
-            blendedShadowReduction,
-            blendedVibrantThreshold
-          );
-        }
-        /**
-         * Process all colors through OKLAB with musical context
-         */
-        async processColorsWithMusicalContext(rawColors, musicData, preset) {
-          const results = {};
-          for (const [key, color3] of Object.entries(rawColors)) {
-            if (!color3 || typeof color3 !== "string" || !color3.startsWith("#")) {
-              continue;
-            }
-            try {
-              const oklabResult = this.oklabProcessor.processColor(color3, preset);
-              results[key] = oklabResult;
-            } catch (error) {
-              if (this.enableDebug) {
-                Y3KDebug?.debug?.warn(
-                  "MusicalOKLABProcessor",
-                  `Failed to process color ${key}:`,
-                  error
-                );
-              }
-            }
-          }
-          return results;
-        }
-        /**
-         * Calculate music influence strength for processing
-         */
-        calculateMusicInfluenceStrength(musicData, emotionalResult) {
-          const energyInfluence = musicData.energy || 0.5;
-          const valenceExtremity = Math.abs((musicData.valence || 0.5) - 0.5) * 2;
-          const emotionalIntensity = emotionalResult.intensity;
-          const baseInfluence = (energyInfluence + valenceExtremity + emotionalIntensity) / 3;
-          let contextBoost = 1;
-          if (musicData.tempo && musicData.tempo > 0) contextBoost += 0.1;
-          if (musicData.danceability && musicData.danceability > 0.7)
-            contextBoost += 0.1;
-          if (musicData.genre && musicData.genre !== "default") contextBoost += 0.1;
-          return Math.min(1, baseInfluence * contextBoost);
-        }
-        /**
-         * Generate comprehensive CSS variables for all visual systems
-         * 🔧 PHASE 4: Enhanced to include metadata variables (detectedGenre, processingStrategy)
-         */
-        generateUnifiedCSSVariables(oklabResults, emotionalResult, genreCharacteristics, preset, detectedGenre, processingStrategy) {
-          const variables = {};
-          Object.entries(oklabResults).forEach(([key, result]) => {
-            variables[`--sn-${key.toLowerCase()}-enhanced`] = result.enhancedHex;
-            variables[`--sn-${key.toLowerCase()}-oklab-l`] = result.oklabEnhanced.L.toFixed(3);
-            variables[`--sn-${key.toLowerCase()}-oklab-a`] = result.oklabEnhanced.a.toFixed(3);
-            variables[`--sn-${key.toLowerCase()}-oklab-b`] = result.oklabEnhanced.b.toFixed(3);
-            variables[`--sn-${key.toLowerCase()}-oklch-c`] = result.oklchEnhanced.C.toFixed(3);
-            variables[`--sn-${key.toLowerCase()}-oklch-h`] = result.oklchEnhanced.H.toFixed(1);
-            variables[`--sn-${key.toLowerCase()}-shadow`] = result.shadowHex;
-          });
-          Object.entries(emotionalResult.cssVariables).forEach(([key, value]) => {
-            variables[key] = value;
-          });
-          variables["--sn-color-processing-strategy"] = processingStrategy;
-          variables["--sn-detected-genre"] = detectedGenre;
-          variables["--sn-emotional-state"] = emotionalResult.primaryEmotion;
-          variables["--sn-active-oklab-preset"] = preset.name;
-          variables["--sn-color-temperature"] = genreCharacteristics ? genreCharacteristics.colorTemperature : "neutral";
-          variables["--sn-emotional-range"] = genreCharacteristics ? genreCharacteristics.emotionalRange : "moderate";
-          variables["--sn-oklab-preset-name"] = preset.name;
-          variables["--sn-oklab-chroma-boost"] = preset.chromaBoost.toString();
-          variables["--sn-oklab-lightness-boost"] = preset.lightnessBoost.toString();
-          variables["--sn-musical-oklab-processing"] = "enabled";
-          variables["--sn-color-processing-mode"] = "unified-musical-oklab";
-          return variables;
-        }
-        /**
-         * Select optimal accent color from enhanced palette
-         */
-        selectOptimalAccentColor(oklabResults) {
-          const priorityKeys = [
-            "VIBRANT",
-            "PROMINENT",
-            "DARK_VIBRANT",
-            "LIGHT_VIBRANT"
-          ];
-          for (const key of priorityKeys) {
-            if (oklabResults[key]) {
-              const result = oklabResults[key];
-              return {
-                accentHex: result.enhancedHex,
-                accentRgb: `${result.enhancedRgb.r},${result.enhancedRgb.g},${result.enhancedRgb.b}`
-              };
-            }
-          }
-          const firstResult = Object.values(oklabResults)[0];
-          if (firstResult) {
-            return {
-              accentHex: firstResult.enhancedHex,
-              accentRgb: `${firstResult.enhancedRgb.r},${firstResult.enhancedRgb.g},${firstResult.enhancedRgb.b}`
-            };
-          }
-          return {
-            accentHex: "#cba6f7",
-            // Catppuccin mauve
-            accentRgb: "203,166,247"
-          };
-        }
-        /**
-         * Create fallback result when coordination fails
-         */
-        createFallbackResult(context, processingTime) {
-          const fallbackPreset = OKLABColorProcessor.getPreset("STANDARD");
-          return {
-            enhancedColors: context.rawColors,
-            accentHex: "#cba6f7",
-            accentRgb: "203,166,247",
-            oklabPreset: fallbackPreset,
-            oklabResults: {},
-            detectedGenre: "default",
-            emotionalResult: {
-              primaryEmotion: "calm",
-              intensity: 0.5,
-              temperature: 3500,
-              blendRatio: 1,
-              cssClass: "smooth-emotion-calm",
-              cssVariables: {},
-              oklabPreset: fallbackPreset
-            },
-            genreCharacteristics: {
-              vibrancyLevel: "standard",
-              emotionalRange: "moderate",
-              colorTemperature: "neutral"
-            },
-            processingTime,
-            musicInfluenceStrength: 0.5,
-            processingStrategy: "fallback",
-            cssVariables: {
-              "--sn-musical-oklab-processing": "fallback",
-              "--sn-oklab-preset-name": "STANDARD"
-            }
-          };
-        }
-        // Utility methods
-        generateCacheKey(context) {
-          return `${context.trackUri}-${context.timestamp}-${JSON.stringify(
-            context.musicData
-          )}`;
-        }
-        cacheResult(cacheKey, result) {
-          if (this.coordinationCache.size >= this.cacheMaxSize) {
-            const firstKey = this.coordinationCache.keys().next().value;
-            if (firstKey) this.coordinationCache.delete(firstKey);
-          }
-          this.coordinationCache.set(cacheKey, result);
-          setTimeout(() => {
-            this.coordinationCache.delete(cacheKey);
-          }, this.cacheTimeoutMs);
-        }
-        /**
-         * Convert MusicalOKLABResult to ColorResult for integration with existing systems
-         */
-        convertToColorResult(musicalResult, context) {
-          return {
-            processedColors: {
-              ...musicalResult.enhancedColors,
-              ...musicalResult.cssVariables
-            },
-            accentHex: musicalResult.accentHex,
-            accentRgb: musicalResult.accentRgb,
-            metadata: {
-              strategy: "musical-oklab-processor",
-              processingTime: musicalResult.processingTime,
-              detectedGenre: musicalResult.detectedGenre,
-              emotionalState: musicalResult.emotionalResult.primaryEmotion,
-              oklabPreset: musicalResult.oklabPreset.name,
-              processingStrategy: musicalResult.processingStrategy,
-              musicInfluenceStrength: musicalResult.musicInfluenceStrength
-            },
-            context: {
-              rawColors: context.rawColors,
-              trackUri: context.trackUri,
-              timestamp: context.timestamp,
-              harmonicMode: context.harmonicMode || "musical-oklab-processing",
-              musicData: context.musicData
-            }
-          };
-        }
-        /**
-         * Clear processing cache
-         */
-        clearProcessingCache() {
-          this.coordinationCache.clear();
-          if (this.enableDebug) {
-            Y3KDebug?.debug?.log(
-              "MusicalOKLABProcessor",
-              "Processing cache cleared"
-            );
-          }
-        }
-        /**
-         * Get processing metrics for monitoring
-         */
-        getProcessingMetrics() {
-          return {
-            cacheSize: this.coordinationCache.size,
-            maxCacheSize: this.cacheMaxSize,
-            cacheTimeoutMs: this.cacheTimeoutMs,
-            enableDebug: this.enableDebug
-          };
-        }
-      };
-      __name(_MusicalOKLABProcessor, "MusicalOKLABProcessor");
-      MusicalOKLABProcessor = _MusicalOKLABProcessor;
-    }
-  });
-
   // src-js/visual/strategies/ColorStrategyRegistry.ts
   var _ColorStrategyRegistry, ColorStrategyRegistry;
   var init_ColorStrategyRegistry = __esm({
@@ -14841,6 +15191,7 @@ void main() {
       init_DebugCoordinator();
       init_config();
       init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
       init_PaletteSystemManager();
       init_ThemeUtilities();
       _DynamicAccentColorStrategy = class _DynamicAccentColorStrategy {
@@ -14870,7 +15221,11 @@ void main() {
             const services = DefaultServiceFactory.getServices();
             this.cssController = services.themeLifecycle?.getCssController() || getGlobalCSSVariableWriter();
           }
-          this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "ThemeColorController",
+            enableDebug: this.config.enableDebug,
+            reason: "constructor"
+          });
           this.initializeCurrentState();
           Y3KDebug?.debug?.log(
             "DynamicAccentColorStrategy",
@@ -15147,7 +15502,19 @@ void main() {
         updateConfig(newConfig) {
           this.integrationConfig = { ...this.integrationConfig, ...newConfig };
           if ("oklabEnhancementEnabled" in newConfig || "oklabPreset" in newConfig) {
-            this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+            const sharedProcessor = getStandardOKLABProcessor({
+              requester: "ThemeColorController.refresh",
+              enableDebug: this.config.enableDebug,
+              reason: "refresh"
+            });
+            if (!sharedProcessor) {
+              OKLABProcessorSingleton.ensureAvailability(
+                "standard",
+                "ThemeColorController.refresh"
+              );
+            } else {
+              this.oklabProcessor = sharedProcessor;
+            }
           }
           Y3KDebug?.debug?.log(
             "DynamicAccentColorStrategy",
@@ -15217,6 +15584,7 @@ void main() {
       init_DeviceCapabilityDetector();
       init_DebugCoordinator();
       init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
       init_ThemeUtilities();
       init_SystemServiceBridge();
       _DynamicGradientStrategy = class _DynamicGradientStrategy extends ServiceVisualSystemBase {
@@ -15294,7 +15662,11 @@ void main() {
               "CSSVariableWriter not available; CSS updates will fall back to direct DOM writes"
             );
           }
-          this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "DynamicGradientStrategy",
+            enableDebug: this.config.enableDebug,
+            reason: "constructor"
+          });
           this.deviceDetector = new DeviceCapabilityDetector();
           this.cssAnimationManager = cssAnimationManager;
           this.initializeBaseState();
@@ -15673,10 +16045,12 @@ void main() {
             let processedPrimary = primaryColor;
             let processedSecondary = secondaryColor;
             let oklabGradientStops = [];
+            let appliedPresetName = null;
             if (this.gradientConfig.oklabInterpolationEnabled && primaryColor) {
               const preset = OKLABColorProcessor.getPreset(
                 this.gradientConfig.oklabPreset
               );
+              appliedPresetName = preset.name;
               const primaryResult = this.oklabProcessor.processColor(
                 primaryColor,
                 preset
@@ -15705,6 +16079,16 @@ void main() {
                 );
                 processedSecondary = oklabGradientStops[oklabGradientStops.length - 1]?.enhancedHex || processedPrimary;
               }
+              if (oklabGradientStops.length > 0) {
+                OKLABProcessorSingleton.reportCacheFootprint(
+                  "DynamicGradientStrategy.gradientStops",
+                  oklabGradientStops.length,
+                  {
+                    trackUri: context.trackUri,
+                    preset: appliedPresetName
+                  }
+                );
+              }
               Y3KDebug?.debug?.log(
                 "DynamicGradientStrategy",
                 "OKLAB gradient processing applied:",
@@ -15714,7 +16098,7 @@ void main() {
                   originalSecondary: secondaryColor,
                   processedSecondary,
                   gradientStops: oklabGradientStops.length,
-                  preset: preset.name
+                  preset: appliedPresetName
                 }
               );
             }
@@ -16241,6 +16625,11 @@ void main() {
           }
           this.oklabCache.clear();
           this.gradientCache.clear();
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "DynamicGradientStrategy.gradientStops",
+            0,
+            { reason: "destroy" }
+          );
           super.destroy();
           Y3KDebug?.debug?.log(
             "DynamicGradientStrategy",
@@ -16272,7 +16661,19 @@ void main() {
         updateConfig(newConfig) {
           this.gradientConfig = { ...this.gradientConfig, ...newConfig };
           if ("oklabInterpolationEnabled" in newConfig || "oklabPreset" in newConfig) {
-            this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+            const sharedProcessor = getStandardOKLABProcessor({
+              requester: "DynamicGradientStrategy.refresh",
+              enableDebug: this.config.enableDebug,
+              reason: "refresh-state"
+            });
+            if (!sharedProcessor) {
+              OKLABProcessorSingleton.ensureAvailability(
+                "standard",
+                "DynamicGradientStrategy.refresh"
+              );
+            } else {
+              this.oklabProcessor = sharedProcessor;
+            }
           }
           Y3KDebug?.debug?.log("DynamicGradientStrategy", "Configuration updated:", {
             ...newConfig,
@@ -16413,6 +16814,7 @@ void main() {
       init_WebGLSystemInterface();
       init_config();
       init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
       init_PaletteSystemManager();
       init_ThemeUtilities();
       init_ShaderLoader();
@@ -16686,7 +17088,11 @@ void main() {
           }, "resizeWebGLCanvas");
           this.deviceDetector = new DeviceCapabilityDetector();
           this.cssController = cssController || getGlobalCSSVariableWriter();
-          this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "WebGLGradientStrategy",
+            enableDebug: this.config.enableDebug,
+            reason: "constructor"
+          });
           this.cssController = getGlobalCSSVariableWriter();
           this.prefersReducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
@@ -17813,7 +18219,22 @@ void main() {
         updateConfig(newConfig) {
           this.flowSettings = { ...this.flowSettings, ...newConfig };
           if ("oklabProcessingEnabled" in newConfig || "oklabPreset" in newConfig) {
-            this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+            const sharedProcessor = getStandardOKLABProcessor({
+              requester: "WebGLGradientStrategy.updateConfig",
+              enableDebug: this.config.enableDebug,
+              reason: "config-update"
+            });
+            if (!sharedProcessor) {
+              console.warn(
+                "[WebGLGradientStrategy] Shared OKLAB processor unavailable during config update"
+              );
+              OKLABProcessorSingleton.ensureAvailability(
+                "standard",
+                "WebGLGradientStrategy.updateConfig"
+              );
+            } else {
+              this.oklabProcessor = sharedProcessor;
+            }
           }
           Y3KDebug?.debug?.log("WebGLGradientStrategy", "Configuration updated:", {
             ...newConfig,
@@ -19077,8 +19498,7 @@ void main() {
       init_config();
       init_DeviceCapabilityDetector();
       init_DebugCoordinator();
-      init_MusicalOKLABCoordinator();
-      init_OKLABColorProcessor();
+      init_OKLABProcessorSingleton();
       init_CoreServiceProviders();
       init_ColorStrategyRegistry();
       init_ColorStrategySelector();
@@ -19090,6 +19510,7 @@ void main() {
       init_globalConfig();
       init_PaletteTransform();
       init_PaletteConstants();
+      init_genre();
       _ColorProcessor = class _ColorProcessor {
         constructor(performanceAnalyzer2) {
           this.initialized = false;
@@ -19154,8 +19575,16 @@ void main() {
           this.deviceCapabilityDetector = new DeviceCapabilityDetector();
           this.strategyRegistry = new ColorStrategyRegistry();
           this.strategySelector = new ColorStrategySelector();
-          this.oklabProcessor = new OKLABColorProcessor();
-          this.musicalOKLABProcessor = new MusicalOKLABProcessor(true);
+          this.oklabProcessor = getStandardOKLABProcessor({
+            requester: "ColorProcessor",
+            enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
+            reason: "constructor"
+          });
+          this.musicalOKLABProcessor = getMusicalOKLABProcessor({
+            requester: "ColorProcessor",
+            enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
+            reason: "constructor"
+          });
           if (ADVANCED_SYSTEM_CONFIG.useDynamicPalettes) {
             this.dynamicPaletteIntegration = new DynamicPaletteIntegration(
               ADVANCED_SYSTEM_CONFIG.enableDebug
@@ -19237,6 +19666,17 @@ void main() {
           }
           this.processingState.processingQueue = [];
           this.processingCache.clear();
+          this.resultCache.clear();
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "ColorProcessor.processingCache",
+            0,
+            { reason: "destroy" }
+          );
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "ColorProcessor.resultCache",
+            0,
+            { reason: "destroy" }
+          );
           this.settingsUnsubscribe?.();
           this.settingsUnsubscribe = null;
           unifiedEventBus.unsubscribeAll("UnifiedColorProcessingEngine");
@@ -19316,7 +19756,7 @@ void main() {
               success: true,
               timestamp: Date.now(),
               coordinationMetrics: {
-                detectedGenre: context.musicData?.genre || "unknown",
+                detectedGenre: context.musicData?.genre ?? "unknown" /* UNKNOWN */,
                 emotionalState: context.musicData?.energy ? this.classifyEmotionalState(context.musicData.energy) : "neutral",
                 oklabPreset: this.determineOKLABPreset(context),
                 coordinationStrategy: result.metadata?.strategy || "unified",
@@ -19843,19 +20283,45 @@ void main() {
         }
         cacheResult(key, result) {
           this.processingCache.set(key, { ...result, timestamp: Date.now() });
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "ColorProcessor.processingCache",
+            this.processingCache.size,
+            { key, type: "processing" }
+          );
           this.resultCache.set(key, result);
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "ColorProcessor.resultCache",
+            this.resultCache.size,
+            { key, type: "result" }
+          );
           if (this.resultCache.size > this.cacheMaxSize) {
             const entries = Array.from(this.resultCache.entries());
             const toRemove = entries.slice(0, entries.length - this.cacheMaxSize);
             toRemove.forEach(([cacheKey]) => this.resultCache.delete(cacheKey));
+            if (toRemove.length > 0) {
+              OKLABProcessorSingleton.reportCacheFootprint(
+                "ColorProcessor.resultCache",
+                this.resultCache.size,
+                { type: "result", reason: "size-limit" }
+              );
+            }
           }
         }
         cleanupCache() {
           const now = Date.now();
+          let removed = false;
           for (const [key, result] of this.processingCache.entries()) {
             if (now - result.timestamp > this.CACHE_TTL_MS) {
               this.processingCache.delete(key);
+              removed = true;
             }
+          }
+          if (removed) {
+            OKLABProcessorSingleton.reportCacheFootprint(
+              "ColorProcessor.processingCache",
+              this.processingCache.size,
+              { reason: "ttl" }
+            );
           }
         }
         updateMetrics(processingTime, success) {
@@ -20282,6 +20748,11 @@ void main() {
             "sn-dynamic-color-intensity"
           ].includes(data.settingKey)) {
             this.processingCache.clear();
+            OKLABProcessorSingleton.reportCacheFootprint(
+              "ColorProcessor.processingCache",
+              this.processingCache.size,
+              { reason: "settings" }
+            );
             Y3KDebug?.debug?.log(
               "UnifiedColorProcessingEngine",
               "Cache cleared due to settings change:",
@@ -20292,6 +20763,11 @@ void main() {
         async handlePerformanceWarning(data) {
           if (data.memoryUsage > 50) {
             this.processingCache.clear();
+            OKLABProcessorSingleton.reportCacheFootprint(
+              "ColorProcessor.processingCache",
+              this.processingCache.size,
+              { reason: "memory" }
+            );
             Y3KDebug?.debug?.log(
               "UnifiedColorProcessingEngine",
               "Cache cleared due to memory pressure"
@@ -20312,6 +20788,11 @@ void main() {
          */
         async forceReprocessColors() {
           this.processingCache.clear();
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "ColorProcessor.processingCache",
+            this.processingCache.size,
+            { reason: "force-reprocess" }
+          );
           if (this.processingState.lastExtractedColors) {
             const context = {
               rawColors: this.processingState.lastExtractedColors,
@@ -24262,6 +24743,7 @@ void main() {
   // src-js/audio/ColorHarmonyEngine.ts
   init_settingKeys();
   init_GenreProfileManager();
+  init_genre();
   init_EventBus();
   init_DebugCoordinator();
   init_EmotionalTemperatureMapper();
@@ -24269,6 +24751,54 @@ void main() {
   init_PaletteSystemManager();
 
   // src-js/utils/core/PaletteExtensionManager.ts
+  var DEFAULT_BASE_COLOR = "#1e1e2e";
+  var DEFAULT_ACCENT_COLOR = "#8caaee";
+  var DEFAULT_ACCENTS = {
+    mauve: "#ca9ee6",
+    pink: "#f4b8e4",
+    blue: "#8caaee",
+    sapphire: "#85c1dc",
+    sky: "#99d1db",
+    teal: "#81c8be",
+    green: "#a6d189",
+    yellow: "#e5c890",
+    peach: "#ef9f76",
+    red: "#e78284",
+    lavender: "#babbf1"
+  };
+  var DEFAULT_NEUTRALS = {
+    base: DEFAULT_BASE_COLOR,
+    surface0: "#313244",
+    surface1: "#45475a",
+    surface2: "#585b70",
+    overlay0: "#6c7086",
+    overlay1: "#7f849c",
+    overlay2: "#9399b2",
+    text: "#cdd6f4"
+  };
+  var ACCENT_VARIATION_CONFIGS = [
+    { name: "primary", hueShift: 0, chromaScale: 1, lightnessDelta: 0 },
+    { name: "secondary", hueShift: 25, chromaScale: 1.05, lightnessDelta: 0.03 },
+    { name: "tertiary", hueShift: -25, chromaScale: 0.95, lightnessDelta: -0.02 },
+    { name: "complement", hueShift: 180, chromaScale: 1, lightnessDelta: 0 },
+    { name: "opposite", hueShift: 210, chromaScale: 0.9, lightnessDelta: 0.02 },
+    { name: "warm1", hueShift: 35, chromaScale: 1.08, lightnessDelta: 0.015 },
+    { name: "cool1", hueShift: -55, chromaScale: 0.92, lightnessDelta: 0.025 },
+    { name: "accent1", hueShift: 60, chromaScale: 1.15, lightnessDelta: 0.05 },
+    { name: "accent2", hueShift: -60, chromaScale: 1.15, lightnessDelta: -0.045 },
+    { name: "highlight", hueShift: 15, chromaScale: 1.1, lightnessDelta: 0.08 },
+    { name: "emphasis", hueShift: -15, chromaScale: 1.05, lightnessDelta: -0.07 }
+  ];
+  var NEUTRAL_LEVELS = [
+    { name: "base", lightnessDelta: 0 },
+    { name: "surface0", lightnessDelta: 0.04 },
+    { name: "surface1", lightnessDelta: 0.08 },
+    { name: "surface2", lightnessDelta: 0.12 },
+    { name: "overlay0", lightnessDelta: 0.16 },
+    { name: "overlay1", lightnessDelta: 0.2 },
+    { name: "overlay2", lightnessDelta: 0.24 },
+    { name: "text", lightnessDelta: 0.3 }
+  ];
   var GENRE_PALETTE_HINTS = {
     jazz: { temperatureShift: 15, saturationBoost: 1.1, warmth: 0.8 },
     electronic: { temperatureShift: -10, saturationBoost: 1.2, warmth: 0.2 },
@@ -24282,13 +24812,139 @@ void main() {
     default: { temperatureShift: 0, saturationBoost: 1, warmth: 0.5 }
   };
   var _PaletteExtensionManager = class _PaletteExtensionManager {
+    // ms
     constructor(config, utils) {
       this.paletteCache = {};
       this.cacheTTL = 3e5;
       // 5 minutes
       this.maxCacheSize = 50;
+      this.computedStyleCache = null;
+      this.computedStyleCacheTTL = 250;
       this.config = config;
       this.utils = utils;
+    }
+    getTimestamp() {
+      if (typeof performance !== "undefined" && typeof performance.now === "function") {
+        return performance.now();
+      }
+      return Date.now();
+    }
+    getComputedRootStyle() {
+      const root = this.utils.getRootStyle();
+      if (!root) {
+        return null;
+      }
+      const now = this.getTimestamp();
+      if (this.computedStyleCache && now - this.computedStyleCache.timestamp < this.computedStyleCacheTTL) {
+        return this.computedStyleCache.style;
+      }
+      const style = getComputedStyle(root);
+      this.computedStyleCache = { style, timestamp: now };
+      return style;
+    }
+    normalizeHexColor(value) {
+      if (!value) return null;
+      const trimmed = value.trim();
+      if (!trimmed) return null;
+      const candidate = trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+      const sixDigit = candidate.slice(0, 7);
+      if (this.isValidHexColor(sixDigit)) {
+        return sixDigit;
+      }
+      const threeDigit = candidate.slice(0, 4);
+      if (this.isValidHexColor(threeDigit)) {
+        return threeDigit;
+      }
+      return null;
+    }
+    getStyleContext() {
+      const computed = this.getComputedRootStyle();
+      if (!computed) {
+        return {
+          baseColor: DEFAULT_BASE_COLOR,
+          accentColor: DEFAULT_ACCENT_COLOR
+        };
+      }
+      const baseCandidates = [
+        this.normalizeHexColor(computed.getPropertyValue("--spice-main")),
+        this.normalizeHexColor(computed.getPropertyValue("--spice-base")),
+        this.normalizeHexColor(computed.getPropertyValue("--sn-dynamic-base"))
+      ];
+      const accentCandidates = [
+        this.normalizeHexColor(computed.getPropertyValue("--sn-gradient-accent")),
+        this.normalizeHexColor(computed.getPropertyValue("--sn-dynamic-accent")),
+        this.normalizeHexColor(computed.getPropertyValue("--spice-button")),
+        this.normalizeHexColor(computed.getPropertyValue("--spice-accent"))
+      ];
+      const dynamicBase = this.normalizeHexColor(computed.getPropertyValue("--spice-base")) || this.normalizeHexColor(computed.getPropertyValue("--sn-dynamic-base")) || void 0;
+      const dynamicAccent = this.normalizeHexColor(computed.getPropertyValue("--sn-dynamic-accent")) || this.normalizeHexColor(computed.getPropertyValue("--spice-accent")) || void 0;
+      const context = {
+        baseColor: baseCandidates.find(Boolean) || DEFAULT_BASE_COLOR,
+        accentColor: accentCandidates.find(Boolean) || DEFAULT_ACCENT_COLOR
+      };
+      if (dynamicBase) {
+        context.dynamicBase = dynamicBase;
+      }
+      if (dynamicAccent) {
+        context.dynamicAccent = dynamicAccent;
+      }
+      return context;
+    }
+    hexToOklch(hex) {
+      const normalized = this.normalizeHexColor(hex ?? void 0);
+      if (!normalized) {
+        return null;
+      }
+      const rgb = this.utils.hexToRgb(normalized);
+      if (!rgb) {
+        return null;
+      }
+      const oklab = this.utils.rgbToOklab(rgb.r, rgb.g, rgb.b);
+      const c = Math.sqrt(oklab.a * oklab.a + oklab.b * oklab.b);
+      const h = this.normalizeHue(Math.atan2(oklab.b, oklab.a) * 180 / Math.PI);
+      return {
+        L: this.clampLightness(oklab.L),
+        C: this.clampChroma(c),
+        H: h
+      };
+    }
+    oklchToHex(color3) {
+      const hueRadians = this.normalizeHue(color3.H) * Math.PI / 180;
+      const a = this.clampChroma(color3.C) * Math.cos(hueRadians);
+      const b = this.clampChroma(color3.C) * Math.sin(hueRadians);
+      const rgb = this.utils.oklabToRgb(this.clampLightness(color3.L), a, b);
+      return this.utils.rgbToHex(rgb.r, rgb.g, rgb.b);
+    }
+    clampLightness(value) {
+      if (!Number.isFinite(value)) return 0;
+      return Math.min(1, Math.max(0, value));
+    }
+    clampChroma(value) {
+      if (!Number.isFinite(value)) return 0;
+      return Math.min(0.4, Math.max(0, value));
+    }
+    normalizeHue(value) {
+      if (!Number.isFinite(value)) return 0;
+      const normalized = value % 360;
+      return normalized < 0 ? normalized + 360 : normalized;
+    }
+    averageHue(h1, h2) {
+      const h1Rad = this.normalizeHue(h1) * Math.PI / 180;
+      const h2Rad = this.normalizeHue(h2) * Math.PI / 180;
+      const avgX = Math.cos(h1Rad) + Math.cos(h2Rad);
+      const avgY = Math.sin(h1Rad) + Math.sin(h2Rad);
+      if (avgX === 0 && avgY === 0) {
+        return this.normalizeHue(h1);
+      }
+      return this.normalizeHue(Math.atan2(avgY, avgX) * 180 / Math.PI);
+    }
+    adjustAccentColor(base, config) {
+      const adjusted = {
+        L: this.clampLightness(base.L + config.lightnessDelta),
+        C: this.clampChroma(base.C * config.chromaScale),
+        H: this.normalizeHue(base.H + config.hueShift)
+      };
+      return this.oklchToHex(adjusted);
     }
     // TODO: Phase 3 - Load custom palette from JSON with validation
     async loadCustomPalette(paletteId, source) {
@@ -24317,76 +24973,69 @@ void main() {
       }
       return null;
     }
-    // TODO: Phase 3 - Generate fallback palette for unknown themes
+    // Phase 3: Generate fallback palette for unknown themes using OKLAB adjustments
     generateFallbackPalette(themeName) {
-      const root = this.utils.getRootStyle();
-      const computedStyle = getComputedStyle(root);
-      const baseColor = computedStyle.getPropertyValue("--spice-main").trim() || computedStyle.getPropertyValue("--spice-base").trim() || "#1e1e2e";
-      const accentColor = (
-        // Prefer Year 3000 dynamic accent if it's already available, else fall back to spice button, then to dynamic accent fallback.
-        computedStyle.getPropertyValue("--sn-gradient-accent").trim() || computedStyle.getPropertyValue("--spice-button").trim() || computedStyle.getPropertyValue("--sn-dynamic-accent").trim() || computedStyle.getPropertyValue("--spice-accent").trim() || "#8caaee"
-      );
-      const baseRgb = this.utils.hexToRgb(
-        baseColor.startsWith("#") ? baseColor : `#${baseColor}`
-      );
-      const accentRgb = this.utils.hexToRgb(
-        accentColor.startsWith("#") ? accentColor : `#${accentColor}`
-      );
-      if (!baseRgb || !accentRgb) {
-        const dynamicAccent = computedStyle.getPropertyValue("--sn-dynamic-accent").trim();
-        const dynamicBase = computedStyle.getPropertyValue("--spice-base").trim();
-        return {
-          name: themeName,
-          version: "1.0.0",
-          accents: {
-            mauve: dynamicAccent || "#ca9ee6",
-            pink: "#f4b8e4",
-            blue: dynamicAccent || "#8caaee",
-            sapphire: "#85c1dc",
-            sky: "#99d1db",
-            teal: "#81c8be",
-            green: "#a6d189",
-            yellow: "#e5c890",
-            peach: "#ef9f76",
-            red: "#e78284",
-            lavender: "#babbf1"
-          },
-          neutrals: {
-            base: dynamicBase || "#1e1e2e",
-            surface0: "#313244",
-            surface1: "#45475a",
-            surface2: "#585b70",
-            overlay0: "#6c7086",
-            overlay1: "#7f849c",
-            overlay2: "#9399b2",
-            text: "#cdd6f4"
-          },
-          metadata: {
-            author: "PaletteExtensionManager",
-            description: `Generated fallback for ${themeName}`,
-            temperature: "neutral"
-          }
-        };
+      const { baseColor, accentColor, dynamicBase, dynamicAccent } = this.getStyleContext();
+      const baseOklch = this.hexToOklch(baseColor) || (dynamicBase ? this.hexToOklch(dynamicBase) : null);
+      const accentOklch = this.hexToOklch(accentColor) || (dynamicAccent ? this.hexToOklch(dynamicAccent) : null);
+      if (!baseOklch || !accentOklch) {
+        return this.buildDefaultFallbackPalette(
+          themeName,
+          dynamicBase,
+          dynamicAccent
+        );
       }
-      const baseHsl = this.utils.rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
-      const accentHsl = this.utils.rgbToHsl(
-        accentRgb.r,
-        accentRgb.g,
-        accentRgb.b
-      );
+      const accents = this.generateAccentVariations(accentOklch);
+      const neutrals = this.generateNeutralVariations(baseOklch);
       return {
         name: themeName,
         version: "1.0.0",
-        accents: this.generateAccentVariations(accentHsl),
-        neutrals: this.generateNeutralVariations(baseHsl),
+        accents,
+        neutrals,
         metadata: {
           author: "PaletteExtensionManager",
           description: `Generated palette for ${themeName}`,
-          temperature: this.detectTemperature(baseHsl, accentHsl)
+          temperature: this.detectTemperature(baseOklch, accentOklch)
         }
       };
     }
-    // TODO: Phase 3 - Apply genre-aware modifications to palette
+    buildDefaultFallbackPalette(themeName, dynamicBase, dynamicAccent) {
+      const accentFallback = dynamicAccent || void 0;
+      const baseFallback = dynamicBase || void 0;
+      return {
+        name: themeName,
+        version: "1.0.0",
+        accents: {
+          mauve: accentFallback || DEFAULT_ACCENTS.mauve,
+          pink: DEFAULT_ACCENTS.pink,
+          blue: accentFallback || DEFAULT_ACCENTS.blue,
+          sapphire: DEFAULT_ACCENTS.sapphire,
+          sky: DEFAULT_ACCENTS.sky,
+          teal: DEFAULT_ACCENTS.teal,
+          green: DEFAULT_ACCENTS.green,
+          yellow: DEFAULT_ACCENTS.yellow,
+          peach: DEFAULT_ACCENTS.peach,
+          red: DEFAULT_ACCENTS.red,
+          lavender: DEFAULT_ACCENTS.lavender
+        },
+        neutrals: {
+          base: baseFallback || DEFAULT_NEUTRALS.base,
+          surface0: DEFAULT_NEUTRALS.surface0,
+          surface1: DEFAULT_NEUTRALS.surface1,
+          surface2: DEFAULT_NEUTRALS.surface2,
+          overlay0: DEFAULT_NEUTRALS.overlay0,
+          overlay1: DEFAULT_NEUTRALS.overlay1,
+          overlay2: DEFAULT_NEUTRALS.overlay2,
+          text: DEFAULT_NEUTRALS.text
+        },
+        metadata: {
+          author: "PaletteExtensionManager",
+          description: `Generated fallback for ${themeName}`,
+          temperature: "neutral"
+        }
+      };
+    }
+    // Phase 3: Apply genre-aware modifications to palette using OKLAB blending
     applyGenreAwareModifications(palette, genre) {
       const genreHints = GENRE_PALETTE_HINTS[genre] || GENRE_PALETTE_HINTS.default;
       if (this.config.enableDebug) {
@@ -24421,7 +25070,7 @@ void main() {
       }
       return modifiedPalette;
     }
-    // TODO: Phase 3 - Validate palette structure and required properties
+    // Phase 3: Validate palette structure and required properties
     validatePalette(palette) {
       if (!palette || typeof palette !== "object") return false;
       if (!palette.name || typeof palette.name !== "string") return false;
@@ -24439,7 +25088,7 @@ void main() {
       }
       return true;
     }
-    // TODO: Phase 3 - Cache management
+    // Phase 3: Cache management
     cachePalette(paletteId, palette, isValid) {
       if (Object.keys(this.paletteCache).length >= this.maxCacheSize) {
         const oldestEntry = Object.entries(this.paletteCache).sort(
@@ -24456,99 +25105,61 @@ void main() {
         isValid
       };
     }
-    // TODO: Phase 3 - Generate accent color variations
-    generateAccentVariations(baseHsl) {
+    generateAccentVariations(base) {
       const variations = {};
-      const hueShifts = [0, 30, 60, 120, 180, 210, 240, 300, 330, 45, 90];
-      const names = [
-        "primary",
-        "secondary",
-        "tertiary",
-        "complement",
-        "opposite",
-        "warm1",
-        "cool1",
-        "accent1",
-        "accent2",
-        "highlight",
-        "emphasis"
-      ];
-      hueShifts.forEach((shift, index) => {
-        const name = names[index] || `variant${index}`;
-        const adjustedHue = (baseHsl.h + shift) % 360;
-        const rgb = this.utils.hslToRgb(adjustedHue, baseHsl.s, baseHsl.l);
-        if (rgb) {
-          variations[name] = this.utils.rgbToHex(rgb.r, rgb.g, rgb.b);
-        }
+      ACCENT_VARIATION_CONFIGS.forEach((config) => {
+        variations[config.name] = this.adjustAccentColor(base, config);
       });
       return variations;
     }
-    // TODO: Phase 3 - Generate neutral color variations
-    generateNeutralVariations(baseHsl) {
+    generateNeutralVariations(base) {
       const neutrals = {};
-      const lightnessLevels = [
-        { name: "base", l: baseHsl.l },
-        { name: "surface0", l: Math.min(95, baseHsl.l + 10) },
-        { name: "surface1", l: Math.min(90, baseHsl.l + 20) },
-        { name: "surface2", l: Math.min(85, baseHsl.l + 30) },
-        { name: "overlay0", l: Math.min(80, baseHsl.l + 40) },
-        { name: "overlay1", l: Math.min(75, baseHsl.l + 50) },
-        { name: "text", l: Math.min(95, baseHsl.l + 60) }
-      ];
-      lightnessLevels.forEach((level) => {
-        const rgb = this.utils.hslToRgb(
-          baseHsl.h,
-          Math.max(0, baseHsl.s - 20),
-          level.l
-        );
-        if (rgb) {
-          neutrals[level.name] = this.utils.rgbToHex(rgb.r, rgb.g, rgb.b);
-        }
+      const baseChroma = this.clampChroma(base.C * 0.2);
+      NEUTRAL_LEVELS.forEach((level, index) => {
+        const chromaScale = Math.max(0, 1 - index * 0.12);
+        const adjusted = {
+          L: this.clampLightness(base.L + level.lightnessDelta),
+          C: this.clampChroma(baseChroma * chromaScale),
+          H: base.H
+        };
+        neutrals[level.name] = this.oklchToHex(adjusted);
       });
       return neutrals;
     }
-    // TODO: Phase 3 - Detect color temperature
-    detectTemperature(baseHsl, accentHsl) {
-      const avgHue = (baseHsl.h + accentHsl.h) / 2;
-      if (avgHue >= 0 && avgHue <= 60 || avgHue >= 300 && avgHue <= 360) {
+    detectTemperature(base, accent) {
+      const avgHue = this.averageHue(base.H, accent.H);
+      if (avgHue >= 0 && avgHue <= 60 || avgHue >= 300 && avgHue < 360) {
         return "warm";
-      } else if (avgHue >= 120 && avgHue <= 240) {
+      }
+      if (avgHue >= 120 && avgHue <= 240) {
         return "cool";
-      } else {
-        return "neutral";
       }
+      return "neutral";
     }
-    // TODO: Phase 3 - Apply genre-specific color modifications
     applyGenreColorModification(hexColor, temperatureShift, saturationBoost) {
-      const rgb = this.utils.hexToRgb(hexColor);
-      if (!rgb) return hexColor;
-      const hsl = this.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
-      const adjustedHue = (hsl.h + temperatureShift + 360) % 360;
-      const adjustedSaturation = Math.max(
-        0,
-        Math.min(100, hsl.s * saturationBoost)
-      );
-      const modifiedRgb = this.utils.hslToRgb(
-        adjustedHue,
-        adjustedSaturation,
-        hsl.l
-      );
-      if (modifiedRgb) {
-        return this.utils.rgbToHex(modifiedRgb.r, modifiedRgb.g, modifiedRgb.b);
+      const color3 = this.hexToOklch(hexColor);
+      if (!color3) {
+        return hexColor;
       }
-      return hexColor;
+      const adjusted = {
+        L: this.clampLightness(color3.L),
+        C: this.clampChroma(color3.C * saturationBoost),
+        H: this.normalizeHue(color3.H + temperatureShift)
+      };
+      return this.oklchToHex(adjusted);
     }
     // TODO: Phase 3 - Validate hex color format
     isValidHexColor(color3) {
       return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color3);
     }
-    // TODO: Phase 3 - Public API for getting genre hints
+    // Phase 3: Public API for getting genre hints
     getGenreHints(genre) {
       return GENRE_PALETTE_HINTS[genre] || GENRE_PALETTE_HINTS.default;
     }
-    // TODO: Phase 3 - Clear cache
+    // Phase 3: Clear cache
     clearCache() {
       this.paletteCache = {};
+      this.computedStyleCache = null;
       if (this.config.enableDebug) {
         console.log("[PaletteExtensionManager] Palette cache cleared");
       }
@@ -24564,6 +25175,95 @@ void main() {
   init_CSSVariableWriter();
 
   // src-js/utils/color/SpicetifyColorGenerators.ts
+  init_ThemeUtilities();
+  var MIN_LIGHTNESS = 0.02;
+  var MAX_LIGHTNESS = 0.98;
+  var MAX_CHROMA = 0.35;
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+  __name(clamp, "clamp");
+  function wrapHue(degrees) {
+    const wrapped = (degrees % 360 + 360) % 360;
+    return wrapped === 360 ? 0 : wrapped;
+  }
+  __name(wrapHue, "wrapHue");
+  function blendHue(source, target, mix) {
+    const clampedMix = clamp(mix, 0, 1);
+    const sourceRad = wrapHue(source) * Math.PI / 180;
+    const targetRad = wrapHue(target) * Math.PI / 180;
+    const x = Math.cos(sourceRad) * (1 - clampedMix) + Math.cos(targetRad) * clampedMix;
+    const y = Math.sin(sourceRad) * (1 - clampedMix) + Math.sin(targetRad) * clampedMix;
+    if (x === 0 && y === 0) {
+      return wrapHue(target);
+    }
+    return wrapHue(Math.atan2(y, x) * 180 / Math.PI);
+  }
+  __name(blendHue, "blendHue");
+  function sanitizeOklch(oklch) {
+    return {
+      L: clamp(oklch.L, MIN_LIGHTNESS, MAX_LIGHTNESS),
+      C: clamp(oklch.C, 0, MAX_CHROMA),
+      H: wrapHue(oklch.H)
+    };
+  }
+  __name(sanitizeOklch, "sanitizeOklch");
+  function toOklch(hex) {
+    if (!isValidHexColor(hex)) {
+      return null;
+    }
+    return hexToOklch(hex);
+  }
+  __name(toOklch, "toOklch");
+  function fromOklch(oklch) {
+    return oklchToHex(sanitizeOklch(oklch));
+  }
+  __name(fromOklch, "fromOklch");
+  function computeLightnessVariant(base, factor, direction) {
+    const clampedFactor = clamp(factor, 0, 1);
+    if (clampedFactor === 0) {
+      return sanitizeOklch(base);
+    }
+    const available = direction === "darker" ? base.L - MIN_LIGHTNESS : MAX_LIGHTNESS - base.L;
+    const lightnessShift = available * clampedFactor;
+    const L = direction === "darker" ? base.L - lightnessShift : base.L + lightnessShift;
+    const chromaScale = direction === "darker" ? 1 - 0.35 * clampedFactor : 1 - 0.18 * clampedFactor;
+    return sanitizeOklch({
+      L,
+      C: clamp(base.C * chromaScale, 0, MAX_CHROMA),
+      H: base.H
+    });
+  }
+  __name(computeLightnessVariant, "computeLightnessVariant");
+  function applyOklchAdjustment(baseHex, adjustment, fallback) {
+    const oklch = toOklch(baseHex);
+    if (!oklch) {
+      return fallback ?? baseHex;
+    }
+    const lightnessScale = adjustment.lightnessScale ?? 1;
+    const lightnessShift = adjustment.lightnessShift ?? 0;
+    const targetLightness = clamp(
+      oklch.L * lightnessScale + lightnessShift,
+      MIN_LIGHTNESS,
+      MAX_LIGHTNESS
+    );
+    const chromaScale = adjustment.chromaScale ?? 1;
+    const chromaAdd = adjustment.chromaAdd ?? 0;
+    const targetChroma = clamp(oklch.C * chromaScale + chromaAdd, 0, MAX_CHROMA);
+    let targetHue = oklch.H;
+    if (typeof adjustment.hueTarget === "number") {
+      const hueMix = adjustment.hueMix ?? 0.5;
+      targetHue = blendHue(oklch.H, adjustment.hueTarget, hueMix);
+    } else if (typeof adjustment.hueShift === "number") {
+      targetHue = wrapHue(oklch.H + adjustment.hueShift);
+    }
+    return fromOklch({
+      L: targetLightness,
+      C: targetChroma,
+      H: targetHue
+    });
+  }
+  __name(applyOklchAdjustment, "applyOklchAdjustment");
   function generateIntelligentColorDistribution(primaryColor, accentColor, shadowColor, highlightColor) {
     const primary = primaryColor;
     const accent = accentColor || primaryColor;
@@ -24600,12 +25300,19 @@ void main() {
   __name(convertColorsToRgb, "convertColorsToRgb");
   function generateDarkerVariant(hexColor, factor) {
     try {
-      const rgb = hexToRgbObject(hexColor);
-      if (!rgb) return hexColor;
-      const r = Math.max(0, Math.round(rgb.r * (1 - factor)));
-      const g = Math.max(0, Math.round(rgb.g * (1 - factor)));
-      const b = Math.max(0, Math.round(rgb.b * (1 - factor)));
-      return rgbToHex2(r, g, b);
+      const clampedFactor = clamp(factor, 0, 1);
+      if (clampedFactor === 0) {
+        return hexColor;
+      }
+      if (clampedFactor >= 1) {
+        return "#000000";
+      }
+      const oklch = toOklch(hexColor);
+      if (!oklch) {
+        return hexColor;
+      }
+      const darkerVariant = computeLightnessVariant(oklch, clampedFactor, "darker");
+      return fromOklch(darkerVariant);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate darker variant:", error);
       return hexColor;
@@ -24614,12 +25321,19 @@ void main() {
   __name(generateDarkerVariant, "generateDarkerVariant");
   function generateLighterVariant(hexColor, factor) {
     try {
-      const rgb = hexToRgbObject(hexColor);
-      if (!rgb) return hexColor;
-      const r = Math.min(255, Math.round(rgb.r + (255 - rgb.r) * factor));
-      const g = Math.min(255, Math.round(rgb.g + (255 - rgb.g) * factor));
-      const b = Math.min(255, Math.round(rgb.b + (255 - rgb.b) * factor));
-      return rgbToHex2(r, g, b);
+      const clampedFactor = clamp(factor, 0, 1);
+      if (clampedFactor === 0) {
+        return hexColor;
+      }
+      if (clampedFactor >= 1) {
+        return "#ffffff";
+      }
+      const oklch = toOklch(hexColor);
+      if (!oklch) {
+        return hexColor;
+      }
+      const lighterVariant = computeLightnessVariant(oklch, clampedFactor, "lighter");
+      return fromOklch(lighterVariant);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate lighter variant:", error);
       return hexColor;
@@ -24628,13 +25342,15 @@ void main() {
   __name(generateLighterVariant, "generateLighterVariant");
   function generateHueRotatedColor(hexColor, hueDegrees) {
     try {
-      const rgb = hexToRgbObject(hexColor);
-      if (!rgb) return hexColor;
-      const hsl = rgbToHsl2(rgb.r, rgb.g, rgb.b);
-      hsl.h = (hsl.h + hueDegrees) % 360;
-      if (hsl.h < 0) hsl.h += 360;
-      const rotatedRgb = hslToRgb2(hsl.h, hsl.s, hsl.l);
-      return rgbToHex2(rotatedRgb.r, rotatedRgb.g, rotatedRgb.b);
+      const oklch = toOklch(hexColor);
+      if (!oklch) {
+        return hexColor;
+      }
+      const rotated = {
+        ...oklch,
+        H: wrapHue(oklch.H + hueDegrees)
+      };
+      return fromOklch(rotated);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate hue-rotated color:", error);
       return hexColor;
@@ -24643,12 +25359,14 @@ void main() {
   __name(generateHueRotatedColor, "generateHueRotatedColor");
   function generateCinematicRed(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#FF0000";
-      const dramaticRed = Math.min(255, rgb.r + 100);
-      const warmGreen = Math.max(0, Math.min(rgb.g * 0.3, 100));
-      const warmBlue = Math.max(0, Math.min(rgb.b * 0.2, 80));
-      return rgbToHex2(dramaticRed, warmGreen, warmBlue);
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#FF0000";
+      const dramatic = sanitizeOklch({
+        L: clamp(oklch.L * 0.7, MIN_LIGHTNESS, 0.7),
+        C: clamp(oklch.C * 1.6 + 0.06, 0.12, MAX_CHROMA),
+        H: blendHue(oklch.H, 25, 0.7)
+      });
+      return fromOklch(dramatic);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate cinematic red:", error);
       return "#FF0000";
@@ -24657,12 +25375,14 @@ void main() {
   __name(generateCinematicRed, "generateCinematicRed");
   function generateCinematicCyan(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#00FFFF";
-      const dramaticGreen = Math.min(255, rgb.g + 120);
-      const dramaticBlue = Math.min(255, rgb.b + 140);
-      const coolRed = Math.max(0, Math.min(rgb.r * 0.2, 60));
-      return rgbToHex2(coolRed, dramaticGreen, dramaticBlue);
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#00FFFF";
+      const dramatic = sanitizeOklch({
+        L: clamp(oklch.L * 0.85 + 0.1, 0.4, 0.88),
+        C: clamp(oklch.C * 1.45 + 0.04, 0.15, MAX_CHROMA),
+        H: blendHue(oklch.H, 200, 0.6)
+      });
+      return fromOklch(dramatic);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate cinematic cyan:", error);
       return "#00FFFF";
@@ -24671,12 +25391,14 @@ void main() {
   __name(generateCinematicCyan, "generateCinematicCyan");
   function generateCinematicYellow(highlightColor) {
     try {
-      const rgb = hexToRgbObject(highlightColor);
-      if (!rgb) return "#FFFF00";
-      const brightRed = Math.min(255, rgb.r + 80);
-      const brightGreen = Math.min(255, rgb.g + 100);
-      const subtleBlue = Math.max(0, Math.min(rgb.b * 0.3, 120));
-      return rgbToHex2(brightRed, brightGreen, subtleBlue);
+      const oklch = toOklch(highlightColor);
+      if (!oklch) return "#FFFF00";
+      const dramatic = sanitizeOklch({
+        L: clamp(oklch.L + 0.18, 0.55, MAX_LIGHTNESS),
+        C: clamp(oklch.C * 1.3 + 0.02, 0.12, MAX_CHROMA),
+        H: blendHue(oklch.H, 95, 0.65)
+      });
+      return fromOklch(dramatic);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate cinematic yellow:", error);
       return "#FFFF00";
@@ -24685,13 +25407,14 @@ void main() {
   __name(generateCinematicYellow, "generateCinematicYellow");
   function generateHolographicPrimary(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#8A2BE2";
-      const hsl = rgbToHsl2(rgb.r, rgb.g, rgb.b);
-      const enhancedSaturation = Math.min(100, hsl.s + 30);
-      const luminousLightness = Math.min(80, Math.max(40, hsl.l + 10));
-      const enhancedRgb = hslToRgb2(hsl.h, enhancedSaturation, luminousLightness);
-      return rgbToHex2(enhancedRgb.r, enhancedRgb.g, enhancedRgb.b);
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#8A2BE2";
+      const luminous = sanitizeOklch({
+        L: clamp(oklch.L + 0.12, 0.45, MAX_LIGHTNESS),
+        C: clamp(oklch.C * 1.35 + 0.03, 0.1, MAX_CHROMA),
+        H: blendHue(oklch.H, wrapHue(oklch.H + 12), 0.4)
+      });
+      return fromOklch(luminous);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate holographic primary:", error);
       return "#8A2BE2";
@@ -24709,13 +25432,14 @@ void main() {
   __name(generateHolographicAccent, "generateHolographicAccent");
   function generateHolographicGlow(highlightColor) {
     try {
-      const rgb = hexToRgbObject(highlightColor);
-      if (!rgb) return "#E0E0FF";
-      const glowIntensity = 0.7;
-      const glowRed = Math.min(255, rgb.r + (255 - rgb.r) * glowIntensity);
-      const glowGreen = Math.min(255, rgb.g + (255 - rgb.g) * glowIntensity);
-      const glowBlue = Math.min(255, rgb.b + (255 - rgb.b) * glowIntensity);
-      return rgbToHex2(glowRed, glowGreen, glowBlue);
+      const oklch = toOklch(highlightColor);
+      if (!oklch) return "#E0E0FF";
+      const glow = sanitizeOklch({
+        L: clamp(oklch.L + 0.25, 0.6, MAX_LIGHTNESS),
+        C: clamp(oklch.C * 0.45, 0, MAX_CHROMA),
+        H: oklch.H
+      });
+      return fromOklch(glow);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate holographic glow:", error);
       return "#E0E0FF";
@@ -24724,14 +25448,9 @@ void main() {
   __name(generateHolographicGlow, "generateHolographicGlow");
   function generateTextColor(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#CAD3F5";
-      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      if (luminance > 0.5) {
-        return "#24273A";
-      } else {
-        return "#CAD3F5";
-      }
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#CAD3F5";
+      return oklch.L > 0.62 ? "#24273A" : "#CAD3F5";
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate text color:", error);
       return "#CAD3F5";
@@ -24740,14 +25459,9 @@ void main() {
   __name(generateTextColor, "generateTextColor");
   function generateSubtextColor(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#A5ADCB";
-      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      if (luminance > 0.5) {
-        return "#5B6078";
-      } else {
-        return "#A5ADCB";
-      }
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#A5ADCB";
+      return oklch.L > 0.62 ? "#5B6078" : "#A5ADCB";
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate subtext color:", error);
       return "#A5ADCB";
@@ -24756,22 +25470,21 @@ void main() {
   __name(generateSubtextColor, "generateSubtextColor");
   function generateOverlayColor(baseColor, opacity) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return `rgba(88,91,112,${opacity})`;
-      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      if (luminance > 0.5) {
-        const factor = 1 - opacity * 2;
-        const overlayRed = Math.max(0, Math.round(rgb.r * factor));
-        const overlayGreen = Math.max(0, Math.round(rgb.g * factor));
-        const overlayBlue = Math.max(0, Math.round(rgb.b * factor));
-        return rgbToHex2(overlayRed, overlayGreen, overlayBlue);
-      } else {
-        const factor = opacity * 255;
-        const overlayRed = Math.min(255, Math.round(rgb.r + factor));
-        const overlayGreen = Math.min(255, Math.round(rgb.g + factor));
-        const overlayBlue = Math.min(255, Math.round(rgb.b + factor));
-        return rgbToHex2(overlayRed, overlayGreen, overlayBlue);
+      const oklch = toOklch(baseColor);
+      if (!oklch) return `rgba(88,91,112,${opacity})`;
+      const clampedOpacity = clamp(opacity, 0, 1);
+      if (clampedOpacity === 0) {
+        return fromOklch(sanitizeOklch(oklch));
       }
+      const sanitized = sanitizeOklch(oklch);
+      const adjustmentFactor = clamp(0.15 + clampedOpacity * 0.55, 0, 1);
+      const direction = sanitized.L > 0.6 ? "darker" : "lighter";
+      let overlayVariant = computeLightnessVariant(sanitized, adjustmentFactor, direction);
+      overlayVariant = sanitizeOklch({
+        ...overlayVariant,
+        C: clamp(overlayVariant.C * (1 - clampedOpacity * 0.25), 0, MAX_CHROMA)
+      });
+      return fromOklch(overlayVariant);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate overlay color:", error);
       return `rgba(88,91,112,${opacity})`;
@@ -24780,20 +25493,16 @@ void main() {
   __name(generateOverlayColor, "generateOverlayColor");
   function generateCrustColor(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#232634";
-      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      if (luminance > 0.5) {
-        const crustRed = Math.max(0, Math.round(rgb.r * 0.8));
-        const crustGreen = Math.max(0, Math.round(rgb.g * 0.8));
-        const crustBlue = Math.max(0, Math.round(rgb.b * 0.8));
-        return rgbToHex2(crustRed, crustGreen, crustBlue);
-      } else {
-        const crustRed = Math.min(255, Math.round(rgb.r + 20));
-        const crustGreen = Math.min(255, Math.round(rgb.g + 20));
-        const crustBlue = Math.min(255, Math.round(rgb.b + 20));
-        return rgbToHex2(crustRed, crustGreen, crustBlue);
-      }
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#232634";
+      const sanitized = sanitizeOklch(oklch);
+      const direction = sanitized.L > 0.6 ? "darker" : "lighter";
+      const variant = computeLightnessVariant(sanitized, direction === "darker" ? 0.3 : 0.18, direction);
+      const bordered = sanitizeOklch({
+        ...variant,
+        C: clamp(variant.C * 0.85, 0, MAX_CHROMA)
+      });
+      return fromOklch(bordered);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate crust color:", error);
       return "#232634";
@@ -24802,20 +25511,16 @@ void main() {
   __name(generateCrustColor, "generateCrustColor");
   function generateMantleColor(baseColor) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) return "#1e2030";
-      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      if (luminance > 0.5) {
-        const mantleRed = Math.max(0, Math.round(rgb.r * 0.95));
-        const mantleGreen = Math.max(0, Math.round(rgb.g * 0.95));
-        const mantleBlue = Math.max(0, Math.round(rgb.b * 0.95));
-        return rgbToHex2(mantleRed, mantleGreen, mantleBlue);
-      } else {
-        const mantleRed = Math.min(255, Math.round(rgb.r + 10));
-        const mantleGreen = Math.min(255, Math.round(rgb.g + 10));
-        const mantleBlue = Math.min(255, Math.round(rgb.b + 10));
-        return rgbToHex2(mantleRed, mantleGreen, mantleBlue);
-      }
+      const oklch = toOklch(baseColor);
+      if (!oklch) return "#1e2030";
+      const sanitized = sanitizeOklch(oklch);
+      const direction = sanitized.L > 0.6 ? "darker" : "lighter";
+      const variant = computeLightnessVariant(sanitized, direction === "darker" ? 0.18 : 0.12, direction);
+      const softened = sanitizeOklch({
+        ...variant,
+        C: clamp(variant.C * 0.9, 0, MAX_CHROMA)
+      });
+      return fromOklch(softened);
     } catch (error) {
       console.warn("[SpicetifyColorGenerators] Failed to generate mantle color:", error);
       return "#1e2030";
@@ -24824,28 +25529,46 @@ void main() {
   __name(generateMantleColor, "generateMantleColor");
   function generateZoneColor(baseColor, zoneType) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) {
+      const oklch = toOklch(baseColor);
+      if (!oklch) {
         console.warn(`[SpicetifyColorGenerators] Failed to parse RGB from ${baseColor}`);
         return baseColor;
       }
       const zoneAdjustments = {
-        flamingo: { rAdjust: 20, gAdjust: -10, bAdjust: -5 },
-        // Warm pink for home comfort
-        lavender: { rAdjust: 10, gAdjust: -5, bAdjust: 15 },
-        // Cool purple for focus/playlist
-        peach: { rAdjust: 25, gAdjust: 10, bAdjust: -15 },
-        // Warm orange for artist discovery
-        rosewater: { rAdjust: 15, gAdjust: -8, bAdjust: 0 },
-        // Subtle pink for secondary elements
-        sapphire: { rAdjust: -20, gAdjust: -10, bAdjust: 25 }
-        // Deep blue for search precision
+        flamingo: {
+          hueTarget: 25,
+          hueMix: 0.65,
+          chromaScale: 1.2,
+          lightnessShift: 0.04
+        },
+        lavender: {
+          hueTarget: 275,
+          hueMix: 0.55,
+          chromaScale: 1.1,
+          lightnessShift: 0.02
+        },
+        peach: {
+          hueTarget: 40,
+          hueMix: 0.7,
+          chromaScale: 1.15,
+          lightnessShift: 0.03
+        },
+        rosewater: {
+          hueTarget: 10,
+          hueMix: 0.6,
+          chromaScale: 1.05,
+          lightnessShift: 0.05
+        },
+        sapphire: {
+          hueTarget: 210,
+          hueMix: 0.7,
+          chromaScale: 1.2,
+          lightnessScale: 0.92,
+          lightnessShift: -0.02
+        }
       };
-      const config = zoneAdjustments[zoneType];
-      const adjustedR = Math.max(0, Math.min(255, rgb.r + config.rAdjust));
-      const adjustedG = Math.max(0, Math.min(255, rgb.g + config.gAdjust));
-      const adjustedB = Math.max(0, Math.min(255, rgb.b + config.bAdjust));
-      return rgbToHex2(adjustedR, adjustedG, adjustedB);
+      const sanitizedHex = fromOklch(sanitizeOklch(oklch));
+      return applyOklchAdjustment(sanitizedHex, zoneAdjustments[zoneType], baseColor);
     } catch (error) {
       console.warn(`[SpicetifyColorGenerators] Failed to generate ${zoneType} color:`, error);
       return baseColor;
@@ -24854,30 +25577,51 @@ void main() {
   __name(generateZoneColor, "generateZoneColor");
   function generatePaletteColor(baseColor, paletteType) {
     try {
-      const rgb = hexToRgbObject(baseColor);
-      if (!rgb) {
+      const oklch = toOklch(baseColor);
+      if (!oklch) {
         console.warn(`[SpicetifyColorGenerators] Failed to parse RGB from ${baseColor}`);
         return baseColor;
       }
       const paletteAdjustments = {
-        pink: { rAdjust: 30, gAdjust: -20, bAdjust: -10 },
-        // Soft pink for decorative elements
-        sky: { rAdjust: -30, gAdjust: 10, bAdjust: 30 },
-        // Bright sky blue for information
-        red: { rAdjust: 35, gAdjust: -25, bAdjust: -15 },
-        // Vibrant red for errors/warnings
-        maroon: { rAdjust: 25, gAdjust: -15, bAdjust: -10 },
-        // Deep maroon for emphasis
-        yellow: { rAdjust: 30, gAdjust: 25, bAdjust: -30 },
-        // Bright yellow for warnings
-        green: { rAdjust: -25, gAdjust: 30, bAdjust: -20 }
-        // Natural green for success
+        pink: {
+          hueTarget: 330,
+          hueMix: 0.6,
+          chromaScale: 1.18,
+          lightnessShift: 0.03
+        },
+        sky: {
+          hueTarget: 205,
+          hueMix: 0.65,
+          chromaScale: 1.15,
+          lightnessShift: 0.04
+        },
+        red: {
+          hueTarget: 20,
+          hueMix: 0.7,
+          chromaScale: 1.25,
+          lightnessScale: 0.95
+        },
+        maroon: {
+          hueTarget: 350,
+          hueMix: 0.6,
+          chromaScale: 1.1,
+          lightnessScale: 0.92
+        },
+        yellow: {
+          hueTarget: 95,
+          hueMix: 0.65,
+          chromaScale: 1.12,
+          lightnessShift: 0.06
+        },
+        green: {
+          hueTarget: 145,
+          hueMix: 0.65,
+          chromaScale: 1.15,
+          lightnessShift: 0.02
+        }
       };
-      const config = paletteAdjustments[paletteType];
-      const adjustedR = Math.max(0, Math.min(255, rgb.r + config.rAdjust));
-      const adjustedG = Math.max(0, Math.min(255, rgb.g + config.gAdjust));
-      const adjustedB = Math.max(0, Math.min(255, rgb.b + config.bAdjust));
-      return rgbToHex2(adjustedR, adjustedG, adjustedB);
+      const sanitizedHex = fromOklch(sanitizeOklch(oklch));
+      return applyOklchAdjustment(sanitizedHex, paletteAdjustments[paletteType], baseColor);
     } catch (error) {
       console.warn(`[SpicetifyColorGenerators] Failed to generate ${paletteType} color:`, error);
       return baseColor;
@@ -24900,73 +25644,6 @@ void main() {
     return { r, g, b };
   }
   __name(hexToRgbObject, "hexToRgbObject");
-  function rgbToHex2(r, g, b) {
-    const toHex = /* @__PURE__ */ __name((n) => {
-      const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
-    }, "toHex");
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
-  __name(rgbToHex2, "rgbToHex");
-  function rgbToHsl2(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-    if (max === min) {
-      h = s = 0;
-    } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return { h: h * 360, s: s * 100, l: l * 100 };
-  }
-  __name(rgbToHsl2, "rgbToHsl");
-  function hslToRgb2(h, s, l) {
-    h /= 360;
-    s /= 100;
-    l /= 100;
-    const hue2rgb = /* @__PURE__ */ __name((p, q, t) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    }, "hue2rgb");
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l;
-    } else {
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
-    }
-    return {
-      r: Math.round(r * 255),
-      g: Math.round(g * 255),
-      b: Math.round(b * 255)
-    };
-  }
-  __name(hslToRgb2, "hslToRgb");
   function hexToRgb2(hex) {
     const rgb = hexToRgbObject(hex);
     if (!rgb) return "0, 0, 0";
@@ -25024,13 +25701,16 @@ void main() {
         this.lastColorUpdate = Date.now();
         await this.applyFallbackColors();
         if (this.config.enableDebug) {
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Initialized as IManagedSystem with", {
-            mappings: _SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
-            batcherAvailable: !!this.cssController,
-            spicetifyAvailable: this.isSpicetifyAvailable(),
-            eventSubscriptions: this.eventSubscriptionIds.length,
-            fallbackColorsApplied: true
-          });
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Initialized as IManagedSystem with",
+            {
+              mappings: _SpicetifyColorBridge.SEMANTIC_MAPPINGS.length,
+              batcherAvailable: !!this.cssController,
+              spicetifyAvailable: this.isSpicetifyAvailable(),
+              eventSubscriptions: this.eventSubscriptionIds.length,
+              fallbackColorsApplied: true
+            }
+          );
         }
         unifiedEventBus.emitSync("system:initialized", {
           systemName: "SpicetifyColorBridge",
@@ -25054,7 +25734,9 @@ void main() {
     }
     async updateSemanticColors() {
       if (!this.initialized) {
-        console.warn("[SpicetifyColorBridge] Not initialized, cannot update colors");
+        console.warn(
+          "[SpicetifyColorBridge] Not initialized, cannot update colors"
+        );
         return;
       }
       const now = Date.now();
@@ -25077,7 +25759,10 @@ void main() {
           semanticColorUpdates[mapping.cssVariable] = color3;
           const rgbColor = hexToRgb(color3);
           if (rgbColor) {
-            const rgbVariable = mapping.cssVariable.replace("--spice-", "--spice-rgb-");
+            const rgbVariable = mapping.cssVariable.replace(
+              "--spice-",
+              "--spice-rgb-"
+            );
             rgbColorUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
             colorUpdateLog[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
           }
@@ -25096,13 +25781,19 @@ void main() {
           // High priority for RGB color variants
           "semantic-rgb-update"
         );
-        console.log("\u{1F3A8} [SpicetifyColorBridge] Color update complete:", colorUpdateLog);
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] Color update complete:",
+          colorUpdateLog
+        );
         this.lastCacheUpdate = now;
         if (this.config.enableDebug) {
           console.log("\u{1F3A8} [SpicetifyColorBridge] Updated all semantic colors");
         }
       } catch (error) {
-        console.error("[SpicetifyColorBridge] Failed to update semantic colors:", error);
+        console.error(
+          "[SpicetifyColorBridge] Failed to update semantic colors:",
+          error
+        );
       }
     }
     async getSemanticColor(semanticColor) {
@@ -25116,19 +25807,27 @@ void main() {
         if (this.isSpicetifyAvailable() && spicetify?.Platform?.getSemanticColors) {
           const semanticColors = await spicetify.Platform.getSemanticColors();
           color3 = semanticColors[semanticColor];
-          console.log(`\u{1F3A8} [SpicetifyColorBridge] Spicetify returned for ${semanticColor}:`, {
-            rawValue: color3,
-            type: typeof color3,
-            isWhite: color3 === "#ffffff" || color3 === "#fff" || color3 === "white",
-            isInvalid: !color3 || color3 === "undefined" || color3 === "null"
-          });
+          console.log(
+            `\u{1F3A8} [SpicetifyColorBridge] Spicetify returned for ${semanticColor}:`,
+            {
+              rawValue: color3,
+              type: typeof color3,
+              isWhite: color3 === "#ffffff" || color3 === "#fff" || color3 === "white",
+              isInvalid: !color3 || color3 === "undefined" || color3 === "null"
+            }
+          );
         } else {
-          console.warn(`\u{1F3A8} [SpicetifyColorBridge] Spicetify not available, using fallback for ${semanticColor}`);
+          console.warn(
+            `\u{1F3A8} [SpicetifyColorBridge] Spicetify not available, using fallback for ${semanticColor}`
+          );
           color3 = this.getFallbackColor(semanticColor);
         }
       } catch (error) {
         if (this.config.enableDebug) {
-          console.warn(`[SpicetifyColorBridge] Failed to get semantic color ${semanticColor}:`, error);
+          console.warn(
+            `[SpicetifyColorBridge] Failed to get semantic color ${semanticColor}:`,
+            error
+          );
         }
         color3 = this.getFallbackColor(semanticColor);
       }
@@ -25156,21 +25855,27 @@ void main() {
       if (!normalizedColor || invalidColors.includes(normalizedColor)) {
         const fallbackColor = this.getFallbackColor(semanticColor);
         if (this.config.enableDebug) {
-          console.warn(`\u{1F527} [SpicetifyColorBridge] Invalid color "${color3}" for ${semanticColor}, using fallback: ${fallbackColor}`);
+          console.warn(
+            `\u{1F527} [SpicetifyColorBridge] Invalid color "${color3}" for ${semanticColor}, using fallback: ${fallbackColor}`
+          );
         }
         return fallbackColor;
       }
       if (!normalizedColor.match(/^#[0-9a-f]{6}$/i) && !normalizedColor.match(/^#[0-9a-f]{3}$/i)) {
         const fallbackColor = this.getFallbackColor(semanticColor);
         if (this.config.enableDebug) {
-          console.warn(`\u{1F527} [SpicetifyColorBridge] Malformed color "${color3}" for ${semanticColor}, using fallback: ${fallbackColor}`);
+          console.warn(
+            `\u{1F527} [SpicetifyColorBridge] Malformed color "${color3}" for ${semanticColor}, using fallback: ${fallbackColor}`
+          );
         }
         return fallbackColor;
       }
       return color3;
     }
     getFallbackColor(semanticColor) {
-      const mapping = _SpicetifyColorBridge.SEMANTIC_MAPPINGS.find((m) => m.semanticColor === semanticColor);
+      const mapping = _SpicetifyColorBridge.SEMANTIC_MAPPINGS.find(
+        (m) => m.semanticColor === semanticColor
+      );
       if (mapping) {
         return mapping.fallbackColor;
       }
@@ -25219,7 +25924,9 @@ void main() {
      * - Visual effects variables
      */
     updateWithAlbumColors(oklabColorsOrEventData) {
-      console.log("\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 updateWithAlbumColors() CALLED \u2550\u2550\u2550");
+      console.log(
+        "\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 updateWithAlbumColors() CALLED \u2550\u2550\u2550"
+      );
       this.lastColorPayload = oklabColorsOrEventData;
       const isEventData = "processedColors" in oklabColorsOrEventData;
       const oklabColors = isEventData ? oklabColorsOrEventData.processedColors : oklabColorsOrEventData;
@@ -25233,13 +25940,19 @@ void main() {
         colors: oklabColors
       });
       if (!this.initialized) {
-        console.error("\u{1F3A8} [SpicetifyColorBridge] \u274C CRITICAL: Not initialized, cannot update with album colors!");
-        console.warn("[SpicetifyColorBridge] Not initialized, cannot update with album colors");
+        console.error(
+          "\u{1F3A8} [SpicetifyColorBridge] \u274C CRITICAL: Not initialized, cannot update with album colors!"
+        );
+        console.warn(
+          "[SpicetifyColorBridge] Not initialized, cannot update with album colors"
+        );
         return;
       }
       try {
         const updateStartTime = performance.now();
-        console.log("\u{1F3A8} [SpicetifyColorBridge] Extracting key colors from OKLAB result...");
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] Extracting key colors from OKLAB result..."
+        );
         const primaryColor = oklabColors["OKLAB_PRIMARY"] || oklabColors["VIBRANT"] || oklabColors["PRIMARY"];
         const accentColor = oklabColors["OKLAB_ACCENT"] || oklabColors["LIGHT_VIBRANT"] || oklabColors["SECONDARY"];
         const shadowColor = oklabColors["OKLAB_SHADOW"] || oklabColors["DARK_VIBRANT"] || oklabColors["DARK"];
@@ -25251,8 +25964,12 @@ void main() {
           highlight: highlightColor
         });
         if (!primaryColor) {
-          console.error("\u{1F3A8} [SpicetifyColorBridge] \u274C CRITICAL: No primary color found in OKLAB result!");
-          console.warn("[SpicetifyColorBridge] No primary color found in OKLAB result, skipping update");
+          console.error(
+            "\u{1F3A8} [SpicetifyColorBridge] \u274C CRITICAL: No primary color found in OKLAB result!"
+          );
+          console.warn(
+            "[SpicetifyColorBridge] No primary color found in OKLAB result, skipping update"
+          );
           return;
         }
         const colorDistribution = generateIntelligentColorDistribution(
@@ -25261,7 +25978,9 @@ void main() {
           shadowColor,
           highlightColor
         );
-        const rgbDistribution = convertColorsToRgb(colorDistribution);
+        const rgbDistribution = convertColorsToRgb(
+          colorDistribution
+        );
         const oklabMetadata = metadata?.oklabMetadata;
         console.log("\u{1F3A8} [SpicetifyColorBridge] OKLAB metadata:", {
           hasOKLABMetadata: !!oklabMetadata,
@@ -25322,22 +26041,47 @@ void main() {
           "--spice-sidebar": colorDistribution.surface1,
           "--spice-rgb-sidebar": rgbDistribution.surface1,
           "--spice-text": generateTextColor(colorDistribution.base),
-          "--spice-rgb-text": hexToRgb2(generateTextColor(colorDistribution.base)),
-          "--spice-subtext": generateSubtextColor(colorDistribution.base),
-          "--spice-rgb-subtext": hexToRgb2(generateSubtextColor(colorDistribution.base)),
+          "--spice-rgb-text": hexToRgb2(
+            generateTextColor(colorDistribution.base)
+          ),
+          "--spice-subtext": generateSubtextColor(
+            colorDistribution.base
+          ),
+          "--spice-rgb-subtext": hexToRgb2(
+            generateSubtextColor(colorDistribution.base)
+          ),
           "--spice-highlight-elevated": colorDistribution.surface2,
           "--spice-rgb-highlight-elevated": rgbDistribution.surface2,
           // Missing Catppuccin overlay system (CRITICAL for background hierarchy)
-          "--spice-overlay0": generateOverlayColor(colorDistribution.base, 0.04),
-          "--spice-rgb-overlay0": hexToRgb2(generateOverlayColor(colorDistribution.base, 0.04)),
-          "--spice-overlay1": generateOverlayColor(colorDistribution.base, 0.08),
-          "--spice-rgb-overlay1": hexToRgb2(generateOverlayColor(colorDistribution.base, 0.08)),
-          "--spice-overlay2": generateOverlayColor(colorDistribution.base, 0.12),
-          "--spice-rgb-overlay2": hexToRgb2(generateOverlayColor(colorDistribution.base, 0.12)),
+          "--spice-overlay0": generateOverlayColor(
+            colorDistribution.base,
+            0.04
+          ),
+          "--spice-rgb-overlay0": hexToRgb2(
+            generateOverlayColor(colorDistribution.base, 0.04)
+          ),
+          "--spice-overlay1": generateOverlayColor(
+            colorDistribution.base,
+            0.08
+          ),
+          "--spice-rgb-overlay1": hexToRgb2(
+            generateOverlayColor(colorDistribution.base, 0.08)
+          ),
+          "--spice-overlay2": generateOverlayColor(
+            colorDistribution.base,
+            0.12
+          ),
+          "--spice-rgb-overlay2": hexToRgb2(
+            generateOverlayColor(colorDistribution.base, 0.12)
+          ),
           "--spice-crust": generateCrustColor(colorDistribution.base),
-          "--spice-rgb-crust": hexToRgb2(generateCrustColor(colorDistribution.base)),
+          "--spice-rgb-crust": hexToRgb2(
+            generateCrustColor(colorDistribution.base)
+          ),
           "--spice-mantle": generateMantleColor(colorDistribution.base),
-          "--spice-rgb-mantle": hexToRgb2(generateMantleColor(colorDistribution.base))
+          "--spice-rgb-mantle": hexToRgb2(
+            generateMantleColor(colorDistribution.base)
+          )
         };
         const visualHarmonyColorUpdates = {
           "--spice-blue": colorDistribution.harmonyPrimary,
@@ -25347,38 +26091,99 @@ void main() {
           "--spice-teal": colorDistribution.harmonyTertiary,
           "--spice-rgb-teal": rgbDistribution.harmonyTertiary,
           // ZONE SYSTEM: Context-aware color variables for different UI zones
-          "--spice-flamingo": generateZoneColor(colorDistribution.primary, "flamingo"),
+          "--spice-flamingo": generateZoneColor(
+            colorDistribution.primary,
+            "flamingo"
+          ),
           // Zone home secondary
-          "--spice-rgb-flamingo": hexToRgb2(generateZoneColor(colorDistribution.primary, "flamingo")),
-          "--spice-lavender": generateZoneColor(colorDistribution.highlight, "lavender"),
+          "--spice-rgb-flamingo": hexToRgb2(
+            generateZoneColor(colorDistribution.primary, "flamingo")
+          ),
+          "--spice-lavender": generateZoneColor(
+            colorDistribution.highlight,
+            "lavender"
+          ),
           // Zone playlist/search primary
-          "--spice-rgb-lavender": hexToRgb2(generateZoneColor(colorDistribution.highlight, "lavender")),
-          "--spice-peach": generateZoneColor(colorDistribution.surface2, "peach"),
+          "--spice-rgb-lavender": hexToRgb2(
+            generateZoneColor(colorDistribution.highlight, "lavender")
+          ),
+          "--spice-peach": generateZoneColor(
+            colorDistribution.surface2,
+            "peach"
+          ),
           // Zone artist primary
-          "--spice-rgb-peach": hexToRgb2(generateZoneColor(colorDistribution.surface2, "peach")),
-          "--spice-rosewater": generateZoneColor(colorDistribution.surface1, "rosewater"),
+          "--spice-rgb-peach": hexToRgb2(
+            generateZoneColor(colorDistribution.surface2, "peach")
+          ),
+          "--spice-rosewater": generateZoneColor(
+            colorDistribution.surface1,
+            "rosewater"
+          ),
           // Zone artist/home secondary
-          "--spice-rgb-rosewater": hexToRgb2(generateZoneColor(colorDistribution.surface1, "rosewater")),
-          "--spice-sapphire": generateZoneColor(colorDistribution.harmonyPrimary, "sapphire"),
+          "--spice-rgb-rosewater": hexToRgb2(
+            generateZoneColor(colorDistribution.surface1, "rosewater")
+          ),
+          "--spice-sapphire": generateZoneColor(
+            colorDistribution.harmonyPrimary,
+            "sapphire"
+          ),
           // Zone search secondary
-          "--spice-rgb-sapphire": hexToRgb2(generateZoneColor(colorDistribution.harmonyPrimary, "sapphire"))
+          "--spice-rgb-sapphire": hexToRgb2(
+            generateZoneColor(
+              colorDistribution.harmonyPrimary,
+              "sapphire"
+            )
+          )
         };
         const paletteSpicetifyUpdates = {
-          "--spice-pink": generatePaletteColor(colorDistribution.primary, "pink"),
-          "--spice-rgb-pink": hexToRgb2(generatePaletteColor(colorDistribution.primary, "pink")),
-          "--spice-sky": generatePaletteColor(colorDistribution.harmonyPrimary, "sky"),
-          "--spice-rgb-sky": hexToRgb2(generatePaletteColor(colorDistribution.harmonyPrimary, "sky")),
-          "--spice-red": generatePaletteColor(colorDistribution.highlight, "red"),
+          "--spice-pink": generatePaletteColor(
+            colorDistribution.primary,
+            "pink"
+          ),
+          "--spice-rgb-pink": hexToRgb2(
+            generatePaletteColor(colorDistribution.primary, "pink")
+          ),
+          "--spice-sky": generatePaletteColor(
+            colorDistribution.harmonyPrimary,
+            "sky"
+          ),
+          "--spice-rgb-sky": hexToRgb2(
+            generatePaletteColor(colorDistribution.harmonyPrimary, "sky")
+          ),
+          "--spice-red": generatePaletteColor(
+            colorDistribution.highlight,
+            "red"
+          ),
           // Used for errors
-          "--spice-rgb-red": hexToRgb2(generatePaletteColor(colorDistribution.highlight, "red")),
-          "--spice-maroon": generatePaletteColor(colorDistribution.shadow, "maroon"),
-          "--spice-rgb-maroon": hexToRgb2(generatePaletteColor(colorDistribution.shadow, "maroon")),
-          "--spice-yellow": generatePaletteColor(colorDistribution.surface2, "yellow"),
+          "--spice-rgb-red": hexToRgb2(
+            generatePaletteColor(colorDistribution.highlight, "red")
+          ),
+          "--spice-maroon": generatePaletteColor(
+            colorDistribution.shadow,
+            "maroon"
+          ),
+          "--spice-rgb-maroon": hexToRgb2(
+            generatePaletteColor(colorDistribution.shadow, "maroon")
+          ),
+          "--spice-yellow": generatePaletteColor(
+            colorDistribution.surface2,
+            "yellow"
+          ),
           // Used for warnings
-          "--spice-rgb-yellow": hexToRgb2(generatePaletteColor(colorDistribution.surface2, "yellow")),
-          "--spice-green": generatePaletteColor(colorDistribution.harmonyTertiary, "green"),
+          "--spice-rgb-yellow": hexToRgb2(
+            generatePaletteColor(colorDistribution.surface2, "yellow")
+          ),
+          "--spice-green": generatePaletteColor(
+            colorDistribution.harmonyTertiary,
+            "green"
+          ),
           // Used for success
-          "--spice-rgb-green": hexToRgb2(generatePaletteColor(colorDistribution.harmonyTertiary, "green")),
+          "--spice-rgb-green": hexToRgb2(
+            generatePaletteColor(
+              colorDistribution.harmonyTertiary,
+              "green"
+            )
+          ),
           "--spice-misc": colorDistribution.surface1,
           // Neutral grey from palette
           "--spice-rgb-misc": rgbDistribution.surface1
@@ -25401,19 +26206,43 @@ void main() {
           "--spice-particle-trail": colorDistribution.shadow,
           "--spice-rgb-particle-trail": rgbDistribution.shadow,
           // Cinematic drama colors (high contrast variants)
-          "--spice-cinematic-red": generateCinematicRed(colorDistribution.primary),
-          "--spice-rgb-cinematic-red": hexToRgb2(generateCinematicRed(colorDistribution.primary)),
-          "--spice-cinematic-cyan": generateCinematicCyan(colorDistribution.primary),
-          "--spice-rgb-cinematic-cyan": hexToRgb2(generateCinematicCyan(colorDistribution.primary)),
-          "--spice-cinematic-yellow": generateCinematicYellow(colorDistribution.highlight),
-          "--spice-rgb-cinematic-yellow": hexToRgb2(generateCinematicYellow(colorDistribution.highlight)),
+          "--spice-cinematic-red": generateCinematicRed(
+            colorDistribution.primary
+          ),
+          "--spice-rgb-cinematic-red": hexToRgb2(
+            generateCinematicRed(colorDistribution.primary)
+          ),
+          "--spice-cinematic-cyan": generateCinematicCyan(
+            colorDistribution.primary
+          ),
+          "--spice-rgb-cinematic-cyan": hexToRgb2(
+            generateCinematicCyan(colorDistribution.primary)
+          ),
+          "--spice-cinematic-yellow": generateCinematicYellow(
+            colorDistribution.highlight
+          ),
+          "--spice-rgb-cinematic-yellow": hexToRgb2(
+            generateCinematicYellow(colorDistribution.highlight)
+          ),
           // Holographic UI colors (luminous variants)
-          "--spice-holographic-primary": generateHolographicPrimary(colorDistribution.primary),
-          "--spice-rgb-holographic-primary": hexToRgb2(generateHolographicPrimary(colorDistribution.primary)),
-          "--spice-holographic-accent": generateHolographicAccent(colorDistribution.harmonyPrimary),
-          "--spice-rgb-holographic-accent": hexToRgb2(generateHolographicAccent(colorDistribution.harmonyPrimary)),
-          "--spice-holographic-glow": generateHolographicGlow(colorDistribution.highlight),
-          "--spice-rgb-holographic-glow": hexToRgb2(generateHolographicGlow(colorDistribution.highlight))
+          "--spice-holographic-primary": generateHolographicPrimary(
+            colorDistribution.primary
+          ),
+          "--spice-rgb-holographic-primary": hexToRgb2(
+            generateHolographicPrimary(colorDistribution.primary)
+          ),
+          "--spice-holographic-accent": generateHolographicAccent(
+            colorDistribution.harmonyPrimary
+          ),
+          "--spice-rgb-holographic-accent": hexToRgb2(
+            generateHolographicAccent(colorDistribution.harmonyPrimary)
+          ),
+          "--spice-holographic-glow": generateHolographicGlow(
+            colorDistribution.highlight
+          ),
+          "--spice-rgb-holographic-glow": hexToRgb2(
+            generateHolographicGlow(colorDistribution.highlight)
+          )
         };
         const allSpicetifyUpdates = {
           ...coreSpicetifyUpdates,
@@ -25453,26 +26282,36 @@ void main() {
           dynamicAccentUpdates["--sn-oklch-h"] = String(oklabMetadata.oklchH);
           dynamicAccentUpdates["--sn-dynamic-accent-original-hex"] = oklabMetadata.originalHex;
           dynamicAccentUpdates["--sn-dynamic-accent-original-rgb"] = oklabMetadata.originalRgb;
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Applied OKLAB dynamic accent variables:", {
-            enhancedHex: oklabMetadata.enhancedHex,
-            shadowHex: oklabMetadata.shadowHex,
-            oklchCoordinates: `L:${oklabMetadata.oklchL} C:${oklabMetadata.oklchC} H:${oklabMetadata.oklchH}`
-          });
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Applied OKLAB dynamic accent variables:",
+            {
+              enhancedHex: oklabMetadata.enhancedHex,
+              shadowHex: oklabMetadata.shadowHex,
+              oklchCoordinates: `L:${oklabMetadata.oklchL} C:${oklabMetadata.oklchC} H:${oklabMetadata.oklchH}`
+            }
+          );
         }
         const musicEnergyUpdates = {};
         if (metadata?.musicEnergy !== void 0) {
           musicEnergyUpdates["--sn-music-energy"] = String(metadata.musicEnergy);
-          musicEnergyUpdates["--sn-energy-response-multiplier"] = String(metadata.energyResponseMultiplier || 1);
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Applied music energy variables:", {
-            energy: metadata.musicEnergy,
-            multiplier: metadata.energyResponseMultiplier
-          });
+          musicEnergyUpdates["--sn-energy-response-multiplier"] = String(
+            metadata.energyResponseMultiplier || 1
+          );
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Applied music energy variables:",
+            {
+              energy: metadata.musicEnergy,
+              multiplier: metadata.energyResponseMultiplier
+            }
+          );
         }
         const livingGradientUpdates = {};
         if (metadata?.baseTransformationEnabled && oklabMetadata) {
           livingGradientUpdates["--sn-living-base-hex"] = oklabMetadata.enhancedHex;
           livingGradientUpdates["--sn-living-base-rgb"] = oklabMetadata.enhancedRgb;
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Applied living gradient variables");
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Applied living gradient variables"
+          );
         }
         const visualEffectsUpdates = {};
         if (metadata?.visualEffectsIntegrationEnabled && oklabMetadata) {
@@ -25480,7 +26319,9 @@ void main() {
           visualEffectsUpdates["--sn-visual-effects-accent-rgb"] = oklabMetadata.enhancedRgb;
           visualEffectsUpdates["--sn-visual-effects-shadow-hex"] = oklabMetadata.shadowHex;
           visualEffectsUpdates["--sn-visual-effects-shadow-rgb"] = oklabMetadata.shadowRgb;
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Applied visual effects variables");
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Applied visual effects variables"
+          );
         }
         const allVariableUpdates = {
           ...allSpicetifyUpdates,
@@ -25496,7 +26337,9 @@ void main() {
         if (Object.keys(changedVariables).length === 0) {
           this.skippedUpdateCount++;
           if (this.config.enableDebug) {
-            console.log(`\u{1F3A8} [SpicetifyColorBridge] No color changes, skipping update (${this.skippedUpdateCount} skipped)`);
+            console.log(
+              `\u{1F3A8} [SpicetifyColorBridge] No color changes, skipping update (${this.skippedUpdateCount} skipped)`
+            );
           }
           return;
         }
@@ -25507,7 +26350,10 @@ void main() {
           // Critical priority for album color coordination
           "album-color-update-optimized"
         );
-        this.lastAppliedVariables = { ...this.lastAppliedVariables, ...allVariableUpdates };
+        this.lastAppliedVariables = {
+          ...this.lastAppliedVariables,
+          ...allVariableUpdates
+        };
         this.clearCache();
         const updateDuration = performance.now() - updateStartTime;
         this.lastUpdateDuration = updateDuration;
@@ -25527,44 +26373,67 @@ void main() {
           appliedAt: this.lastColorUpdate
         });
         if (this.config.enableDebug) {
-          console.log("\u{1F3A8} [SpicetifyColorBridge] Optimized color update with change detection:", {
-            primaryColor: colorDistribution.primary,
-            accentColor: colorDistribution.surface1,
-            shadowColor: colorDistribution.shadow,
-            highlightColor: colorDistribution.highlight,
-            surfaceProgression: [colorDistribution.base, colorDistribution.surface0, colorDistribution.surface1, colorDistribution.surface2],
-            harmonyColors: [colorDistribution.harmonyPrimary, colorDistribution.harmonySecondary, colorDistribution.harmonyTertiary],
-            performanceMetrics: {
-              updateDuration: updateDuration.toFixed(2) + "ms",
-              totalVariablesCalculated,
-              totalVariablesApplied,
-              skippedVariables: totalVariablesCalculated - totalVariablesApplied,
-              changeDetectionEfficiency: ((totalVariablesCalculated - totalVariablesApplied) / totalVariablesCalculated * 100).toFixed(1) + "%",
-              totalSkippedUpdates: this.skippedUpdateCount
-            },
-            effectColors: {
-              shimmerColors: 4,
-              // primary, secondary, tertiary, quaternary
-              particleColors: 3,
-              // glow, core, trail
-              cinematicColors: 3,
-              // red, cyan, yellow
-              holographicColors: 3
-              // primary, accent, glow
-            },
-            eventEmitted: true
-          });
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] Optimized color update with change detection:",
+            {
+              primaryColor: colorDistribution.primary,
+              accentColor: colorDistribution.surface1,
+              shadowColor: colorDistribution.shadow,
+              highlightColor: colorDistribution.highlight,
+              surfaceProgression: [
+                colorDistribution.base,
+                colorDistribution.surface0,
+                colorDistribution.surface1,
+                colorDistribution.surface2
+              ],
+              harmonyColors: [
+                colorDistribution.harmonyPrimary,
+                colorDistribution.harmonySecondary,
+                colorDistribution.harmonyTertiary
+              ],
+              performanceMetrics: {
+                updateDuration: updateDuration.toFixed(2) + "ms",
+                totalVariablesCalculated,
+                totalVariablesApplied,
+                skippedVariables: totalVariablesCalculated - totalVariablesApplied,
+                changeDetectionEfficiency: ((totalVariablesCalculated - totalVariablesApplied) / totalVariablesCalculated * 100).toFixed(1) + "%",
+                totalSkippedUpdates: this.skippedUpdateCount
+              },
+              effectColors: {
+                shimmerColors: 4,
+                // primary, secondary, tertiary, quaternary
+                particleColors: 3,
+                // glow, core, trail
+                cinematicColors: 3,
+                // red, cyan, yellow
+                holographicColors: 3
+                // primary, accent, glow
+              },
+              eventEmitted: true
+            }
+          );
         }
-        console.log("\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 updateWithAlbumColors() COMPLETE \u2550\u2550\u2550");
-        console.log("\u{1F3A8} [SpicetifyColorBridge] \u2705 Successfully updated CSS variables:", {
-          updateDuration: `${updateDuration.toFixed(2)}ms`,
-          totalVariablesCalculated,
-          totalVariablesApplied,
-          primaryColor: colorDistribution.primary
-        });
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 updateWithAlbumColors() COMPLETE \u2550\u2550\u2550"
+        );
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] \u2705 Successfully updated CSS variables:",
+          {
+            updateDuration: `${updateDuration.toFixed(2)}ms`,
+            totalVariablesCalculated,
+            totalVariablesApplied,
+            primaryColor: colorDistribution.primary
+          }
+        );
       } catch (error) {
-        console.error("\u{1F3A8} [SpicetifyColorBridge] \u274C FAILED to update with album colors:", error);
-        console.error("[SpicetifyColorBridge] Failed to update with album colors:", error);
+        console.error(
+          "\u{1F3A8} [SpicetifyColorBridge] \u274C FAILED to update with album colors:",
+          error
+        );
+        console.error(
+          "[SpicetifyColorBridge] Failed to update with album colors:",
+          error
+        );
       }
     }
     getColorMappings() {
@@ -25610,7 +26479,9 @@ void main() {
         }
       });
       if (this.config.enableDebug && changeCount === 0) {
-        console.log(`\u{1F3A8} [SpicetifyColorBridge] No changes detected in ${Object.keys(newVariables).length} variables`);
+        console.log(
+          `\u{1F3A8} [SpicetifyColorBridge] No changes detected in ${Object.keys(newVariables).length} variables`
+        );
       }
       return changed;
     }
@@ -25620,18 +26491,25 @@ void main() {
      */
     async applyFallbackColors() {
       if (!this.cssController) {
-        console.warn("[SpicetifyColorBridge] Cannot apply fallback colors - no CSS controller");
+        console.warn(
+          "[SpicetifyColorBridge] Cannot apply fallback colors - no CSS controller"
+        );
         return;
       }
       try {
-        console.log("\u{1F3A8} [SpicetifyColorBridge] Applying Catppuccin Macchiato fallback colors...");
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] Applying Catppuccin Macchiato fallback colors..."
+        );
         const fallbackUpdates = {};
         const rgbFallbackUpdates = {};
         for (const mapping of _SpicetifyColorBridge.SEMANTIC_MAPPINGS) {
           fallbackUpdates[mapping.cssVariable] = mapping.fallbackColor;
           const rgbColor = hexToRgb(mapping.fallbackColor);
           if (rgbColor) {
-            const rgbVariable = mapping.cssVariable.replace("--spice-", "--spice-rgb-");
+            const rgbVariable = mapping.cssVariable.replace(
+              "--spice-",
+              "--spice-rgb-"
+            );
             rgbFallbackUpdates[rgbVariable] = `${rgbColor.r},${rgbColor.g},${rgbColor.b}`;
           }
         }
@@ -25647,9 +26525,14 @@ void main() {
           "high",
           "fallback-rgb-colors"
         );
-        console.log(`\u{1F3A8} [SpicetifyColorBridge] Applied ${Object.keys(fallbackUpdates).length} fallback colors`);
+        console.log(
+          `\u{1F3A8} [SpicetifyColorBridge] Applied ${Object.keys(fallbackUpdates).length} fallback colors`
+        );
       } catch (error) {
-        console.error("[SpicetifyColorBridge] Failed to apply fallback colors:", error);
+        console.error(
+          "[SpicetifyColorBridge] Failed to apply fallback colors:",
+          error
+        );
       }
     }
     destroy() {
@@ -25670,7 +26553,9 @@ void main() {
           reason: "Manual destruction"
         });
         if (this.config.enableDebug) {
-          console.log("\u{1F3A8} [SpicetifyColorBridge] System destroyed and cleaned up");
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] System destroyed and cleaned up"
+          );
         }
       } catch (error) {
         console.error("[SpicetifyColorBridge] Error during destruction:", error);
@@ -25706,7 +26591,9 @@ void main() {
           lastUpdateDuration: parseFloat(this.lastUpdateDuration.toFixed(2)),
           averageUpdateDuration: parseFloat(avgUpdateDuration.toFixed(2)),
           skippedUpdateCount: this.skippedUpdateCount,
-          changeDetectionEfficiency: parseFloat(changeDetectionEfficiency.toFixed(1)),
+          changeDetectionEfficiency: parseFloat(
+            changeDetectionEfficiency.toFixed(1)
+          ),
           cssVariablesManaged: 96,
           // Total CSS variables managed by this system
           updatePerformanceStatus: avgUpdateDuration < 50 ? "optimal" : avgUpdateDuration < 100 ? "acceptable" : "needs-optimization"
@@ -25721,19 +26608,31 @@ void main() {
         healthResult.issues.push("Spicetify API not available");
       }
       if (this.colorUpdateCount === 0 && this.initialized) {
-        healthResult.issues.push("No color updates performed since initialization");
+        healthResult.issues.push(
+          "No color updates performed since initialization"
+        );
       }
       if (this.eventSubscriptionIds.length === 0 && this.initialized) {
         healthResult.issues.push("No event subscriptions active");
       }
       if (avgUpdateDuration > 100 && this.colorUpdateCount > 5) {
-        healthResult.issues.push(`Average update duration ${avgUpdateDuration.toFixed(2)}ms exceeds 100ms threshold`);
+        healthResult.issues.push(
+          `Average update duration ${avgUpdateDuration.toFixed(
+            2
+          )}ms exceeds 100ms threshold`
+        );
       }
       if (avgUpdateDuration > 50 && avgUpdateDuration <= 100 && this.colorUpdateCount > 5) {
-        healthResult.issues.push(`Average update duration ${avgUpdateDuration.toFixed(2)}ms exceeds optimal 50ms target (acceptable)`);
+        healthResult.issues.push(
+          `Average update duration ${avgUpdateDuration.toFixed(
+            2
+          )}ms exceeds optimal 50ms target (acceptable)`
+        );
       }
       if (healthResult.issues.length > 0) {
-        healthResult.details = `Issues detected: ${healthResult.issues.join(", ")}`;
+        healthResult.details = `Issues detected: ${healthResult.issues.join(
+          ", "
+        )}`;
         if (healthResult.issues.length >= 2) {
           healthResult.healthy = false;
         }
@@ -25748,33 +26647,42 @@ void main() {
         "music:track-changed",
         async (data) => {
           if (this.config.enableDebug) {
-            console.log("\u{1F3A8} [SpicetifyColorBridge] Track changed, preparing for color refresh:", data.trackUri);
+            console.log(
+              "\u{1F3A8} [SpicetifyColorBridge] Track changed, preparing for color refresh:",
+              data.trackUri
+            );
           }
           this.clearCache();
         },
         "SpicetifyColorBridge"
       );
       this.settingsChangeUnsubscribe?.();
-      this.settingsChangeUnsubscribe = settings.onChange((data) => {
-        const isTextAccentSetting = data.settingKey === "sn-dynamic-text-accent";
-        if (data.settingKey.includes("color") || data.settingKey.includes("theme") || isTextAccentSetting) {
-          if (this.config.enableDebug) {
-            console.log(
-              "\u{1F3A8} [SpicetifyColorBridge] Color-related setting changed:",
-              data.settingKey
-            );
-          }
-          this.clearCache();
-          if (isTextAccentSetting && this.lastColorPayload) {
-            this.updateWithAlbumColors(this.lastColorPayload);
+      this.settingsChangeUnsubscribe = settings.onChange(
+        (data) => {
+          const isTextAccentSetting = data.settingKey === "sn-dynamic-text-accent";
+          if (data.settingKey.includes("color") || data.settingKey.includes("theme") || isTextAccentSetting) {
+            if (this.config.enableDebug) {
+              console.log(
+                "\u{1F3A8} [SpicetifyColorBridge] Color-related setting changed:",
+                data.settingKey
+              );
+            }
+            this.clearCache();
+            if (isTextAccentSetting && this.lastColorPayload) {
+              this.updateWithAlbumColors(this.lastColorPayload);
+            }
           }
         }
-      });
-      console.log("\u{1F3A8} [SpicetifyColorBridge] Subscribing to 'colors:harmonized' event...");
+      );
+      console.log(
+        "\u{1F3A8} [SpicetifyColorBridge] Subscribing to 'colors:harmonized' event..."
+      );
       const colorsHarmonizedId = unifiedEventBus.subscribe(
         "colors:harmonized",
         (data) => {
-          console.log("\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 RECEIVED 'colors:harmonized' EVENT \u2550\u2550\u2550");
+          console.log(
+            "\u{1F3A8} [SpicetifyColorBridge] \u2550\u2550\u2550 RECEIVED 'colors:harmonized' EVENT \u2550\u2550\u2550"
+          );
           console.log("\u{1F3A8} [SpicetifyColorBridge] Event data:", {
             hasProcessedColors: !!data?.processedColors,
             colorCount: data?.processedColors ? Object.keys(data.processedColors).length : 0,
@@ -25784,27 +26692,42 @@ void main() {
             processingTime: data?.processingTime
           });
           if (data.processedColors) {
-            console.log("\u{1F3A8} [SpicetifyColorBridge] Processed colors received:", data.processedColors);
+            console.log(
+              "\u{1F3A8} [SpicetifyColorBridge] Processed colors received:",
+              data.processedColors
+            );
             if (this.config.enableDebug) {
-              console.log("\u{1F3A8} [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:", {
-                colorCount: Object.keys(data.processedColors).length,
-                strategies: data.strategies,
-                processingTime: data.processingTime
-              });
+              console.log(
+                "\u{1F3A8} [SpicetifyColorBridge] Received harmonized colors from ColorProcessor:",
+                {
+                  colorCount: Object.keys(data.processedColors).length,
+                  strategies: data.strategies,
+                  processingTime: data.processingTime
+                }
+              );
             }
-            console.log("\u{1F3A8} [SpicetifyColorBridge] Updating CSS variables with album colors...");
+            console.log(
+              "\u{1F3A8} [SpicetifyColorBridge] Updating CSS variables with album colors..."
+            );
             this.updateWithAlbumColors(data);
             console.log("\u{1F3A8} [SpicetifyColorBridge] \u2705 CSS variables updated");
           } else {
-            console.warn("\u{1F3A8} [SpicetifyColorBridge] \u26A0\uFE0F No processed colors in event data!");
+            console.warn(
+              "\u{1F3A8} [SpicetifyColorBridge] \u26A0\uFE0F No processed colors in event data!"
+            );
           }
         },
         "SpicetifyColorBridge"
       );
-      console.log("\u{1F3A8} [SpicetifyColorBridge] \u2705 Subscribed to 'colors:harmonized'");
+      console.log(
+        "\u{1F3A8} [SpicetifyColorBridge] \u2705 Subscribed to 'colors:harmonized'"
+      );
       this.eventSubscriptionIds = [trackChangeId, colorsHarmonizedId];
       if (this.config.enableDebug) {
-        console.log("\u{1F3A8} [SpicetifyColorBridge] Event subscriptions established:", this.eventSubscriptionIds.length);
+        console.log(
+          "\u{1F3A8} [SpicetifyColorBridge] Event subscriptions established:",
+          this.eventSubscriptionIds.length
+        );
       }
     }
     /**
@@ -25839,31 +26762,141 @@ void main() {
   // Semantic color mappings to our CSS variables
   _SpicetifyColorBridge.SEMANTIC_MAPPINGS = [
     // Text colors (Catppuccin Macchiato)
-    { semanticColor: "textBase", cssVariable: "--spice-text", fallbackColor: "#cad3f5", description: "Primary text color" },
-    { semanticColor: "textSubdued", cssVariable: "--spice-subtext", fallbackColor: "#a5adcb", description: "Secondary text color" },
-    { semanticColor: "textBrightAccent", cssVariable: "--spice-accent", fallbackColor: "#c6a0f6", description: "Accent text color" },
-    { semanticColor: "textNegative", cssVariable: "--spice-red", fallbackColor: "#ed8796", description: "Error text color" },
-    { semanticColor: "textWarning", cssVariable: "--spice-yellow", fallbackColor: "#eed49f", description: "Warning text color" },
-    { semanticColor: "textPositive", cssVariable: "--spice-green", fallbackColor: "#a6da95", description: "Success text color" },
-    { semanticColor: "textAnnouncement", cssVariable: "--spice-blue", fallbackColor: "#8aadf4", description: "Info text color" },
+    {
+      semanticColor: "textBase",
+      cssVariable: "--spice-text",
+      fallbackColor: "#cad3f5",
+      description: "Primary text color"
+    },
+    {
+      semanticColor: "textSubdued",
+      cssVariable: "--spice-subtext",
+      fallbackColor: "#a5adcb",
+      description: "Secondary text color"
+    },
+    {
+      semanticColor: "textBrightAccent",
+      cssVariable: "--spice-accent",
+      fallbackColor: "#c6a0f6",
+      description: "Accent text color"
+    },
+    {
+      semanticColor: "textNegative",
+      cssVariable: "--spice-red",
+      fallbackColor: "#ed8796",
+      description: "Error text color"
+    },
+    {
+      semanticColor: "textWarning",
+      cssVariable: "--spice-yellow",
+      fallbackColor: "#eed49f",
+      description: "Warning text color"
+    },
+    {
+      semanticColor: "textPositive",
+      cssVariable: "--spice-green",
+      fallbackColor: "#a6da95",
+      description: "Success text color"
+    },
+    {
+      semanticColor: "textAnnouncement",
+      cssVariable: "--spice-blue",
+      fallbackColor: "#8aadf4",
+      description: "Info text color"
+    },
     // Essential colors (for icons, controls) - Catppuccin Macchiato
-    { semanticColor: "essentialBase", cssVariable: "--spice-button", fallbackColor: "#cad3f5", description: "Primary button color" },
-    { semanticColor: "essentialSubdued", cssVariable: "--spice-button-disabled", fallbackColor: "#6e738d", description: "Disabled button color" },
-    { semanticColor: "essentialBrightAccent", cssVariable: "--spice-button-active", fallbackColor: "#c6a0f6", description: "Active button color" },
-    { semanticColor: "essentialNegative", cssVariable: "--spice-notification-error", fallbackColor: "#ed8796", description: "Error button color" },
-    { semanticColor: "essentialWarning", cssVariable: "--spice-notification-warning", fallbackColor: "#eed49f", description: "Warning button color" },
-    { semanticColor: "essentialPositive", cssVariable: "--spice-notification-success", fallbackColor: "#a6da95", description: "Success button color" },
+    {
+      semanticColor: "essentialBase",
+      cssVariable: "--spice-button",
+      fallbackColor: "#cad3f5",
+      description: "Primary button color"
+    },
+    {
+      semanticColor: "essentialSubdued",
+      cssVariable: "--spice-button-disabled",
+      fallbackColor: "#6e738d",
+      description: "Disabled button color"
+    },
+    {
+      semanticColor: "essentialBrightAccent",
+      cssVariable: "--spice-button-active",
+      fallbackColor: "#c6a0f6",
+      description: "Active button color"
+    },
+    {
+      semanticColor: "essentialNegative",
+      cssVariable: "--spice-notification-error",
+      fallbackColor: "#ed8796",
+      description: "Error button color"
+    },
+    {
+      semanticColor: "essentialWarning",
+      cssVariable: "--spice-notification-warning",
+      fallbackColor: "#eed49f",
+      description: "Warning button color"
+    },
+    {
+      semanticColor: "essentialPositive",
+      cssVariable: "--spice-notification-success",
+      fallbackColor: "#a6da95",
+      description: "Success button color"
+    },
     // Background colors - Catppuccin Macchiato
-    { semanticColor: "backgroundBase", cssVariable: "--spice-main", fallbackColor: "#24273a", description: "Main background color" },
-    { semanticColor: "backgroundHighlight", cssVariable: "--spice-highlight", fallbackColor: "#363a4f", description: "Highlight background color" },
-    { semanticColor: "backgroundPress", cssVariable: "--spice-press", fallbackColor: "#494d64", description: "Press state background color" },
-    { semanticColor: "backgroundElevatedBase", cssVariable: "--spice-card", fallbackColor: "#1e2030", description: "Card background color" },
-    { semanticColor: "backgroundElevatedHighlight", cssVariable: "--spice-card-highlight", fallbackColor: "#363a4f", description: "Card highlight background" },
-    { semanticColor: "backgroundTintedBase", cssVariable: "--spice-sidebar", fallbackColor: "#363a4f", description: "Sidebar background color" },
-    { semanticColor: "backgroundTintedHighlight", cssVariable: "--spice-sidebar-highlight", fallbackColor: "#494d64", description: "Sidebar highlight background" },
+    {
+      semanticColor: "backgroundBase",
+      cssVariable: "--spice-main",
+      fallbackColor: "#24273a",
+      description: "Main background color"
+    },
+    {
+      semanticColor: "backgroundHighlight",
+      cssVariable: "--spice-highlight",
+      fallbackColor: "#363a4f",
+      description: "Highlight background color"
+    },
+    {
+      semanticColor: "backgroundPress",
+      cssVariable: "--spice-press",
+      fallbackColor: "#494d64",
+      description: "Press state background color"
+    },
+    {
+      semanticColor: "backgroundElevatedBase",
+      cssVariable: "--spice-card",
+      fallbackColor: "#1e2030",
+      description: "Card background color"
+    },
+    {
+      semanticColor: "backgroundElevatedHighlight",
+      cssVariable: "--spice-card-highlight",
+      fallbackColor: "#363a4f",
+      description: "Card highlight background"
+    },
+    {
+      semanticColor: "backgroundTintedBase",
+      cssVariable: "--spice-sidebar",
+      fallbackColor: "#363a4f",
+      description: "Sidebar background color"
+    },
+    {
+      semanticColor: "backgroundTintedHighlight",
+      cssVariable: "--spice-sidebar-highlight",
+      fallbackColor: "#494d64",
+      description: "Sidebar highlight background"
+    },
     // Decorative colors - Catppuccin Macchiato
-    { semanticColor: "decorativeBase", cssVariable: "--spice-decorative", fallbackColor: "#cad3f5", description: "Decorative element color" },
-    { semanticColor: "decorativeSubdued", cssVariable: "--spice-decorative-subdued", fallbackColor: "#939ab7", description: "Subdued decorative color" }
+    {
+      semanticColor: "decorativeBase",
+      cssVariable: "--spice-decorative",
+      fallbackColor: "#cad3f5",
+      description: "Decorative element color"
+    },
+    {
+      semanticColor: "decorativeSubdued",
+      cssVariable: "--spice-decorative-subdued",
+      fallbackColor: "#939ab7",
+      description: "Subdued decorative color"
+    }
   ];
   var SpicetifyColorBridge = _SpicetifyColorBridge;
 
@@ -26377,6 +27410,7 @@ void main() {
       this.themingStateService = null;
       this.performanceService = null;
       this.performanceProfileService = null;
+      this.genreService = null;
       this.fallbackDomCleanup = [];
       this.systemName = "ColorHarmonyEngine";
       this.utils = utils;
@@ -26638,7 +27672,7 @@ void main() {
         // Strong emotion influence by default
       };
       this.genreState = {
-        currentGenre: "unknown",
+        currentGenre: "unknown" /* UNKNOWN */,
         genreConfidence: 0,
         genreHistory: [],
         lastGenreUpdate: 0,
@@ -26656,6 +27690,7 @@ void main() {
       this.themingStateService = services.themingState ?? null;
       this.performanceService = services.performance ?? null;
       this.performanceProfileService = services.performanceProfile ?? null;
+      this.genreService = services.genre ?? null;
     }
     getOptionalServices() {
       return [
@@ -26663,7 +27698,8 @@ void main() {
         "musicSyncLifecycle",
         "themingState",
         "performance",
-        "performanceProfile"
+        "performanceProfile",
+        "genre"
       ];
     }
     /**
@@ -29684,16 +30720,14 @@ void main() {
      */
     async analyzeGenreAesthetics(musicData, albumArtColors) {
       try {
-        if (!this.genreProfileManager) {
-          return null;
-        }
-        const currentGenre = this.genreProfileManager.getCurrentGenre();
-        const genreConfidence = this.genreProfileManager.getGenreConfidence();
+        const genreProvider = this.genreService ?? this.genreProfileManager;
+        const currentGenre = genreProvider.getCurrentGenre();
+        const genreConfidence = genreProvider.getGenreConfidence();
         if (genreConfidence < 0.3) {
           return null;
         }
-        const genreCharacteristics = this.genreProfileManager.getCharacteristics(currentGenre);
-        const genreVisualStyle = this.genreProfileManager.getVisualStyle(currentGenre);
+        const genreCharacteristics = genreProvider.getCharacteristics(currentGenre);
+        const genreVisualStyle = genreProvider.getVisualStyle(currentGenre);
         let albumGenreHarmonyScore = 1;
         let genreValidatedByAlbumColors = genreConfidence;
         if (albumArtColors && Object.keys(albumArtColors).length > 0) {
@@ -30312,6 +31346,7 @@ void main() {
   init_GenreProfileManager();
   init_OKLABColorProcessor();
   init_EmotionalTemperatureMapper();
+  init_OKLABProcessorSingleton();
   function safeGetSpicetify2() {
     return typeof window !== "undefined" && window.Spicetify ? window.Spicetify : null;
   }
@@ -30436,7 +31471,16 @@ void main() {
       this.utils = dependencies.ThemeUtilities || ThemeUtilities_exports;
       this.year3000System = dependencies.year3000System || null;
       this.genreProfileManager = dependencies.genreProfileManager || new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG: this.config });
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+      this.oklabProcessor = getStandardOKLABProcessor({
+        requester: "MusicSyncService",
+        enableDebug: this.config.enableDebug,
+        reason: "constructor"
+      });
+      getMusicalOKLABProcessor({
+        requester: "MusicSyncService",
+        enableDebug: this.config.enableDebug,
+        reason: "constructor-prewarm"
+      });
       this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(this.config.enableDebug);
       this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
       this.userPreferences = this.loadUserPreferences();
@@ -30678,6 +31722,11 @@ void main() {
       }
       if (cached) {
         this.unifiedCache.delete(key);
+        OKLABProcessorSingleton.reportCacheFootprint(
+          "MusicSyncService.unifiedCache",
+          this.unifiedCache.size,
+          { reason: "expired", key }
+        );
       }
       return null;
     }
@@ -30686,6 +31735,11 @@ void main() {
         data,
         timestamp: Date.now()
       });
+      OKLABProcessorSingleton.reportCacheFootprint(
+        "MusicSyncService.unifiedCache",
+        this.unifiedCache.size,
+        { key }
+      );
     }
     // === ENHANCED BPM CALCULATION ===
     async calculateEnhancedBPM(audioData, options = {}) {
@@ -31535,6 +32589,11 @@ void main() {
       if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
       this.subscribers.clear();
       this.unifiedCache.clear();
+      OKLABProcessorSingleton.reportCacheFootprint(
+        "MusicSyncService.unifiedCache",
+        0,
+        { reason: "destroy" }
+      );
       this.isInitialized = false;
       this.latestProcessedData = null;
       this.metrics = {
@@ -34143,6 +35202,7 @@ void main() {
   init_config();
   init_DebugCoordinator();
   init_EmotionalTemperatureMapper();
+  init_genre();
   var _EmotionalGradientMapper = class _EmotionalGradientMapper {
     constructor(cssController, musicSyncService = null) {
       this.musicSyncService = null;
@@ -34492,8 +35552,7 @@ void main() {
         // Default major, could be enhanced
         key: 0,
         // Default
-        genre: data.emotion.primary
-        // Use primary emotion as genre hint
+        genre: "default" /* DEFAULT */
       };
       this.processMusicalEmotionalData(musicData);
     }
@@ -34941,27 +36000,27 @@ void main() {
     inferGenreFromProfile(profile) {
       const { mood, energy, valence, tension, arousal, mode } = profile;
       if (mood === "aggressive" || energy > 0.8 && valence < 0.4) {
-        return tension > 0.7 ? "metal" : "hard-rock";
+        return tension > 0.7 ? "metal" /* METAL */ : "rock" /* ROCK */;
       }
       if (mood === "euphoric" || energy > 0.7 && valence > 0.7) {
-        return arousal > 0.8 ? "edm" : "pop";
+        return arousal > 0.8 ? "electronic" /* ELECTRONIC */ : "pop" /* POP */;
       }
       if (mood === "melancholic" || energy < 0.4 && valence < 0.4) {
-        return mode === "minor" ? "blues" : "folk";
+        return mode === "minor" ? "blues" /* BLUES */ : "folk" /* FOLK */;
       }
       if (mood === "peaceful" || energy < 0.3 && valence > 0.6) {
-        return "ambient";
+        return "ambient" /* AMBIENT */;
       }
       if (mood === "dramatic" || tension > 0.6 && energy > 0.5) {
-        return "classical";
+        return "classical" /* CLASSICAL */;
       }
       if (mood === "mysterious" || valence < 0.5 && tension > 0.5) {
-        return "jazz";
+        return "jazz" /* JAZZ */;
       }
       if (mood === "heroic" || mode === "major" && energy > 0.6) {
-        return "soundtrack";
+        return "classical" /* CLASSICAL */;
       }
-      return "indie-pop";
+      return "indie" /* INDIE */;
     }
     /**
      * Get current emotional temperature result
@@ -34978,7 +36037,7 @@ void main() {
           energy: intensity,
           valence: intensity > 0.5 ? 0.7 : 0.3,
           // High intensity usually positive
-          genre: "override"
+          genre: "default" /* DEFAULT */
         };
         const overrideTemperature = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature(
           mockMusicData
@@ -48719,6 +49778,7 @@ void main() {
   // src-js/ui/managers/Card3DManager.ts
   init_EmotionalTemperatureMapper();
   init_OKLABColorProcessor();
+  init_OKLABProcessorSingleton();
   init_EventBus();
   var _Card3DManager = class _Card3DManager {
     constructor(performanceMonitor, utils) {
@@ -48749,7 +49809,11 @@ void main() {
       this.utils = utils;
       this.cards = document.querySelectorAll(this.config.selector);
       this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
-      this.oklabProcessor = new OKLABColorProcessor(true);
+      this.oklabProcessor = getStandardOKLABProcessor({
+        requester: "Card3DManager",
+        enableDebug: true,
+        reason: "constructor"
+      });
       this.effectPreset = OKLABColorProcessor.getPreset("VIBRANT");
       this.effectState = {
         currentMusicMood: "neutral",
@@ -49698,6 +50762,7 @@ void main() {
   init_ThemeUtilities();
   init_EmotionalTemperatureMapper();
   init_OKLABColorProcessor();
+  init_OKLABProcessorSingleton();
   init_EventBus();
   var _GlassmorphismManager = class _GlassmorphismManager extends ViewportAwareSystem {
     constructor(config = ADVANCED_SYSTEM_CONFIG, utils = ThemeUtilities_exports, cssBatcher = null, performanceAnalyzer2 = null, viewportOptions = {}) {
@@ -49729,7 +50794,11 @@ void main() {
       this.isSupported = this.detectBackdropFilterSupport();
       this.currentIntensity = "balanced";
       this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
-      this.oklabProcessor = new OKLABColorProcessor(true);
+      this.oklabProcessor = getStandardOKLABProcessor({
+        requester: "GlassmorphismManager",
+        enableDebug: true,
+        reason: "constructor"
+      });
       this.effectPreset = OKLABColorProcessor.getPreset("STANDARD");
       this.effectState = {
         currentMusicMood: "neutral",
@@ -49820,14 +50889,20 @@ void main() {
       this.updateGlassVariables(intensity);
     }
     updateGlassVariables(intensity) {
-      const root = document.documentElement;
       const shouldReduceQuality = this.performanceAnalyzer?.shouldReduceQuality() || false;
       let blurValue, opacityValue, saturationValue;
       switch (intensity) {
         case "disabled":
-          root.style.removeProperty("--glass-blur");
-          root.style.removeProperty("--glass-opacity");
-          root.style.removeProperty("--glass-saturation");
+          this.cssController.batchSetVariables(
+            "GlassmorphismManager",
+            {
+              "--glass-blur": "0px",
+              "--glass-opacity": "0",
+              "--glass-saturation": "1"
+            },
+            "high",
+            "glass-properties-update"
+          );
           return;
         case "minimal":
           blurValue = shouldReduceQuality ? "2px" : "3px";
@@ -51282,11 +52357,6 @@ void main() {
         "performanceCoordinator"
       ]);
       this.systemRegistry.set(
-        "PerformanceAnalyzer",
-        PerformanceAnalyzer
-      );
-      this.systemDependencies.set("PerformanceAnalyzer", []);
-      this.systemRegistry.set(
         "DeviceCapabilityDetector",
         DeviceCapabilityDetector
       );
@@ -51308,13 +52378,6 @@ void main() {
       ]);
       this.systemRegistry.set("UnifiedPerformanceCoordinator", SimplePerformanceCoordinator);
       this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
-      this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
-      this.systemDependencies.set("SimplePerformanceCoordinator", [
-        "performanceAnalyzer",
-        "performanceCoordinator",
-        "deviceCapabilityDetector",
-        "performanceBudgetManager"
-      ]);
       this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
       this.systemDependencies.set("SimplePerformanceCoordinator", []);
       this.systemRegistry.set("WebGLSystemsIntegration", WebGLSystemsIntegration);
@@ -52068,6 +53131,7 @@ void main() {
   init_DeviceCapabilityDetector();
   init_DebugCoordinator();
   init_CoreServiceProviders();
+  init_OKLABProcessorSingleton();
   var _SystemIntegrationCoordinator = class _SystemIntegrationCoordinator {
     constructor(config, utils, year3000System) {
       // Facade instances (renamed for clarity)
@@ -52568,6 +53632,10 @@ void main() {
             ok: true,
             details: "Music sync service operational"
           },
+          oklabProcessor: {
+            ok: true,
+            details: "OKLAB processor singleton verified"
+          },
           // Legacy systems (optional for backward compatibility)
           performanceAnalyzer: {
             ok: true,
@@ -52577,6 +53645,20 @@ void main() {
         recommendations: [],
         timestamp: performance.now()
       };
+      const oklabStats = OKLABProcessorSingleton.getMemoryStats();
+      const oklabAvailable = OKLABProcessorSingleton.ensureAvailability(
+        "standard",
+        "SystemIntegrationCoordinator.performHealthCheck"
+      );
+      const oklabHealthy = oklabAvailable && oklabStats.standardInstances === 1;
+      healthCheck.sharedResources.oklabProcessor.ok = oklabHealthy;
+      healthCheck.sharedResources.oklabProcessor.details = `Standard instances: ${oklabStats.standardInstances}, musical instances: ${oklabStats.musicalInstances}, caches tracked: ${oklabStats.trackedCaches}`;
+      if (!oklabHealthy && healthCheck.overall !== "critical") {
+        healthCheck.overall = "degraded";
+        healthCheck.recommendations.push(
+          "Verify OKLAB processor singleton initialization before continuing boot."
+        );
+      }
       if (this.visualSystemCoordinator) {
         try {
           const visualHealth = await this.visualSystemCoordinator.performVisualHealthCheck();
@@ -52983,6 +54065,22 @@ void main() {
           "SystemIntegrationCoordinator",
           "ColorProcessor initialized and ready to receive colors:extracted events"
         );
+        const singletonHealthy = OKLABProcessorSingleton.ensureAvailability(
+          "standard",
+          "SystemIntegrationCoordinator.initializeColorProcessor"
+        );
+        const memoryStats = OKLABProcessorSingleton.getMemoryStats();
+        if (!singletonHealthy || memoryStats.standardInstances !== 1) {
+          console.warn(
+            "[SystemIntegrationCoordinator] OKLAB processor singleton health check failed",
+            memoryStats
+          );
+        } else if (this.config.enableDebug) {
+          console.log(
+            "\u{1F3A8} [SystemIntegrationCoordinator] OKLAB singleton verified",
+            memoryStats
+          );
+        }
       } catch (error) {
         Y3KDebug?.debug?.error(
           "SystemIntegrationCoordinator",
@@ -58059,6 +59157,7 @@ void main() {
   var UserGenreHistory = _UserGenreHistory;
 
   // src-js/visual/ui/AudioVisualController.ts
+  init_genre();
   function median(values) {
     if (!values.length) return 0;
     const sorted = [...values].sort((a, b) => a - b);
@@ -58135,8 +59234,7 @@ void main() {
         }, "AudioVisualController"),
         unifiedEventBus.subscribe("music:track-changed", (data) => {
           this._handleGenreChange({
-            genre: "unknown"
-            // Could be enhanced with actual genre detection
+            genre: "unknown" /* UNKNOWN */
           });
         }, "AudioVisualController"),
         unifiedEventBus.subscribe("user:scroll", (data) => {

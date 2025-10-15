@@ -8,7 +8,7 @@
  */
 
 import { Y3KDebug } from "@/debug/DebugCoordinator";
-import { colorEventOrchestrator } from "./ColorEventRouter";
+import { colorEventRouter } from "./ColorEventRouter";
 import { EventName, unifiedEventBus } from "./EventBus";
 
 interface EventFlowMetrics {
@@ -219,7 +219,7 @@ export class EventSystemMonitor {
       const busMetrics = unifiedEventBus.getMetrics();
 
       // Get color orchestrator metrics
-      const colorMetrics = colorEventOrchestrator.getMetrics();
+      const colorMetrics = colorEventRouter.getMetrics();
 
       // Update system load calculation based on all metrics
       this.calculateSystemLoad(busMetrics, colorMetrics);
@@ -303,8 +303,8 @@ export class EventSystemMonitor {
     const startTime = performance.now();
 
     try {
-      const metrics = colorEventOrchestrator.getMetrics();
-      const processingState = colorEventOrchestrator.getProcessingState();
+      const metrics = colorEventRouter.getMetrics();
+      const processingState = colorEventRouter.getProcessingState();
       const responseTime = performance.now() - startTime;
 
       const errorRate =
@@ -561,7 +561,7 @@ export class EventSystemMonitor {
    */
   public getDiagnostics(): EventFlowDiagnostics {
     const busMetrics = unifiedEventBus.getMetrics();
-    const colorMetrics = colorEventOrchestrator.getMetrics();
+    const colorMetrics = colorEventRouter.getMetrics();
 
     const healthySystems = Array.from(this.systemHealth.values()).filter(
       (h) => h.status === "healthy"

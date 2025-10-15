@@ -11,6 +11,7 @@ import {
   getStandardOKLABProcessor,
   OKLABProcessorSingleton,
 } from './OKLABProcessorSingleton';
+import { GenreType } from '@/types/genre';
 
 export interface MusicAnalysisData {
   energy?: number; // 0-1
@@ -23,7 +24,7 @@ export interface MusicAnalysisData {
   speechiness?: number; // 0-1
   mode?: number; // 0 = minor, 1 = major
   key?: number; // 0-11 pitch class
-  genre?: string;
+  genre?: GenreType;
 }
 
 export interface EmotionalTemperatureResult {
@@ -436,7 +437,10 @@ export class EmotionalTemperatureMapper {
   /**
    * Get genre-specific emotional adjustments
    */
-  private getGenreEmotionalAdjustment(genre: string, currentEmotion: EmotionalState): {
+  private getGenreEmotionalAdjustment(
+    genre: GenreType | string,
+    currentEmotion: EmotionalState
+  ): {
     override?: EmotionalState;
     secondary?: EmotionalState;
     blendRatio?: number;

@@ -11,6 +11,7 @@
  */
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
+import { GenreType } from "@/types/genre";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor } from "@/utils/color/OKLABColorProcessor";
@@ -207,7 +208,7 @@ export class OKLABConsistencyValidator {
           energy: 0.8,
           valence: 0.7,
           tempo: 128,
-          genre: "electronic",
+          genre: GenreType.ELECTRONIC,
         },
         rawColors: {
           VIBRANT: "#cba6f7",
@@ -269,7 +270,7 @@ export class OKLABConsistencyValidator {
         energy: 0.6,
         valence: 0.5,
         tempo: 120,
-        genre: "rock",
+        genre: GenreType.ROCK,
       };
 
       const result = mapper.mapMusicToEmotionalTemperature(testMusicData);
@@ -327,7 +328,13 @@ export class OKLABConsistencyValidator {
       const manager = new GenreProfileManager();
 
       // Test genre OKLAB preset mapping
-      const testGenres = ["electronic", "classical", "rock", "jazz", "default"];
+      const testGenres = [
+        GenreType.ELECTRONIC,
+        GenreType.CLASSICAL,
+        GenreType.ROCK,
+        GenreType.JAZZ,
+        GenreType.DEFAULT,
+      ];
 
       for (const genre of testGenres) {
         this.validationResults.summary.totalChecks++;

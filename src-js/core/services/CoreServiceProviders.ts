@@ -33,6 +33,7 @@ import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordina
 import { unifiedEventBus } from "@/core/events/EventBus";
 import type { UnifiedEventMap } from "@/core/events/EventBus";
 import { MusicSyncService } from "@/audio/MusicSyncService";
+import { GenreService } from "@/audio/GenreService";
 import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
 import {
   getSettings,
@@ -557,7 +558,8 @@ export class DefaultServiceFactory {
         themingState: new DefaultThemingStateService(),
         settings: new DefaultSettingsService(),
         themeLifecycle: new DefaultThemeLifecycleService(),
-        visualCoordinator: new DefaultVisualCoordinatorService()
+        visualCoordinator: new DefaultVisualCoordinatorService(),
+        genre: new GenreService()
       };
     }
     if (DefaultServiceFactory.overrides) {

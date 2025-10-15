@@ -1,5 +1,6 @@
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { OKLCHColor } from "@/utils/color/OKLABColorProcessor";
+import { GenreType } from "@/types/genre";
 import * as ThemeUtilities from "./ThemeUtilities";
 
 const DEFAULT_BASE_COLOR = "#1e1e2e";
@@ -402,7 +403,7 @@ export class PaletteExtensionManager {
   // Phase 3: Apply genre-aware modifications to palette using OKLAB blending
   public applyGenreAwareModifications(
     palette: CustomPalette,
-    genre: string
+    genre: GenreType
   ): CustomPalette {
     const genreHints =
       GENRE_PALETTE_HINTS[genre as keyof typeof GENRE_PALETTE_HINTS] ||
@@ -561,7 +562,7 @@ export class PaletteExtensionManager {
   }
 
   // Phase 3: Public API for getting genre hints
-  public getGenreHints(genre: string) {
+  public getGenreHints(genre: GenreType) {
     return (
       GENRE_PALETTE_HINTS[genre as keyof typeof GENRE_PALETTE_HINTS] ||
       GENRE_PALETTE_HINTS.default

@@ -21,6 +21,14 @@ import type {
   SettingsChangeEvent,
   TypedSettingsManager
 } from "@/config";
+import type {
+  AudioFeatures,
+  GenreDetectionResult,
+  GenreProfile,
+  GenreType,
+  GenreCharacteristics,
+  GenreVisualStyle
+} from "@/types/genre";
 import type { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
 import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
@@ -320,6 +328,31 @@ export interface MusicSyncLifecycleService {
 }
 
 // =============================================================================
+// GENRE SYSTEM SERVICE
+// =============================================================================
+
+export interface GenreSystemService {
+  getCurrentGenre(): GenreType;
+  getGenreConfidence(): number;
+  getGenreHistory(): Array<{
+    genre: GenreType;
+    confidence: number;
+    timestamp: number;
+  }>;
+  detectGenre(features?: AudioFeatures): GenreDetectionResult;
+  getProfileForTrack(features?: AudioFeatures): GenreProfile;
+  getColorCharacteristicsForGenre(
+    genre: GenreType
+  ): NonNullable<GenreProfile["colorCharacteristics"]>;
+  getCharacteristics(genre: GenreType): GenreCharacteristics;
+  getVisualStyle(genre: GenreType): GenreVisualStyle;
+  getLastDetection(): GenreDetectionResult | null;
+  subscribe(
+    listener: (result: GenreDetectionResult) => void
+  ): () => void;
+}
+
+// =============================================================================
 // THEMING STATE SERVICE
 // =============================================================================
 
@@ -496,6 +529,7 @@ export interface ServiceContainer {
   settings?: SettingsService;
   themeLifecycle?: ThemeLifecycleService;
   visualCoordinator?: VisualCoordinatorService;
+  genre?: GenreSystemService;
 }
 
 // =============================================================================
