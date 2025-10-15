@@ -45,9 +45,15 @@ describe('SystemCoordinator Integration', () => {
       expect(webglIntegration).toBeTruthy();
     });
 
-    test('Enhanced device tier detector is initialized', () => {
-      const tierDetector = coordinator.getSharedEnhancedDeviceTierDetector();
-      expect(tierDetector).toBeTruthy();
+    test('Performance profile service is initialized', () => {
+      const profileService = coordinator.getPerformanceProfileService();
+
+      expect(profileService).toBeTruthy();
+
+      if (profileService) {
+        expect(typeof profileService.getCurrentSnapshot).toBe('function');
+        expect(profileService.getCurrentSnapshot()).toBeDefined();
+      }
     });
 
     test('Performance coordinator is shared instance across queries', () => {
@@ -104,8 +110,8 @@ describe('SystemCoordinator Integration', () => {
       const health = await coordinator.performHealthCheck();
 
       expect(health).toBeDefined();
-      expect(health.status).toBeDefined();
-      expect(['excellent', 'good', 'degraded', 'critical']).toContain(health.status);
+      expect(health.overall).toBeDefined();
+      expect(['excellent', 'good', 'degraded', 'critical']).toContain(health.overall);
     });
 
     test('Performance coordinator health is monitored', async () => {

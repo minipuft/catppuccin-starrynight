@@ -378,14 +378,7 @@ export class SystemIntegrationCoordinator {
       await this.sharedWebGLSystemsIntegration.initialize();
 
       // Initialize shared services backed by the simplified performance system
-      this.performanceProfileService = new DefaultPerformanceProfileService(
-        this.config,
-        this.performanceCoordinator as any
-      );
-      this.performanceProfileService.setDependencies(
-        this.config,
-        this.performanceCoordinator as any
-      );
+      this.ensurePerformanceProfileService();
       this.musicSyncLifecycleService = new DefaultMusicSyncLifecycleService();
       this.themingStateService = new DefaultThemingStateService();
       const typedSettingsManager = getSettings();
@@ -396,7 +389,7 @@ export class SystemIntegrationCoordinator {
       );
 
       DefaultServiceFactory.registerOverrides({
-        performanceProfile: this.performanceProfileService,
+        performanceProfile: this.performanceProfileService!,
         musicSyncLifecycle: this.musicSyncLifecycleService,
         themingState: this.themingStateService,
         settings: this.settingsService,
@@ -449,6 +442,25 @@ export class SystemIntegrationCoordinator {
       );
       throw error;
     }
+  }
+
+  private ensurePerformanceProfileService(): void {
+    if (!this.performanceProfileService) {
+      this.performanceProfileService = new DefaultPerformanceProfileService(
+        this.config,
+        this.performanceCoordinator as any
+      );
+    }
+
+    const profileService = this.performanceProfileService;
+    profileService.setDependencies(
+      this.config,
+      this.performanceCoordinator as any
+    );
+
+    DefaultServiceFactory.registerOverrides({
+      performanceProfile: profileService,
+    });
   }
 
   private async initializeFacades(): Promise<void> {
@@ -1380,6 +1392,8 @@ export class SystemIntegrationCoordinator {
 
     this.performanceCoordinator = new SimplePerformanceCoordinator();
     await this.performanceCoordinator.initialize();
+
+    this.ensurePerformanceProfileService();
 
     // Legacy system removed - using SimplePerformanceCoordinator instead
     // this.performanceCoordinator = new PerformanceAnalyzer(); // REMOVED: Complex monitoring replaced with tier-based system
@@ -2657,6 +2671,12 @@ export class SystemIntegrationCoordinator {
     return this.performanceCoordinator || undefined;
   }
 
+  public getPerformanceProfileService():
+    | DefaultPerformanceProfileService
+    | undefined {
+    return this.performanceProfileService || undefined;
+  }
+
   public getSharedWebGLSystemsIntegration():
     | WebGLSystemsIntegration
     | undefined {
@@ -2679,6 +2699,10 @@ export class SystemIntegrationCoordinator {
       case "performanceAnalyzer":
       case "simplePerformanceCoordinator":
         return (this.performanceCoordinator as T) || null;
+
+      case "performanceProfileService":
+      case "performanceProfile":
+        return (this.performanceProfileService as T) || null;
 
       case "cssVariableManager":
       case "cssVariableController":
