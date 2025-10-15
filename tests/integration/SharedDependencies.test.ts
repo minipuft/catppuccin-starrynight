@@ -93,20 +93,25 @@ describe('Shared Dependencies Integration', () => {
     });
   });
 
-  describe('Enhanced Device Tier Detection', () => {
-    test('Enhanced device tier detector is initialized', () => {
-      const tierDetector = coordinator.getSharedEnhancedDeviceTierDetector();
+  describe('Performance Profile Service', () => {
+    test('Performance profile service is initialized', () => {
+      const profileService = coordinator.getPerformanceProfileService();
 
-      expect(tierDetector).toBeTruthy();
+      expect(profileService).toBeTruthy();
+
+      if (profileService) {
+        expect(typeof profileService.getCurrentSnapshot).toBe('function');
+        expect(profileService.getCurrentSnapshot()).toBeDefined();
+      }
     });
 
-    test('Enhanced device tier detector is shared instance', () => {
-      const tier1 = coordinator.getSharedEnhancedDeviceTierDetector();
-      const tier2 = coordinator.getSharedEnhancedDeviceTierDetector();
+    test('Performance profile service is shared instance', () => {
+      const first = coordinator.getPerformanceProfileService();
+      const second = coordinator.getPerformanceProfileService();
 
-      expect(tier1).toBeTruthy();
-      expect(tier2).toBeTruthy();
-      expect(tier1).toBe(tier2);
+      expect(first).toBeTruthy();
+      expect(second).toBeTruthy();
+      expect(first).toBe(second);
     });
   });
 
