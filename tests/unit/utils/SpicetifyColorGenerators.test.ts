@@ -15,6 +15,14 @@
  */
 
 import * as SpicetifyColorGen from '@/utils/color/SpicetifyColorGenerators';
+import * as ThemeUtilities from '@/utils/core/ThemeUtilities';
+
+const getOklch = (hex: string) => ThemeUtilities.hexToOklch(hex)!;
+
+const hueDistance = (a: number, b: number) => {
+  const diff = Math.abs(a - b) % 360;
+  return diff > 180 ? 360 - diff : diff;
+};
 
 describe('SpicetifyColorGenerators', () => {
   describe('Core Color Distribution', () => {
@@ -73,16 +81,14 @@ describe('SpicetifyColorGenerators', () => {
         const original = '#c6a0f6'; // Purple
         const darker = SpicetifyColorGen.generateDarkerVariant(original, 0.3);
 
-        expect(darker).toMatch(/^#[0-9a-f]{6}$/i);
-        expect(darker).not.toBe(original);
+      expect(darker).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(darker).not.toBe(original);
 
-        // Verify it's actually darker
-        const origRgb = SpicetifyColorGen.hexToRgbObject(original)!;
-        const darkRgb = SpicetifyColorGen.hexToRgbObject(darker)!;
-        expect(darkRgb.r).toBeLessThan(origRgb.r);
-        expect(darkRgb.g).toBeLessThan(origRgb.g);
-        expect(darkRgb.b).toBeLessThan(origRgb.b);
-      });
+      // Verify perceptual lightness decreased
+      const originalOklch = getOklch(original);
+      const darkerOklch = getOklch(darker);
+      expect(darkerOklch.L).toBeLessThan(originalOklch.L);
+    });
 
       test('handles factor of 0 (no change)', () => {
         const original = '#c6a0f6';
@@ -107,16 +113,14 @@ describe('SpicetifyColorGenerators', () => {
         const original = '#c6a0f6';
         const lighter = SpicetifyColorGen.generateLighterVariant(original, 0.2);
 
-        expect(lighter).toMatch(/^#[0-9a-f]{6}$/i);
-        expect(lighter).not.toBe(original);
+      expect(lighter).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(lighter).not.toBe(original);
 
-        // Verify it's actually lighter
-        const origRgb = SpicetifyColorGen.hexToRgbObject(original)!;
-        const lightRgb = SpicetifyColorGen.hexToRgbObject(lighter)!;
-        expect(lightRgb.r).toBeGreaterThan(origRgb.r);
-        expect(lightRgb.g).toBeGreaterThan(origRgb.g);
-        expect(lightRgb.b).toBeGreaterThan(origRgb.b);
-      });
+      // Verify perceptual lightness increased
+      const originalOklch = getOklch(original);
+      const lighterOklch = getOklch(lighter);
+      expect(lighterOklch.L).toBeGreaterThan(originalOklch.L);
+    });
 
       test('handles factor of 0 (no change)', () => {
         const original = '#c6a0f6';
@@ -163,29 +167,31 @@ describe('SpicetifyColorGenerators', () => {
       const result = SpicetifyColorGen.generateCinematicRed('#c6a0f6');
       expect(result).toMatch(/^#[0-9a-f]{6}$/i);
 
-      const rgb = SpicetifyColorGen.hexToRgbObject(result)!;
-      // Should have boosted red channel
-      expect(rgb.r).toBeGreaterThan(150);
+      const base = getOklch('#c6a0f6');
+      const cinematic = getOklch(result);
+      expect(cinematic.C).toBeGreaterThan(base.C);
+      expect(hueDistance(cinematic.H, 25)).toBeLessThan(40);
     });
 
     test('generateCinematicCyan creates dramatic cyan', () => {
       const result = SpicetifyColorGen.generateCinematicCyan('#c6a0f6');
       expect(result).toMatch(/^#[0-9a-f]{6}$/i);
 
-      const rgb = SpicetifyColorGen.hexToRgbObject(result)!;
-      // Should have high green and blue channels
-      expect(rgb.g).toBeGreaterThan(100);
-      expect(rgb.b).toBeGreaterThan(100);
+      const base = getOklch('#c6a0f6');
+      const cinematic = getOklch(result);
+      expect(cinematic.C).toBeGreaterThan(base.C * 0.9);
+      expect(hueDistance(cinematic.H, 200)).toBeLessThan(40);
+      expect(cinematic.L).toBeGreaterThan(0.6);
     });
 
     test('generateCinematicYellow creates bright yellow', () => {
       const result = SpicetifyColorGen.generateCinematicYellow('#cad3f5');
       expect(result).toMatch(/^#[0-9a-f]{6}$/i);
 
-      const rgb = SpicetifyColorGen.hexToRgbObject(result)!;
-      // Should have high red and green channels
-      expect(rgb.r).toBeGreaterThan(150);
-      expect(rgb.g).toBeGreaterThan(150);
+      const base = getOklch('#cad3f5');
+      const cinematic = getOklch(result);
+      expect(cinematic.L).toBeGreaterThan(base.L);
+      expect(hueDistance(cinematic.H, 95)).toBeLessThan(35);
     });
 
     test('generateHolographicPrimary enhances saturation', () => {
@@ -193,6 +199,11 @@ describe('SpicetifyColorGenerators', () => {
       const result = SpicetifyColorGen.generateHolographicPrimary(original);
       expect(result).toMatch(/^#[0-9a-f]{6}$/i);
       expect(result).not.toBe(original);
+
+      const base = getOklch(original);
+      const holographic = getOklch(result);
+      expect(holographic.C).toBeGreaterThanOrEqual(base.C * 0.75);
+      expect(holographic.L).toBeGreaterThan(base.L);
     });
 
     test('generateHolographicAccent applies prismatic shift', () => {
@@ -204,11 +215,10 @@ describe('SpicetifyColorGenerators', () => {
       const result = SpicetifyColorGen.generateHolographicGlow('#cad3f5');
       expect(result).toMatch(/^#[0-9a-f]{6}$/i);
 
-      const rgb = SpicetifyColorGen.hexToRgbObject(result)!;
-      // Should be very light (high RGB values)
-      expect(rgb.r).toBeGreaterThan(200);
-      expect(rgb.g).toBeGreaterThan(200);
-      expect(rgb.b).toBeGreaterThan(200);
+      const base = getOklch('#cad3f5');
+      const glow = getOklch(result);
+      expect(glow.L).toBeGreaterThan(base.L);
+      expect(glow.C).toBeLessThan(base.C);
     });
   });
 
@@ -236,10 +246,10 @@ describe('SpicetifyColorGenerators', () => {
       const overlay = SpicetifyColorGen.generateOverlayColor(darkBg, 0.1);
       expect(overlay).toMatch(/^#[0-9a-f]{6}$/i);
 
-      const bgRgb = SpicetifyColorGen.hexToRgbObject(darkBg)!;
-      const overlayRgb = SpicetifyColorGen.hexToRgbObject(overlay)!;
-      // Overlay should be lighter than background
-      expect(overlayRgb.r).toBeGreaterThanOrEqual(bgRgb.r);
+      const baseOklch = getOklch(darkBg);
+      const overlayOklch = getOklch(overlay);
+      // Overlay should be perceptually lighter than background
+      expect(overlayOklch.L).toBeGreaterThan(baseOklch.L);
     });
 
     test('generateCrustColor creates border color', () => {

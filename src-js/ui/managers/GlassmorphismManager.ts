@@ -12,6 +12,10 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorTypes";
 // NOTE: QualityLevel types imported from simplified performance system
@@ -86,7 +90,11 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
     
     // Initialize Year 3000 music analysis systems
     this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
-    this.oklabProcessor = new OKLABColorProcessor(true);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "GlassmorphismManager",
+      enableDebug: true,
+      reason: "constructor",
+    });
     this.effectPreset = OKLABColorProcessor.getPreset('STANDARD');
     
     // Initialize music effect state
@@ -208,7 +216,6 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
   }
 
   private updateGlassVariables(intensity: GlassIntensity): void {
-    const root = document.documentElement;
     const shouldReduceQuality =
       this.performanceAnalyzer?.shouldReduceQuality() || false;
 
@@ -216,9 +223,16 @@ export class GlassmorphismManager extends ViewportAwareSystem implements Quality
 
     switch (intensity) {
       case "disabled":
-        root.style.removeProperty("--glass-blur");
-        root.style.removeProperty("--glass-opacity");
-        root.style.removeProperty("--glass-saturation");
+        this.cssController.batchSetVariables(
+          "GlassmorphismManager",
+          {
+            "--glass-blur": "0px",
+            "--glass-opacity": "0",
+            "--glass-saturation": "1",
+          },
+          "high",
+          "glass-properties-update"
+        );
         return;
       case "minimal":
         blurValue = shouldReduceQuality ? "2px" : "3px";

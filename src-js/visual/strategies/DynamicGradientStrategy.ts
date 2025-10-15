@@ -24,6 +24,10 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { ServiceContainer } from "@/core/services/SystemServices";
@@ -132,7 +136,11 @@ export class DynamicGradientStrategy
         "CSSVariableWriter not available; CSS updates will fall back to direct DOM writes"
       );
     }
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "DynamicGradientStrategy",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
     this.deviceDetector = new DeviceCapabilityDetector();
     this.cssAnimationManager = cssAnimationManager;
 
@@ -657,10 +665,13 @@ export class DynamicGradientStrategy
       let processedSecondary = secondaryColor;
       let oklabGradientStops: OKLABProcessingResult[] = [];
 
+      let appliedPresetName: string | null = null;
+
       if (this.gradientConfig.oklabInterpolationEnabled && primaryColor) {
         const preset = OKLABColorProcessor.getPreset(
           this.gradientConfig.oklabPreset
         );
+        appliedPresetName = preset.name;
 
         // Process primary color through OKLAB
         const primaryResult = this.oklabProcessor.processColor(
@@ -700,6 +711,17 @@ export class DynamicGradientStrategy
             processedPrimary;
         }
 
+        if (oklabGradientStops.length > 0) {
+          OKLABProcessorSingleton.reportCacheFootprint(
+            "DynamicGradientStrategy.gradientStops",
+            oklabGradientStops.length,
+            {
+              trackUri: context.trackUri,
+              preset: appliedPresetName,
+            }
+          );
+        }
+
         Y3KDebug?.debug?.log(
           "DynamicGradientStrategy",
           "OKLAB gradient processing applied:",
@@ -709,7 +731,7 @@ export class DynamicGradientStrategy
             originalSecondary: secondaryColor,
             processedSecondary,
             gradientStops: oklabGradientStops.length,
-            preset: preset.name,
+            preset: appliedPresetName,
           }
         );
       }
@@ -1426,6 +1448,11 @@ export class DynamicGradientStrategy
     // Clear caches
     this.oklabCache.clear();
     this.gradientCache.clear();
+    OKLABProcessorSingleton.reportCacheFootprint(
+      "DynamicGradientStrategy.gradientStops",
+      0,
+      { reason: "destroy" }
+    );
 
     // Call base system cleanup
     super.destroy();
@@ -1473,7 +1500,20 @@ export class DynamicGradientStrategy
       "oklabInterpolationEnabled" in newConfig ||
       "oklabPreset" in newConfig
     ) {
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+      const sharedProcessor = getStandardOKLABProcessor({
+        requester: "DynamicGradientStrategy.refresh",
+        enableDebug: this.config.enableDebug,
+        reason: "refresh-state",
+      });
+
+      if (!sharedProcessor) {
+        OKLABProcessorSingleton.ensureAvailability(
+          "standard",
+          "DynamicGradientStrategy.refresh"
+        );
+      } else {
+        this.oklabProcessor = sharedProcessor;
+      }
     }
 
     Y3KDebug?.debug?.log("DynamicGradientStrategy", "Configuration updated:", {

@@ -2,11 +2,15 @@
 // EMOTIONAL TEMPERATURE MAPPER - Music Analysis to OKLAB Emotional State Integration
 // ████████████████████████████████████████████████████████████████████████████████
 
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset, 
-  type OKLABProcessingResult 
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset,
+  type OKLABProcessingResult
 } from './OKLABColorProcessor';
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from './OKLABProcessorSingleton';
 
 export interface MusicAnalysisData {
   energy?: number; // 0-1
@@ -241,7 +245,11 @@ export class EmotionalTemperatureMapper {
 
   constructor(enableDebug: boolean = false) {
     this.enableDebug = enableDebug;
-    this.oklabProcessor = new OKLABColorProcessor(enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "EmotionalTemperatureMapper",
+      enableDebug,
+      reason: "constructor",
+    });
   }
 
   /**

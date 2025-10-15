@@ -13,8 +13,12 @@
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
-import { MusicalOKLABCoordinator } from "@/utils/color/MusicalOKLABCoordinator";
 import { OKLABColorProcessor } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  getMusicalOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -108,7 +112,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const processor = new OKLABColorProcessor(false);
+      const processor = getStandardOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "validation",
+      });
+
+      if (!processor) {
+        this.addIssue(
+          "error",
+          "color-processing",
+          "OKLABColorProcessor singleton unavailable"
+        );
+        return;
+      }
 
       // Test basic OKLAB processing
       const testColor = "#cba6f7"; // Catppuccin mauve
@@ -169,7 +186,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const coordinator = new MusicalOKLABCoordinator(false);
+      const coordinator = getMusicalOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "validation",
+      });
+
+      if (!coordinator) {
+        this.addIssue(
+          "error",
+          "integration",
+          "MusicalOKLABCoordinator singleton unavailable"
+        );
+        return;
+      }
 
       // Test musical color coordination
       const testContext = {
@@ -461,7 +491,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const processor = new OKLABColorProcessor(false);
+      const processor = getStandardOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "performance-check",
+      });
+
+      if (!processor) {
+        this.addIssue(
+          "error",
+          "performance",
+          "OKLABColorProcessor singleton unavailable for performance validation"
+        );
+        return;
+      }
       const testColors = [
         "#cba6f7",
         "#f5c2e7",

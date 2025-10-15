@@ -19,13 +19,18 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
 import { settings } from "@/config";
 import { GenreProfileManager } from "./GenreProfileManager";
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset 
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset
 } from "@/utils/color/OKLABColorProcessor";
-import { 
-  EmotionalTemperatureMapper 
+import {
+  EmotionalTemperatureMapper
 } from "@/utils/color/EmotionalTemperatureMapper";
+import {
+  getMusicalOKLABProcessor,
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 
 // Interfaces
 interface GenreProfile {
@@ -392,7 +397,16 @@ export class MusicSyncService {
       new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG: this.config });
 
     // Initialize OKLAB integration for perceptually uniform color processing
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "MusicSyncService",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
+    getMusicalOKLABProcessor({
+      requester: "MusicSyncService",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor-prewarm",
+    });
     this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(this.config.enableDebug);
 
     this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
@@ -701,6 +715,11 @@ export class MusicSyncService {
     }
     if (cached) {
       this.unifiedCache.delete(key); // Remove expired entry
+      OKLABProcessorSingleton.reportCacheFootprint(
+        "MusicSyncService.unifiedCache",
+        this.unifiedCache.size,
+        { reason: "expired", key }
+      );
     }
     return null;
   }
@@ -710,6 +729,11 @@ export class MusicSyncService {
       data,
       timestamp: Date.now(),
     });
+    OKLABProcessorSingleton.reportCacheFootprint(
+      "MusicSyncService.unifiedCache",
+      this.unifiedCache.size,
+      { key }
+    );
   }
 
   // === ENHANCED BPM CALCULATION ===
@@ -1791,6 +1815,11 @@ export class MusicSyncService {
     if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
     this.subscribers.clear();
     this.unifiedCache.clear();
+    OKLABProcessorSingleton.reportCacheFootprint(
+      "MusicSyncService.unifiedCache",
+      0,
+      { reason: "destroy" }
+    );
     this.isInitialized = false;
     this.latestProcessedData = null;
 

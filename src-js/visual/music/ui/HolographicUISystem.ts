@@ -39,6 +39,10 @@ import {
   OKLABColorProcessor,
   type EnhancementPreset,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 
 export interface HolographicState {
   flickerIntensity: number; // 0-1 holographic flicker intensity
@@ -247,7 +251,11 @@ export class HolographicUISystem
     this.musicSyncService = musicSyncService || new MusicSyncService();
 
     // Initialize OKLAB components
-    this.oklabProcessor = new OKLABColorProcessor(true);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "HolographicUISystem",
+      enableDebug: true,
+      reason: "constructor",
+    });
     this.emotionalMapper = new EmotionalTemperatureMapper(true);
     this.genreManager = new GenreProfileManager();
     this.holographicPreset = OKLABColorProcessor.getPreset("COSMIC"); // Default to cosmic preset

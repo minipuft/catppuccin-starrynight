@@ -78,6 +78,7 @@ import {
   VisualEffectsCoordinator,
   VisualSystemKey,
 } from "@/visual/effects/VisualEffectsCoordinator";
+import { OKLABProcessorSingleton } from "@/utils/color/OKLABProcessorSingleton";
 
 // High-energy visual effects imports for integration
 
@@ -164,6 +165,7 @@ export interface FacadeHealthCheck {
     simplePerformanceCoordinator: { ok: boolean; details: string };
     cssVariableController: { ok: boolean; details: string };
     musicSyncService: { ok: boolean; details: string };
+    oklabProcessor: { ok: boolean; details: string };
     semanticColorManager?: { ok: boolean; details: string };
     // Legacy systems (will be removed after migration)
     performanceAnalyzer?: { ok: boolean; details: string };
@@ -877,6 +879,10 @@ export class SystemIntegrationCoordinator {
           ok: true,
           details: "Music sync service operational",
         },
+        oklabProcessor: {
+          ok: true,
+          details: "OKLAB processor singleton verified",
+        },
         // Legacy systems (optional for backward compatibility)
         performanceAnalyzer: {
           ok: true,
@@ -886,6 +892,22 @@ export class SystemIntegrationCoordinator {
       recommendations: [],
       timestamp: performance.now(),
     };
+
+    const oklabStats = OKLABProcessorSingleton.getMemoryStats();
+    const oklabAvailable = OKLABProcessorSingleton.ensureAvailability(
+      "standard",
+      "SystemIntegrationCoordinator.performHealthCheck"
+    );
+    const oklabHealthy = oklabAvailable && oklabStats.standardInstances === 1;
+    healthCheck.sharedResources.oklabProcessor.ok = oklabHealthy;
+    healthCheck.sharedResources.oklabProcessor.details = `Standard instances: ${oklabStats.standardInstances}, musical instances: ${oklabStats.musicalInstances}, caches tracked: ${oklabStats.trackedCaches}`;
+
+    if (!oklabHealthy && healthCheck.overall !== "critical") {
+      healthCheck.overall = "degraded";
+      healthCheck.recommendations.push(
+        "Verify OKLAB processor singleton initialization before continuing boot."
+      );
+    }
 
     // Check visual facade
     if (this.visualSystemCoordinator) {
@@ -1445,6 +1467,24 @@ export class SystemIntegrationCoordinator {
         "SystemIntegrationCoordinator",
         "ColorProcessor initialized and ready to receive colors:extracted events"
       );
+
+      const singletonHealthy = OKLABProcessorSingleton.ensureAvailability(
+        "standard",
+        "SystemIntegrationCoordinator.initializeColorProcessor"
+      );
+      const memoryStats = OKLABProcessorSingleton.getMemoryStats();
+
+      if (!singletonHealthy || memoryStats.standardInstances !== 1) {
+        console.warn(
+          "[SystemIntegrationCoordinator] OKLAB processor singleton health check failed",
+          memoryStats
+        );
+      } else if (this.config.enableDebug) {
+        console.log(
+          "🎨 [SystemIntegrationCoordinator] OKLAB singleton verified",
+          memoryStats
+        );
+      }
     } catch (error) {
       Y3KDebug?.debug?.error(
         "SystemIntegrationCoordinator",

@@ -5,6 +5,10 @@ import type * as Utils from "@/utils/core/ThemeUtilities";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/utils/color/EmotionalTemperatureMapper";
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorTypes";
 // NOTE: QualityLevel types imported from simplified performance system
@@ -96,7 +100,11 @@ export class Card3DManager implements IManagedSystem, QualityScalingCapable {
 
     // Initialize Year 3000 music analysis systems
     this.musicTemperatureMapper = new EmotionalTemperatureMapper(true);
-    this.oklabProcessor = new OKLABColorProcessor(true);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "Card3DManager",
+      enableDebug: true,
+      reason: "constructor",
+    });
     this.effectPreset = OKLABColorProcessor.getPreset('VIBRANT');
     
     // Initialize music effect state

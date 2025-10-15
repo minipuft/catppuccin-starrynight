@@ -27,6 +27,10 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import {
@@ -353,7 +357,11 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
   ) {
     this.deviceDetector = new DeviceCapabilityDetector();
     this.cssController = cssController || getGlobalCSSVariableWriter();
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "WebGLGradientStrategy",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
 
     // Get CSS visual effects controller
     this.cssController = getGlobalCSSVariableWriter();
@@ -1784,7 +1792,23 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
 
     // Update OKLAB processor debug setting if configuration changed
     if ("oklabProcessingEnabled" in newConfig || "oklabPreset" in newConfig) {
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+      const sharedProcessor = getStandardOKLABProcessor({
+        requester: "WebGLGradientStrategy.updateConfig",
+        enableDebug: this.config.enableDebug,
+        reason: "config-update",
+      });
+
+      if (!sharedProcessor) {
+        console.warn(
+          "[WebGLGradientStrategy] Shared OKLAB processor unavailable during config update"
+        );
+        OKLABProcessorSingleton.ensureAvailability(
+          "standard",
+          "WebGLGradientStrategy.updateConfig"
+        );
+      } else {
+        this.oklabProcessor = sharedProcessor;
+      }
     }
 
     Y3KDebug?.debug?.log("WebGLGradientStrategy", "Configuration updated:", {

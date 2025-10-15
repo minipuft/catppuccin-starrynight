@@ -24,6 +24,10 @@ import {
   type EnhancementPreset,
   type OKLABProcessingResult,
 } from "./OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "./OKLABProcessorSingleton";
 
 export interface MusicalColorContext {
   musicData: MusicAnalysisData;
@@ -83,7 +87,11 @@ export class MusicalOKLABProcessor {
     this.enableDebug = enableDebug;
 
     // Initialize integrated processors
-    this.oklabProcessor = new OKLABColorProcessor(enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "MusicalOKLABProcessor",
+      enableDebug,
+      reason: "constructor",
+    });
     this.emotionalMapper = new EmotionalTemperatureMapper(enableDebug);
     this.genreManager = new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG });
 
@@ -571,10 +579,20 @@ export class MusicalOKLABProcessor {
     }
 
     this.coordinationCache.set(cacheKey, result);
+    OKLABProcessorSingleton.reportCacheFootprint(
+      "MusicalOKLABProcessor.coordinationCache",
+      this.coordinationCache.size,
+      { accent: result.accentHex, type: "musical" }
+    );
 
     // Set cache timeout
     setTimeout(() => {
       this.coordinationCache.delete(cacheKey);
+      OKLABProcessorSingleton.reportCacheFootprint(
+        "MusicalOKLABProcessor.coordinationCache",
+        this.coordinationCache.size,
+        { reason: "ttl" }
+      );
     }, this.cacheTimeoutMs);
   }
 
@@ -616,6 +634,11 @@ export class MusicalOKLABProcessor {
    */
   public clearProcessingCache(): void {
     this.coordinationCache.clear();
+    OKLABProcessorSingleton.reportCacheFootprint(
+      "MusicalOKLABProcessor.coordinationCache",
+      0,
+      { reason: "manual-clear" }
+    );
     if (this.enableDebug) {
       Y3KDebug?.debug?.log(
         "MusicalOKLABProcessor",

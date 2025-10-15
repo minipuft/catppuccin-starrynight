@@ -21,11 +21,15 @@ import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
 import type { SettingsChangeEvent } from "@/config";
-import {
+import type {
   MusicalOKLABProcessor,
-  type ProcessingOptions,
-  type MusicalColorContext,
+  ProcessingOptions,
+  MusicalColorContext,
 } from "@/utils/color/MusicalOKLABCoordinator";
+import {
+  getMusicalOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
 import { ColorProcessor, globalColorProcessor } from "@/core/color/ColorProcessor";
@@ -115,7 +119,11 @@ export class ColorEventRouter {
     this.colorOrchestrator = globalColorProcessor;
 
     // Initialize unified OKLAB coordination
-    this.musicalOKLABCoordinator = new MusicalOKLABProcessor(true);
+    this.musicalOKLABCoordinator = getMusicalOKLABProcessor({
+      requester: "ColorEventRouter",
+      enableDebug: true,
+      reason: "constructor",
+    });
 
     // Initialize color orchestrator
     this.initializeColorOrchestrator();

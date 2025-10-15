@@ -27,6 +27,10 @@ import {
   type EnhancementPreset,
 } from "@/utils/color/OKLABColorProcessor";
 import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
+import {
   HolographicUISystem,
   type HolographicElement,
 } from "@/visual/music/ui/HolographicUISystem";
@@ -162,7 +166,11 @@ export class RedEnergyBurstSystem implements IManagedSystem {
     this.musicSyncService = musicSyncService;
 
     // Initialize OKLAB color processing for cinematic effects
-    this.oklabProcessor = new OKLABColorProcessor(true);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "HighEnergyEffectsController",
+      enableDebug: true,
+      reason: "constructor",
+    });
     this.emotionalMapper = new EmotionalTemperatureMapper(true);
     this.cinematicPreset = OKLABColorProcessor.getPreset("COSMIC"); // Use cosmic preset for dramatic effects
 

@@ -43,6 +43,10 @@ import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorSingleton,
+} from "@/utils/color/OKLABProcessorSingleton";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -134,7 +138,11 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
         services.themeLifecycle?.getCssController() ||
         getGlobalCSSVariableWriter();
     }
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "ThemeColorController",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
 
     // Initialize current state from existing variables
     this.initializeCurrentState();
@@ -428,7 +436,20 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
 
     // Update OKLAB processor debug setting if configuration changed
     if ("oklabEnhancementEnabled" in newConfig || "oklabPreset" in newConfig) {
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+      const sharedProcessor = getStandardOKLABProcessor({
+        requester: "ThemeColorController.refresh",
+        enableDebug: this.config.enableDebug,
+        reason: "refresh",
+      });
+
+      if (!sharedProcessor) {
+        OKLABProcessorSingleton.ensureAvailability(
+          "standard",
+          "ThemeColorController.refresh"
+        );
+      } else {
+        this.oklabProcessor = sharedProcessor;
+      }
     }
 
     Y3KDebug?.debug?.log(

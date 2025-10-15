@@ -258,6 +258,13 @@ interface OKLABProcessingResult {
 
 Album art colors are processed to derive perceptually uniform shadow and highlight variants:
 
+#### Phase 3.5: Shared OKLAB Processor Singleton
+**Implemented**: 2025-10-16
+
+- `OKLABProcessorSingleton` supplies the standard and musical processors to every subsystem (gradients, ThemeColorController, high-energy effects, MusicSyncService).
+- Health checks in `SystemIntegrationCoordinator` validate the singleton during boot and surface cache telemetry for diagnostics.
+- All visual/audio strategies now delegate cache footprint reporting to the singleton, consolidating memory tracking and eliminating ad-hoc `new OKLABColorProcessor()` calls.
+
 ```typescript
 // In ColorHarmonyEngine.blendWithAdvancedOKLAB()
 const primaryColor = processedColors.PRIMARY || processedColors.VIBRANT;
