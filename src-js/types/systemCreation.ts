@@ -13,6 +13,7 @@ import type { SimplePerformanceCoordinator } from "@/core/performance/SimplePerf
 import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import type { MusicSyncService } from "@/audio/MusicSyncService";
 import type { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
+import type { GenreService } from "@/audio/GenreService";
 import type { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
 import type { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
 
@@ -44,6 +45,7 @@ export interface SharedDependencies {
   // Audio/Visual services
   musicSyncService?: MusicSyncService;
   colorHarmonyEngine?: ColorHarmonyEngine;
+  genreService?: GenreService; // Phase 3: Unified profile integration
 
   // System reference
   year3000System?: any;

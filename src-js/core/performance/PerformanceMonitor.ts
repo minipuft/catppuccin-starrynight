@@ -2,6 +2,8 @@
 import { unifiedEventBus } from '@/core/events/EventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
 import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
+import { getPerformanceModeService } from './PerformanceModeService';
+import type { PerformanceMode } from '@/config/settingsSchema';
 
 // Performance analyzer interface to break circular dependency
 export interface IPerformanceAnalyzer {
@@ -27,7 +29,7 @@ export interface DeviceCapabilities {
   devicePixelRatio: number;
 }
 
-export interface PerformanceMode {
+export interface PerformanceModeConfig {
   name: 'balanced' | 'performance' | 'auto';
   qualityLevel: number; // 0-1
   animationQuality: number; // 0-1
@@ -150,7 +152,7 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   
   // Enhanced capabilities from PerformanceOptimizationManager consolidation
   private deviceCapabilities!: DeviceCapabilities; // Initialized in initializeDeviceCapabilities
-  private currentPerformanceMode!: PerformanceMode; // Initialized in constructor
+  private currentPerformanceMode!: PerformanceModeConfig; // Initialized in constructor
   private frameTimeHistory: number[] = [];
   private memoryUsageHistory: number[] = [];
   private lastOptimizationTime = 0;
@@ -198,7 +200,7 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   };
   
   // Performance modes configuration (from PerformanceOptimizationManager)
-  private readonly PERFORMANCE_MODES: Record<string, PerformanceMode> = {
+  private readonly PERFORMANCE_MODES: Record<string, PerformanceModeConfig> = {
     balanced: {
       name: 'balanced',
       qualityLevel: 0.8,
@@ -1061,9 +1063,39 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   // ===============================================================================
   
   /**
-   * Initialize device capabilities detection
+   * Initialize device capabilities detection using PerformanceModeService
    */
   private initializeDeviceCapabilities(): void {
+    try {
+      const service = getPerformanceModeService();
+      const detection = service.detectOptimalMode();
+      
+      // Use the unified service's device detection
+      this.deviceCapabilities = {
+        performanceTier: detection.deviceCapabilities.performanceTier,
+        memoryGB: detection.deviceCapabilities.memoryGB,
+        cpuCores: detection.deviceCapabilities.cpuCores,
+        gpuAcceleration: detection.deviceCapabilities.supportsWebGL,
+        isMobile: detection.deviceCapabilities.isMobile,
+        supportsWebGL: detection.deviceCapabilities.supportsWebGL,
+        supportsBackdropFilter: CSS.supports('backdrop-filter', 'blur(10px)'),
+        maxTextureSize: 4096, // Default, could be enhanced in service
+        devicePixelRatio: window.devicePixelRatio || 1,
+      };
+      
+      if (this.config.enableDebug) {
+        console.log('[PerformanceAnalyzer] Device capabilities detected via PerformanceModeService:', this.deviceCapabilities);
+      }
+    } catch (error) {
+      console.warn('[PerformanceAnalyzer] Failed to use PerformanceModeService for device detection, falling back to legacy:', error);
+      this.initializeDeviceCapabilitiesLegacy();
+    }
+  }
+
+  /**
+   * Legacy device capabilities detection fallback
+   */
+  private initializeDeviceCapabilitiesLegacy(): void {
     const nav = navigator as any;
     const memory = (performance as any).memory;
     
@@ -1104,18 +1136,18 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     };
     
     if (this.config.enableDebug) {
-      console.log('[PerformanceAnalyzer] Device capabilities detected:', this.deviceCapabilities);
+      console.log('[PerformanceAnalyzer] Device capabilities detected via legacy method:', this.deviceCapabilities);
     }
   }
   
   
   /**
-   * Set performance mode
+   * Set performance mode config
    */
   public setPerformanceMode(modeName: 'balanced' | 'performance' | 'auto'): void {
     const mode = this.PERFORMANCE_MODES[modeName];
     if (!mode) return;
-    
+
     this.currentPerformanceMode = mode;
     
     // Emit performance mode change event
@@ -1138,11 +1170,11 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     return { ...this.deviceCapabilities };
   }
   
-  
+
   /**
-   * Get current performance mode
+   * Get current performance mode config
    */
-  public getCurrentPerformanceMode(): PerformanceMode {
+  public getCurrentPerformanceMode(): PerformanceModeConfig {
     return { ...this.currentPerformanceMode };
   }
 
@@ -1461,9 +1493,36 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
   }
 
   /**
-   * Apply performance mode (maps to tier)
+   * Apply performance mode using unified PerformanceModeService
    */
-  public applyPerformanceMode(mode: 'auto' | 'performance' | 'balanced' | 'quality' | 'maximum'): void {
+  public async applyPerformanceMode(mode: import('@/config/settingsSchema').PerformanceMode): Promise<void> {
+    try {
+      const service = getPerformanceModeService();
+      
+      // Use the unified service to apply performance mode
+      await service.applyPerformanceMode(mode);
+      
+      // Update internal tier mapping for compatibility
+      this.updateInternalTierFromMode(mode);
+      
+      // Apply tier settings for legacy compatibility
+      this.applyTierSettings();
+      
+      if (this.config.enableDebug) {
+        console.log(`[PerformanceAnalyzer] Applied performance mode: ${mode} via PerformanceModeService`);
+      }
+    } catch (error) {
+      console.error('[PerformanceAnalyzer] Failed to apply performance mode:', error);
+      
+      // Fallback to legacy implementation
+      this.applyPerformanceModeLegacy(mode);
+    }
+  }
+
+  /**
+   * Legacy fallback for performance mode application
+   */
+  private applyPerformanceModeLegacy(mode: import('@/config/settingsSchema').PerformanceMode): void {
     const MODE_TO_TIER: Record<string, PerformanceTier> = {
       performance: 'low',
       balanced: 'medium',
@@ -1491,6 +1550,27 @@ export class PerformanceAnalyzer implements IPerformanceMonitor {
     }
 
     this.applyTierSettings();
+  }
+
+  /**
+   * Update internal tier mapping based on performance mode
+   */
+  private updateInternalTierFromMode(mode: import('@/config/settingsSchema').PerformanceMode): void {
+    const service = getPerformanceModeService();
+    const detection = service.detectOptimalMode();
+    
+    // Map performance mode to tier for internal compatibility
+    const MODE_TO_TIER: Record<import('@/config/settingsSchema').PerformanceMode, PerformanceTier> = {
+      auto: detection.deviceCapabilities.performanceTier === 'premium' ? 'high' : 
+            detection.deviceCapabilities.performanceTier as PerformanceTier,
+      performance: 'low',
+      balanced: 'medium', 
+      quality: 'high',
+      maximum: 'high'
+    };
+    
+    this.currentTier = MODE_TO_TIER[mode];
+    this.currentTierSettings = this.tierSettings[this.currentTier];
   }
 
   /**

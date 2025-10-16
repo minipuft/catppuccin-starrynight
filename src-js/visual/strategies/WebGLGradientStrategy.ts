@@ -29,8 +29,8 @@ import {
 } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import {
@@ -1802,7 +1802,7 @@ export class WebGLGradientStrategy implements IColorProcessor, IManagedSystem, W
         console.warn(
           "[WebGLGradientStrategy] Shared OKLAB processor unavailable during config update"
         );
-        OKLABProcessorSingleton.ensureAvailability(
+        OKLABProcessorFactory.ensureAvailability(
           "standard",
           "WebGLGradientStrategy.updateConfig"
         );

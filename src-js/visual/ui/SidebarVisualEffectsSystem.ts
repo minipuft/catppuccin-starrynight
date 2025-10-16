@@ -7,6 +7,7 @@ import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordi
 import { sample as sampleNoise } from "@/utils/graphics/NoiseField";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
+import type { MusicAnalysisProfile } from "@/types/genre";
 
 // Type definitions
 interface PerformanceMetrics {
@@ -485,11 +486,27 @@ export class SidebarVisualEffectsSystem extends ServiceVisualSystemBase {
 
   private _updateSidebarVariables(processedMusicData: any = {}) {
     if (!this.rootNavBar) return;
-    const {
-      visualIntensity = 0.5,
-      moodIdentifier = "neutral",
-      energyLevel = "low",
-    } = processedMusicData;
+
+    const profile = processedMusicData.unifiedProfile as MusicAnalysisProfile | undefined;
+    if (!profile) {
+      // Apply safe defaults when profile unavailable
+      this.rootNavBar.classList.remove(
+        "sn-music-low-energy",
+        "sn-music-mid-energy",
+        "sn-music-high-energy"
+      );
+      this.rootNavBar.classList.add("sn-music-low-energy");
+      this.rootNavBar.setAttribute("data-mood", "neutral");
+      return;
+    }
+
+    // Classify energy level from unified profile
+    const energy = profile.visualMetrics.energy;
+    const energyLevel = energy < 0.3 ? "low" : energy < 0.6 ? "mid" : "high";
+    const moodIdentifier = profile.emotion.primary;
+    const visualIntensity = profile.visualMetrics.visualEffectsResonance;
+
+    // Apply energy class
     this.rootNavBar.classList.remove(
       "sn-music-low-energy",
       "sn-music-mid-energy",

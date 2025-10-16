@@ -1,5 +1,5 @@
 /**
- * DynamicAccentColorStrategy - Dynamic Accent Color Processing Strategy
+ * Dynamic Accent Color Processing Strategy
  *
  * Pure strategy pattern implementation for OKLAB color processing.
  * Processes album art colors with OKLAB enhancement and returns metadata to
@@ -26,10 +26,11 @@
  * @see SpicetifyColorBridge for CSS variable application
  */
 
+import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import {
-  getGlobalCSSVariableWriter,
   CSSVariableWriter,
+  getGlobalCSSVariableWriter,
 } from "@/core/css/CSSVariableWriter";
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
@@ -38,15 +39,14 @@ import type {
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import { settings } from "@/config";
 import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -443,7 +443,7 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
       });
 
       if (!sharedProcessor) {
-        OKLABProcessorSingleton.ensureAvailability(
+        OKLABProcessorFactory.ensureAvailability(
           "standard",
           "ThemeColorController.refresh"
         );

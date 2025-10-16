@@ -14,8 +14,8 @@ import { EmotionalTemperatureMapper, type EmotionalTemperatureResult } from "@/u
 import { OKLABColorProcessor, type EnhancementPreset } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import type { BeatData, MusicEmotion, VisualEffectsState } from "@/types/colorTypes";
 // NOTE: QualityLevel types imported from simplified performance system

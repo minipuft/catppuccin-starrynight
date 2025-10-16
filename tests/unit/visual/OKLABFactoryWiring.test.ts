@@ -26,7 +26,7 @@ const mockCssWriter = {
   setVariable: jest.fn(),
 };
 
-describe("OKLAB processor singleton wiring", () => {
+describe("OKLAB processor factory wiring", () => {
   beforeEach(() => {
     jest.resetModules();
     jest.clearAllMocks();
@@ -39,7 +39,7 @@ describe("OKLAB processor singleton wiring", () => {
     jest.restoreAllMocks();
   });
 
-  async function setupSingletonMocks() {
+  async function setupFactoryMocks() {
     const deviceModule = await import("@/core/performance/DeviceCapabilityDetector");
     const mockCapabilities = {
       overall: "high" as const,
@@ -59,20 +59,20 @@ describe("OKLAB processor singleton wiring", () => {
           }) as unknown as InstanceType<typeof deviceModule.DeviceCapabilityDetector>
       );
 
-    const singletonModule = await import("@/utils/color/OKLABProcessorSingleton");
+    const factoryModule = await import("@/utils/color/OKLABProcessorFactory");
     const getStandardSpy = jest
-      .spyOn(singletonModule, "getStandardOKLABProcessor")
+      .spyOn(factoryModule, "getStandardOKLABProcessor")
       .mockReturnValue(mockProcessor as any);
 
     jest
-      .spyOn(singletonModule, "getMusicalOKLABProcessor")
+      .spyOn(factoryModule, "getMusicalOKLABProcessor")
       .mockReturnValue(mockMusicalProcessor as any);
 
     return { getStandardSpy };
   }
 
   it("requests the shared processor once when ThemeColorController initializes", async () => {
-    const { getStandardSpy } = await setupSingletonMocks();
+    const { getStandardSpy } = await setupFactoryMocks();
 
     const { DynamicAccentColorStrategy } = await import(
       "@/visual/color/ThemeColorController"
@@ -83,8 +83,8 @@ describe("OKLAB processor singleton wiring", () => {
     expect(getStandardSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("avoids redundant singleton requests during gradient processing", async () => {
-    const { getStandardSpy } = await setupSingletonMocks();
+  it("avoids redundant factory requests during gradient processing", async () => {
+    const { getStandardSpy } = await setupFactoryMocks();
 
     const { DynamicGradientStrategy } = await import(
       "@/visual/strategies/DynamicGradientStrategy"

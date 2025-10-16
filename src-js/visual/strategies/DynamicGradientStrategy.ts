@@ -26,8 +26,8 @@ import {
 } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import * as Utils from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { ServiceContainer } from "@/core/services/SystemServices";
@@ -712,7 +712,7 @@ export class DynamicGradientStrategy
         }
 
         if (oklabGradientStops.length > 0) {
-          OKLABProcessorSingleton.reportCacheFootprint(
+          OKLABProcessorFactory.reportCacheFootprint(
             "DynamicGradientStrategy.gradientStops",
             oklabGradientStops.length,
             {
@@ -1448,7 +1448,7 @@ export class DynamicGradientStrategy
     // Clear caches
     this.oklabCache.clear();
     this.gradientCache.clear();
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "DynamicGradientStrategy.gradientStops",
       0,
       { reason: "destroy" }
@@ -1507,7 +1507,7 @@ export class DynamicGradientStrategy
       });
 
       if (!sharedProcessor) {
-        OKLABProcessorSingleton.ensureAvailability(
+        OKLABProcessorFactory.ensureAvailability(
           "standard",
           "DynamicGradientStrategy.refresh"
         );

@@ -26,8 +26,8 @@ import {
 } from "./OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "./OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "./OKLABProcessorFactory";
 import { GenreType } from "@/types/genre";
 
 export interface MusicalColorContext {
@@ -581,7 +581,7 @@ export class MusicalOKLABProcessor {
     }
 
     this.coordinationCache.set(cacheKey, result);
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "MusicalOKLABProcessor.coordinationCache",
       this.coordinationCache.size,
       { accent: result.accentHex, type: "musical" }
@@ -590,7 +590,7 @@ export class MusicalOKLABProcessor {
     // Set cache timeout
     setTimeout(() => {
       this.coordinationCache.delete(cacheKey);
-      OKLABProcessorSingleton.reportCacheFootprint(
+      OKLABProcessorFactory.reportCacheFootprint(
         "MusicalOKLABProcessor.coordinationCache",
         this.coordinationCache.size,
         { reason: "ttl" }
@@ -636,7 +636,7 @@ export class MusicalOKLABProcessor {
    */
   public clearProcessingCache(): void {
     this.coordinationCache.clear();
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "MusicalOKLABProcessor.coordinationCache",
       0,
       { reason: "manual-clear" }

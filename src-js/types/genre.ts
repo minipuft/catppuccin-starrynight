@@ -125,47 +125,17 @@ export interface GenreVisualStyle {
 }
 
 /**
- * Unified genre profile - combines audio behavior, color science, and visual styling
- * This interface consolidates GenreProfileManager and GenreGradientEvolution data
- */
-export interface GenreProfile {
-  // Audio behavior modifiers (from GenreProfileManager)
-  energyBoost?: number;
-  beatEmphasis?: number;
-  precision?: number;
-  intensityMultiplier?: number;
-  dynamicRange?: number;
-  grooveFactor?: number;
-  tempoMultiplier?: number;
-  adaptiveVariation?: boolean;
-  complexity?: number;
-  smoothingFactor?: number;
-  gentleMode?: boolean;
-  tempoVariationHandling?: 'adaptive' | string;
-  subtleMode?: boolean;
-  intensityReduction?: number;
-  balanced?: boolean;
-
-  // OKLAB color science integration
-  oklabPreset?: string;
-  colorCharacteristics?: GenreColorCharacteristics;
-
-  // Audio characteristics (from GenreGradientEvolution)
-  characteristics?: GenreCharacteristics;
-
-  // Visual styling (from GenreGradientEvolution)
-  visualStyle?: GenreVisualStyle;
-}
-
-/**
  * Genre detection result with confidence and metadata
+ *
+ * Phase 2 Migration: Now uses MusicAnalysisProfile as the unified profile type.
+ * - `characteristics` removed (available via `profile.characteristics`)
+ * - `oklabPreset` removed (derivable from `profile.emotion.primary`)
+ * - `confidence` and `timestamp` preserved at top level for backwards compatibility
  */
 export interface GenreDetectionResult {
   genre: GenreType;
   confidence: number;              // 0-1 detection confidence
-  characteristics: GenreCharacteristics;
-  profile: GenreProfile;
-  oklabPreset?: EnhancementPreset;
+  profile: MusicAnalysisProfile;   // ✅ Unified profile (was GenreProfile)
   timestamp: number;
 }
 
@@ -255,4 +225,66 @@ export interface GenreCoreParameters {
    * Emotional expression breadth
    */
   emotionalRange: 'narrow' | 'moderate' | 'wide' | 'extreme';
+}
+
+// ================================
+// Phase 4 – Unified Emotion + Genre Model
+// ================================
+
+export type EmotionType =
+  | 'calm'
+  | 'melancholy'
+  | 'energetic'
+  | 'aggressive'
+  | 'happy'
+  | 'romantic'
+  | 'mysterious'
+  | 'epic'
+  | 'ambient';
+
+export interface MusicAnalysisProfile {
+  // Metadata
+  timestamp: number;
+  trackId?: string;
+  confidence: number;
+
+  // Genre
+  genre: GenreType;
+  characteristics: GenreCharacteristics;
+  visualStyle: GenreVisualStyle;
+
+  // Emotion
+  emotion: {
+    primary: EmotionType;
+    intensity: number; // 0-1
+    confidence: number; // 0-1
+    valence: number; // 0-1
+    arousal: number; // 0-1 (maps from energy)
+    mood: string;
+    temperatureK: number; // Kelvin
+  };
+
+  // Unified visual metrics
+  colorTemperature: number; // Kelvin (alias for emotion.temperatureK)
+  visualMetrics: {
+    smoothFlow: number; // 0-1
+    cinematicDepth: number; // 0-1
+    visualEffectsResonance: number; // 0-1
+    energy: number; // 0-1
+    danceability: number; // 0-1
+  };
+
+  // Raw features for advanced consumers (optional values)
+  rawFeatures: {
+    tempo?: number;
+    key?: number;
+    mode?: number;
+    loudness?: number;
+    danceability?: number;
+    energy?: number;
+    valence?: number;
+    acousticness?: number;
+    instrumentalness?: number;
+    speechiness?: number;
+  };
 }

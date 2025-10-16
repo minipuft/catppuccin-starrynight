@@ -18,8 +18,8 @@ import { OKLABColorProcessor } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
   getMusicalOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 
 export interface ValidationResult {
   isValid: boolean;

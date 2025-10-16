@@ -136,6 +136,33 @@ async function createSettingsSection(): Promise<SettingsSection> {
     return DefaultServiceFactory.getServices().themeLifecycle || null;
   }
 
+  // Get override information from PerformanceModeService EARLY (needed by getSettingLabelWithOverride)
+  let hasOverrides = false;
+  let overriddenSettings: string[] = [];
+  let deviceDetection: any = null;
+
+  try {
+    const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+    const performanceModeService = getPerformanceModeService();
+
+    if (performanceModeService) {
+      const overrides = performanceModeService.getOverrides();
+      hasOverrides = overrides.hasOverrides;
+      overriddenSettings = Array.from(overrides.overriddenSettings);
+      deviceDetection = performanceModeService.detectOptimalMode();
+    }
+  } catch (error) {
+    console.warn("[StarryNight] Could not load PerformanceModeService for override indicators:", error);
+  }
+
+  // Helper function to check if a setting is overridden and add appropriate indicator
+  const getSettingLabelWithOverride = (baseLabel: string, settingKey: string) => {
+    if (hasOverrides && overriddenSettings.includes(settingKey)) {
+      return `${baseLabel} 🔧 (overridden)`;
+    }
+    return `${baseLabel} ✓ (from preset)`;
+  };
+
   // --- Accent colour ---
   const accentOptions = [
     "dynamic",
@@ -168,15 +195,30 @@ async function createSettingsSection(): Promise<SettingsSection> {
 
   section.addDropDown(
     "sn-gradient-intensity",
-    "Background effects intensity (stars, nebula, flow gradients)",
+    getSettingLabelWithOverride("Background effects intensity (stars, nebula, flow gradients)", "sn-gradient-intensity"),
     intensityOptions as unknown as string[],
     Math.max(0, intensityOptions.indexOf(currentGradient as any)),
     undefined,
     {
-      onChange: (e: any) => {
-        const idx = e?.currentTarget?.selectedIndex ?? 0;
-        const newGrad = intensityOptions[idx] ?? "balanced";
-        applyStarryNightSettings(newGrad as any, newGrad as any);
+      onChange: async (e: any) => {
+        try {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const newGrad = intensityOptions[idx] ?? "balanced";
+          
+          // Use PerformanceModeService to track override
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            await performanceModeService.overrideSetting("sn-gradient-intensity", newGrad);
+          } else {
+            settings.set("sn-gradient-intensity", newGrad);
+          }
+          
+          applyStarryNightSettings(newGrad as any, newGrad as any);
+        } catch (err) {
+          console.error("[StarryNight] Failed to update gradient intensity", err);
+        }
       },
     }
   );
@@ -248,10 +290,32 @@ async function createSettingsSection(): Promise<SettingsSection> {
 
   section.addDropDown(
     "sn-glassmorphism-level",
-    "Glassmorphism",
+    getSettingLabelWithOverride("Glassmorphism (glass-like transparency effects)", "sn-glassmorphism-level"),
     glassOptions as unknown as string[],
     Math.max(0, glassOptions.indexOf(currentGlass as any)),
-    undefined
+    undefined,
+    {
+      onChange: async (e: any) => {
+        try {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const val = glassOptions[idx] ?? "moderate";
+          
+          // Use PerformanceModeService to track override
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            await performanceModeService.overrideSetting("sn-glassmorphism-level", val);
+          } else {
+            settings.set("sn-glassmorphism-level", val);
+          }
+          
+          console.log(`[StarryNight] Glassmorphism level changed to: ${val}`);
+        } catch (err) {
+          console.error("[StarryNight] Failed to update glassmorphism level", err);
+        }
+      },
+    }
   );
 
   // --- Artistic mode ---
@@ -297,7 +361,7 @@ async function createSettingsSection(): Promise<SettingsSection> {
     currentEvolution
   );
 
-  // --- Performance Mode ---
+  // --- Performance Mode (Enhanced with Override Indicators) ---
   const performanceModes = ["auto", "performance", "balanced", "quality", "maximum"] as const;
   const performanceModeLabels = [
     "Auto (detect device capabilities - recommended)",
@@ -310,9 +374,25 @@ async function createSettingsSection(): Promise<SettingsSection> {
   const currentPerformanceMode = settings.get("sn-performance-mode") || "auto";
   const currentModeIndex = Math.max(0, performanceModes.indexOf(currentPerformanceMode as any));
 
+  // Enhanced performance mode description with override status
+  const getPerformanceModeDescription = () => {
+    let baseDescription = "Master performance mode (controls all quality settings below)";
+    
+    if (hasOverrides) {
+      baseDescription += ` ⚠️ ${overriddenSettings.length} custom overrides active`;
+    }
+    
+    if (deviceDetection) {
+      baseDescription += `\n📱 Current: ${deviceDetection.deviceCapabilities.memoryGB}GB RAM, ${deviceDetection.deviceCapabilities.cpuCores} cores`;
+      baseDescription += `\n🎯 Recommended: ${deviceDetection.recommendedMode}`;
+    }
+    
+    return baseDescription;
+  };
+
   section.addDropDown(
     "sn-performance-mode",
-    "Performance mode (controls WebGL, animations, and effects quality)",
+    getPerformanceModeDescription(),
     performanceModes as unknown as string[],
     currentModeIndex,
     undefined,
@@ -321,7 +401,35 @@ async function createSettingsSection(): Promise<SettingsSection> {
         try {
           const idx = e?.currentTarget?.selectedIndex ?? 0;
           const mode = performanceModes[idx] ?? "auto";
-          console.log(`[StarryNight] Performance mode changed to: ${mode} - ${performanceModeLabels[idx]}`);
+          
+          // Use PerformanceModeService for unified performance management
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            // Check if we need to confirm due to existing overrides
+            if (hasOverrides) {
+              const shouldProceed = confirm(
+                `You have ${overriddenSettings.length} custom performance settings.\n\n` +
+                `Changing performance mode to "${mode}" will reset these settings to the preset values.\n\n` +
+                `Overridden settings:\n${overriddenSettings.map(s => `• ${s}`).join('\n')}\n\n` +
+                `Do you want to proceed?`
+              );
+              
+              if (!shouldProceed) {
+                // Revert the dropdown selection
+                e.currentTarget.selectedIndex = currentModeIndex;
+                return;
+              }
+            }
+            
+            await performanceModeService.applyPerformanceMode(mode);
+            console.log(`[StarryNight] Performance mode changed to: ${mode} - ${performanceModeLabels[idx]}`);
+          } else {
+            // Fallback to basic mode change
+            settings.set("sn-performance-mode", mode);
+            console.log(`[StarryNight] Performance mode changed to: ${mode} (fallback mode)`);
+          }
         } catch (err) {
           console.error("[StarryNight] Failed to update performance mode", err);
         }
@@ -329,6 +437,34 @@ async function createSettingsSection(): Promise<SettingsSection> {
     },
     performanceModeLabels as unknown as string[]
   );
+
+  // Add "Reset to Preset" button if overrides exist
+  if (hasOverrides) {
+    section.addButton(
+      "reset-performance-preset",
+      `🔄 Reset All to ${currentPerformanceMode} Preset`,
+      async () => {
+        try {
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            await performanceModeService.resetToPreset();
+            console.log(`[StarryNight] Reset all performance settings to ${currentPerformanceMode} preset`);
+            
+            // Force UI refresh
+            section.setRerender?.((prev: number) => prev + 1);
+          }
+        } catch (err) {
+          console.error("[StarryNight] Failed to reset performance preset", err);
+        }
+      }
+    );
+  }
+
+  // --- Advanced Performance Settings Section ---
+  // Add a separator and section header for advanced settings
+  section.addSeparator();
 
   // --- Corridor effects ---
   const corridorOptions = ["auto", "enabled", "disabled"] as const;
@@ -341,16 +477,31 @@ async function createSettingsSection(): Promise<SettingsSection> {
 
   section.addDropDown(
     "sn-corridor-effects-mode",
-    "Corridor effects (3D tunnel/depth effects)",
+    getSettingLabelWithOverride("Corridor effects (3D tunnel/depth effects)", "sn-corridor-effects-mode"),
     corridorOptions as unknown as string[],
     Math.max(0, corridorOptions.indexOf(currentCorridor as any)),
     undefined,
     {
-      onChange: (e: any) => {
-        const idx = e?.currentTarget?.selectedIndex ?? 0;
-        const val = corridorOptions[idx] ?? "auto";
-        void getThemeService()?.applyInitialSettings();
-        console.log(`[StarryNight] Corridor effects mode changed to: ${val}`);
+      onChange: async (e: any) => {
+        try {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const val = corridorOptions[idx] ?? "auto";
+          
+          // Use PerformanceModeService to track override
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            await performanceModeService.overrideSetting("sn-corridor-effects-mode", val);
+          } else {
+            settings.set("sn-corridor-effects-mode", val);
+          }
+          
+          void getThemeService()?.applyInitialSettings();
+          console.log(`[StarryNight] Corridor effects mode changed to: ${val}`);
+        } catch (err) {
+          console.error("[StarryNight] Failed to update corridor effects mode", err);
+        }
       },
     },
     corridorLabels as unknown as string[]
@@ -369,16 +520,31 @@ async function createSettingsSection(): Promise<SettingsSection> {
 
   section.addDropDown(
     "sn-rendering-mode",
-    "Rendering mode (advanced: manual quality override)",
+    getSettingLabelWithOverride("Rendering mode (advanced: manual quality override)", "sn-rendering-mode"),
     renderingOptions as unknown as string[],
     Math.max(0, renderingOptions.indexOf(currentRendering as any)),
     undefined,
     {
-      onChange: (e: any) => {
-        const idx = e?.currentTarget?.selectedIndex ?? 0;
-        const val = renderingOptions[idx] ?? "auto";
-        void getThemeService()?.applyInitialSettings();
-        console.log(`[StarryNight] Rendering mode changed to: ${val}`);
+      onChange: async (e: any) => {
+        try {
+          const idx = e?.currentTarget?.selectedIndex ?? 0;
+          const val = renderingOptions[idx] ?? "auto";
+          
+          // Use PerformanceModeService to track override
+          const { getPerformanceModeService } = await import("@/core/performance/PerformanceModeService");
+          const performanceModeService = getPerformanceModeService();
+          
+          if (performanceModeService) {
+            await performanceModeService.overrideSetting("sn-rendering-mode", val);
+          } else {
+            settings.set("sn-rendering-mode", val);
+          }
+          
+          void getThemeService()?.applyInitialSettings();
+          console.log(`[StarryNight] Rendering mode changed to: ${val}`);
+        } catch (err) {
+          console.error("[StarryNight] Failed to update rendering mode", err);
+        }
       },
     },
     renderingLabels as unknown as string[]

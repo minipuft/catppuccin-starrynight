@@ -61,7 +61,7 @@ function cloneMetrics(metrics: OKLABSingletonMetrics) {
   };
 }
 
-export class OKLABProcessorSingleton {
+export class OKLABProcessorFactory {
   private static standardInstance: OKLABColorProcessor | null = null;
   private static musicalInstance: MusicalOKLABProcessor | null = null;
   private static metrics: OKLABSingletonMetrics = {
@@ -78,30 +78,30 @@ export class OKLABProcessorSingleton {
   public static getStandardOKLABProcessor(
     options: RequestOptions = {}
   ): OKLABColorProcessor {
-    if (!OKLABProcessorSingleton.standardInstance) {
-      OKLABProcessorSingleton.standardInstance = new OKLABColorProcessor(
+    if (!OKLABProcessorFactory.standardInstance) {
+      OKLABProcessorFactory.standardInstance = new OKLABColorProcessor(
         options.enableDebug ?? ADVANCED_SYSTEM_CONFIG.enableDebug
       );
-      OKLABProcessorSingleton.metrics.instances.standard = true;
+      OKLABProcessorFactory.metrics.instances.standard = true;
     }
 
-    OKLABProcessorSingleton.registerRequest("standard", options);
-    return OKLABProcessorSingleton.standardInstance;
+    OKLABProcessorFactory.registerRequest("standard", options);
+    return OKLABProcessorFactory.standardInstance;
   }
 
   public static getMusicalOKLABProcessor(
     options: RequestOptions = {}
   ): MusicalOKLABProcessor {
-    if (!OKLABProcessorSingleton.musicalInstance) {
+    if (!OKLABProcessorFactory.musicalInstance) {
       const MusicalCtor = resolveMusicalProcessorCtor();
-      OKLABProcessorSingleton.musicalInstance = new MusicalCtor(
+      OKLABProcessorFactory.musicalInstance = new MusicalCtor(
         options.enableDebug ?? ADVANCED_SYSTEM_CONFIG.enableDebug
       );
-      OKLABProcessorSingleton.metrics.instances.musical = true;
+      OKLABProcessorFactory.metrics.instances.musical = true;
     }
 
-    OKLABProcessorSingleton.registerRequest("musical", options);
-    return OKLABProcessorSingleton.musicalInstance;
+    OKLABProcessorFactory.registerRequest("musical", options);
+    return OKLABProcessorFactory.musicalInstance;
   }
 
   public static reportCacheFootprint(
@@ -119,33 +119,33 @@ export class OKLABProcessorSingleton {
       cacheMetrics.metadata = metadata;
     }
 
-    OKLABProcessorSingleton.metrics.cacheFootprint.set(name, cacheMetrics);
+    OKLABProcessorFactory.metrics.cacheFootprint.set(name, cacheMetrics);
   }
 
   public static getProcessingMetrics() {
-    return cloneMetrics(OKLABProcessorSingleton.metrics);
+    return cloneMetrics(OKLABProcessorFactory.metrics);
   }
 
   public static getMemoryStats() {
     return {
-      standardInstances: OKLABProcessorSingleton.standardInstance ? 1 : 0,
-      musicalInstances: OKLABProcessorSingleton.musicalInstance ? 1 : 0,
-      trackedCaches: OKLABProcessorSingleton.metrics.cacheFootprint.size,
+      standardInstances: OKLABProcessorFactory.standardInstance ? 1 : 0,
+      musicalInstances: OKLABProcessorFactory.musicalInstance ? 1 : 0,
+      trackedCaches: OKLABProcessorFactory.metrics.cacheFootprint.size,
     };
   }
 
   public static ensureAvailability(kind: ProcessorKind, requester?: string): boolean {
     const instance =
       kind === "standard"
-        ? OKLABProcessorSingleton.standardInstance
-        : OKLABProcessorSingleton.musicalInstance;
+        ? OKLABProcessorFactory.standardInstance
+        : OKLABProcessorFactory.musicalInstance;
 
     if (!instance) {
       const message =
         kind === "standard"
-          ? "Standard OKLABColorProcessor singleton has not been initialized"
-          : "Musical OKLABColorProcessor singleton has not been initialized";
-      console.warn(`[OKLABProcessorSingleton] ${message}`, {
+          ? "Standard OKLABColorProcessor has not been initialized"
+          : "Musical OKLABColorProcessor has not been initialized";
+      console.warn(`[OKLABProcessorFactory] ${message}`, {
         requester,
       });
       return false;
@@ -155,9 +155,9 @@ export class OKLABProcessorSingleton {
   }
 
   public static resetForTests(): void {
-    OKLABProcessorSingleton.standardInstance = null;
-    OKLABProcessorSingleton.musicalInstance = null;
-    OKLABProcessorSingleton.metrics = {
+    OKLABProcessorFactory.standardInstance = null;
+    OKLABProcessorFactory.musicalInstance = null;
+    OKLABProcessorFactory.metrics = {
       totalRequests: 0,
       perRequester: new Map(),
       recentRequests: [],
@@ -176,20 +176,20 @@ export class OKLABProcessorSingleton {
     const requester = options.requester ?? "unknown";
     const timestamp = Date.now();
 
-    OKLABProcessorSingleton.metrics.totalRequests += 1;
-    OKLABProcessorSingleton.metrics.perRequester.set(
+    OKLABProcessorFactory.metrics.totalRequests += 1;
+    OKLABProcessorFactory.metrics.perRequester.set(
       requester,
-      (OKLABProcessorSingleton.metrics.perRequester.get(requester) ?? 0) + 1
+      (OKLABProcessorFactory.metrics.perRequester.get(requester) ?? 0) + 1
     );
 
-    OKLABProcessorSingleton.metrics.recentRequests.unshift({
+    OKLABProcessorFactory.metrics.recentRequests.unshift({
       requester,
       kind,
       timestamp,
     });
 
-    if (OKLABProcessorSingleton.metrics.recentRequests.length > MAX_RECENT_REQUESTS) {
-      OKLABProcessorSingleton.metrics.recentRequests.length = MAX_RECENT_REQUESTS;
+    if (OKLABProcessorFactory.metrics.recentRequests.length > MAX_RECENT_REQUESTS) {
+      OKLABProcessorFactory.metrics.recentRequests.length = MAX_RECENT_REQUESTS;
     }
 
     const shouldDebugLog =
@@ -197,14 +197,14 @@ export class OKLABProcessorSingleton {
 
     if (shouldDebugLog) {
       Y3KDebug?.debug?.log(
-        "OKLABProcessorSingleton",
-        `Singleton request registered for ${kind} processor`,
+        "OKLABProcessorFactory",
+        `Factory request registered for ${kind} processor`,
         {
           requester,
           reason: options.reason,
           metrics: {
-            totalRequests: OKLABProcessorSingleton.metrics.totalRequests,
-            cacheFootprint: OKLABProcessorSingleton.metrics.cacheFootprint.size,
+            totalRequests: OKLABProcessorFactory.metrics.totalRequests,
+            cacheFootprint: OKLABProcessorFactory.metrics.cacheFootprint.size,
           },
         }
       );
@@ -212,9 +212,9 @@ export class OKLABProcessorSingleton {
   }
 }
 
-export const getStandardOKLABProcessor = OKLABProcessorSingleton.getStandardOKLABProcessor.bind(
-  OKLABProcessorSingleton
+export const getStandardOKLABProcessor = OKLABProcessorFactory.getStandardOKLABProcessor.bind(
+  OKLABProcessorFactory
 );
-export const getMusicalOKLABProcessor = OKLABProcessorSingleton.getMusicalOKLABProcessor.bind(
-  OKLABProcessorSingleton
+export const getMusicalOKLABProcessor = OKLABProcessorFactory.getMusicalOKLABProcessor.bind(
+  OKLABProcessorFactory
 );

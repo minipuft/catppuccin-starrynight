@@ -47,12 +47,7 @@ import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
 import { globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
-import {
-  MusicEmotionAnalyzer,
-  type AudioData,
-  type AudioFeatures,
-  type EmotionalState,
-} from "@/visual/music/integration/MusicEmotionAnalyzer";
+import type { MusicAnalysisProfile, EmotionType } from "@/types/genre";
 // TODO: Phase 4 - Import WebGL and Worker support for performance
 
 // Type definitions for color structures
@@ -197,8 +192,8 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   private animationEngine: AnimationFrameCoordinator | null = null;
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
   private oklabProcessor: OKLABUtilityProcessor; // Utility processor for OKLAB color operations
-  private musicEmotionAnalyzer: MusicEmotionAnalyzer;
   private genreProfileManager: GenreProfileManager;
+  private genreUnsubscribe: (() => void) | null = null;
 
   // Enhanced OKLAB processing state
   private oklabState: {
@@ -212,8 +207,8 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
   // Musical emotion state for audio-responsive color processing
   private emotionalState: {
-    currentEmotion: EmotionalState | null;
-    emotionHistory: EmotionalState[];
+    currentEmotion: UnifiedEmotionContext | null;
+    emotionHistory: UnifiedEmotionContext[];
     lastEmotionUpdate: number;
     emotionInfluenceIntensity: number; // 0-1 how much emotion affects colors
   };
@@ -478,15 +473,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     // Initialize OKLAB processor for advanced color science
     this.oklabProcessor = new OKLABUtilityProcessor(this.config.enableDebug);
 
-    // Initialize music emotion analyzer for audio-responsive color processing
-    this.musicEmotionAnalyzer = new MusicEmotionAnalyzer({
-      emotionSensitivity: 0.7,
-      confidenceThreshold: 0.6,
-      visualEffectsAwareness: true,
-      smoothFlowDetection: true,
-      cinematicAnalysis: true,
-      analysisInterval: 500, // 2Hz analysis rate
-    });
+    // MusicEmotionAnalyzer removed (Phase 4). Use unified profile via GenreService/MusicSyncService.
 
     // Initialize GenreProfileManager for genre detection and characteristics
     this.genreProfileManager = new GenreProfileManager();
@@ -764,23 +751,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       );
     }
 
-    try {
-      await this.musicEmotionAnalyzer.initialize();
-      this.musicEmotionAnalyzer.onEmotionUpdate((emotion: EmotionalState) => {
-        this.handleEmotionUpdate(emotion);
-      });
-
-      if (this.config.enableDebug) {
-        console.log(
-          "🎭 [ColorHarmonyEngine] MusicEmotionAnalyzer initialized with audioAnalysis awareness"
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "🎭 [ColorHarmonyEngine] Failed to initialize MusicEmotionAnalyzer:",
-        error
-      );
-    }
+    // Phase 4: Emotion updates arrive via unified MusicAnalysisProfile; no analyzer init
 
     if (this.eventService) {
       this.eventService.subscribeToDOM(
@@ -827,6 +798,34 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
       });
     }
 
+    // Phase 3.1: Subscribe to GenreService updates if available
+    try {
+      const genreProvider = this.genreService;
+      if (genreProvider && typeof genreProvider.subscribe === "function") {
+        this.genreUnsubscribe = genreProvider.subscribe((result) => {
+          try {
+            this.genreState.currentGenre = result.genre;
+            this.genreState.genreConfidence = result.confidence;
+            this.genreState.lastGenreUpdate = Date.now();
+            this.genreState.genreHistory.unshift({
+              genre: result.genre,
+              confidence: result.confidence,
+              timestamp: this.genreState.lastGenreUpdate,
+            });
+            if (this.genreState.genreHistory.length > 10) {
+              this.genreState.genreHistory = this.genreState.genreHistory.slice(0, 10);
+            }
+          } catch (e) {
+            console.warn("[ColorHarmonyEngine] Genre subscription update failed", e);
+          }
+        });
+      }
+    } catch (e) {
+      if (this.config.enableDebug) {
+        console.warn("[ColorHarmonyEngine] Failed to subscribe to GenreService", e);
+      }
+    }
+
     if (this.evolutionEnabled) {
       this._startEvolutionLoop();
     }
@@ -842,7 +841,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    * Handle emotion updates from MusicEmotionAnalyzer
    * Updates emotional state and triggers audioAnalysis-aware color processing
    */
-  private handleEmotionUpdate(emotion: EmotionalState): void {
+  private handleEmotionUpdate(emotion: UnifiedEmotionContext): void {
     if (!this.initialized) return;
 
     try {
@@ -859,12 +858,37 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
       // Emit emotion event for other systems (like GradientConductor)
       unifiedEventBus.emit("music:emotion-analyzed", {
-        emotion,
+        emotion: {
+          primary: emotion.primary,
+          secondary: [],
+          intensity: emotion.intensity,
+          confidence: emotion.confidence,
+          valence: emotion.valence,
+          arousal: emotion.arousal,
+          dominance: 0.5,
+          colorTemperature: emotion.colorTemperature,
+          timestamp: emotion.timestamp,
+          duration: 0,
+          musicalCharacteristics: {
+            tempo: 120,
+            key: 0,
+            mode: 1,
+            timeSignature: 4,
+            energy: emotion.arousal,
+            danceability: 0.5,
+            acousticness: 0.5,
+            instrumentalness: 0.5,
+            liveness: 0.5,
+            speechiness: 0.1,
+            smoothFlow: emotion.smoothFlow,
+            cinematicDepth: emotion.cinematicDepth,
+            visualEffectsResonance: emotion.visualEffectsResonance,
+          },
+        },
         colorTemperature: emotion.colorTemperature,
-        visualEffectsLevel:
-          emotion.musicalCharacteristics.visualEffectsResonance,
-        smoothFlow: emotion.musicalCharacteristics.smoothFlow,
-        cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
+        visualEffectsLevel: emotion.visualEffectsResonance,
+        smoothFlow: emotion.smoothFlow,
+        cinematicDepth: emotion.cinematicDepth,
         timestamp: emotion.timestamp,
       });
 
@@ -891,7 +915,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   /**
    * Trigger color update based on emotional state
    */
-  private triggerEmotionalColorUpdate(emotion: EmotionalState): void {
+  private triggerEmotionalColorUpdate(emotion: UnifiedEmotionContext): void {
     // Only trigger if emotion influence is enabled and confidence is high enough
     if (
       this.emotionalState.emotionInfluenceIntensity > 0 &&
@@ -913,7 +937,7 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    * Refresh palette with emotional influence
    */
   private async refreshPaletteWithEmotion(
-    emotion: EmotionalState
+    emotion: UnifiedEmotionContext
   ): Promise<void> {
     try {
       // Create emotional color context based on current emotion
@@ -923,11 +947,10 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
         colorTemperature: emotion.colorTemperature,
         valence: emotion.valence,
         arousal: emotion.arousal,
-        dominance: emotion.dominance,
-        smoothFlow: emotion.musicalCharacteristics.smoothFlow,
-        cinematicDepth: emotion.musicalCharacteristics.cinematicDepth,
-        visualEffectsResonance:
-          emotion.musicalCharacteristics.visualEffectsResonance,
+        dominance: 0.5,
+        smoothFlow: emotion.smoothFlow,
+        cinematicDepth: emotion.cinematicDepth,
+        visualEffectsResonance: emotion.visualEffectsResonance,
       };
 
       // Emit emotional color context for other systems
@@ -1609,20 +1632,20 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
     // Preserve previous boost behaviour
     const artisticMode = this.config?.artisticMode ?? "artist-vision";
-    const animationMultipliers =
-      this.animationEngine?.getCurrentMultipliers?.() || undefined;
+    const currentMultipliers =
+      this.config?.getCurrentMultipliers?.() || undefined;
 
-    const shouldUseEmergent =
-      (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") && !!animationMultipliers;
+    const shouldUseEnhanced =
+      (artisticMode === "advanced-maximum" || artisticMode === "cosmic-maximum") && !!currentMultipliers;
 
-    const validMultipliers: any = animationMultipliers || {};
+    const validMultipliers: any = currentMultipliers || {};
 
-    const saturationBoostFactor = shouldUseEmergent
+    const saturationBoostFactor = shouldUseEnhanced
       ? (validMultipliers.visualIntensityBase || 1) * 1.25 // Align with previous behaviour
       : this.vibrancyConfig.artisticSaturationBoost;
 
-    const luminanceBoostFactor = shouldUseEmergent
-      ? (validMultipliers.aestheticGravityStrength || 1) * 1.15
+    const luminanceBoostFactor = shouldUseEnhanced
+      ? (validMultipliers.interactionStrength || 1) * 1.15
       : this.vibrancyConfig.enhancedLuminanceBoost;
 
     // Minimum saturation guard (uses configured threshold)
@@ -2175,6 +2198,51 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
 
     // TODO: Phase 2 - Calculate music-aware dynamic values
     this._calculateMusicAwareDynamics(processedMusicData);
+
+    // Phase 4: Unified MusicAnalysisProfile → emotion context
+    try {
+      const unifiedProfile = processedMusicData?.unifiedProfile as MusicAnalysisProfile | undefined;
+      if (unifiedProfile) {
+        const ctx: UnifiedEmotionContext = {
+          primary: unifiedProfile.emotion.primary as EmotionType | string,
+          intensity: unifiedProfile.emotion.intensity,
+          confidence: unifiedProfile.emotion.confidence,
+          valence: unifiedProfile.emotion.valence,
+          arousal: unifiedProfile.emotion.arousal,
+          colorTemperature: unifiedProfile.colorTemperature,
+          smoothFlow: unifiedProfile.visualMetrics.smoothFlow,
+          cinematicDepth: unifiedProfile.visualMetrics.cinematicDepth,
+          visualEffectsResonance: unifiedProfile.visualMetrics.visualEffectsResonance,
+          timestamp: unifiedProfile.timestamp,
+        };
+        this.handleEmotionUpdate(ctx);
+      } else if (this.emotionalTemperatureMapper) {
+        const fallback = this.emotionalTemperatureMapper.mapMusicToEmotionalTemperature({
+          energy: processedMusicData.energy,
+          valence: processedMusicData.valence,
+          danceability: processedMusicData.estimatedDanceability,
+          tempo: processedMusicData.enhancedBPM,
+          genre: processedMusicData.genre,
+        });
+        const ctx: UnifiedEmotionContext = {
+          primary: fallback.primaryEmotion as any,
+          intensity: fallback.intensity,
+          confidence: 0.5,
+          valence: processedMusicData.valence ?? 0.5,
+          arousal: processedMusicData.energy ?? 0.5,
+          colorTemperature: fallback.temperature,
+          smoothFlow: this.kineticState.visualMomentum ?? 0.5,
+          cinematicDepth: 0.5,
+          visualEffectsResonance: processedMusicData.visualIntensity ?? 0.5,
+          timestamp: Date.now(),
+        };
+        this.handleEmotionUpdate(ctx);
+      }
+    } catch (e) {
+      if (this.config.enableDebug) {
+        console.warn("[ColorHarmonyEngine] Unified emotion application failed", e);
+      }
+    }
   }
 
   // TODO: Phase 2 - New method for music-aware dynamic calculations
@@ -2778,42 +2846,30 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
    * Analyze music and update emotional state for audioAnalysis-aware color processing
    * This method connects the Music → Emotion → Color flow
    */
-  public async analyzeMusicEmotion(
-    audioFeatures: AudioFeatures,
-    audioData?: AudioData
-  ): Promise<EmotionalState | null> {
-    if (!this.initialized || !this.musicEmotionAnalyzer) {
-      if (this.config.enableDebug) {
-        console.warn(
-          "🎭 [ColorHarmonyEngine] Cannot analyze music emotion: not initialized"
-        );
-      }
-      return null;
-    }
+  public async analyzeMusicEmotion(audioFeatures: any, _audioData?: any): Promise<UnifiedEmotionContext | null> {
+    if (!this.initialized) return null;
 
     try {
-      // Analyze emotion using MusicEmotionAnalyzer
-      const emotion = await this.musicEmotionAnalyzer.analyzeEmotion(
-        audioFeatures,
-        audioData
-      );
-
-      if (this.config.enableDebug) {
-        console.log(
-          `🎭 [ColorHarmonyEngine] Analyzed music emotion: ${
-            emotion.primary
-          } (${emotion.intensity.toFixed(
-            2
-          )} intensity, ${emotion.confidence.toFixed(2)} confidence)`
-        );
+      const profile = await this.genreService?.getMusicAnalysisProfile?.(audioFeatures);
+      if (profile) {
+        const ctx: UnifiedEmotionContext = {
+          primary: profile.emotion.primary as EmotionType | string,
+          intensity: profile.emotion.intensity,
+          confidence: profile.emotion.confidence,
+          valence: profile.emotion.valence,
+          arousal: profile.emotion.arousal,
+          colorTemperature: profile.colorTemperature,
+          smoothFlow: profile.visualMetrics.smoothFlow,
+          cinematicDepth: profile.visualMetrics.cinematicDepth,
+          visualEffectsResonance: profile.visualMetrics.visualEffectsResonance,
+          timestamp: profile.timestamp,
+        };
+        this.handleEmotionUpdate(ctx);
+        return ctx;
       }
-
-      return emotion;
+      return null;
     } catch (error) {
-      console.error(
-        "🎭 [ColorHarmonyEngine] Error analyzing music emotion:",
-        error
-      );
+      console.error("🎭 [ColorHarmonyEngine] Unified emotion analysis failed:", error);
       return null;
     }
   }
@@ -2821,14 +2877,14 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   /**
    * Get current emotional state
    */
-  public getCurrentEmotion(): EmotionalState | null {
+  public getCurrentEmotion(): UnifiedEmotionContext | null {
     return this.emotionalState?.currentEmotion || null;
   }
 
   /**
    * Get emotion history for audioAnalysis flow analysis
    */
-  public getEmotionHistory(limit: number = 10): EmotionalState[] {
+  public getEmotionHistory(limit: number = 10): UnifiedEmotionContext[] {
     if (!this.emotionalState?.emotionHistory) return [];
     return this.emotionalState.emotionHistory.slice(-limit);
   }
@@ -3012,6 +3068,11 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
   public override _performSystemSpecificCleanup(): void {
     this._stopEvolutionLoop();
 
+    if (this.genreUnsubscribe) {
+      try { this.genreUnsubscribe(); } catch {}
+      this.genreUnsubscribe = null;
+    }
+
     if (this.eventService) {
       this.eventService.cleanupSystem(this.systemName);
     } else {
@@ -3022,7 +3083,6 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     }
 
     this.semanticColorManager?.destroy();
-    this.musicEmotionAnalyzer?.destroy();
 
     if (this.emotionalState) {
       this.emotionalState.currentEmotion = null;
@@ -3858,6 +3918,9 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
           genreData
         );
       }
+
+      // Track the currently active preset for downstream consumers/CSS diagnostics
+      this.oklabState.currentPreset = genreAdjustedPreset;
 
       // Process primary colors through OKLAB for enhanced vibrancy and perceptual uniformity
       const colorPriorities = [
@@ -5492,6 +5555,20 @@ export class OKLABColorProcessor extends ServiceSystemBase implements IManagedSy
     };
   }
 }
+
+// Phase 4: Unified emotion context bridging type
+type UnifiedEmotionContext = {
+  primary: EmotionType | string;
+  intensity: number;
+  confidence: number;
+  valence: number;
+  arousal: number;
+  colorTemperature: number;
+  smoothFlow: number;
+  cinematicDepth: number;
+  visualEffectsResonance: number;
+  timestamp: number;
+};
 
 // =============================================================================
 // BACKWARD COMPATIBILITY ALIAS

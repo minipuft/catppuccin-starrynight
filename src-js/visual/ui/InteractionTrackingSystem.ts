@@ -7,6 +7,7 @@ import { MusicSyncService } from "@/audio/MusicSyncService";
 import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
+import type { MusicAnalysisProfile } from "@/types/genre";
 
 // Type definitions - Simplified to only include actually used state
 interface NexusState {
@@ -318,22 +319,23 @@ export class InteractionTrackingSystem extends ServiceVisualSystemBase {
   }
 
   private updateNexusTargets(processedMusicData: any) {
-    const {
-      energy,
-      valence,
-      visualIntensity,
-      moodIdentifier,
-    } = processedMusicData;
+    const profile = processedMusicData.unifiedProfile as MusicAnalysisProfile | undefined;
+    if (!profile) {
+      // Apply safe defaults - nexus state should gracefully handle missing data
+      return;
+    }
 
-    // Store music data for state tracking
-    this.nexusState.lastEnergy = energy;
-    this.nexusState.lastValence = valence;
-    this.nexusState.lastVisualIntensity = visualIntensity;
-    this.nexusState.lastMoodIdentifier = moodIdentifier;
+    // Map unified profile to nexus state
+    this.nexusState.lastEnergy = profile.visualMetrics.energy;
+    this.nexusState.lastValence = profile.emotion.valence;
+    this.nexusState.lastVisualIntensity = profile.visualMetrics.visualEffectsResonance;
+    this.nexusState.lastMoodIdentifier = profile.emotion.primary;
 
     // Calculate navigation scale based on music intensity
-    this.nexusState.targetNavigationScale =
-      this.calculateOptimizedNavigationScale(visualIntensity, moodIdentifier);
+    this.nexusState.targetNavigationScale = this.calculateOptimizedNavigationScale(
+      profile.visualMetrics.visualEffectsResonance,
+      profile.emotion.primary
+    );
   }
 
   private updateDigitalMeditationState(processedMusicData: any) {
@@ -342,13 +344,17 @@ export class InteractionTrackingSystem extends ServiceVisualSystemBase {
       return;
     }
     this.lastBiometricCheckTime = now;
-    const timeSinceLastInteraction =
-      now - this.biometricState.lastUserInteractionTime;
 
+    const profile = processedMusicData.unifiedProfile as MusicAnalysisProfile | undefined;
+    if (!profile) return;
+
+    const timeSinceLastInteraction = now - this.biometricState.lastUserInteractionTime;
+
+    // Meditation detection: low energy + positive valence + no interaction
     if (
       timeSinceLastInteraction > this.biometricState.meditationGracePeriod &&
-      processedMusicData.energy < 0.3 &&
-      processedMusicData.valence > 0.6
+      profile.visualMetrics.energy < 0.3 &&
+      profile.emotion.valence > 0.6
     ) {
       this.biometricState.isMeditating = true;
       this.biometricState.targetDesaturation = 0.6;

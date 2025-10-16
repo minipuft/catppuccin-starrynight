@@ -7,6 +7,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 **Catppuccin StarryNight** is an advanced Spicetify theme that implements sophisticated visual effects and music synchronization through a modular TypeScript architecture. It creates dynamic, music-responsive interfaces with real-time audio analysis and OKLAB color science processing.
 
 ### Core Architecture
+
 - **Coordination Pattern**: ThemeLifecycleCoordinator → SystemIntegrationCoordinator → (VisualEffectsCoordinator + InfrastructureSystemCoordinator)
 - **Unified Interface**: All systems implement `IManagedSystem` for consistent lifecycle management
 - **Service Composition**: Modern systems use `SystemServiceBridge` (composition) instead of `BaseVisualSystem` (inheritance)
@@ -15,6 +16,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 - **Audio Integration**: Real-time music analysis driving visual harmonization
 
 ### Tech Stack
+
 - **Languages**: TypeScript (strict mode), SCSS, JavaScript ES6+
 - **Build**: ESBuild bundling, Jest testing, SASS compilation
 - **Build Output**:
@@ -26,6 +28,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 ## Development Commands
 
 ### Build & Test
+
 - `npm run build` - Full development build (CSS + JS with sourcemap)
 - `npm run build:dev` - Same as build (development mode)
 - `npm run build:prod` - Production build with minification and PostCSS optimization
@@ -36,6 +39,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 - `npm run build:css:prod` - Compressed SCSS with PostCSS optimization
 
 ### Testing & Validation
+
 - `npm test` - Run Jest tests
 - `npm run test:unit` - Run unit tests only
 - `npm run test:integration` - Run integration tests only
@@ -52,6 +56,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 - `npm run validate` - Complete validation (typecheck + lint + test)
 
 ### CSS Development
+
 - `npm run sass:watch` - Watch SCSS files for changes and auto-compile
 - `npm run scan-css` - Scan SCSS files for tokens and variables
 - `npm run diff-css` - Show differences between CSS token versions
@@ -62,6 +67,7 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 - `npm run build:css:advanced` - Advanced CSS optimization build
 
 ### Installation & Release
+
 - `npm run install` - Build and install theme (CI detection)
 - `npm run install:force` - Force install with mocha flavor
 - `npm run prepare:release` - Prepare files for release
@@ -69,9 +75,11 @@ This file provides guidance to Claude Code when working with the **Catppuccin St
 ## Architecture Summary
 
 ### Build Architecture
+
 The theme consists of two compilation pipelines:
 
 1. **TypeScript Pipeline** (`src-js/` → `theme.js`):
+
    - Entry point: `src-js/theme.entry.ts`
    - Bundler: ESBuild with tree-shaking
    - Output: Single bundled `theme.js` file loaded by Spicetify
@@ -86,16 +94,19 @@ The theme consists of two compilation pipelines:
 **IMPORTANT**: Changes to `src-js/**/*.ts` files require rebuilding `theme.js` to take effect. Changes to `src/**/*.scss` files require recompiling `user.css`. The compiled outputs (`theme.js` and `user.css`) are what Spicetify actually loads.
 
 ### System Entry Point
+
 **Entry Point**: `src-js/theme.entry.ts` - Main system initialization and progressive API detection
 
 ### Core System Hierarchy
 
 #### 1. Central Orchestration Layer
+
 - **`AdvancedThemeSystem`** - Central system orchestrator (Year3000System)
 - **`SystemCoordinator`** - Dependency injection and facade coordination
 - **Progressive API Detection** - Graceful degradation when Spicetify APIs unavailable
 
 #### 2. System Coordination Layer
+
 - **`SystemIntegrationCoordinator`** - Main facade coordinator managing both visual and infrastructure systems
 - **`VisualEffectsCoordinator`** - Manages visual systems (backgrounds, particles, effects, UI)
 - **`InfrastructureSystemCoordinator`** - Manages non-visual systems (performance, CSS, settings, music sync)
@@ -103,6 +114,7 @@ The theme consists of two compilation pipelines:
 - **Service composition** via `DefaultServiceFactory` providing shared services to all systems
 
 #### 3. Visual & Audio Integration Layer
+
 - **`MusicSyncService`** - Spicetify API integration with beat detection
 - **`ColorHarmonyEngine`** - OKLAB color science processing
 - **`VisualEffectsCoordinator`** - Unified visual state coordination
@@ -110,11 +122,13 @@ The theme consists of two compilation pipelines:
 - **Background Systems** - Multiple specialized visual effect controllers
 
 #### 4. Performance Optimization Layer
+
 - **`PerformanceAnalyzer`** - Real-time monitoring and quality scaling
 - **`DeviceCapabilityDetector`** - Hardware detection and optimization
 - **`OptimizedUnifiedCSSController`** - Efficient DOM updates and variable management
 
 ### Core Interface Pattern
+
 All systems implement the `IManagedSystem` interface:
 
 ```typescript
@@ -129,6 +143,7 @@ interface IManagedSystem {
 ```
 
 ### Module Path Mapping (TypeScript only)
+
 - `@/` → `src-js/` (main source directory)
 - `@/audio/*` → `src-js/audio/*` (music sync and color harmony)
 - `@/core/*` → `src-js/core/*` (system architecture and coordination)
@@ -140,6 +155,7 @@ interface IManagedSystem {
 **Note**: Path aliases only apply to TypeScript files in `src-js/`. SCSS files in `src/` use standard SCSS `@import` or `@use` statements.
 
 ### Spicetify Environment
+
 - **React/ReactDOM**: Provided by Spicetify, marked as external in ESBuild
 - **API Availability**: Progressive detection with graceful degradation
 - **Build Target**: Chromium engine (Spotify's embedded browser)
@@ -150,12 +166,14 @@ interface IManagedSystem {
 The project uses a **three-file type architecture** for optimal TypeScript performance:
 
 1. **Active Types** ([src-js/types/spicetify.d.ts](src-js/types/spicetify.d.ts)):
+
    - Minimal production types (~190 lines)
    - Only APIs actually used by the theme
    - Included in TypeScript compilation
    - Fast compilation, zero bundle impact
 
 2. **Theme Extensions** ([src-js/types/spicetify-extensions.d.ts](src-js/types/spicetify-extensions.d.ts)):
+
    - Theme-specific type augmentations
    - Custom interfaces and type guards
    - Variant and SemanticColor types
@@ -197,6 +215,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 ```
 
 **Performance Characteristics**:
+
 - Type definitions have **zero runtime impact** (no bundle size increase)
 - Compile-time only - types don't exist in transpiled JavaScript
 - Reference docs excluded from compilation for fast builds
@@ -205,6 +224,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 ## Development Standards
 
 ### Performance Requirements (Target Goals)
+
 - **Frame Rate**: 60fps target with graceful degradation
 - **Memory**: Minimize heap usage, prevent leaks during extended sessions
 - **Responsiveness**: UI interactions <100ms, smooth transitions
@@ -212,6 +232,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **Bundle Optimization**: Production builds with minification and compression
 
 ### Code Quality Standards
+
 - **TypeScript**: Strict mode enabled, working toward eliminating `any` types
 - **Interface Compliance**: Core systems implement `IManagedSystem` (ongoing migration)
 - **Error Handling**: All Spicetify API calls should have try-catch with fallbacks
@@ -220,19 +241,24 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **Accessibility**: `prefers-reduced-motion` support implemented
 
 ### Naming Conventions
+
 **Classes** - Clear, descriptive, indicate function:
+
 - ✅ `AudioAnalyzer`, `ColorHarmonyEngine`, `PerformanceAnalyzer`
 - ❌ `ConsciousnessManager`, `OrganicInterface`, `FlowEntity`
 
 **Methods** - Action-oriented, specify behavior:
+
 - ✅ `updateColorsFromMusic()`, `detectBeat()`, `optimizePerformance()`
 - ❌ `channelConsciousness()`, `breatheInterface()`, `orchestrateFlow()`
 
 **Variables** - Describe data clearly:
+
 - ✅ `currentTrack`, `colorTemperature`, `frameRate`, `deviceCapabilities`
 - ❌ `consciousness`, `organicState`, `synapticData`
 
 **Technical Naming**:
+
 - **Files**: `PascalCase.ts` for systems, `camelCase.ts` for utilities
 - **CSS Variables**: `--sn-*` theme prefix, `--spice-*` Spicetify compatibility
 - **SCSS Mixins**: `kebab-case` with descriptive names
@@ -240,6 +266,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 ## Technology Constraints
 
 ### Allowed Technologies
+
 - **Languages**: TypeScript (strict), SCSS, JavaScript ES6+
 - **APIs**: Spicetify Player/Platform, React/ReactDOM, colorExtractor, getAudioData
 - **Build**: ESBuild, TypeScript compiler, Jest/ts-jest, SASS, PostCSS
@@ -247,6 +274,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **Libraries**: OKLAB color utilities, lightweight utilities (<10KB total)
 
 ### Prohibited Technologies
+
 - **Heavy Libraries**: jQuery, GSAP, Three.js, external UI frameworks
 - **Build Tools**: Webpack, Rollup, Parcel (ESBuild only)
 - **Styling**: CSS-in-JS, styled-components, runtime CSS generation
@@ -255,6 +283,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 ## Claude Code Development Workflow
 
 ### File Navigation
+
 - Use **Glob** tool for finding files by patterns: `**/*.ts`, `src-js/**/*`, `src/**/*.scss`
 - Use **Grep** tool for code search: find implementations, interfaces, references
 - Use **Read** tool to understand file contents before making changes
@@ -262,6 +291,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **SCSS Entry Point**: `app.scss` (imports from `src/`, compiles to `user.css`)
 
 ### Development Process
+
 1. **Understand First**: Read relevant files and understand current architecture
 2. **Search Thoroughly**: Use Grep to find all references before modifying interfaces
 3. **Build After Changes**:
@@ -275,6 +305,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 **Critical**: Remember that Spicetify loads the compiled `theme.js` and `user.css` files, not the source files directly. Always rebuild after making changes to see them take effect.
 
 ### Common Tasks
+
 - **Adding Visual Effects**: Extend `ServiceVisualSystemBase`, register with `VisualEffectsCoordinator`
 - **Adding Infrastructure Systems**: Extend `ServiceSystemBase`, register with `InfrastructureSystemCoordinator`
 - **Legacy Systems**: Still using `BaseVisualSystem` (14 systems pending migration to service composition)
@@ -284,6 +315,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **Settings**: Use `TypedSettingsManager` singleton for persistent configuration
 
 ### Testing Strategy
+
 - **Framework**: Jest with ts-jest preset and JSDOM environment
 - **Coverage**: Focus on system coordination and cross-system integration
 - **Test Structure**: Unit tests in `tests/unit/`, integration tests in `tests/integration/`
@@ -291,12 +323,14 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 - **Module Mapping**: `@/` paths configured in both tsconfig.json and jest.config.js
 
 ### Error Handling Patterns
+
 - All Spicetify API calls must have try-catch blocks with fallback behavior
 - Progressive enhancement when APIs are unavailable
 - Graceful degradation maintaining core CSS-only functionality
 - Health check methods for system diagnostics
 
 ## Key Documentation
+
 - [`docs/MASTER_ARCHITECTURE_OVERVIEW.md`](./docs/MASTER_ARCHITECTURE_OVERVIEW.md) - Complete system architecture
 - [`docs/API_REFERENCE.md`](./docs/API_REFERENCE.md) - Interfaces and implementation examples
 - [`docs/VISUAL_EFFECTS_COORDINATION.md`](./docs/VISUAL_EFFECTS_COORDINATION.md) - Visual system coordination guide
@@ -305,6 +339,7 @@ const state: Spicetify.PlayerState = Spicetify.Player.data;
 ## Quick Reference
 
 ### Essential Validation Commands
+
 ```bash
 npm run typecheck    # TypeScript compilation check
 npm test            # Run Jest test suite
@@ -313,20 +348,16 @@ npm run validate    # Complete validation suite (typecheck + lint + test)
 ```
 
 ### Code Quality Status
+
 The codebase is actively being modernized. Current status:
+
 - **TypeScript**: Compiles successfully with strict mode
 - **ESLint**: ~1500 warnings/errors being addressed (mainly `any` types and unused variables)
 - **Testing**: Jest framework configured, tests need expansion
 - **Performance**: Core systems optimized, ongoing refinements
 
-### Debug Access
-When `ADVANCED_SYSTEM_CONFIG.enableDebug = true`, access global `Y3K` object:
-- `Y3K.system` - Main Year3000System instance
-- `Y3K.music` - MusicSyncService
-- `Y3K.debug` - Debug utilities
-- `Y3K.health` - System health monitoring
-
 ### Development Philosophy
+
 - **Simplicity First**: Choose the simplest solution that meets requirements
 - **Performance-First**: Every feature must meet performance budgets
 - **Progressive Enhancement**: Core functionality first, sophistication later

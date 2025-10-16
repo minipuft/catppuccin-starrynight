@@ -44,8 +44,8 @@ import {
 import {
   getStandardOKLABProcessor,
   getMusicalOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
@@ -367,12 +367,12 @@ export class ColorProcessor
     this.processingState.processingQueue = [];
     this.processingCache.clear();
     this.resultCache.clear();
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "ColorProcessor.processingCache",
       0,
       { reason: "destroy" }
     );
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "ColorProcessor.resultCache",
       0,
       { reason: "destroy" }
@@ -1179,7 +1179,7 @@ export class ColorProcessor
 
   private cacheResult(key: string, result: UnifiedProcessingResult): void {
     this.processingCache.set(key, { ...result, timestamp: Date.now() });
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "ColorProcessor.processingCache",
       this.processingCache.size,
       { key, type: "processing" }
@@ -1187,7 +1187,7 @@ export class ColorProcessor
 
     // Also cache in the enhanced resultCache with TTL management
     this.resultCache.set(key, result);
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "ColorProcessor.resultCache",
       this.resultCache.size,
       { key, type: "result" }
@@ -1200,7 +1200,7 @@ export class ColorProcessor
       const toRemove = entries.slice(0, entries.length - this.cacheMaxSize);
       toRemove.forEach(([cacheKey]) => this.resultCache.delete(cacheKey));
       if (toRemove.length > 0) {
-        OKLABProcessorSingleton.reportCacheFootprint(
+        OKLABProcessorFactory.reportCacheFootprint(
           "ColorProcessor.resultCache",
           this.resultCache.size,
           { type: "result", reason: "size-limit" }
@@ -1220,7 +1220,7 @@ export class ColorProcessor
     }
 
     if (removed) {
-      OKLABProcessorSingleton.reportCacheFootprint(
+      OKLABProcessorFactory.reportCacheFootprint(
         "ColorProcessor.processingCache",
         this.processingCache.size,
         { reason: "ttl" }
@@ -1772,7 +1772,7 @@ export class ColorProcessor
       ].includes(data.settingKey)
     ) {
       this.processingCache.clear();
-      OKLABProcessorSingleton.reportCacheFootprint(
+      OKLABProcessorFactory.reportCacheFootprint(
         "ColorProcessor.processingCache",
         this.processingCache.size,
         { reason: "settings" }
@@ -1790,7 +1790,7 @@ export class ColorProcessor
     if (data.memoryUsage > 50) {
       // MB
       this.processingCache.clear();
-      OKLABProcessorSingleton.reportCacheFootprint(
+      OKLABProcessorFactory.reportCacheFootprint(
         "ColorProcessor.processingCache",
         this.processingCache.size,
         { reason: "memory" }
@@ -1818,7 +1818,7 @@ export class ColorProcessor
    */
   public async forceReprocessColors(): Promise<void> {
     this.processingCache.clear();
-    OKLABProcessorSingleton.reportCacheFootprint(
+    OKLABProcessorFactory.reportCacheFootprint(
       "ColorProcessor.processingCache",
       this.processingCache.size,
       { reason: "force-reprocess" }

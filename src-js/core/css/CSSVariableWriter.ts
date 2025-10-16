@@ -1,21 +1,16 @@
 // CSS Variable Writing System - Efficient DOM updates with batching and prioritization
 //
 // Consolidates CSS variable management across the entire system:
-// - CSSVariableBatcher: High-performance batching and critical variable handling
-// - CSSVariableWriter: Priority-based transactions and variable groups
-// - OptimizedCSSVariableManager: Device-aware performance optimization
-//
 // The writer provides visual-effects-driven CSS updates that adapt to music,
 // aesthetics, performance constraints, and device capabilities.
 
+import { type VariablePriority } from "@/core/css/CSSVariableSchema";
 import { unifiedEventBus } from "@/core/events/EventBus";
 import {
-  UnifiedPerformanceCoordinator,
   PerformanceAnalyzer,
   type DeviceCapabilities,
-  type PerformanceMode,
+  type PerformanceModeConfig,
 } from "@/core/performance/PerformanceMonitor";
-import { type VariablePriority } from "@/core/css/CSSVariableSchema";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 
@@ -83,15 +78,15 @@ export interface CSSVisualEffectsConfig {
   // Enhanced optimization features (from OptimizedCSSVariableManager)
   enableAdaptiveThrottling?: boolean;
   priorityMappings?: {
-    critical: string[];    // Applied immediately
-    high: string[];        // High priority batch
-    normal: string[];      // Normal priority batch
-    low: string[];         // Low priority batch
+    critical: string[]; // Applied immediately
+    high: string[]; // High priority batch
+    normal: string[]; // Normal priority batch
+    low: string[]; // Low priority batch
   };
   thresholds?: {
-    excellentFPS: number;  // Above this: use faster batching
-    goodFPS: number;       // Above this: use normal batching
-    poorFPS: number;       // Below this: use slower batching
+    excellentFPS: number; // Above this: use faster batching
+    goodFPS: number; // Above this: use normal batching
+    poorFPS: number; // Below this: use slower batching
   };
 }
 
@@ -191,7 +186,7 @@ export class CSSVariableWriter implements IManagedSystem {
 
   // === PERFORMANCE LAYER (from CSSVariableWriter) ===
   private currentDeviceCapabilities: DeviceCapabilities | null = null;
-  private currentPerformanceMode: PerformanceMode | null = null;
+  private currentPerformanceMode: PerformanceModeConfig | null = null;
   private lastCSSUpdate = 0;
   private cssUpdateThrottle = 100; // Update CSS at most every 100ms
   private appliedClasses: Set<string> = new Set();
@@ -204,9 +199,12 @@ export class CSSVariableWriter implements IManagedSystem {
   // === ENHANCED OPTIMIZATION LAYER (from OptimizedCSSVariableManager) ===
   private optimizedConfig: Partial<CSSVisualEffectsConfig> = {};
   private lastFPSCheck = 0;
-  private currentPerformanceLevel: 'excellent' | 'good' | 'poor' = 'good';
+  private currentPerformanceLevel: "excellent" | "good" | "poor" = "good";
   private adaptiveThrottleLevel = 1;
-  private priorityQueues: Map<string, Map<string, { property: string; value: string; timestamp: number }>> = new Map();
+  private priorityQueues: Map<
+    string,
+    Map<string, { property: string; value: string; timestamp: number }>
+  > = new Map();
   private adaptiveMonitoringInterval: number | null = null;
 
   // === FRAME CONTEXT INTEGRATION (from CDFVariableBridge) ===
@@ -272,15 +270,23 @@ export class CSSVariableWriter implements IManagedSystem {
       // Enhanced optimization features (from OptimizedCSSVariableManager)
       enableAdaptiveThrottling: true,
       priorityMappings: {
-        critical: ['--sn-rs-glow-alpha', '--sn-rs-beat-intensity', '--sn-rs-hue-shift'],
-        high: ['--sn-gradient-primary', '--sn-gradient-secondary', '--sn-gradient-accent'],
-        normal: ['--sn-gradient-', '--sn-rs-'],
-        low: ['--sn-debug-', '--sn-dev-']
+        critical: [
+          "--sn-rs-glow-alpha",
+          "--sn-rs-beat-intensity",
+          "--sn-rs-hue-shift",
+        ],
+        high: [
+          "--sn-gradient-primary",
+          "--sn-gradient-secondary",
+          "--sn-gradient-accent",
+        ],
+        normal: ["--sn-gradient-", "--sn-rs-"],
+        low: ["--sn-debug-", "--sn-dev-"],
       },
       thresholds: {
-        excellentFPS: 55,  // 55+ FPS = excellent
-        goodFPS: 45,       // 45+ FPS = good
-        poorFPS: 30        // <30 FPS = poor
+        excellentFPS: 55, // 55+ FPS = excellent
+        goodFPS: 45, // 45+ FPS = good
+        poorFPS: 30, // <30 FPS = poor
       },
     };
 
@@ -372,13 +378,10 @@ export class CSSVariableWriter implements IManagedSystem {
     };
   }
 
-
   public forceRepaint?(reason?: string): void {
     this.flushCSSVariableBatch();
     if (this.config.enableDebug && reason) {
-      console.log(
-        `🌌 [CSSVariableWriter] Force repaint: ${reason}`
-      );
+      console.log(`🌌 [CSSVariableWriter] Force repaint: ${reason}`);
     }
   }
 
@@ -398,19 +401,31 @@ export class CSSVariableWriter implements IManagedSystem {
     source: string = "unknown"
   ): void {
     const targetElement = element || document.documentElement;
-    const effectivePriority = this.optimizedConfig.enableAdaptiveThrottling 
+    const effectivePriority = this.optimizedConfig.enableAdaptiveThrottling
       ? this.determineVariablePriority(property, priority)
       : priority;
-    
+
     // Enhanced critical path with adaptive optimization
-    if (effectivePriority === 'critical' || CRITICAL_NOW_PLAYING_VARS.has(property)) {
+    if (
+      effectivePriority === "critical" ||
+      CRITICAL_NOW_PLAYING_VARS.has(property)
+    ) {
       this.applyCriticalUpdate(property, value, targetElement);
       return;
     }
 
     // Enhanced priority queue management
-    if (this.optimizedConfig.enableAdaptiveThrottling && this.priorityQueues.size > 0) {
-      this.queueByPriority(property, value, targetElement, effectivePriority, source);
+    if (
+      this.optimizedConfig.enableAdaptiveThrottling &&
+      this.priorityQueues.size > 0
+    ) {
+      this.queueByPriority(
+        property,
+        value,
+        targetElement,
+        effectivePriority,
+        source
+      );
       return;
     }
 
@@ -565,7 +580,7 @@ export class CSSVariableWriter implements IManagedSystem {
   /**
    * Apply performance-based optimizations
    */
-  public applyPerformanceOptimizations(performanceMode: PerformanceMode): void {
+  public applyPerformanceOptimizations(performanceMode: PerformanceModeConfig): void {
     if (!this.cssConfig.enableAdaptiveOptimization) return;
 
     this.currentPerformanceMode = performanceMode;
@@ -1020,12 +1035,16 @@ export class CSSVariableWriter implements IManagedSystem {
 
   private subscribeToEvents(): void {
     // Subscribe to performance tier changes
-    this.eventBus.subscribe("performance:tier-changed", (payload: any) => {
-      this.currentPerformanceMode =
-        this.performanceCoordinator.getCurrentPerformanceMode();
-      this.applyPerformanceModeOptimizations();
-      this.updateCSSPerformanceVariables();
-    }, 'CSSVariableWriter');
+    this.eventBus.subscribe(
+      "performance:tier-changed",
+      (payload: any) => {
+        this.currentPerformanceMode =
+          this.performanceCoordinator.getCurrentPerformanceMode();
+        this.applyPerformanceModeOptimizations();
+        this.updateCSSPerformanceVariables();
+      },
+      "CSSVariableWriter"
+    );
   }
 
   private applyInitialOptimizations(): void {
@@ -1069,29 +1088,39 @@ export class CSSVariableWriter implements IManagedSystem {
       // Update performance mode variables with safe property access
       const variables: Record<string, string> = {
         "--sn.performance.mode": this.currentPerformanceMode.name || "balanced",
-        "--sn.performance.quality.level":
-          (this.currentPerformanceMode.qualityLevel ?? 0.8).toString(),
-        "--sn.performance.fps.target":
-          (this.currentPerformanceMode.frameRate ?? 60).toString(),
+        "--sn.performance.quality.level": (
+          this.currentPerformanceMode.qualityLevel ?? 0.8
+        ).toString(),
+        "--sn.performance.fps.target": (
+          this.currentPerformanceMode.frameRate ?? 60
+        ).toString(),
         "--sn.performance.frame.budget": (
           1000 / (this.currentPerformanceMode.frameRate ?? 60)
         ).toString(),
-        "--sn.performance.optimization.level":
-          (this.currentPerformanceMode.optimizationLevel ?? 1).toString(),
-        "--sn.device.tier": this.currentDeviceCapabilities.performanceTier ?? "mid",
-        "--sn.device.memory": (this.currentDeviceCapabilities.memoryGB ?? 8).toString(),
-        "--sn.device.gpu": (this.currentDeviceCapabilities.gpuAcceleration ?? true)
-          ? "1"
-          : "0",
-        "--sn.device.mobile": (this.currentDeviceCapabilities.isMobile ?? false) ? "1" : "0",
-        "--sn.performance.blur.quality":
-          (this.currentPerformanceMode.blurQuality ?? 0.8).toString(),
-        "--sn.performance.shadow.quality":
-          (this.currentPerformanceMode.shadowQuality ?? 0.8).toString(),
-        "--sn.performance.animation.quality":
-          (this.currentPerformanceMode.animationQuality ?? 0.8).toString(),
-        "--sn.performance.effect.quality":
-          (this.currentPerformanceMode.effectQuality ?? 0.8).toString(),
+        "--sn.performance.optimization.level": (
+          this.currentPerformanceMode.optimizationLevel ?? 1
+        ).toString(),
+        "--sn.device.tier":
+          this.currentDeviceCapabilities.performanceTier ?? "mid",
+        "--sn.device.memory": (
+          this.currentDeviceCapabilities.memoryGB ?? 8
+        ).toString(),
+        "--sn.device.gpu":
+          this.currentDeviceCapabilities.gpuAcceleration ?? true ? "1" : "0",
+        "--sn.device.mobile":
+          this.currentDeviceCapabilities.isMobile ?? false ? "1" : "0",
+        "--sn.performance.blur.quality": (
+          this.currentPerformanceMode.blurQuality ?? 0.8
+        ).toString(),
+        "--sn.performance.shadow.quality": (
+          this.currentPerformanceMode.shadowQuality ?? 0.8
+        ).toString(),
+        "--sn.performance.animation.quality": (
+          this.currentPerformanceMode.animationQuality ?? 0.8
+        ).toString(),
+        "--sn.performance.effect.quality": (
+          this.currentPerformanceMode.effectQuality ?? 0.8
+        ).toString(),
       };
 
       this.updateVariables(variables, "high", "performance-coordinator");
@@ -1521,10 +1550,7 @@ export class CSSVariableWriter implements IManagedSystem {
     this.cssConfig = { ...this.cssConfig, ...newConfig };
 
     if (this.config.enableDebug) {
-      console.log(
-        "🌌 [CSSVariableWriter] Configuration updated:",
-        newConfig
-      );
+      console.log("🌌 [CSSVariableWriter] Configuration updated:", newConfig);
     }
   }
 
@@ -1541,9 +1567,7 @@ export class CSSVariableWriter implements IManagedSystem {
     // Implementation would control batching behavior
     if (this.config.enableDebug) {
       console.log(
-        `🌌 [CSSVariableWriter] Batching ${
-          enabled ? "enabled" : "disabled"
-        }`
+        `🌌 [CSSVariableWriter] Batching ${enabled ? "enabled" : "disabled"}`
       );
     }
   }
@@ -1738,7 +1762,7 @@ export class CSSVariableWriter implements IManagedSystem {
       finalProperty = propertyOrValue!;
       finalValue = valueOrPriority!;
       finalPriority = priority || "normal";
-      finalSource = `${sourceOrName}${description ? `:${description}` : ''}`;
+      finalSource = `${sourceOrName}${description ? `:${description}` : ""}`;
     } else {
       // New interface: (name, value, priority)
       finalProperty = sourceOrName;
@@ -1747,8 +1771,15 @@ export class CSSVariableWriter implements IManagedSystem {
       finalSource = "legacy-api";
     }
 
-    const normalizedPriority = (finalPriority as "low" | "normal" | "high" | "critical") || "normal";
-    this.queueCSSVariableUpdate(finalProperty, finalValue, null, normalizedPriority, finalSource);
+    const normalizedPriority =
+      (finalPriority as "low" | "normal" | "high" | "critical") || "normal";
+    this.queueCSSVariableUpdate(
+      finalProperty,
+      finalValue,
+      null,
+      normalizedPriority,
+      finalSource
+    );
   }
 
   /**
@@ -1767,11 +1798,13 @@ export class CSSVariableWriter implements IManagedSystem {
     let finalSource: string;
 
     // Detect interface based on first argument type
-    if (typeof sourceOrVariables === 'string') {
+    if (typeof sourceOrVariables === "string") {
       // Old interface: (source, variables, priority, description)
       finalVariables = variablesOrPriority as Record<string, string>;
       finalPriority = priority || "normal";
-      finalSource = `${sourceOrVariables}${description ? `:${description}` : ''}`;
+      finalSource = `${sourceOrVariables}${
+        description ? `:${description}` : ""
+      }`;
     } else {
       // New interface: (variables, priority)
       finalVariables = sourceOrVariables;
@@ -1779,7 +1812,8 @@ export class CSSVariableWriter implements IManagedSystem {
       finalSource = "legacy-batch-api";
     }
 
-    const normalizedPriority = (finalPriority as "low" | "normal" | "high" | "critical") || "normal";
+    const normalizedPriority =
+      (finalPriority as "low" | "normal" | "high" | "critical") || "normal";
     this.updateVariables(finalVariables, normalizedPriority, finalSource);
   }
 
@@ -1792,14 +1826,14 @@ export class CSSVariableWriter implements IManagedSystem {
    */
   private initializeOptimizedFeatures(): void {
     // Initialize adaptive throttling based on device performance tier
-    if (this.currentDeviceCapabilities?.performanceTier === 'low') {
+    if (this.currentDeviceCapabilities?.performanceTier === "low") {
       // More aggressive optimization for low-end devices
       // Note: adaptiveDifferenceThreshold is not implemented in current version
       // This would be added if performance optimization features are needed
     }
-    
+
     if (this.config.enableDebug) {
-      console.log('[CSSVariableWriter] Optimized features initialized');
+      console.log("[CSSVariableWriter] Optimized features initialized");
     }
   }
 
@@ -1809,39 +1843,50 @@ export class CSSVariableWriter implements IManagedSystem {
   private initializeFrameContextIntegration(): void {
     // Frame context integration is handled through existing priority queuing
     // No additional initialization needed - existing systems provide this functionality
-    
+
     if (this.config.enableDebug) {
-      console.log('[CSSVariableWriter] Frame context integration initialized');
+      console.log("[CSSVariableWriter] Frame context integration initialized");
     }
   }
 
   /**
    * Determine variable priority based on property and context
    */
-  private determineVariablePriority(property: string, requestedPriority?: VariablePriority): VariablePriority {
+  private determineVariablePriority(
+    property: string,
+    requestedPriority?: VariablePriority
+  ): VariablePriority {
     // Critical variables always take highest priority
-    if (property.includes('sn-critical') || property.includes('spice-main')) {
-      return 'critical';
+    if (property.includes("sn-critical") || property.includes("spice-main")) {
+      return "critical";
     }
-    
+
     // Music-related variables get high priority during active playback
-    if (property.includes('music') || property.includes('beat') || property.includes('energy')) {
-      return 'high';
+    if (
+      property.includes("music") ||
+      property.includes("beat") ||
+      property.includes("energy")
+    ) {
+      return "high";
     }
-    
+
     // Color variables get normal priority
-    if (property.includes('color') || property.includes('accent')) {
-      return 'normal';
+    if (property.includes("color") || property.includes("accent")) {
+      return "normal";
     }
-    
+
     // Use requested priority or default to low
-    return requestedPriority || 'low';
+    return requestedPriority || "low";
   }
 
   /**
    * Apply critical updates immediately bypassing queue
    */
-  private applyCriticalUpdate(property: string, value: string, targetElement?: Element): void {
+  private applyCriticalUpdate(
+    property: string,
+    value: string,
+    targetElement?: Element
+  ): void {
     const element = targetElement || document.documentElement;
 
     try {
@@ -1858,10 +1903,12 @@ export class CSSVariableWriter implements IManagedSystem {
       }
 
       if (this.config.enableDebug) {
-        console.log(`[CSSVariableWriter] Critical update applied: ${property} = ${value}`);
+        console.log(
+          `[CSSVariableWriter] Critical update applied: ${property} = ${value}`
+        );
       }
     } catch (error) {
-      console.warn('[CSSVariableWriter] Critical update failed:', error);
+      console.warn("[CSSVariableWriter] Critical update failed:", error);
     }
   }
 
@@ -1869,9 +1916,9 @@ export class CSSVariableWriter implements IManagedSystem {
    * Queue update by priority level
    */
   private queueByPriority(
-    property: string, 
-    value: string, 
-    targetElement: Element | null, 
+    property: string,
+    value: string,
+    targetElement: Element | null,
     priority: VariablePriority,
     source: string
   ): void {
@@ -1879,12 +1926,12 @@ export class CSSVariableWriter implements IManagedSystem {
     if (!this.priorityQueues.has(priority)) {
       this.priorityQueues.set(priority, new Map());
     }
-    
+
     const queue = this.priorityQueues.get(priority)!;
     queue.set(property, { property, value, timestamp: Date.now() });
-    
+
     // Process queues based on priority
-    if (priority === 'critical' || priority === 'high') {
+    if (priority === "critical" || priority === "high") {
       // Process immediately for high-priority items by triggering flush
       this.flushCSSVariableBatch();
     }
@@ -1896,9 +1943,9 @@ export class CSSVariableWriter implements IManagedSystem {
   private destroyFrameContextIntegration(): void {
     // Clean up any frame context resources
     // Most cleanup is handled by existing destroy logic
-    
+
     if (this.config.enableDebug) {
-      console.log('[CSSVariableWriter] Frame context integration destroyed');
+      console.log("[CSSVariableWriter] Frame context integration destroyed");
     }
   }
 
@@ -1953,8 +2000,8 @@ let globalCSSVariableWriter: CSSVariableWriter | null = null;
 export function setGlobalCSSVariableWriter(instance: CSSVariableWriter): void {
   if (globalCSSVariableWriter && globalCSSVariableWriter !== instance) {
     console.warn(
-      '[CSSVariableWriter] Replacing existing global instance. ' +
-      'This may indicate multiple SystemIntegrationCoordinator initializations.'
+      "[CSSVariableWriter] Replacing existing global instance. " +
+        "This may indicate multiple SystemIntegrationCoordinator initializations."
     );
   }
   globalCSSVariableWriter = instance;
@@ -1969,8 +2016,8 @@ export function setGlobalCSSVariableWriter(instance: CSSVariableWriter): void {
 export function getGlobalCSSVariableWriter(): CSSVariableWriter {
   if (!globalCSSVariableWriter) {
     throw new Error(
-      '[CSSVariableWriter] Global instance not initialized. ' +
-      'SystemIntegrationCoordinator must call setGlobalCSSVariableWriter() during initialization.'
+      "[CSSVariableWriter] Global instance not initialized. " +
+        "SystemIntegrationCoordinator must call setGlobalCSSVariableWriter() during initialization."
     );
   }
   return globalCSSVariableWriter;

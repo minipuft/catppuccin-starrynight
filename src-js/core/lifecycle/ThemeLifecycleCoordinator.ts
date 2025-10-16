@@ -298,13 +298,8 @@ export class ThemeLifecycleCoordinator {
   // Consciousness Systems
   // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
   // Access genre functionality via ColorHarmonyEngine or DepthLayeredGradientSystem
-  public get musicEmotionAnalyzer() {
-    return (
-      this.facadeCoordinator?.getCachedNonVisualSystem(
-        "MusicEmotionAnalyzer"
-      ) || null
-    );
-  }
+  // MusicEmotionAnalyzer removed (Phase 4). Use ColorHarmonyEngine + GenreService.
+  public get musicEmotionAnalyzer() { return null; }
 
   // 🔧 PHASE 4: Unified Visual Effects Coordination
   public get visualEffectsCoordinator() {
@@ -1290,7 +1285,6 @@ export class ThemeLifecycleCoordinator {
       const eventDrivenSystems: InfrastructureSystemKey[] = [
         "MusicSyncService",
         "ColorHarmonyEngine", // 🎵 Now includes GenreProfileManager integration
-        "MusicEmotionAnalyzer", // 🎭 Emotional intelligence for music analysis
       ];
 
       // Group 4: UI systems that depend on CSS variable management
@@ -1575,7 +1569,6 @@ export class ThemeLifecycleCoordinator {
         // Test 2: Validate Strategy Pattern Systems (Phase 2 fix)
         const strategyPatternSystems = [
           "ColorHarmonyEngine",
-          "MusicEmotionAnalyzer",
         ];
         let strategySystemsFound = 0;
 

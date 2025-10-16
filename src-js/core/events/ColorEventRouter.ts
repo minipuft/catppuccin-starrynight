@@ -28,8 +28,8 @@ import type {
 } from "@/utils/color/MusicalOKLABCoordinator";
 import {
   getMusicalOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
 import { ColorProcessor, globalColorProcessor } from "@/core/color/ColorProcessor";

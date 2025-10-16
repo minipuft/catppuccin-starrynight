@@ -4,10 +4,12 @@ import {
   GenreType,
   type AudioFeatures,
   type GenreCharacteristics,
+  type GenreColorCharacteristics,
   type GenreDetectionResult,
-  type GenreProfile,
   type GenreVisualStyle,
+  type MusicAnalysisProfile,
 } from "@/types/genre";
+import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
 import type { GenreSystemService } from "@/core/services/SystemServices";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -37,6 +39,9 @@ export class GenreService implements IManagedSystem, GenreSystemService {
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
   private cacheHits = 0;
   private cacheMisses = 0;
+  // Phase 4: Emotion consolidation
+  private readonly emotionMapper = new EmotionalTemperatureMapper(false);
+  private readonly useUnifiedEmotionAnalysis = true;
 
   constructor(dependencies: GenreServiceDependencies = {}) {
     this.config = dependencies.config ?? ADVANCED_SYSTEM_CONFIG;
@@ -100,25 +105,15 @@ export class GenreService implements IManagedSystem, GenreSystemService {
 
   public detectGenre(features?: AudioFeatures): GenreDetectionResult {
     const genre = this.manager.detectGenre(features);
-    const profile = { ...this.manager.getProfileForTrack(features) };
-    const characteristics = this.manager.getCharacteristics(genre);
-    const visualStyle = this.manager.getVisualStyle(genre);
-    const oklabPreset = this.manager.getOKLABPresetForGenre(genre);
 
-    if (!profile.oklabPreset && oklabPreset) {
-      profile.oklabPreset = oklabPreset.name;
-    }
-
-    profile.characteristics = characteristics;
-    profile.visualStyle = visualStyle;
+    // Phase 2: Use unified profile instead of legacy profile
+    const profile = this.getMusicAnalysisProfile(features);
 
     const detection: GenreDetectionResult = {
       genre,
-      confidence: this.manager.getGenreConfidence(),
-      characteristics,
-      profile,
-      oklabPreset,
-      timestamp: Date.now(),
+      confidence: profile.confidence,
+      profile,  // ✅ Now MusicAnalysisProfile with all data
+      timestamp: profile.timestamp,
     };
 
     this.lastDetection = detection;
@@ -126,13 +121,9 @@ export class GenreService implements IManagedSystem, GenreSystemService {
     return detection;
   }
 
-  public getProfileForTrack(features?: AudioFeatures): GenreProfile {
-    return this.manager.getProfileForTrack(features);
-  }
-
   public getColorCharacteristicsForGenre(
     genre: GenreType
-  ): NonNullable<GenreProfile["colorCharacteristics"]> {
+  ): GenreColorCharacteristics {
     return this.manager.getColorCharacteristicsForGenre(genre);
   }
 
@@ -175,6 +166,131 @@ export class GenreService implements IManagedSystem, GenreSystemService {
     return this.manager;
   }
 
+  // ==============================
+  // Phase 4 – Unified Emotion + Genre Profile
+  // ==============================
+  public getMusicAnalysisProfile(features: AudioFeatures = {}): MusicAnalysisProfile {
+    // Phase 2: Directly detect genre without calling detectGenre() to avoid circular dependency
+    const genre = this.manager.detectGenre(features);
+    const characteristics = this.manager.getCharacteristics(genre);
+    const visualStyle = this.manager.getVisualStyle(genre);
+    const confidence = this.manager.getGenreConfidence();
+
+    const key = `musicProfile:${genre}:${features.energy ?? 0}:${features.valence ?? 0}:${features.tempo ?? 0}`;
+    return this.getCachedResult(key, () => {
+      const emotion = this.calculateEmotionFromFeatures(features, genre);
+
+      const smoothFlow = GenreService.clamp01(
+        0.6 - (characteristics.rhythmComplexity ?? 0.5) * 0.3 + (features.danceability ?? 0.5) * 0.5
+      );
+      const cinematicDepth = GenreService.clamp01(
+        ((visualStyle?.depthIllusion ?? 0.5) * 0.7) + ((visualStyle?.contrastLevel ?? 0.5) * 0.3)
+      );
+      const visualEffectsResonance = GenreService.clamp01(
+        (features.energy ?? 0.5) * 0.6 + (features.danceability ?? 0.5) * 0.4
+      );
+
+      const profile: MusicAnalysisProfile = {
+        timestamp: Date.now(),
+        confidence: Math.min(1, Math.max(0, confidence)),
+        genre,
+        characteristics,
+        visualStyle,
+        emotion: {
+          primary: emotion.primary,
+          intensity: emotion.intensity,
+          confidence: emotion.confidence,
+          valence: features.valence ?? 0.5,
+          arousal: features.energy ?? 0.5,
+          mood: emotion.mood,
+          temperatureK: emotion.temperatureK,
+        },
+        colorTemperature: emotion.temperatureK,
+        visualMetrics: {
+          smoothFlow,
+          cinematicDepth,
+          visualEffectsResonance,
+          energy: features.energy ?? 0.5,
+          danceability: features.danceability ?? 0.5,
+        },
+        rawFeatures: (() => {
+          const rf: MusicAnalysisProfile["rawFeatures"] = {};
+          if (typeof features.tempo === 'number') rf.tempo = features.tempo;
+          if (typeof features.key === 'number') rf.key = features.key;
+          if (typeof features.mode === 'number') rf.mode = features.mode;
+          if (typeof features.loudness === 'number') rf.loudness = features.loudness;
+          if (typeof features.danceability === 'number') rf.danceability = features.danceability;
+          if (typeof features.energy === 'number') rf.energy = features.energy;
+          if (typeof features.valence === 'number') rf.valence = features.valence;
+          if (typeof features.acousticness === 'number') rf.acousticness = features.acousticness;
+          if (typeof features.instrumentalness === 'number') rf.instrumentalness = features.instrumentalness;
+          if (typeof features.speechiness === 'number') rf.speechiness = features.speechiness;
+          return rf;
+        })(),
+      };
+
+      return profile;
+    });
+  }
+
+  public calculateEmotionFromFeatures(features: AudioFeatures = {}, genre?: GenreType): {
+    primary: any; // EmotionType shape
+    intensity: number;
+    confidence: number;
+    temperatureK: number;
+    mood: string;
+  } {
+    if (!this.useUnifiedEmotionAnalysis) {
+      // Fallback conservative defaults
+      return {
+        primary: 'calm',
+        intensity: 0.6,
+        confidence: 0.5,
+        temperatureK: 4000,
+        mood: 'neutral',
+      };
+    }
+
+    const result = this.emotionMapper.mapMusicToEmotionalTemperature({
+      energy: features.energy ?? 0.5,
+      valence: features.valence ?? 0.5,
+      danceability: features.danceability ?? 0.5,
+      tempo: features.tempo ?? 120,
+      mode: features.mode ?? 1,
+      genre: genre ?? this.lastDetection?.genre ?? GenreType.DEFAULT,
+    } as any);
+
+    // Derive a confidence score from intensity bounded by feature presence
+    const featureCompleteness = [
+      features.energy,
+      features.valence,
+      features.danceability,
+      features.tempo,
+    ].filter((v) => typeof v === 'number').length / 4;
+
+    const confidence = GenreService.clamp01(
+      0.5 * featureCompleteness + 0.5 * Math.min(1, result.intensity)
+    );
+
+    const mood = (() => {
+      const e = features.energy ?? 0.5;
+      const v = features.valence ?? 0.5;
+      if (e > 0.6 && v > 0.6) return 'energetic-happy';
+      if (e > 0.6 && v <= 0.4) return 'intense-moody';
+      if (e <= 0.4 && v > 0.6) return 'calm-happy';
+      if (e <= 0.4 && v <= 0.4) return 'calm-melancholy';
+      return 'neutral';
+    })();
+
+    return {
+      primary: result.primaryEmotion as any,
+      intensity: result.intensity,
+      confidence,
+      temperatureK: result.temperature,
+      mood,
+    };
+  }
+
   private notifySubscribers(result: GenreDetectionResult): void {
     for (const listener of this.subscribers.values()) {
       try {
@@ -207,5 +323,9 @@ export class GenreService implements IManagedSystem, GenreSystemService {
 
   public setCacheTimeout(ms: number): void {
     this.cacheTimeout = Math.max(0, ms);
+  }
+
+  private static clamp01(n: number): number {
+    return Math.max(0, Math.min(1, n));
   }
 }

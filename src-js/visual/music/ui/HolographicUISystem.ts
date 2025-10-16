@@ -34,6 +34,7 @@ interface HealthCheckResult {
 
 // OKLAB integration for perceptually uniform holographic colors
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
+import type { GenreSystemService } from "@/core/services/SystemServices";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
 import {
   OKLABColorProcessor,
@@ -41,8 +42,8 @@ import {
 } from "@/utils/color/OKLABColorProcessor";
 import {
   getStandardOKLABProcessor,
-  OKLABProcessorSingleton,
-} from "@/utils/color/OKLABProcessorSingleton";
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { GenreType } from "@/types/genre";
 
 export interface HolographicState {
@@ -200,6 +201,7 @@ export class HolographicUISystem
   private oklabProcessor: OKLABColorProcessor;
   private emotionalMapper: EmotionalTemperatureMapper;
   private genreManager: GenreProfileManager;
+  private genreService: GenreSystemService | null = null;
   private holographicPreset: EnhancementPreset;
   private lastMusicalContext: any = null;
   private eventSubscriptionIds: string[] = [];
@@ -259,6 +261,12 @@ export class HolographicUISystem
     });
     this.emotionalMapper = new EmotionalTemperatureMapper(true);
     this.genreManager = new GenreProfileManager();
+    // Phase 3.2: Acquire GenreService if available
+    try {
+      this.genreService = DefaultServiceFactory.getServices()?.genre ?? null;
+    } catch {
+      this.genreService = null;
+    }
     this.holographicPreset = OKLABColorProcessor.getPreset("COSMIC"); // Default to cosmic preset
 
     // Initialize holographic state
@@ -2087,6 +2095,7 @@ export class HolographicUISystem
 
       // Get genre-specific OKLAB preset
       const genrePreset =
+        (this.genreService as any)?.getOKLABPresetForGenre?.(detectedGenre) ||
         this.genreManager.getOKLABPresetForGenre(detectedGenre);
       if (genrePreset) {
         this.holographicPreset = genrePreset;
