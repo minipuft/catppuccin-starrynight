@@ -9,6 +9,7 @@ import {
   ISettingsField,
   ISettingsFieldButton,
   ISettingsFieldDropdown,
+  ISettingsFieldHidden,
   ISettingsFieldInput,
   ISettingsFieldToggle,
 } from "./SettingsField";
@@ -146,6 +147,31 @@ export class SettingsSection {
       inputType,
       events,
     } as ISettingsFieldInput;
+  };
+
+  /** Button */
+  addButton = (
+    nameId: string,
+    label: string,
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  ) => {
+    this.settingsFields[nameId] = {
+      type: "button",
+      description: "",
+      value: label,
+      events: {
+        onClick,
+      },
+    } as ISettingsFieldButton;
+  };
+
+  /** Separator (visual divider) - implemented as hidden field with special rendering */
+  addSeparator = (nameId?: string) => {
+    const id = nameId || `separator-${Date.now()}`;
+    this.settingsFields[id] = {
+      type: "hidden",
+      defaultValue: null,
+    } as ISettingsFieldHidden;
   };
 
   /* ----- generic storage helpers (use TypedSettingsManager) -------- */

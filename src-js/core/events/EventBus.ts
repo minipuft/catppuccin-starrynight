@@ -181,6 +181,29 @@ export interface UnifiedEventMap {
     tier: "excellent" | "good" | "degraded" | "critical";
     previousTier: "excellent" | "good" | "degraded" | "critical";
     timestamp: number;
+    energyBoost?: boolean;
+  };
+
+  // Performance Mode Events (from PerformanceModeService)
+  "performance:mode-changed": {
+    mode: import('@/config/settingsSchema').PerformanceMode;
+    preset: any; // PerformancePreset from PerformanceModeService
+    hasOverrides: boolean;
+    timestamp: number;
+  };
+
+  "performance:override-changed": {
+    key: string;
+    value: any;
+    isOverride: boolean;
+    hasOverrides: boolean;
+    timestamp: number;
+  };
+
+  "performance:reset-to-preset": {
+    mode: import('@/config/settingsSchema').PerformanceMode;
+    preset: any; // PerformancePreset from PerformanceModeService
+    timestamp: number;
   };
 
   // Visual Effects Events
