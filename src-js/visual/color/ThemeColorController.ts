@@ -1,5 +1,5 @@
 /**
- * DynamicAccentColorStrategy - Dynamic Accent Color Processing Strategy
+ * Dynamic Accent Color Processing Strategy
  *
  * Pure strategy pattern implementation for OKLAB color processing.
  * Processes album art colors with OKLAB enhancement and returns metadata to
@@ -26,10 +26,11 @@
  * @see SpicetifyColorBridge for CSS variable application
  */
 
+import { settings } from "@/config";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import {
-  getGlobalCSSVariableWriter,
   CSSVariableWriter,
+  getGlobalCSSVariableWriter,
 } from "@/core/css/CSSVariableWriter";
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
@@ -38,11 +39,14 @@ import type {
   ColorResult,
   IColorProcessor,
 } from "@/types/colorStrategy";
-import { settings } from "@/config";
 import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import * as Utils from "@/utils/core/ThemeUtilities";
 
@@ -134,7 +138,11 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
         services.themeLifecycle?.getCssController() ||
         getGlobalCSSVariableWriter();
     }
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "ThemeColorController",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
 
     // Initialize current state from existing variables
     this.initializeCurrentState();
@@ -428,7 +436,20 @@ export class DynamicAccentColorStrategy implements IColorProcessor {
 
     // Update OKLAB processor debug setting if configuration changed
     if ("oklabEnhancementEnabled" in newConfig || "oklabPreset" in newConfig) {
-      this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+      const sharedProcessor = getStandardOKLABProcessor({
+        requester: "ThemeColorController.refresh",
+        enableDebug: this.config.enableDebug,
+        reason: "refresh",
+      });
+
+      if (!sharedProcessor) {
+        OKLABProcessorFactory.ensureAvailability(
+          "standard",
+          "ThemeColorController.refresh"
+        );
+      } else {
+        this.oklabProcessor = sharedProcessor;
+      }
     }
 
     Y3KDebug?.debug?.log(

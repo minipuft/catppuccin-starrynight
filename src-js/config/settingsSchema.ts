@@ -55,6 +55,16 @@ export type PerformanceMode =
   | "maximum";
 
 /**
+ * Performance overrides tracking interface
+ * Tracks user overrides to performance mode presets
+ */
+export interface PerformanceOverrides {
+  hasOverrides: boolean;
+  overriddenSettings: string[];
+  baseMode: PerformanceMode;
+}
+
+/**
  * Complete typed settings interface
  * Maps setting keys to their actual TypeScript types
  */
@@ -78,6 +88,7 @@ export interface TypedSettings {
 
   // === PERFORMANCE SETTINGS ===
   "sn-performance-mode": PerformanceMode; // Master performance control
+  "sn-performance-overrides": PerformanceOverrides; // Internal override tracking
   "sn-webgl-enabled": boolean;
   "sn-webgl-quality": WebGLQuality;
   "sn-animation-quality": QualityLevel;
@@ -213,7 +224,45 @@ export const SETTINGS_METADATA: {
     validator: (value): value is PerformanceMode =>
       typeof value === "string" &&
       ["auto", "performance", "balanced", "quality", "maximum"].includes(value),
-    description: "Master performance mode controlling all quality settings",
+    description: "Master performance mode (controls all quality settings below)",
+    category: "performance",
+  },
+
+  "sn-performance-overrides": {
+    defaultValue: {
+      hasOverrides: false,
+      overriddenSettings: [],
+      baseMode: "auto",
+    },
+    validator: (value): value is PerformanceOverrides => {
+      if (typeof value !== "object" || value === null) return false;
+      const obj = value as Record<string, unknown>;
+      return (
+        typeof obj.hasOverrides === "boolean" &&
+        Array.isArray(obj.overriddenSettings) &&
+        typeof obj.baseMode === "string" &&
+        ["auto", "performance", "balanced", "quality", "maximum"].includes(obj.baseMode)
+      );
+    },
+    parser: (value: string) => {
+      try {
+        const parsed = JSON.parse(value);
+        if (
+          typeof parsed === "object" &&
+          parsed !== null &&
+          typeof parsed.hasOverrides === "boolean" &&
+          Array.isArray(parsed.overriddenSettings) &&
+          typeof parsed.baseMode === "string"
+        ) {
+          return parsed as PerformanceOverrides;
+        }
+        return null;
+      } catch {
+        return null;
+      }
+    },
+    serializer: (value: PerformanceOverrides) => JSON.stringify(value),
+    description: "Internal: Tracks user overrides to performance mode presets",
     category: "performance",
   },
 
@@ -226,7 +275,7 @@ export const SETTINGS_METADATA: {
       return null;
     },
     serializer: (value: boolean) => value.toString(),
-    description: "Toggle WebGL-based visual systems",
+    description: "⚙️ Advanced: WebGL-based visual systems (controlled by performance mode unless overridden)",
     category: "performance",
   },
 
@@ -234,7 +283,7 @@ export const SETTINGS_METADATA: {
     defaultValue: "medium",
     validator: (value): value is WebGLQuality =>
       typeof value === "string" && ["low", "medium", "high"].includes(value),
-    description: "Preferred quality level for WebGL rendering",
+    description: "⚙️ Advanced: WebGL rendering quality (controlled by performance mode unless overridden)",
     category: "performance",
   },
 
@@ -242,7 +291,7 @@ export const SETTINGS_METADATA: {
     defaultValue: "auto",
     validator: (value): value is QualityLevel =>
       typeof value === "string" && ["auto", "low", "high"].includes(value),
-    description: "Animation quality preference for dynamic effects",
+    description: "⚙️ Advanced: Animation quality for dynamic effects (controlled by performance mode unless overridden)",
     category: "performance",
   },
 
@@ -252,7 +301,7 @@ export const SETTINGS_METADATA: {
       typeof value === "string" &&
       ["auto", "enabled", "disabled"].includes(value),
     description:
-      "Corridor shader effects control (auto enables on capable devices)",
+      "⚙️ Advanced: Corridor shader effects (controlled by performance mode unless overridden)",
     category: "performance",
   },
 
@@ -261,7 +310,7 @@ export const SETTINGS_METADATA: {
     validator: (value): value is RenderingModePreference =>
       typeof value === "string" &&
       ["auto", "basic", "standard", "enhanced", "full"].includes(value),
-    description: "Advanced: Manual rendering backend selection",
+    description: "⚙️ Advanced: Manual rendering backend selection (controlled by performance mode unless overridden)",
     category: "performance",
   },
 };

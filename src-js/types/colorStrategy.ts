@@ -1,3 +1,5 @@
+import { GenreType } from "@/types/genre";
+
 /**
  * Color Processing Strategy Interfaces
  * 
@@ -34,7 +36,7 @@ export interface ColorContext {
     energy?: number;
     valence?: number;
     tempo?: number;
-    genre?: string;
+    genre?: GenreType;
   } | undefined;
 
   /** Performance hints for strategy selection */

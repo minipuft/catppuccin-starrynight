@@ -11,7 +11,7 @@
 import type { AdvancedSystemConfig, Year3000Config, PerformanceProfile } from "@/types/models";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { createOptimizedCanvas, detectRenderingCapabilities, type CanvasResult, type CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
-import type { PerformanceMode } from "@/core/performance/PerformanceMonitor";
+import type { PerformanceModeConfig } from "@/core/performance/PerformanceMonitor";
 import type {
   SystemLifecycleService,
   PerformanceTrackingService,
@@ -33,6 +33,7 @@ import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordina
 import { unifiedEventBus } from "@/core/events/EventBus";
 import type { UnifiedEventMap } from "@/core/events/EventBus";
 import { MusicSyncService } from "@/audio/MusicSyncService";
+import { GenreService } from "@/audio/GenreService";
 import { selectPerformanceProfile } from "@/utils/animation/visualPerformance";
 import {
   getSettings,
@@ -557,7 +558,8 @@ export class DefaultServiceFactory {
         themingState: new DefaultThemingStateService(),
         settings: new DefaultSettingsService(),
         themeLifecycle: new DefaultThemeLifecycleService(),
-        visualCoordinator: new DefaultVisualCoordinatorService()
+        visualCoordinator: new DefaultVisualCoordinatorService(),
+        genre: new GenreService()
       };
     }
     if (DefaultServiceFactory.overrides) {
@@ -606,7 +608,7 @@ export class DefaultPerformanceProfileService implements PerformanceProfileServi
 
   constructor(
     private config: AdvancedSystemConfig | Year3000Config | null = null,
-    private performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceMode } | null = null,
+    private performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceModeConfig } | null = null,
     private eventBus = unifiedEventBus
   ) {
     this.refreshSnapshot();
@@ -615,7 +617,7 @@ export class DefaultPerformanceProfileService implements PerformanceProfileServi
 
   public setDependencies(
     config: AdvancedSystemConfig | Year3000Config | null,
-    performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceMode } | null
+    performanceCoordinator: { getCurrentPerformanceMode?: () => PerformanceModeConfig } | null
   ): void {
     this.config = config;
     this.performanceCoordinator = performanceCoordinator;
@@ -705,7 +707,7 @@ export class DefaultPerformanceProfileService implements PerformanceProfileServi
 
   private resolveProfile(
     quality: PerformanceProfileSnapshot["quality"],
-    mode: PerformanceMode | null
+    mode: PerformanceModeConfig | null
   ): PerformanceProfile | null {
     const profiles = (this.config as any)?.performanceProfiles;
     if (!profiles) return null;
@@ -721,7 +723,7 @@ export class DefaultPerformanceProfileService implements PerformanceProfileServi
   }
 
   private mapModeToQuality(
-    mode: PerformanceMode | null,
+    mode: PerformanceModeConfig | null,
     fallback: PerformanceProfileSnapshot["quality"] = "balanced"
   ): PerformanceProfileSnapshot["quality"] {
     if (!mode) return fallback;

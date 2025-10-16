@@ -11,10 +11,15 @@
  */
 
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
+import { GenreType } from "@/types/genre";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { EmotionalTemperatureMapper } from "@/utils/color/EmotionalTemperatureMapper";
-import { MusicalOKLABCoordinator } from "@/utils/color/MusicalOKLABCoordinator";
 import { OKLABColorProcessor } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  getMusicalOKLABProcessor,
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -108,7 +113,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const processor = new OKLABColorProcessor(false);
+      const processor = getStandardOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "validation",
+      });
+
+      if (!processor) {
+        this.addIssue(
+          "error",
+          "color-processing",
+          "OKLABColorProcessor singleton unavailable"
+        );
+        return;
+      }
 
       // Test basic OKLAB processing
       const testColor = "#cba6f7"; // Catppuccin mauve
@@ -169,7 +187,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const coordinator = new MusicalOKLABCoordinator(false);
+      const coordinator = getMusicalOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "validation",
+      });
+
+      if (!coordinator) {
+        this.addIssue(
+          "error",
+          "integration",
+          "MusicalOKLABCoordinator singleton unavailable"
+        );
+        return;
+      }
 
       // Test musical color coordination
       const testContext = {
@@ -177,7 +208,7 @@ export class OKLABConsistencyValidator {
           energy: 0.8,
           valence: 0.7,
           tempo: 128,
-          genre: "electronic",
+          genre: GenreType.ELECTRONIC,
         },
         rawColors: {
           VIBRANT: "#cba6f7",
@@ -239,7 +270,7 @@ export class OKLABConsistencyValidator {
         energy: 0.6,
         valence: 0.5,
         tempo: 120,
-        genre: "rock",
+        genre: GenreType.ROCK,
       };
 
       const result = mapper.mapMusicToEmotionalTemperature(testMusicData);
@@ -297,7 +328,13 @@ export class OKLABConsistencyValidator {
       const manager = new GenreProfileManager();
 
       // Test genre OKLAB preset mapping
-      const testGenres = ["electronic", "classical", "rock", "jazz", "default"];
+      const testGenres = [
+        GenreType.ELECTRONIC,
+        GenreType.CLASSICAL,
+        GenreType.ROCK,
+        GenreType.JAZZ,
+        GenreType.DEFAULT,
+      ];
 
       for (const genre of testGenres) {
         this.validationResults.summary.totalChecks++;
@@ -461,7 +498,20 @@ export class OKLABConsistencyValidator {
     this.validationResults.summary.totalChecks++;
 
     try {
-      const processor = new OKLABColorProcessor(false);
+      const processor = getStandardOKLABProcessor({
+        requester: "OKLABConsistencyValidator",
+        enableDebug: this.enableDebug,
+        reason: "performance-check",
+      });
+
+      if (!processor) {
+        this.addIssue(
+          "error",
+          "performance",
+          "OKLABColorProcessor singleton unavailable for performance validation"
+        );
+        return;
+      }
       const testColors = [
         "#cba6f7",
         "#f5c2e7",

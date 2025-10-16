@@ -1,7 +1,7 @@
 /**
  * Spotify UI Application System
  *
- * The missing piece that takes the unified Year3000 state and applies it to Spotify UI elements.
+ * takes the unified Year3000 state and applies it to Spotify UI elements.
  * This system discovers DOM elements and applies the existing --sn-* variables systematically.
  */
 
@@ -11,6 +11,13 @@ import type { HealthCheckResult, IManagedSystem } from "../../types/systems";
 // Event-driven integration imports
 import { unifiedEventBus } from "../../core/events/EventBus";
 import type { ColorHarmonizedEvent } from "../../types/colorStrategy";
+
+// Centralized selector definitions
+import {
+  MODERN_SELECTORS,
+  SELECTOR_GROUPS,
+  ORBITAL_ELEMENTS,
+} from "@/debug/SpotifyDOMSelectors";
 
 interface SpotifyUITargets {
   nowPlaying: Element[];
@@ -43,7 +50,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   private targets: SpotifyUITargets;
   private effectLayers: EffectLayer[] = [];
   private observerRegistry: Map<string, MutationObserver> = new Map();
-  
+
   // Performance optimization
   private lastDiscoveryLogTime: number = 0;
   private lastRefreshLogTime: number = 0;
@@ -74,7 +81,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
       const isHealthy = this.initialized && totalElements > 0;
       const issues: string[] = [];
-      
+
       if (totalElements === 0) {
         issues.push("No UI elements discovered");
       }
@@ -86,7 +93,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
           this.initialized ? "active" : "inactive"
         }, ${totalElements} elements enhanced`,
         issues: issues,
-        system: 'SpotifyUIApplicationSystem',
+        system: "SpotifyUIApplicationSystem",
       };
     } catch (error) {
       return {
@@ -94,7 +101,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
         ok: false,
         details: "Health check failed",
         issues: [error instanceof Error ? error.message : "Unknown error"],
-        system: 'SpotifyUIApplicationSystem',
+        system: "SpotifyUIApplicationSystem",
       };
     }
   }
@@ -152,73 +159,35 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
   /**
    * DOM Intelligence Layer - Discovers current Spotify UI elements (OPTIMIZED)
+   * Uses centralized selectors from SpotifyDOMSelectors for consistency
    */
   private async discoverUITargets(): Promise<void> {
-    const selectors = {
-      nowPlaying: [
-        '[data-testid="now-playing-widget"]',
-        ".main-nowPlayingWidget-nowPlaying",
-        ".Root__now-playing-bar",
-      ],
-      sidebar: [
-        '[data-testid="nav-bar"]',
-        ".main-navBar-navBar",
-        ".Root__nav-bar",
-      ],
-      mainContent: [
-        '[data-testid="main"]',
-        ".main-view-container",
-        ".Root__main-view",
-      ],
-      buttons: [
-        'button[class*="Button"]',
-        '[role="button"]',
-        ".main-playButton-PlayButton",
-      ],
-      cards: [
-        ".sn-card", // Phase 2.2: Unified selector (CardDOMWatcher)
-        '[data-testid*="card"]',
-        ".main-card-card", // Legacy selector (kept for transition)
-        ".main-entityCard-container",
-      ],
-      headers: [
-        "h1, h2, h3, h4, h5, h6",
-        '[data-testid*="header"]',
-        ".main-entityHeader-titleText",
-      ],
-      textElements: [
-        '[data-testid="track-name"]',
-        '[data-testid="artist-name"]',
-        ".main-trackList-trackName",
-        ".main-trackList-artistName",
-      ],
-      iconElements: [
-        'svg[class*="Icon"]',
-        '[data-testid*="icon"]',
-        ".Svg-sc-ytk21e-0",
-      ],
-      playbackControls: [
-        '[data-testid="control-button"]',
-        ".main-playPauseButton-button",
-        ".player-controls__buttons",
-      ],
-      trackRows: [
-        '[data-testid="tracklist-row"]',
-        ".main-trackList-trackListRow",
-        ".main-rootlist-rootlistItem",
-      ],
+    // Use centralized selector groups with built-in fallbacks
+    const selectorMappings: Record<keyof SpotifyUITargets, string[]> = {
+      nowPlaying: SELECTOR_GROUPS.nowPlaying as string[],
+      sidebar: SELECTOR_GROUPS.sidebar as string[],
+      mainContent: SELECTOR_GROUPS.mainContent as string[],
+      buttons: SELECTOR_GROUPS.buttons as string[],
+      cards: SELECTOR_GROUPS.cards as string[],
+      headers: SELECTOR_GROUPS.headers as string[],
+      textElements: SELECTOR_GROUPS.textElements as string[],
+      iconElements: SELECTOR_GROUPS.iconElements as string[],
+      playbackControls: SELECTOR_GROUPS.playbackControls as string[],
+      trackRows: SELECTOR_GROUPS.trackRows as string[],
     };
 
     // Use combined selectors to minimize DOM queries (optimization)
     const combinedQueries: Record<string, string> = {};
-    for (const [category, selectorArray] of Object.entries(selectors)) {
-      combinedQueries[category] = selectorArray.join(', ');
+    for (const [category, selectorArray] of Object.entries(selectorMappings)) {
+      combinedQueries[category] = selectorArray.join(", ");
     }
 
     // Execute all queries in a single pass to reduce DOM overhead
     const elementMap = new Map<Element, string[]>();
-    
-    for (const [category, combinedSelector] of Object.entries(combinedQueries)) {
+
+    for (const [category, combinedSelector] of Object.entries(
+      combinedQueries
+    )) {
       try {
         const found = document.querySelectorAll(combinedSelector);
         for (const element of found) {
@@ -360,7 +329,11 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     element?: HTMLElement
   ): void {
     if (this.year3000System?.queueCSSVariableUpdate) {
-      this.year3000System.queueCSSVariableUpdate(property, value, element || null);
+      this.year3000System.queueCSSVariableUpdate(
+        property,
+        value,
+        element || null
+      );
     } else {
       // Fallback: apply directly if Year3000System not available
       const target = element || document.documentElement;
@@ -409,38 +382,22 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
     // Hover effects
     element.addEventListener("mouseenter", () => {
-      this.safeQueueCSSVariableUpdate(
-        "--sn-hover-intensity",
-        "1",
-        element
-      );
+      this.safeQueueCSSVariableUpdate("--sn-hover-intensity", "1", element);
       element.classList.add("sn-hover-active");
     });
 
     element.addEventListener("mouseleave", () => {
-      this.safeQueueCSSVariableUpdate(
-        "--sn-hover-intensity",
-        "0",
-        element
-      );
+      this.safeQueueCSSVariableUpdate("--sn-hover-intensity", "0", element);
       element.classList.remove("sn-hover-active");
     });
 
     // Click effects
     element.addEventListener("click", () => {
-      this.safeQueueCSSVariableUpdate(
-        "--sn-click-intensity",
-        "1",
-        element
-      );
+      this.safeQueueCSSVariableUpdate("--sn-click-intensity", "1", element);
       element.classList.add("sn-click-active");
 
       setTimeout(() => {
-        this.safeQueueCSSVariableUpdate(
-          "--sn-click-intensity",
-          "0",
-          element
-        );
+        this.safeQueueCSSVariableUpdate("--sn-click-intensity", "0", element);
         element.classList.remove("sn-click-active");
       }, 300);
     });
@@ -448,6 +405,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
 
   /**
    * Sets up DOM mutation observers for dynamic Spotify UI updates (OPTIMIZED)
+   * Uses centralized selectors for consistency
    */
   private setupDOMObservers(): void {
     const observerConfig = {
@@ -456,6 +414,16 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       attributes: false, // Disabled attribute watching for performance
     };
 
+    // Build significant selector list from centralized selectors
+    const significantSelectors = [
+      ORBITAL_ELEMENTS.cards,
+      ORBITAL_ELEMENTS.trackRows,
+      MODERN_SELECTORS.entityHeader,
+      MODERN_SELECTORS.buttonRole,
+    ]
+      .filter((s) => s) // Remove any undefined selectors
+      .join(", ");
+
     // Main content observer with more intelligent filtering
     const mainObserver = new MutationObserver((mutations) => {
       let significantChange = false;
@@ -463,16 +431,20 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       mutations.forEach((mutation) => {
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
           // Only refresh for significant DOM additions
-          const hasSignificantNodes = Array.from(mutation.addedNodes).some(node => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              const element = node as Element;
-              // Look for elements that might contain our target selectors
-              return element.matches('[data-testid*="card"], [data-testid*="track"], [data-testid*="header"], [role="button"]') ||
-                     element.querySelector('[data-testid*="card"], [data-testid*="track"], [data-testid*="header"], [role="button"]');
+          const hasSignificantNodes = Array.from(mutation.addedNodes).some(
+            (node) => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as Element;
+                // Look for elements that might contain our target selectors
+                return (
+                  element.matches(significantSelectors) ||
+                  element.querySelector(significantSelectors)
+                );
+              }
+              return false;
             }
-            return false;
-          });
-          
+          );
+
           if (hasSignificantNodes) {
             significantChange = true;
           }
@@ -484,8 +456,10 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       }
     });
 
+    // Use centralized selector for main element
     const mainElement =
-      document.querySelector('[data-testid="main"]') || document.body;
+      document.querySelector(MODERN_SELECTORS.mainView as string) ||
+      document.body;
     mainObserver.observe(mainElement, observerConfig);
     this.observerRegistry.set("main", mainObserver);
   }
@@ -511,7 +485,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     try {
       // Calculate hash of current targets to avoid redundant refreshes
       const previousTargetHash = this.calculateTargetHash();
-      
+
       // Rediscover targets
       await this.discoverUITargets();
 
@@ -519,7 +493,7 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       const currentTargetHash = this.calculateTargetHash();
       if (previousTargetHash !== currentTargetHash) {
         this.applyUnifiedState();
-        
+
         // Throttled refresh logging (only every 10 seconds)
         if (performance.now() - this.lastRefreshLogTime >= 10000) {
           console.log("🔄 UI targets refreshed");
@@ -530,11 +504,11 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
       console.error("Failed to refresh UI targets", error);
     }
   }
-  
+
   private calculateTargetHash(): string {
     // Quick hash based on total elements found in each category
-    const counts = Object.values(this.targets).map(arr => arr.length);
-    return counts.join('-');
+    const counts = Object.values(this.targets).map((arr) => arr.length);
+    return counts.join("-");
   }
 
   /**
@@ -543,63 +517,76 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   private registerSystemCallbacks(): void {
     // Listen for color harmony updates via event-driven pattern (NEW ARCHITECTURE)
     try {
-      unifiedEventBus.subscribe('colors:harmonized', (data) => {
-        this.handleColorHarmonizedEvent({
-          type: 'colors/harmonized',
-          payload: {
-            processedColors: data.processedColors,
-            accentHex: data.accentHex || '#cba6f7',
-            accentRgb: data.accentRgb || '203,166,247',
-            context: {
-              rawColors: data.processedColors,
-              trackUri: '',
-              timestamp: Date.now()
+      unifiedEventBus.subscribe(
+        "colors:harmonized",
+        (data) => {
+          this.handleColorHarmonizedEvent({
+            type: "colors/harmonized",
+            payload: {
+              processedColors: data.processedColors,
+              accentHex: data.accentHex || "#cba6f7",
+              accentRgb: data.accentRgb || "203,166,247",
+              context: {
+                rawColors: data.processedColors,
+                trackUri: "",
+                timestamp: Date.now(),
+              },
+              cssVariables: {},
+              metadata: {
+                strategy: data.strategies[0] || "unknown",
+                accentHex: data.accentHex,
+                processingTime: data.processingTime,
+              },
             },
-            cssVariables: {},
-            metadata: {
-              strategy: data.strategies[0] || 'unknown',
-              accentHex: data.accentHex,
-              processingTime: data.processingTime
-            }
-          }
-        });
-      }, 'SpotifyUIApplicationSystem');
-      
-      console.log("🎨 [SpotifyUIApplicationSystem] Subscribed to colors:harmonized events");
+          });
+        },
+        "SpotifyUIApplicationSystem"
+      );
+
+      console.log(
+        "🎨 [SpotifyUIApplicationSystem] Subscribed to colors:harmonized events"
+      );
     } catch (error) {
-      console.error("[SpotifyUIApplicationSystem] Failed to subscribe to colors:harmonized events:", error);
-      
+      console.error(
+        "[SpotifyUIApplicationSystem] Failed to subscribe to colors:harmonized events:",
+        error
+      );
+
       // Fallback to legacy method interception for compatibility
       if (this.year3000System.colorHarmonyEngine) {
         const originalApplyColors = this.year3000System.applyColorsToTheme.bind(
           this.year3000System
         );
-        this.year3000System.applyColorsToTheme = (extractedColors: any = {}) => {
+        this.year3000System.applyColorsToTheme = (
+          extractedColors: any = {}
+        ) => {
           originalApplyColors(extractedColors);
           this.updateColorVariables(extractedColors);
         };
-        
-        console.warn("[SpotifyUIApplicationSystem] Using legacy color application hook as fallback");
+
+        console.warn(
+          "[SpotifyUIApplicationSystem] Using legacy color application hook as fallback"
+        );
       }
     }
 
     // Subscribe to music analysis events via unified event bus
     unifiedEventBus.subscribe(
-      'music:energy',
+      "music:energy",
       (payload) => {
         this.updateMusicIntensity({ processedEnergy: payload.energy });
       },
-      'SpotifyUIApplicationSystem'
+      "SpotifyUIApplicationSystem"
     );
 
     unifiedEventBus.subscribe(
-      'music:beat',
+      "music:beat",
       (payload) => {
-        if (typeof payload.intensity === 'number') {
+        if (typeof payload.intensity === "number") {
           this.triggerBeatEffects({ intensity: payload.intensity });
         }
       },
-      'SpotifyUIApplicationSystem'
+      "SpotifyUIApplicationSystem"
     );
 
     // Listen for beat detection from existing systems
@@ -643,28 +630,33 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
    * Handle colors/harmonized event from ColorOrchestrator (Event-driven architecture)
    */
   private handleColorHarmonizedEvent(event: ColorHarmonizedEvent): void {
-    if (event.type !== 'colors/harmonized') return;
-    
+    if (event.type !== "colors/harmonized") return;
+
     const { processedColors, cssVariables, metadata } = event.payload;
-    
-    console.log("🎨 [SpotifyUIApplicationSystem] Received harmonized colors via event-driven pattern", {
-      strategy: metadata.strategy,
-      colorsCount: Object.keys(processedColors).length,
-      cssVariablesCount: Object.keys(cssVariables).length
-    });
-    
+
+    console.log(
+      "🎨 [SpotifyUIApplicationSystem] Received harmonized colors via event-driven pattern",
+      {
+        strategy: metadata.strategy,
+        colorsCount: Object.keys(processedColors).length,
+        cssVariablesCount: Object.keys(cssVariables).length,
+      }
+    );
+
     try {
       // Update color variables for Spotify UI elements
       this.updateColorVariables(processedColors);
-      
+
       // Apply CSS variables directly if provided (optimization)
       if (cssVariables && Object.keys(cssVariables).length > 0) {
         this.applyCSSVariablesToSpotifyUI(cssVariables);
       }
-      
     } catch (error) {
-      console.error("[SpotifyUIApplicationSystem] Failed to apply harmonized colors from event:", error);
-      
+      console.error(
+        "[SpotifyUIApplicationSystem] Failed to apply harmonized colors from event:",
+        error
+      );
+
       // Fallback to basic color application
       this.updateColorVariables(processedColors);
     }
@@ -673,18 +665,20 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   /**
    * Apply CSS variables directly to Spotify UI elements (optimization for event-driven pattern)
    */
-  private applyCSSVariablesToSpotifyUI(cssVariables: Record<string, string>): void {
+  private applyCSSVariablesToSpotifyUI(
+    cssVariables: Record<string, string>
+  ): void {
     try {
       const root = document.documentElement;
       const enhancedElements = document.querySelectorAll(".sn-ui-enhanced");
-      
+
       // Apply to root for global availability
       for (const [variable, value] of Object.entries(cssVariables)) {
         if (variable && value) {
           root.style.setProperty(variable, value);
         }
       }
-      
+
       // Apply to enhanced Spotify UI elements
       enhancedElements.forEach((element) => {
         if (element instanceof HTMLElement) {
@@ -695,14 +689,19 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
           }
         }
       });
-      
-      console.log("🎨 [SpotifyUIApplicationSystem] Applied CSS variables to Spotify UI", {
-        variablesCount: Object.keys(cssVariables).length,
-        enhancedElementsCount: enhancedElements.length
-      });
-      
+
+      console.log(
+        "🎨 [SpotifyUIApplicationSystem] Applied CSS variables to Spotify UI",
+        {
+          variablesCount: Object.keys(cssVariables).length,
+          enhancedElementsCount: enhancedElements.length,
+        }
+      );
     } catch (error) {
-      console.error("[SpotifyUIApplicationSystem] Failed to apply CSS variables to Spotify UI:", error);
+      console.error(
+        "[SpotifyUIApplicationSystem] Failed to apply CSS variables to Spotify UI:",
+        error
+      );
     }
   }
 
@@ -749,19 +748,11 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
     const beatElements = document.querySelectorAll(".sn-beat-responsive");
     beatElements.forEach((element) => {
       if (element instanceof HTMLElement) {
-        this.safeQueueCSSVariableUpdate(
-          "--sn-beat-pulse",
-          "1",
-          element
-        );
+        this.safeQueueCSSVariableUpdate("--sn-beat-pulse", "1", element);
         element.classList.add("sn-beat-active");
 
         setTimeout(() => {
-          this.safeQueueCSSVariableUpdate(
-            "--sn-beat-pulse",
-            "0",
-            element
-          );
+          this.safeQueueCSSVariableUpdate("--sn-beat-pulse", "0", element);
           element.classList.remove("sn-beat-active");
         }, 200);
       }
@@ -785,7 +776,9 @@ export class SpotifyUIApplicationSystem implements IManagedSystem {
   async destroy(): Promise<void> {
     // Unregister timers from consolidation system
     if (this.year3000System?.timerConsolidationSystem) {
-      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer("SpotifyUIApplicationSystem-beatEffects");
+      this.year3000System.timerConsolidationSystem.unregisterConsolidatedTimer(
+        "SpotifyUIApplicationSystem-beatEffects"
+      );
     }
 
     // Clean up observers

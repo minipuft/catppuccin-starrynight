@@ -6,6 +6,8 @@
 // No external dependencies; safe for degraded builds.
 // ============================================================================
 
+import { GenreType } from "@/types/genre";
+
 const LS_KEY = "sn_seen_genres_v1";
 
 export class UserGenreHistory {
@@ -17,11 +19,11 @@ export class UserGenreHistory {
     this.seen = new Set<string>(raw ? JSON.parse(raw) : []);
   }
 
-  public hasSeen(genre: string): boolean {
+  public hasSeen(genre: GenreType): boolean {
     return this.seen.has(genre.toLowerCase());
   }
 
-  public markSeen(genre: string): void {
+  public markSeen(genre: GenreType): void {
     const key = genre.toLowerCase();
     if (!this.seen.has(key)) {
       this.seen.add(key);

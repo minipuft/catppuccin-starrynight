@@ -35,6 +35,8 @@
  * @see SpicetifyColorBridge - Primary consumer of these utilities
  * @see docs/architecture/adr/ADR-001-rename-semantic-color-manager.md
  */
+import * as ThemeUtilities from "@/utils/core/ThemeUtilities";
+import type { OKLCHColor } from "@/utils/color/OKLABColorProcessor";
 
 /**
  * RGB Color object
@@ -79,6 +81,123 @@ export type ZoneColorType = 'flamingo' | 'lavender' | 'peach' | 'rosewater' | 's
  * Palette color types for Catppuccin compatibility
  */
 export type PaletteColorType = 'pink' | 'sky' | 'red' | 'maroon' | 'yellow' | 'green';
+
+const MIN_LIGHTNESS = 0.02;
+const MAX_LIGHTNESS = 0.98;
+const MAX_CHROMA = 0.35;
+
+type LightnessDirection = 'lighter' | 'darker';
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function wrapHue(degrees: number): number {
+  const wrapped = ((degrees % 360) + 360) % 360;
+  return wrapped === 360 ? 0 : wrapped;
+}
+
+function blendHue(source: number, target: number, mix: number): number {
+  const clampedMix = clamp(mix, 0, 1);
+  const sourceRad = (wrapHue(source) * Math.PI) / 180;
+  const targetRad = (wrapHue(target) * Math.PI) / 180;
+
+  const x = Math.cos(sourceRad) * (1 - clampedMix) + Math.cos(targetRad) * clampedMix;
+  const y = Math.sin(sourceRad) * (1 - clampedMix) + Math.sin(targetRad) * clampedMix;
+
+  if (x === 0 && y === 0) {
+    return wrapHue(target);
+  }
+
+  return wrapHue((Math.atan2(y, x) * 180) / Math.PI);
+}
+
+function sanitizeOklch(oklch: OKLCHColor): OKLCHColor {
+  return {
+    L: clamp(oklch.L, MIN_LIGHTNESS, MAX_LIGHTNESS),
+    C: clamp(oklch.C, 0, MAX_CHROMA),
+    H: wrapHue(oklch.H),
+  };
+}
+
+function toOklch(hex: string): OKLCHColor | null {
+  if (!ThemeUtilities.isValidHexColor(hex)) {
+    return null;
+  }
+
+  return ThemeUtilities.hexToOklch(hex);
+}
+
+function fromOklch(oklch: OKLCHColor): string {
+  return ThemeUtilities.oklchToHex(sanitizeOklch(oklch));
+}
+
+function computeLightnessVariant(
+  base: OKLCHColor,
+  factor: number,
+  direction: LightnessDirection
+): OKLCHColor {
+  const clampedFactor = clamp(factor, 0, 1);
+  if (clampedFactor === 0) {
+    return sanitizeOklch(base);
+  }
+
+  const available = direction === 'darker' ? base.L - MIN_LIGHTNESS : MAX_LIGHTNESS - base.L;
+  const lightnessShift = available * clampedFactor;
+  const L = direction === 'darker' ? base.L - lightnessShift : base.L + lightnessShift;
+  const chromaScale = direction === 'darker' ? 1 - 0.35 * clampedFactor : 1 - 0.18 * clampedFactor;
+
+  return sanitizeOklch({
+    L,
+    C: clamp(base.C * chromaScale, 0, MAX_CHROMA),
+    H: base.H,
+  });
+}
+
+function applyOklchAdjustment(
+  baseHex: string,
+  adjustment: {
+    hueShift?: number;
+    hueTarget?: number;
+    hueMix?: number;
+    chromaScale?: number;
+    chromaAdd?: number;
+    lightnessShift?: number;
+    lightnessScale?: number;
+  },
+  fallback?: string
+): string {
+  const oklch = toOklch(baseHex);
+  if (!oklch) {
+    return fallback ?? baseHex;
+  }
+
+  const lightnessScale = adjustment.lightnessScale ?? 1;
+  const lightnessShift = adjustment.lightnessShift ?? 0;
+  const targetLightness = clamp(
+    oklch.L * lightnessScale + lightnessShift,
+    MIN_LIGHTNESS,
+    MAX_LIGHTNESS
+  );
+
+  const chromaScale = adjustment.chromaScale ?? 1;
+  const chromaAdd = adjustment.chromaAdd ?? 0;
+  const targetChroma = clamp(oklch.C * chromaScale + chromaAdd, 0, MAX_CHROMA);
+
+  let targetHue = oklch.H;
+  if (typeof adjustment.hueTarget === 'number') {
+    const hueMix = adjustment.hueMix ?? 0.5;
+    targetHue = blendHue(oklch.H, adjustment.hueTarget, hueMix);
+  } else if (typeof adjustment.hueShift === 'number') {
+    targetHue = wrapHue(oklch.H + adjustment.hueShift);
+  }
+
+  return fromOklch({
+    L: targetLightness,
+    C: targetChroma,
+    H: targetHue,
+  });
+}
 
 // ============================================================================
 // CORE COLOR DISTRIBUTION
@@ -173,15 +292,21 @@ export function convertColorsToRgb(colorDistribution: ColorDistribution): Record
  */
 export function generateDarkerVariant(hexColor: string, factor: number): string {
   try {
-    const rgb = hexToRgbObject(hexColor);
-    if (!rgb) return hexColor;
+    const clampedFactor = clamp(factor, 0, 1);
+    if (clampedFactor === 0) {
+      return hexColor;
+    }
+    if (clampedFactor >= 1) {
+      return '#000000';
+    }
 
-    // Simple darkening by reducing RGB values
-    const r = Math.max(0, Math.round(rgb.r * (1 - factor)));
-    const g = Math.max(0, Math.round(rgb.g * (1 - factor)));
-    const b = Math.max(0, Math.round(rgb.b * (1 - factor)));
+    const oklch = toOklch(hexColor);
+    if (!oklch) {
+      return hexColor;
+    }
 
-    return rgbToHex(r, g, b);
+    const darkerVariant = computeLightnessVariant(oklch, clampedFactor, 'darker');
+    return fromOklch(darkerVariant);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate darker variant:', error);
     return hexColor;
@@ -200,15 +325,21 @@ export function generateDarkerVariant(hexColor: string, factor: number): string 
  */
 export function generateLighterVariant(hexColor: string, factor: number): string {
   try {
-    const rgb = hexToRgbObject(hexColor);
-    if (!rgb) return hexColor;
+    const clampedFactor = clamp(factor, 0, 1);
+    if (clampedFactor === 0) {
+      return hexColor;
+    }
+    if (clampedFactor >= 1) {
+      return '#ffffff';
+    }
 
-    // Simple lightening by moving RGB values toward white
-    const r = Math.min(255, Math.round(rgb.r + (255 - rgb.r) * factor));
-    const g = Math.min(255, Math.round(rgb.g + (255 - rgb.g) * factor));
-    const b = Math.min(255, Math.round(rgb.b + (255 - rgb.b) * factor));
+    const oklch = toOklch(hexColor);
+    if (!oklch) {
+      return hexColor;
+    }
 
-    return rgbToHex(r, g, b);
+    const lighterVariant = computeLightnessVariant(oklch, clampedFactor, 'lighter');
+    return fromOklch(lighterVariant);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate lighter variant:', error);
     return hexColor;
@@ -227,19 +358,17 @@ export function generateLighterVariant(hexColor: string, factor: number): string
  */
 export function generateHueRotatedColor(hexColor: string, hueDegrees: number): string {
   try {
-    const rgb = hexToRgbObject(hexColor);
-    if (!rgb) return hexColor;
+    const oklch = toOklch(hexColor);
+    if (!oklch) {
+      return hexColor;
+    }
 
-    // Convert RGB to HSL for hue rotation
-    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const rotated: OKLCHColor = {
+      ...oklch,
+      H: wrapHue(oklch.H + hueDegrees),
+    };
 
-    // Rotate hue (wrap around 360 degrees)
-    hsl.h = (hsl.h + hueDegrees) % 360;
-    if (hsl.h < 0) hsl.h += 360;
-
-    // Convert back to RGB
-    const rotatedRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
-    return rgbToHex(rotatedRgb.r, rotatedRgb.g, rotatedRgb.b);
+    return fromOklch(rotated);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate hue-rotated color:', error);
     return hexColor;
@@ -259,16 +388,16 @@ export function generateHueRotatedColor(hexColor: string, hueDegrees: number): s
  */
 export function generateCinematicRed(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#FF0000'; // Fallback
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#FF0000';
 
-    // Create dramatic red with base color influence
-    // Boost red channel significantly while maintaining base color warmth
-    const dramaticRed = Math.min(255, rgb.r + 100);
-    const warmGreen = Math.max(0, Math.min(rgb.g * 0.3, 100));
-    const warmBlue = Math.max(0, Math.min(rgb.b * 0.2, 80));
+    const dramatic: OKLCHColor = sanitizeOklch({
+      L: clamp(oklch.L * 0.7, MIN_LIGHTNESS, 0.7),
+      C: clamp(oklch.C * 1.6 + 0.06, 0.12, MAX_CHROMA),
+      H: blendHue(oklch.H, 25, 0.7),
+    });
 
-    return rgbToHex(dramaticRed, warmGreen, warmBlue);
+    return fromOklch(dramatic);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate cinematic red:', error);
     return '#FF0000';
@@ -284,16 +413,16 @@ export function generateCinematicRed(baseColor: string): string {
  */
 export function generateCinematicCyan(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#00FFFF'; // Fallback
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#00FFFF';
 
-    // Create dramatic cyan complementary to base color
-    // High blue and green channels with base color influence
-    const dramaticGreen = Math.min(255, rgb.g + 120);
-    const dramaticBlue = Math.min(255, rgb.b + 140);
-    const coolRed = Math.max(0, Math.min(rgb.r * 0.2, 60));
+    const dramatic: OKLCHColor = sanitizeOklch({
+      L: clamp(oklch.L * 0.85 + 0.1, 0.4, 0.88),
+      C: clamp(oklch.C * 1.45 + 0.04, 0.15, MAX_CHROMA),
+      H: blendHue(oklch.H, 200, 0.6),
+    });
 
-    return rgbToHex(coolRed, dramaticGreen, dramaticBlue);
+    return fromOklch(dramatic);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate cinematic cyan:', error);
     return '#00FFFF';
@@ -309,15 +438,16 @@ export function generateCinematicCyan(baseColor: string): string {
  */
 export function generateCinematicYellow(highlightColor: string): string {
   try {
-    const rgb = hexToRgbObject(highlightColor);
-    if (!rgb) return '#FFFF00'; // Fallback
+    const oklch = toOklch(highlightColor);
+    if (!oklch) return '#FFFF00';
 
-    // Create bright yellow with highlight color characteristics
-    const brightRed = Math.min(255, rgb.r + 80);
-    const brightGreen = Math.min(255, rgb.g + 100);
-    const subtleBlue = Math.max(0, Math.min(rgb.b * 0.3, 120));
+    const dramatic: OKLCHColor = sanitizeOklch({
+      L: clamp(oklch.L + 0.18, 0.55, MAX_LIGHTNESS),
+      C: clamp(oklch.C * 1.3 + 0.02, 0.12, MAX_CHROMA),
+      H: blendHue(oklch.H, 95, 0.65),
+    });
 
-    return rgbToHex(brightRed, brightGreen, subtleBlue);
+    return fromOklch(dramatic);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate cinematic yellow:', error);
     return '#FFFF00';
@@ -333,20 +463,16 @@ export function generateCinematicYellow(highlightColor: string): string {
  */
 export function generateHolographicPrimary(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#8A2BE2'; // Fallback to violet
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#8A2BE2';
 
-    // Create luminous holographic color with prismatic characteristics
-    // Boost saturation and add prismatic shimmer
-    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const luminous: OKLCHColor = sanitizeOklch({
+      L: clamp(oklch.L + 0.12, 0.45, MAX_LIGHTNESS),
+      C: clamp(oklch.C * 1.35 + 0.03, 0.1, MAX_CHROMA),
+      H: blendHue(oklch.H, wrapHue(oklch.H + 12), 0.4),
+    });
 
-    // Increase saturation for holographic effect
-    const enhancedSaturation = Math.min(100, hsl.s + 30);
-    // Adjust lightness for luminous glow
-    const luminousLightness = Math.min(80, Math.max(40, hsl.l + 10));
-
-    const enhancedRgb = hslToRgb(hsl.h, enhancedSaturation, luminousLightness);
-    return rgbToHex(enhancedRgb.r, enhancedRgb.g, enhancedRgb.b);
+    return fromOklch(luminous);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate holographic primary:', error);
     return '#8A2BE2';
@@ -379,16 +505,16 @@ export function generateHolographicAccent(harmonyColor: string): string {
  */
 export function generateHolographicGlow(highlightColor: string): string {
   try {
-    const rgb = hexToRgbObject(highlightColor);
-    if (!rgb) return '#E0E0FF'; // Fallback to soft blue-white
+    const oklch = toOklch(highlightColor);
+    if (!oklch) return '#E0E0FF';
 
-    // Create soft, luminous glow by increasing all channels proportionally
-    const glowIntensity = 0.7;
-    const glowRed = Math.min(255, rgb.r + (255 - rgb.r) * glowIntensity);
-    const glowGreen = Math.min(255, rgb.g + (255 - rgb.g) * glowIntensity);
-    const glowBlue = Math.min(255, rgb.b + (255 - rgb.b) * glowIntensity);
+    const glow: OKLCHColor = sanitizeOklch({
+      L: clamp(oklch.L + 0.25, 0.6, MAX_LIGHTNESS),
+      C: clamp(oklch.C * 0.45, 0, MAX_CHROMA),
+      H: oklch.H,
+    });
 
-    return rgbToHex(glowRed, glowGreen, glowBlue);
+    return fromOklch(glow);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate holographic glow:', error);
     return '#E0E0FF';
@@ -408,19 +534,10 @@ export function generateHolographicGlow(highlightColor: string): string {
  */
 export function generateTextColor(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#CAD3F5'; // Fallback to Catppuccin text
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#CAD3F5';
 
-    // Calculate luminance to determine if background is light or dark
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-
-    if (luminance > 0.5) {
-      // Light background - use dark text
-      return '#24273A'; // Catppuccin base (dark)
-    } else {
-      // Dark background - use light text
-      return '#CAD3F5'; // Catppuccin text (light)
-    }
+    return oklch.L > 0.62 ? '#24273A' : '#CAD3F5';
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate text color:', error);
     return '#CAD3F5';
@@ -436,19 +553,10 @@ export function generateTextColor(baseColor: string): string {
  */
 export function generateSubtextColor(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#A5ADCB'; // Fallback to Catppuccin subtext
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#A5ADCB';
 
-    // Calculate luminance to determine background brightness
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-
-    if (luminance > 0.5) {
-      // Light background - use medium dark text
-      return '#5B6078'; // Catppuccin overlay2 (medium dark)
-    } else {
-      // Dark background - use medium light text
-      return '#A5ADCB'; // Catppuccin subtext (medium light)
-    }
+    return oklch.L > 0.62 ? '#5B6078' : '#A5ADCB';
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate subtext color:', error);
     return '#A5ADCB';
@@ -465,27 +573,25 @@ export function generateSubtextColor(baseColor: string): string {
  */
 export function generateOverlayColor(baseColor: string, opacity: number): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return `rgba(88,91,112,${opacity})`; // Fallback to Catppuccin overlay
+    const oklch = toOklch(baseColor);
+    if (!oklch) return `rgba(88,91,112,${opacity})`;
 
-    // Calculate luminance to determine lightening strategy
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-
-    if (luminance > 0.5) {
-      // Light background - darken for overlay
-      const factor = 1 - (opacity * 2); // Progressive darkening
-      const overlayRed = Math.max(0, Math.round(rgb.r * factor));
-      const overlayGreen = Math.max(0, Math.round(rgb.g * factor));
-      const overlayBlue = Math.max(0, Math.round(rgb.b * factor));
-      return rgbToHex(overlayRed, overlayGreen, overlayBlue);
-    } else {
-      // Dark background - lighten for overlay
-      const factor = opacity * 255; // Progressive lightening
-      const overlayRed = Math.min(255, Math.round(rgb.r + factor));
-      const overlayGreen = Math.min(255, Math.round(rgb.g + factor));
-      const overlayBlue = Math.min(255, Math.round(rgb.b + factor));
-      return rgbToHex(overlayRed, overlayGreen, overlayBlue);
+    const clampedOpacity = clamp(opacity, 0, 1);
+    if (clampedOpacity === 0) {
+      return fromOklch(sanitizeOklch(oklch));
     }
+
+    const sanitized = sanitizeOklch(oklch);
+    const adjustmentFactor = clamp(0.15 + clampedOpacity * 0.55, 0, 1);
+    const direction: LightnessDirection = sanitized.L > 0.6 ? 'darker' : 'lighter';
+
+    let overlayVariant = computeLightnessVariant(sanitized, adjustmentFactor, direction);
+    overlayVariant = sanitizeOklch({
+      ...overlayVariant,
+      C: clamp(overlayVariant.C * (1 - clampedOpacity * 0.25), 0, MAX_CHROMA),
+    });
+
+    return fromOklch(overlayVariant);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate overlay color:', error);
     return `rgba(88,91,112,${opacity})`;
@@ -501,25 +607,18 @@ export function generateOverlayColor(baseColor: string, opacity: number): string
  */
 export function generateCrustColor(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#232634'; // Fallback to Catppuccin crust
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#232634';
 
-    // Calculate luminance to determine border strategy
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+    const sanitized = sanitizeOklch(oklch);
+    const direction: LightnessDirection = sanitized.L > 0.6 ? 'darker' : 'lighter';
+    const variant = computeLightnessVariant(sanitized, direction === 'darker' ? 0.3 : 0.18, direction);
+    const bordered = sanitizeOklch({
+      ...variant,
+      C: clamp(variant.C * 0.85, 0, MAX_CHROMA),
+    });
 
-    if (luminance > 0.5) {
-      // Light background - darker border
-      const crustRed = Math.max(0, Math.round(rgb.r * 0.8));
-      const crustGreen = Math.max(0, Math.round(rgb.g * 0.8));
-      const crustBlue = Math.max(0, Math.round(rgb.b * 0.8));
-      return rgbToHex(crustRed, crustGreen, crustBlue);
-    } else {
-      // Dark background - slightly lighter border
-      const crustRed = Math.min(255, Math.round(rgb.r + 20));
-      const crustGreen = Math.min(255, Math.round(rgb.g + 20));
-      const crustBlue = Math.min(255, Math.round(rgb.b + 20));
-      return rgbToHex(crustRed, crustGreen, crustBlue);
-    }
+    return fromOklch(bordered);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate crust color:', error);
     return '#232634';
@@ -535,25 +634,18 @@ export function generateCrustColor(baseColor: string): string {
  */
 export function generateMantleColor(baseColor: string): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) return '#1e2030'; // Fallback to Catppuccin mantle
+    const oklch = toOklch(baseColor);
+    if (!oklch) return '#1e2030';
 
-    // Calculate luminance for color strategy
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+    const sanitized = sanitizeOklch(oklch);
+    const direction: LightnessDirection = sanitized.L > 0.6 ? 'darker' : 'lighter';
+    const variant = computeLightnessVariant(sanitized, direction === 'darker' ? 0.18 : 0.12, direction);
+    const softened = sanitizeOklch({
+      ...variant,
+      C: clamp(variant.C * 0.9, 0, MAX_CHROMA),
+    });
 
-    if (luminance > 0.5) {
-      // Light background - slightly darker mantle
-      const mantleRed = Math.max(0, Math.round(rgb.r * 0.95));
-      const mantleGreen = Math.max(0, Math.round(rgb.g * 0.95));
-      const mantleBlue = Math.max(0, Math.round(rgb.b * 0.95));
-      return rgbToHex(mantleRed, mantleGreen, mantleBlue);
-    } else {
-      // Dark background - slightly lighter mantle
-      const mantleRed = Math.min(255, Math.round(rgb.r + 10));
-      const mantleGreen = Math.min(255, Math.round(rgb.g + 10));
-      const mantleBlue = Math.min(255, Math.round(rgb.b + 10));
-      return rgbToHex(mantleRed, mantleGreen, mantleBlue);
-    }
+    return fromOklch(softened);
   } catch (error) {
     console.warn('[SpicetifyColorGenerators] Failed to generate mantle color:', error);
     return '#1e2030';
@@ -570,29 +662,48 @@ export function generateMantleColor(baseColor: string): string {
  */
 export function generateZoneColor(baseColor: string, zoneType: ZoneColorType): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) {
+    const oklch = toOklch(baseColor);
+    if (!oklch) {
       console.warn(`[SpicetifyColorGenerators] Failed to parse RGB from ${baseColor}`);
       return baseColor;
     }
 
-    // Zone-specific RGB adjustments for context-aware coloring
-    const zoneAdjustments: Record<ZoneColorType, { rAdjust: number; gAdjust: number; bAdjust: number }> = {
-      flamingo: { rAdjust: 20, gAdjust: -10, bAdjust: -5 }, // Warm pink for home comfort
-      lavender: { rAdjust: 10, gAdjust: -5, bAdjust: 15 }, // Cool purple for focus/playlist
-      peach: { rAdjust: 25, gAdjust: 10, bAdjust: -15 }, // Warm orange for artist discovery
-      rosewater: { rAdjust: 15, gAdjust: -8, bAdjust: 0 }, // Subtle pink for secondary elements
-      sapphire: { rAdjust: -20, gAdjust: -10, bAdjust: 25 } // Deep blue for search precision
+    const zoneAdjustments: Record<ZoneColorType, Parameters<typeof applyOklchAdjustment>[1]> = {
+      flamingo: {
+        hueTarget: 25,
+        hueMix: 0.65,
+        chromaScale: 1.2,
+        lightnessShift: 0.04,
+      },
+      lavender: {
+        hueTarget: 275,
+        hueMix: 0.55,
+        chromaScale: 1.1,
+        lightnessShift: 0.02,
+      },
+      peach: {
+        hueTarget: 40,
+        hueMix: 0.7,
+        chromaScale: 1.15,
+        lightnessShift: 0.03,
+      },
+      rosewater: {
+        hueTarget: 10,
+        hueMix: 0.6,
+        chromaScale: 1.05,
+        lightnessShift: 0.05,
+      },
+      sapphire: {
+        hueTarget: 210,
+        hueMix: 0.7,
+        chromaScale: 1.2,
+        lightnessScale: 0.92,
+        lightnessShift: -0.02,
+      },
     };
 
-    const config = zoneAdjustments[zoneType];
-
-    // Apply zone-specific RGB adjustments
-    const adjustedR = Math.max(0, Math.min(255, rgb.r + config.rAdjust));
-    const adjustedG = Math.max(0, Math.min(255, rgb.g + config.gAdjust));
-    const adjustedB = Math.max(0, Math.min(255, rgb.b + config.bAdjust));
-
-    return rgbToHex(adjustedR, adjustedG, adjustedB);
+    const sanitizedHex = fromOklch(sanitizeOklch(oklch));
+    return applyOklchAdjustment(sanitizedHex, zoneAdjustments[zoneType], baseColor);
   } catch (error) {
     console.warn(`[SpicetifyColorGenerators] Failed to generate ${zoneType} color:`, error);
     return baseColor;
@@ -609,30 +720,53 @@ export function generateZoneColor(baseColor: string, zoneType: ZoneColorType): s
  */
 export function generatePaletteColor(baseColor: string, paletteType: PaletteColorType): string {
   try {
-    const rgb = hexToRgbObject(baseColor);
-    if (!rgb) {
+    const oklch = toOklch(baseColor);
+    if (!oklch) {
       console.warn(`[SpicetifyColorGenerators] Failed to parse RGB from ${baseColor}`);
       return baseColor;
     }
 
-    // Palette-specific RGB adjustments for context-aware color mapping
-    const paletteAdjustments: Record<PaletteColorType, { rAdjust: number; gAdjust: number; bAdjust: number }> = {
-      pink: { rAdjust: 30, gAdjust: -20, bAdjust: -10 }, // Soft pink for decorative elements
-      sky: { rAdjust: -30, gAdjust: 10, bAdjust: 30 }, // Bright sky blue for information
-      red: { rAdjust: 35, gAdjust: -25, bAdjust: -15 }, // Vibrant red for errors/warnings
-      maroon: { rAdjust: 25, gAdjust: -15, bAdjust: -10 }, // Deep maroon for emphasis
-      yellow: { rAdjust: 30, gAdjust: 25, bAdjust: -30 }, // Bright yellow for warnings
-      green: { rAdjust: -25, gAdjust: 30, bAdjust: -20 } // Natural green for success
+    const paletteAdjustments: Record<PaletteColorType, Parameters<typeof applyOklchAdjustment>[1]> = {
+      pink: {
+        hueTarget: 330,
+        hueMix: 0.6,
+        chromaScale: 1.18,
+        lightnessShift: 0.03,
+      },
+      sky: {
+        hueTarget: 205,
+        hueMix: 0.65,
+        chromaScale: 1.15,
+        lightnessShift: 0.04,
+      },
+      red: {
+        hueTarget: 20,
+        hueMix: 0.7,
+        chromaScale: 1.25,
+        lightnessScale: 0.95,
+      },
+      maroon: {
+        hueTarget: 350,
+        hueMix: 0.6,
+        chromaScale: 1.1,
+        lightnessScale: 0.92,
+      },
+      yellow: {
+        hueTarget: 95,
+        hueMix: 0.65,
+        chromaScale: 1.12,
+        lightnessShift: 0.06,
+      },
+      green: {
+        hueTarget: 145,
+        hueMix: 0.65,
+        chromaScale: 1.15,
+        lightnessShift: 0.02,
+      },
     };
 
-    const config = paletteAdjustments[paletteType];
-
-    // Apply palette-specific RGB adjustments
-    const adjustedR = Math.max(0, Math.min(255, rgb.r + config.rAdjust));
-    const adjustedG = Math.max(0, Math.min(255, rgb.g + config.gAdjust));
-    const adjustedB = Math.max(0, Math.min(255, rgb.b + config.bAdjust));
-
-    return rgbToHex(adjustedR, adjustedG, adjustedB);
+    const sanitizedHex = fromOklch(sanitizeOklch(oklch));
+    return applyOklchAdjustment(sanitizedHex, paletteAdjustments[paletteType], baseColor);
   } catch (error) {
     console.warn(`[SpicetifyColorGenerators] Failed to generate ${paletteType} color:`, error);
     return baseColor;

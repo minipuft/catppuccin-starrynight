@@ -57,6 +57,7 @@ import {
 // Simplified performance system imports (replacing complex monitoring)
 import { SimplePerformanceCoordinator } from "@/core/performance/SimplePerformanceCoordinator";
 import { WebGLSystemsIntegration } from "@/core/webgl/WebGLSystemsIntegration";
+import { getPerformanceModeService } from "@/core/performance/PerformanceModeService";
 // Legacy imports for backward compatibility (will be deprecated)
 import { getSettings } from "@/config";
 import { DeviceCapabilityDetector } from "@/core/performance/DeviceCapabilityDetector";
@@ -78,6 +79,7 @@ import {
   VisualEffectsCoordinator,
   VisualSystemKey,
 } from "@/visual/effects/VisualEffectsCoordinator";
+import { OKLABProcessorFactory } from "@/utils/color/OKLABProcessorFactory";
 
 // High-energy visual effects imports for integration
 
@@ -164,6 +166,7 @@ export interface FacadeHealthCheck {
     simplePerformanceCoordinator: { ok: boolean; details: string };
     cssVariableController: { ok: boolean; details: string };
     musicSyncService: { ok: boolean; details: string };
+    oklabProcessor: { ok: boolean; details: string };
     semanticColorManager?: { ok: boolean; details: string };
     // Legacy systems (will be removed after migration)
     performanceAnalyzer?: { ok: boolean; details: string };
@@ -466,6 +469,13 @@ export class SystemIntegrationCoordinator {
           { cacheOnly: true }
         )) || null;
 
+      // Phase 2: Get EmotionalGradientService from InfrastructureSystemCoordinator
+      const emotionalGradientService =
+        (await this.infrastructureSystemFacade?.getSystem(
+          "EmotionalGradientService",
+          { cacheOnly: true }
+        )) || null;
+
       // 🔧 PHASE 2.2: Initialize VisualEffectsCoordinator (consolidated visual system management)
       this.visualSystemCoordinator = new VisualEffectsCoordinator(
         this.config,
@@ -473,9 +483,11 @@ export class SystemIntegrationCoordinator {
         this.performanceCoordinator as any,
         this.sharedMusicSyncService!,
         this.sharedColorHarmonyEngine!,
+        this.sharedColorProcessor || undefined, // 🔧 PHASE 7: ColorProcessor dependency
         this.utils,
         this.year3000System,
-        animationCoordinator
+        animationCoordinator,
+        emotionalGradientService // Phase 2: Shared EmotionalGradientService instance
       );
 
       await this.visualSystemCoordinator.initialize({
@@ -764,6 +776,16 @@ export class SystemIntegrationCoordinator {
   }
 
   /**
+   * Phase 2: Get the shared EmotionalGradientService instance
+   * This ensures single-writer rule for emotional CSS variables
+   */
+  public getEmotionalGradientService(): any | null {
+    if (!this.infrastructureSystemFacade) return null;
+    // Get the cached shared instance - no creation
+    return this.infrastructureSystemFacade.getCachedSystemSync<any>("EmotionalGradientService");
+  }
+
+  /**
    * 🔧 CRITICAL FIX: Broadcast setting changes to all managed systems
    * Penetrates facade layers to reach all systems with applyUpdatedSettings()
    */
@@ -877,6 +899,10 @@ export class SystemIntegrationCoordinator {
           ok: true,
           details: "Music sync service operational",
         },
+        oklabProcessor: {
+          ok: true,
+          details: "OKLAB processor singleton verified",
+        },
         // Legacy systems (optional for backward compatibility)
         performanceAnalyzer: {
           ok: true,
@@ -886,6 +912,22 @@ export class SystemIntegrationCoordinator {
       recommendations: [],
       timestamp: performance.now(),
     };
+
+    const oklabStats = OKLABProcessorFactory.getMemoryStats();
+    const oklabAvailable = OKLABProcessorFactory.ensureAvailability(
+      "standard",
+      "SystemIntegrationCoordinator.performHealthCheck"
+    );
+    const oklabHealthy = oklabAvailable && oklabStats.standardInstances === 1;
+    healthCheck.sharedResources.oklabProcessor.ok = oklabHealthy;
+    healthCheck.sharedResources.oklabProcessor.details = `Standard instances: ${oklabStats.standardInstances}, musical instances: ${oklabStats.musicalInstances}, caches tracked: ${oklabStats.trackedCaches}`;
+
+    if (!oklabHealthy && healthCheck.overall !== "critical") {
+      healthCheck.overall = "degraded";
+      healthCheck.recommendations.push(
+        "Verify OKLAB processor singleton initialization before continuing boot."
+      );
+    }
 
     // Check visual facade
     if (this.visualSystemCoordinator) {
@@ -1445,6 +1487,24 @@ export class SystemIntegrationCoordinator {
         "SystemIntegrationCoordinator",
         "ColorProcessor initialized and ready to receive colors:extracted events"
       );
+
+      const singletonHealthy = OKLABProcessorFactory.ensureAvailability(
+        "standard",
+        "SystemIntegrationCoordinator.initializeColorProcessor"
+      );
+      const memoryStats = OKLABProcessorFactory.getMemoryStats();
+
+      if (!singletonHealthy || memoryStats.standardInstances !== 1) {
+        console.warn(
+          "[SystemIntegrationCoordinator] OKLAB processor singleton health check failed",
+          memoryStats
+        );
+      } else if (this.config.enableDebug) {
+        console.log(
+          "🎨 [SystemIntegrationCoordinator] OKLAB singleton verified",
+          memoryStats
+        );
+      }
     } catch (error) {
       Y3KDebug?.debug?.error(
         "SystemIntegrationCoordinator",
@@ -1708,6 +1768,13 @@ export class SystemIntegrationCoordinator {
   }
 
   private async initializeVisualFacade(): Promise<void> {
+    // Phase 2: Get EmotionalGradientService from InfrastructureSystemCoordinator
+    const emotionalGradientService =
+      (await this.infrastructureSystemFacade?.getSystem(
+        "EmotionalGradientService",
+        { cacheOnly: true }
+      )) || null;
+
     // 🔧 PHASE 2.2: Initialize VisualEffectsCoordinator (consolidated visual system management)
     this.visualSystemCoordinator = new VisualEffectsCoordinator(
       this.config,
@@ -1718,7 +1785,8 @@ export class SystemIntegrationCoordinator {
       this.sharedColorProcessor || undefined, // 🔧 PHASE 7: ColorProcessor dependency injection
       this.utils,
       this, // year3000System
-      undefined // animationCoordinator (not available yet in this initialization path)
+      undefined, // animationCoordinator (not available yet in this initialization path)
+      emotionalGradientService // Phase 2: Shared EmotionalGradientService instance
     );
 
     // Note: SpicetifyColorBridge can be accessed through SystemIntegrationCoordinator shared dependencies
@@ -2526,40 +2594,44 @@ export class SystemIntegrationCoordinator {
   // ============================================================================
 
   /**
-   * Apply initial performance mode from settings
+   * Apply initial performance mode from settings using unified PerformanceModeService
    * 🎯 PHASE 5: Performance mode initialization on startup
-   * 🔧 Phase 3 Consolidation: Uses PerformanceAnalyzer directly (tier management consolidated)
+   * 🔧 UNIFIED SYSTEM: Uses PerformanceModeService for centralized performance management
    */
   private async initializePerformanceModeFromSettings(): Promise<void> {
     try {
       const { settings } = await import("@/config");
       const performanceMode = settings.get("sn-performance-mode") || "auto";
 
+      // Use the unified PerformanceModeService for centralized performance management
+      const performanceModeService = getPerformanceModeService();
+      
+      // Initialize the service if not already initialized
+      if (!performanceModeService) {
+        Y3KDebug?.debug?.warn(
+          "SystemIntegrationCoordinator",
+          "PerformanceModeService not available for performance mode initialization"
+        );
+        return;
+      }
+
+      // Apply the performance mode using the unified service
+      await performanceModeService.applyPerformanceMode(performanceMode as any);
+
+      Y3KDebug?.debug?.log(
+        "SystemIntegrationCoordinator",
+        `Initial performance mode applied: ${performanceMode} (via unified PerformanceModeService)`
+      );
+
+      // Also apply to legacy performance coordinator for compatibility
       if (this.performanceCoordinator) {
-        // PerformanceAnalyzer now has applyPerformanceMode from Phase 3 consolidation
-        const performanceSystem =
-          this.performanceCoordinator.getPerformanceSystem();
+        const performanceSystem = this.performanceCoordinator.getPerformanceSystem();
         if (
           performanceSystem &&
           typeof performanceSystem.applyPerformanceMode === "function"
         ) {
           performanceSystem.applyPerformanceMode(performanceMode as any);
-
-          Y3KDebug?.debug?.log(
-            "SystemIntegrationCoordinator",
-            `Initial performance mode applied: ${performanceMode} (via consolidated PerformanceAnalyzer)`
-          );
-        } else {
-          Y3KDebug?.debug?.warn(
-            "SystemIntegrationCoordinator",
-            "PerformanceAnalyzer not available for performance mode initialization"
-          );
         }
-      } else {
-        Y3KDebug?.debug?.warn(
-          "SystemIntegrationCoordinator",
-          "Performance coordinator not available for performance mode initialization"
-        );
       }
     } catch (error) {
       Y3KDebug?.debug?.error(
@@ -2571,42 +2643,58 @@ export class SystemIntegrationCoordinator {
   }
 
   /**
-   * Setup settings change listeners for performance mode
+   * Setup settings change listeners for performance mode using unified PerformanceModeService
    * 🎯 PHASE 5: Reactive performance mode updates
-   * 🔧 Phase 3 Consolidation: Uses PerformanceAnalyzer directly (tier management consolidated)
+   * 🔧 UNIFIED SYSTEM: Uses PerformanceModeService for centralized performance management
    */
   private setupSettingsChangeListeners(): void {
     try {
       const settingsManager = getSettings();
 
       this.performanceSettingsUnsubscribe?.();
-      this.performanceSettingsUnsubscribe = settingsManager.onChange((event) => {
+      this.performanceSettingsUnsubscribe = settingsManager.onChange(async (event) => {
         if (event.settingKey !== "sn-performance-mode") {
           return;
         }
 
-        const newMode = event.newValue;
+        const newMode = event.newValue as import('@/config/settingsSchema').PerformanceMode;
 
         Y3KDebug?.debug?.log(
           "SystemIntegrationCoordinator",
-          `Performance mode changed to: ${newMode} (via consolidated PerformanceAnalyzer)`
+          `Performance mode changed to: ${newMode} (via unified PerformanceModeService)`
         );
 
-        if (this.performanceCoordinator) {
-          const performanceSystem =
-            this.performanceCoordinator.getPerformanceSystem();
-          if (
-            performanceSystem &&
-            typeof performanceSystem.applyPerformanceMode === "function"
-          ) {
-            performanceSystem.applyPerformanceMode(newMode);
+        try {
+          // Use the unified PerformanceModeService for centralized performance management
+          const performanceModeService = getPerformanceModeService();
+
+          if (performanceModeService) {
+            await performanceModeService.applyPerformanceMode(newMode);
           }
+
+          // Also apply to legacy performance coordinator for compatibility
+          if (this.performanceCoordinator) {
+            const performanceSystem =
+              this.performanceCoordinator.getPerformanceSystem();
+            if (
+              performanceSystem &&
+              typeof performanceSystem.applyPerformanceMode === "function"
+            ) {
+              performanceSystem.applyPerformanceMode(newMode);
+            }
+          }
+        } catch (error) {
+          Y3KDebug?.debug?.error(
+            "SystemIntegrationCoordinator",
+            "Failed to apply performance mode change:",
+            error
+          );
         }
       });
 
       Y3KDebug?.debug?.log(
         "SystemIntegrationCoordinator",
-        "Settings change listeners initialized for performance mode (using consolidated PerformanceAnalyzer)"
+        "Settings change listeners initialized for performance mode (using unified PerformanceModeService)"
       );
     } catch (error) {
       Y3KDebug?.debug?.error(

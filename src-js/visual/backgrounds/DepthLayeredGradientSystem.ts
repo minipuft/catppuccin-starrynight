@@ -10,8 +10,9 @@
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
-import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
+import { EmotionalGradientService } from "@/audio/EmotionalGradientService";
 import { GenreProfileManager } from "@/audio/GenreProfileManager";
+import type { GenreSystemService } from "@/core/services/SystemServices";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { CSSVariableWriter, getGlobalCSSVariableWriter } from "@/core/css/CSSVariableWriter";
@@ -119,8 +120,9 @@ export class DepthLayeredGradientSystem
   private visualEffectsLayers: Map<string, HTMLDivElement>;
   private cssVariableController: CSSVariableWriter | null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
-  private emotionalGradientMapper: EmotionalGradientMapper | null = null;
+  private emotionalGradientMapper: EmotionalGradientService | null = null;
   private genreProfileManager: GenreProfileManager | null = null;
+  private genreService: GenreSystemService | null = null;
   private containerElement: HTMLElement | null = null;
   private backgroundContainer: HTMLElement | null = null;
   
@@ -298,20 +300,20 @@ export class DepthLayeredGradientSystem
 
   /**
    * Initialize musical visual effects components (async version)
+   * Phase 2: No need to call initialize() - service is already initialized by InfrastructureSystemCoordinator
    */
   private async initializeMusicalVisualEffectsAsync(): Promise<void> {
     this.initializeMusicalVisualEffects();
-    
-    // Initialize the components asynchronously
-    if (this.emotionalGradientMapper) {
-      await this.emotionalGradientMapper.initialize();
-    }
+
+    // Phase 2: EmotionalGradientService is already initialized by InfrastructureSystemCoordinator
+    // No need to call initialize() again - that would duplicate subscriptions
 
     // GenreProfileManager doesn't need initialization (stateless)
   }
 
   /**
    * Initialize musical visual effects components
+   * Phase 2: Resolve EmotionalGradientService from InfrastructureSystemCoordinator
    */
   private initializeMusicalVisualEffects(): void {
     if (!this.cssVariableController) {
@@ -323,15 +325,36 @@ export class DepthLayeredGradientSystem
     }
 
     try {
-      // Initialize emotional gradient mapper
-      this.emotionalGradientMapper = new EmotionalGradientMapper(
-        this.cssVariableController,
-        this.musicSyncService
-        // NOTE: settingsManager parameter removed - using TypedSettingsManager singleton
-      );
+      // Phase 2: Resolve EmotionalGradientService from InfrastructureSystemCoordinator
+      // This is a shared singleton service to prevent duplicate subscriptions and CSS writes
+      const themeService = this.services.themeLifecycle;
+      const themeCoordinator = themeService?.getCoordinator();
+      const facadeCoordinator = themeCoordinator?.facadeCoordinator;
+
+      if (facadeCoordinator) {
+        // Request the shared EmotionalGradientService instance from infrastructure coordinator
+        this.emotionalGradientMapper = facadeCoordinator.getEmotionalGradientService() || null;
+
+        if (this.emotionalGradientMapper) {
+          Y3KDebug?.debug?.log(
+            "DepthLayeredGradientSystem",
+            "Using shared EmotionalGradientService instance"
+          );
+        }
+      } else {
+        Y3KDebug?.debug?.warn(
+          "DepthLayeredGradientSystem",
+          "SystemIntegrationCoordinator not available, EmotionalGradientService not resolved"
+        );
+      }
 
       // Initialize genre profile manager for genre detection
       this.genreProfileManager = new GenreProfileManager();
+      try {
+        this.genreService = this.services.genre ?? null;
+      } catch {
+        this.genreService = null;
+      }
 
       Y3KDebug?.debug?.log(
         "DepthLayeredGradientSystem",
@@ -1425,10 +1448,9 @@ export class DepthLayeredGradientSystem
     this.destroyVisualEffectsLayers();
 
     // Clean up musical visual effects components
-    if (this.emotionalGradientMapper) {
-      this.emotionalGradientMapper.destroy();
-      this.emotionalGradientMapper = null;
-    }
+    // Phase 2: Don't destroy EmotionalGradientService - it's a shared singleton managed by InfrastructureSystemCoordinator
+    // Just release the reference
+    this.emotionalGradientMapper = null;
 
     // GenreProfileManager doesn't need cleanup (stateless)
     this.genreProfileManager = null;
@@ -1553,13 +1575,13 @@ export class DepthLayeredGradientSystem
         this.emotionalGradientMapper?.getCurrentEmotionalProfile() || null,
       gradientState:
         this.emotionalGradientMapper?.getCurrentGradientState() || null,
-      currentGenre: this.genreProfileManager?.getCurrentGenre() || null,
-      genreConfidence: this.genreProfileManager?.getGenreConfidence() || 0,
-      genreHistory: this.genreProfileManager?.getGenreHistory() || [],
+      currentGenre: (this.genreService?.getCurrentGenre?.() ?? this.genreProfileManager?.getCurrentGenre()) || null,
+      genreConfidence: (this.genreService?.getGenreConfidence?.() ?? this.genreProfileManager?.getGenreConfidence()) || 0,
+      genreHistory: (this.genreService?.getGenreHistory?.() ?? this.genreProfileManager?.getGenreHistory()) || [],
     };
   }
 
-  public getEmotionalGradientMapper(): EmotionalGradientMapper | null {
+  public getEmotionalGradientService(): EmotionalGradientService | null {
     return this.emotionalGradientMapper;
   }
 

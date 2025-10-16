@@ -9,7 +9,7 @@
  */
 
 import { PerformanceAnalyzer } from "./PerformanceMonitor";
-import type { DeviceCapabilities, PerformanceMode } from './PerformanceMonitor';
+import type { DeviceCapabilities, PerformanceModeConfig } from './PerformanceMonitor';
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
@@ -39,7 +39,7 @@ export interface QualityScalingCapable {
 }
 
 // Re-export types for backward compatibility
-export type { DeviceCapabilities, PerformanceMode };
+export type { DeviceCapabilities, PerformanceModeConfig };
 
 /**
  * SimplePerformanceCoordinator - High-Level Performance Management
@@ -189,8 +189,16 @@ export class SimplePerformanceCoordinator implements IManagedSystem {
    * Get current performance mode (required by CSSVariableWriter)
    * Delegated to PerformanceAnalyzer
    */
-  public getCurrentPerformanceMode(): PerformanceMode {
+  public getCurrentPerformanceMode(): PerformanceModeConfig {
     return this.unifiedCoordinator.getCurrentPerformanceMode();
+  }
+
+  /**
+   * Apply performance mode (integrates with PerformanceModeService)
+   * Delegated to PerformanceAnalyzer which uses PerformanceModeService
+   */
+  public async applyPerformanceMode(mode: import('@/config/settingsSchema').PerformanceMode): Promise<void> {
+    return this.unifiedCoordinator.applyPerformanceMode(mode);
   }
 
   // =============================================================================

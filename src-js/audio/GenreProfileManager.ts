@@ -4,10 +4,12 @@ import {
   OKLABColorProcessor,
   type EnhancementPreset
 } from "@/utils/color/OKLABColorProcessor";
+import { GenreType } from "@/types/genre";
 import type {
-  GenreType,
+  AudioFeatures,
   GenreCharacteristics,
-  GenreVisualStyle
+  GenreVisualStyle,
+  GenreColorCharacteristics,
 } from "@/types/genre";
 import { GenreCalculator } from "./GenreCalculator";
 
@@ -20,206 +22,6 @@ import { GenreCalculator } from "./GenreCalculator";
 // ALGORITHMIC ARCHITECTURE: Uses GenreCalculator singleton to derive
 // all genre properties from core parameters, reducing bundle size by 84%.
 
-interface GenreProfile {
-  energyBoost?: number;
-  beatEmphasis?: number;
-  precision?: number;
-  intensityMultiplier?: number;
-  dynamicRange?: number;
-  grooveFactor?: number;
-  tempoMultiplier?: number;
-  adaptiveVariation?: boolean;
-  complexity?: number;
-  smoothingFactor?: number;
-  gentleMode?: boolean;
-  tempoVariationHandling?: "adaptive" | string;
-  subtleMode?: boolean;
-  intensityReduction?: number;
-  balanced?: boolean;
-  // OKLAB integration for genre-specific color processing
-  oklabPreset?: string; // OKLAB preset name (SUBTLE, STANDARD, VIBRANT, COSMIC)
-  colorCharacteristics?: {
-    vibrancyLevel: 'subtle' | 'standard' | 'vibrant' | 'cosmic';
-    emotionalRange: 'narrow' | 'moderate' | 'wide' | 'extreme';
-    colorTemperature: 'cool' | 'neutral' | 'warm' | 'dynamic';
-  };
-}
-
-interface AudioFeatures {
-  danceability?: number;
-  energy?: number;
-  acousticness?: number;
-  instrumentalness?: number;
-  tempo?: number;
-}
-
-const GENRE_PROFILES: Record<string, GenreProfile> = {
-  // Electronic genres - high energy, vibrant colors with dynamic range
-  electronic: { 
-    energyBoost: 1.1, beatEmphasis: 1.2, precision: 0.9,
-    oklabPreset: 'VIBRANT',
-    colorCharacteristics: {
-      vibrancyLevel: 'vibrant',
-      emotionalRange: 'wide',
-      colorTemperature: 'dynamic'
-    }
-  },
-  dance: { 
-    energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95,
-    oklabPreset: 'COSMIC',
-    colorCharacteristics: {
-      vibrancyLevel: 'cosmic',
-      emotionalRange: 'extreme',
-      colorTemperature: 'dynamic'
-    }
-  },
-  house: { 
-    energyBoost: 1.2, beatEmphasis: 1.25, precision: 0.95,
-    oklabPreset: 'VIBRANT',
-    colorCharacteristics: {
-      vibrancyLevel: 'vibrant',
-      emotionalRange: 'wide',
-      colorTemperature: 'warm'
-    }
-  },
-  techno: { 
-    energyBoost: 1.15, beatEmphasis: 1.3, precision: 1.0,
-    oklabPreset: 'COSMIC',
-    colorCharacteristics: {
-      vibrancyLevel: 'cosmic',
-      emotionalRange: 'extreme',
-      colorTemperature: 'cool'
-    }
-  },
-  trance: { 
-    energyBoost: 1.15, beatEmphasis: 1.1, precision: 0.85,
-    oklabPreset: 'VIBRANT',
-    colorCharacteristics: {
-      vibrancyLevel: 'vibrant',
-      emotionalRange: 'wide',
-      colorTemperature: 'dynamic'
-    }
-  },
-
-  // Rock genres - intense but controlled vibrancy
-  rock: { 
-    energyBoost: 1.05, intensityMultiplier: 1.1, dynamicRange: 1.1,
-    oklabPreset: 'VIBRANT',
-    colorCharacteristics: {
-      vibrancyLevel: 'vibrant',
-      emotionalRange: 'wide',
-      colorTemperature: 'warm'
-    }
-  },
-  metal: { 
-    energyBoost: 1.15, intensityMultiplier: 1.2, dynamicRange: 1.2,
-    oklabPreset: 'COSMIC',
-    colorCharacteristics: {
-      vibrancyLevel: 'cosmic',
-      emotionalRange: 'extreme',
-      colorTemperature: 'cool'
-    }
-  },
-  punk: { 
-    energyBoost: 1.2, intensityMultiplier: 1.1, precision: 0.8,
-    oklabPreset: 'VIBRANT',
-    colorCharacteristics: {
-      vibrancyLevel: 'vibrant',
-      emotionalRange: 'wide',
-      colorTemperature: 'dynamic'
-    }
-  },
-
-  // Urban genres - rhythmic emphasis with moderate vibrancy
-  hiphop: { 
-    beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'warm'
-    }
-  },
-  rap: { 
-    beatEmphasis: 1.3, grooveFactor: 1.2, tempoMultiplier: 0.95,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'neutral'
-    }
-  },
-
-  // Sophisticated genres - subtle, refined enhancement
-  jazz: { 
-    adaptiveVariation: true, complexity: 1.2, smoothingFactor: 1.3,
-    oklabPreset: 'SUBTLE',
-    colorCharacteristics: {
-      vibrancyLevel: 'subtle',
-      emotionalRange: 'wide',
-      colorTemperature: 'warm'
-    }
-  },
-  classical: {
-    gentleMode: true, dynamicRange: 1.4, tempoVariationHandling: "adaptive",
-    oklabPreset: 'SUBTLE',
-    colorCharacteristics: {
-      vibrancyLevel: 'subtle',
-      emotionalRange: 'extreme',
-      colorTemperature: 'neutral'
-    }
-  },
-  ambient: { 
-    subtleMode: true, intensityReduction: 0.7, smoothingFactor: 1.5,
-    oklabPreset: 'SUBTLE',
-    colorCharacteristics: {
-      vibrancyLevel: 'subtle',
-      emotionalRange: 'narrow',
-      colorTemperature: 'cool'
-    }
-  },
-
-  // Popular genres - balanced enhancement
-  pop: { 
-    energyBoost: 1.05, beatEmphasis: 1.1, precision: 0.85,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'warm'
-    }
-  },
-  rnb: { 
-    grooveFactor: 1.25, smoothingFactor: 1.1,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'warm'
-    }
-  },
-  soul: { 
-    grooveFactor: 1.3, smoothingFactor: 1.15,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'wide',
-      colorTemperature: 'warm'
-    }
-  },
-
-  // Default fallback - safe, balanced enhancement
-  default: {
-    balanced: true, energyBoost: 1.0, beatEmphasis: 1.0, precision: 1.0,
-    oklabPreset: 'STANDARD',
-    colorCharacteristics: {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'neutral'
-    }
-  },
-};
-
 interface GenreProfileManagerDependencies {
   ADVANCED_SYSTEM_CONFIG?: Year3000Config;
   YEAR3000_CONFIG?: Year3000Config; // Legacy compatibility
@@ -229,9 +31,9 @@ export class GenreProfileManager {
   private config: AdvancedSystemConfig | Year3000Config;
 
   // State tracking for current genre detection
-  private currentGenre: string = 'default';
-  private genreConfidence: number = 0.5;
-  private genreHistory: Array<{ genre: string; confidence: number; timestamp: number }> = [];
+  private currentGenre: GenreType = GenreType.DEFAULT;
+  private genreConfidence = 0.5;
+  private genreHistory: Array<{ genre: GenreType; confidence: number; timestamp: number }> = [];
   private readonly historyMaxLength = 10;
 
   constructor(dependencies: GenreProfileManagerDependencies = {}) {
@@ -242,59 +44,33 @@ export class GenreProfileManager {
     }
   }
 
-  private _getGenreFromAudioFeatures(features?: AudioFeatures): string {
-    if (!features) return "default";
-    const { 
-      danceability = 0.5, 
-      energy = 0.5, 
-      acousticness = 0.5, 
-      instrumentalness = 0.5, 
-      tempo = 120 
+  private _getGenreFromAudioFeatures(features?: AudioFeatures): GenreType {
+    if (!features) return GenreType.DEFAULT;
+    const {
+      danceability = 0.5,
+      energy = 0.5,
+      acousticness = 0.5,
+      instrumentalness = 0.5,
+      tempo = 120,
     } = features;
 
     if (instrumentalness > 0.6 && acousticness < 0.2 && energy > 0.6) {
-      if (tempo > 120) return "techno";
-      return "electronic";
+      return tempo > 120 ? GenreType.TECHNO : GenreType.ELECTRONIC;
     }
-    if (danceability > 0.7 && energy > 0.7) return "dance";
-    if (acousticness > 0.7 && energy < 0.4) return "classical";
-    if (acousticness > 0.5 && instrumentalness < 0.1) return "jazz"; // Simplified
+    if (danceability > 0.7 && energy > 0.7) return GenreType.HOUSE;
+    if (acousticness > 0.7 && energy < 0.4) return GenreType.CLASSICAL;
+    if (acousticness > 0.5 && instrumentalness < 0.1) return GenreType.JAZZ;
     if (energy > 0.7 && instrumentalness < 0.1 && danceability > 0.5)
-      return "rock";
+      return GenreType.ROCK;
     if (
       danceability > 0.7 &&
       instrumentalness < 0.2 &&
       energy > 0.5 &&
       tempo < 110
     )
-      return "hiphop";
+      return GenreType.HIPHOP;
 
-    return "default";
-  }
-
-  public getProfileForTrack(audioFeatures?: AudioFeatures): GenreProfile {
-    const genre = this._getGenreFromAudioFeatures(audioFeatures);
-    const profile = GENRE_PROFILES[genre];
-
-    if (this.config.enableDebug) {
-      console.log(
-        `[GenreProfileManager] Detected genre: '${genre}'. Applying profile.`
-      );
-    }
-
-    if (profile) {
-      return profile;
-    }
-
-    const defaultProfile = GENRE_PROFILES.default;
-    if (defaultProfile) {
-      return defaultProfile;
-    }
-
-    // This should be unreachable
-    throw new Error(
-      "[GenreProfileManager] Critical: Default genre profile is missing."
-    );
+    return GenreType.DEFAULT;
   }
 
   /**
@@ -303,7 +79,7 @@ export class GenreProfileManager {
    *
    * Also updates internal state tracking (currentGenre, genreConfidence, genreHistory).
    */
-  public detectGenre(features?: AudioFeatures): string {
+  public detectGenre(features?: AudioFeatures): GenreType {
     const detectedGenre = this._getGenreFromAudioFeatures(features);
 
     // Calculate confidence based on how strongly features match the detected genre
@@ -335,7 +111,10 @@ export class GenreProfileManager {
   /**
    * Calculate confidence score for a detected genre based on audio features
    */
-  private _calculateGenreConfidence(features?: AudioFeatures, genre?: string): number {
+  private _calculateGenreConfidence(
+    features?: AudioFeatures,
+    genre?: GenreType
+  ): number {
     if (!features || !genre) return 0.5;
 
     const { energy = 0.5, danceability = 0.5, acousticness = 0.5 } = features;
@@ -345,12 +124,18 @@ export class GenreProfileManager {
     let confidence = 0.5;
 
     // Boost confidence for strong feature matches
-    if (genre === 'electronic' && energy > 0.7 && acousticness < 0.3) confidence = 0.9;
-    else if (genre === 'rock' && energy > 0.7 && acousticness < 0.5) confidence = 0.85;
-    else if (genre === 'classical' && acousticness > 0.7 && energy < 0.4) confidence = 0.9;
-    else if (genre === 'jazz' && acousticness > 0.5) confidence = 0.8;
-    else if (genre === 'hiphop' && danceability > 0.7) confidence = 0.85;
-    else if (genre === 'ambient' && energy < 0.3) confidence = 0.8;
+    if (genre === GenreType.ELECTRONIC && energy > 0.7 && acousticness < 0.3)
+      confidence = 0.9;
+    else if (genre === GenreType.ROCK && energy > 0.7 && acousticness < 0.5)
+      confidence = 0.85;
+    else if (genre === GenreType.CLASSICAL && acousticness > 0.7 && energy < 0.4)
+      confidence = 0.9;
+    else if (genre === GenreType.JAZZ && acousticness > 0.5)
+      confidence = 0.8;
+    else if (genre === GenreType.HIPHOP && danceability > 0.7)
+      confidence = 0.85;
+    else if (genre === GenreType.AMBIENT && energy < 0.3)
+      confidence = 0.8;
     else confidence = 0.6; // Moderate confidence for other matches
 
     return Math.min(1.0, Math.max(0.0, confidence));
@@ -359,7 +144,7 @@ export class GenreProfileManager {
   /**
    * Get the currently detected genre
    */
-  public getCurrentGenre(): string {
+  public getCurrentGenre(): GenreType {
     return this.currentGenre;
   }
 
@@ -373,7 +158,11 @@ export class GenreProfileManager {
   /**
    * Get history of recent genre detections
    */
-  public getGenreHistory(): Array<{ genre: string; confidence: number; timestamp: number }> {
+  public getGenreHistory(): Array<{
+    genre: GenreType;
+    confidence: number;
+    timestamp: number;
+  }> {
     return [...this.genreHistory];
   }
 
@@ -383,28 +172,9 @@ export class GenreProfileManager {
    * Get OKLAB enhancement preset for a specific genre
    * Returns the appropriate OKLAB preset based on genre characteristics
    */
-  public getOKLABPresetForGenre(genre: string): EnhancementPreset {
-    const profile = GENRE_PROFILES[genre] || GENRE_PROFILES.default!;
-    const presetName = profile.oklabPreset || 'STANDARD';
-    
-    try {
-      const preset = OKLABColorProcessor.getPreset(presetName);
-      
-      if (this.config.enableDebug) {
-        console.log(`🧬 [GenreProfileManager] OKLAB preset for genre '${genre}':`, {
-          genre,
-          preset: presetName,
-          colorCharacteristics: profile.colorCharacteristics
-        });
-      }
-      
-      return preset;
-    } catch (error) {
-      if (this.config.enableDebug) {
-        console.warn(`🧬 [GenreProfileManager] Failed to get OKLAB preset '${presetName}' for genre '${genre}', using STANDARD:`, error);
-      }
-      return OKLABColorProcessor.getPreset('STANDARD');
-    }
+  public getOKLABPresetForGenre(genre: GenreType): EnhancementPreset {
+    // Use algorithmic mapping with dynamic adjustments
+    return this.createGenreSpecificOKLABPreset(genre, 1.0);
   }
 
   /**
@@ -420,13 +190,13 @@ export class GenreProfileManager {
    * Get color characteristics for a specific genre
    * Returns detailed color processing guidance for visual systems
    */
-  public getColorCharacteristicsForGenre(genre: string): NonNullable<GenreProfile['colorCharacteristics']> {
-    const profile = GENRE_PROFILES[genre] || GENRE_PROFILES.default!;
-    const characteristics = profile.colorCharacteristics || {
-      vibrancyLevel: 'standard',
-      emotionalRange: 'moderate',
-      colorTemperature: 'neutral'
-    };
+  public getColorCharacteristicsForGenre(
+    genre: GenreType
+  ): GenreColorCharacteristics {
+    const calculator = GenreCalculator.getInstance();
+    const characteristicsData = calculator.calculateCharacteristics(genre);
+    const visualStyle = calculator.calculateVisualStyle(genre);
+    const characteristics = this._mapToColorCharacteristics(characteristicsData, visualStyle);
 
     if (this.config.enableDebug) {
       console.log(`🧬 [GenreProfileManager] Color characteristics for genre '${genre}':`, characteristics);
@@ -438,7 +208,7 @@ export class GenreProfileManager {
   /**
    * Get color characteristics for a track based on its audio features
    */
-  public getColorCharacteristicsForTrack(audioFeatures?: AudioFeatures): NonNullable<GenreProfile['colorCharacteristics']> {
+  public getColorCharacteristicsForTrack(audioFeatures?: AudioFeatures): GenreColorCharacteristics {
     const detectedGenre = this.detectGenre(audioFeatures);
     return this.getColorCharacteristicsForGenre(detectedGenre);
   }
@@ -495,18 +265,25 @@ export class GenreProfileManager {
    * Get all available genre-OKLAB preset mappings
    * Useful for system initialization and debugging
    */
-  public getAllGenreOKLABMappings(): Record<string, { preset: string; characteristics: GenreProfile['colorCharacteristics'] }> {
-    const mappings: Record<string, { preset: string; characteristics: GenreProfile['colorCharacteristics'] }> = {};
-    
-    Object.entries(GENRE_PROFILES).forEach(([genre, profile]) => {
+  public getAllGenreOKLABMappings(): Record<string, { preset: string; characteristics: GenreColorCharacteristics }> {
+    const mappings: Record<string, { preset: string; characteristics: GenreColorCharacteristics }> = {};
+    const calculator = GenreCalculator.getInstance();
+
+    Object.values(GenreType).forEach((g) => {
+      const genre = g as GenreType;
+      if (typeof genre !== 'string') return;
+      const ch = calculator.calculateCharacteristics(genre);
+      const vs = calculator.calculateVisualStyle(genre);
+      const cc = this._mapToColorCharacteristics(ch, vs);
+      const preset = this.createGenreSpecificOKLABPreset(genre, 1.0);
       mappings[genre] = {
-        preset: profile.oklabPreset || 'STANDARD',
-        characteristics: profile.colorCharacteristics
+        preset: preset.name,
+        characteristics: cc,
       };
     });
 
     if (this.config.enableDebug) {
-      console.log('🧬 [GenreProfileManager] All genre-OKLAB mappings:', mappings);
+      console.log('🧬 [GenreProfileManager] All genre-OKLAB mappings (algorithmic):', mappings);
     }
 
     return mappings;
@@ -521,9 +298,9 @@ export class GenreProfileManager {
    * Get audio characteristics for a specific genre
    * Returns algorithmically calculated sonic signature data
    */
-  public getCharacteristics(genre: string): GenreCharacteristics {
+  public getCharacteristics(genre: GenreType): GenreCharacteristics {
     const calculator = GenreCalculator.getInstance();
-    const characteristics = calculator.calculateCharacteristics(genre as GenreType);
+    const characteristics = calculator.calculateCharacteristics(genre);
 
     if (this.config.enableDebug) {
       console.log(`🧬 [GenreProfileManager] Characteristics for genre '${genre}':`, characteristics);
@@ -544,9 +321,9 @@ export class GenreProfileManager {
    * Get visual style parameters for a specific genre
    * Returns algorithmically calculated gradient, animation, and rendering parameters
    */
-  public getVisualStyle(genre: string): GenreVisualStyle {
+  public getVisualStyle(genre: GenreType): GenreVisualStyle {
     const calculator = GenreCalculator.getInstance();
-    const visualStyle = calculator.calculateVisualStyle(genre as GenreType);
+    const visualStyle = calculator.calculateVisualStyle(genre);
 
     if (this.config.enableDebug) {
       console.log(`🧬 [GenreProfileManager] Visual style for genre '${genre}':`, visualStyle);
@@ -563,19 +340,128 @@ export class GenreProfileManager {
     return this.getVisualStyle(detectedGenre);
   }
 
-  /**
-   * Get complete genre data (profile + characteristics + visual style)
-   * Consolidates all genre information for comprehensive system integration
-   */
-  public getFullGenreData(genre: string): {
-    profile: GenreProfile;
-    characteristics: GenreCharacteristics;
-    visualStyle: GenreVisualStyle;
-  } {
-    return {
-      profile: this.getProfileForTrack({}),
-      characteristics: this.getCharacteristics(genre),
-      visualStyle: this.getVisualStyle(genre),
+  // ==============================
+  // Phase 2.2 - OKLAB enhancements
+  // ==============================
+  public createGenreSpecificOKLABPreset(genre: GenreType, intensity: number): EnhancementPreset {
+    const calculator = GenreCalculator.getInstance();
+    const ch = calculator.calculateCharacteristics(genre);
+    const vs = calculator.calculateVisualStyle(genre);
+
+    // Select base preset
+    const baseName = this._selectBasePreset(ch, vs);
+    const base = OKLABColorProcessor.getPreset(baseName);
+
+    // Dynamic adjustments
+    const influence = Math.max(0, Math.min(1, intensity));
+    const adjusted = {
+      ...base,
+      name: `${base.name}-${genre}`,
+      description: `${base.description} (${genre})`,
+      chromaBoost: this._clamp(
+        base.chromaBoost + (ch.saturation - 0.5) * 0.5 * influence,
+        0.5,
+        2.0
+      ),
+      lightnessBoost: this._clamp(
+        base.lightnessBoost + (vs.contrastLevel - 0.5) * 0.3 * influence,
+        0.5,
+        1.5
+      ),
+      shadowReduction: this._clamp(
+        base.shadowReduction + (ch.smoothness > 0.6 ? 0.05 : -0.05) * influence,
+        0.1,
+        0.5
+      ),
+      vibrantThreshold: this._clamp(
+        base.vibrantThreshold + (ch.musicalComplexity > 0.7 ? -0.02 : 0.02) * influence,
+        0.05,
+        0.2
+      ),
+    } as EnhancementPreset;
+
+    return adjusted;
+  }
+
+  public applyGenreColorModifications(colors: Record<string, string>, genre: GenreType): Record<string, string> {
+    const calculator = GenreCalculator.getInstance();
+    const ch = calculator.calculateCharacteristics(genre);
+
+    const result: Record<string, string> = { ...colors };
+    const boost = ch.saturation; // 0-1
+
+    const adjustHex = (hex?: string, factor = 1): string | undefined => {
+      if (!hex) return undefined;
+      try {
+        const rgb = (OKLABColorProcessor as any).prototype.utils.hexToRgb(hex);
+        if (!rgb) return hex;
+        const hsl = (OKLABColorProcessor as any).prototype.utils.rgbToHsl(rgb.r, rgb.g, rgb.b);
+        // Increase saturation slightly for high-energy genres
+        const s = Math.max(0, Math.min(100, hsl.s * (1 + (boost - 0.5) * 0.4 * factor)));
+        const l = Math.max(0, Math.min(100, hsl.l));
+        const out = (OKLABColorProcessor as any).prototype.utils.hslToRgb(hsl.h, s, l);
+        const outHex = (OKLABColorProcessor as any).prototype.utils.rgbToHex(out.r, out.g, out.b);
+        return outHex;
+      } catch {
+        return hex;
+      }
     };
+
+    for (const k of Object.keys(result)) {
+      const adjusted = adjustHex(result[k], 1);
+      if (adjusted) result[k] = adjusted;
+    }
+
+    return result;
+  }
+
+  // ==============================
+  // Internal helpers
+  // ==============================
+  private _mapToColorCharacteristics(
+    ch: GenreCharacteristics,
+    vs: GenreVisualStyle
+  ): GenreColorCharacteristics {
+    // Vibrancy level
+    const vibrancyLevel: GenreColorCharacteristics['vibrancyLevel'] =
+      ch.artificialProcessing > 0.8 || vs.particleInfluence > 0.7
+        ? 'cosmic'
+        : ch.saturation > 0.7
+        ? 'vibrant'
+        : ch.saturation < 0.35
+        ? 'subtle'
+        : 'standard';
+
+    // Emotional range mapping
+    const er = ch.emotionalRange;
+    const emotionalRange: GenreColorCharacteristics['emotionalRange'] =
+      er >= 0.85 ? 'extreme' : er >= 0.65 ? 'wide' : er >= 0.4 ? 'moderate' : 'narrow';
+
+    // Color temperature from primary hue range and dynamics
+    const [h1, h2] = vs.primaryHueRange;
+    const avgHue = ((h1 + h2) / 2 + 360) % 360;
+    const warm = (avgHue >= 15 && avgHue <= 60) || (avgHue >= 300 && avgHue <= 345);
+    const cool = avgHue >= 180 && avgHue <= 270;
+    const colorTemperature: GenreColorCharacteristics['colorTemperature'] =
+      ch.dynamicRange > 0.7 && vs.animationStyle !== 'minimal'
+        ? 'dynamic'
+        : warm
+        ? 'warm'
+        : cool
+        ? 'cool'
+        : 'neutral';
+
+    return { vibrancyLevel, emotionalRange, colorTemperature };
+  }
+
+  private _selectBasePreset(ch: GenreCharacteristics, vs: GenreVisualStyle): 'SUBTLE' | 'STANDARD' | 'VIBRANT' | 'COSMIC' {
+    if (ch.artificialProcessing > 0.8 || (vs.contrastLevel > 0.75 && vs.gradientComplexity > 0.6)) return 'COSMIC';
+    if (ch.saturation > 0.65) return 'VIBRANT';
+    if (ch.smoothness > 0.6 && ch.emotionalRange < 0.5) return 'SUBTLE';
+    return 'STANDARD';
+  }
+
+  private _clamp(v: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, v));
   }
 }

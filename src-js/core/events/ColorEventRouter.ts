@@ -21,11 +21,15 @@ import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { ColorContext, ColorResult } from "@/types/colorStrategy";
 import { settings } from "@/config";
 import type { SettingsChangeEvent } from "@/config";
-import {
+import type {
   MusicalOKLABProcessor,
-  type ProcessingOptions,
-  type MusicalColorContext,
+  ProcessingOptions,
+  MusicalColorContext,
 } from "@/utils/color/MusicalOKLABCoordinator";
+import {
+  getMusicalOKLABProcessor,
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
 import { ColorProcessor, globalColorProcessor } from "@/core/color/ColorProcessor";
@@ -115,7 +119,11 @@ export class ColorEventRouter {
     this.colorOrchestrator = globalColorProcessor;
 
     // Initialize unified OKLAB coordination
-    this.musicalOKLABCoordinator = new MusicalOKLABProcessor(true);
+    this.musicalOKLABCoordinator = getMusicalOKLABProcessor({
+      requester: "ColorEventRouter",
+      enableDebug: true,
+      reason: "constructor",
+    });
 
     // Initialize color orchestrator
     this.initializeColorOrchestrator();
@@ -917,34 +925,3 @@ export class ColorEventRouter {
 
 // Export singleton instance
 export const colorEventRouter = ColorEventRouter.getInstance();
-
-// 🔧 PHASE 4: Backward compatibility aliases
-/**
- * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const colorEventManager = colorEventRouter;
-
-/**
- * @deprecated Use colorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const colorEventOrchestrator = colorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const ColorEventManager = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter instead. This alias is provided for backward compatibility.
- */
-export const ColorEventOrchestrator = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter type instead.
- */
-export type ColorEventManager = ColorEventRouter;
-
-/**
- * @deprecated Use ColorEventRouter type instead.
- */
-export type ColorEventOrchestrator = ColorEventRouter;

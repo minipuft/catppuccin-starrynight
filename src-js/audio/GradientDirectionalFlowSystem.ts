@@ -19,6 +19,7 @@ import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { ServiceVisualSystemBase } from "@/core/services/SystemServiceBridge";
 import type { ServiceContainer, CSSVariableService } from "@/core/services/SystemServices";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
+import { GenreType } from "@/types/genre";
 
 // Local interfaces for this system
 interface AudioAnalysisData {
@@ -30,7 +31,7 @@ interface AudioAnalysisData {
 }
 
 interface GenreClassification {
-  genre: string;
+  genre: GenreType;
   confidence: number;
   subgenres: string[];
 }

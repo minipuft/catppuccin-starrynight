@@ -18,6 +18,7 @@ import type {
   StrategySelectionCriteria,
 } from "@/types/colorStrategy";
 import { settings } from "@/config";
+import { GenreType } from "@/types/genre";
 
 // Import strategy implementations
 import { DepthLayeredStrategy } from "./DepthLayeredStrategy";
@@ -46,7 +47,7 @@ interface BackgroundStrategySelectionCriteria
   musicContext?: {
     energy: number;
     tempo: number;
-    genre: string;
+    genre: GenreType;
     valence?: number;
   };
   deviceContext: {

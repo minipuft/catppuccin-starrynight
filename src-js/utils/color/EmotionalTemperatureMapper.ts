@@ -2,11 +2,16 @@
 // EMOTIONAL TEMPERATURE MAPPER - Music Analysis to OKLAB Emotional State Integration
 // ████████████████████████████████████████████████████████████████████████████████
 
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset, 
-  type OKLABProcessingResult 
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset,
+  type OKLABProcessingResult
 } from './OKLABColorProcessor';
+import {
+  getStandardOKLABProcessor,
+  OKLABProcessorFactory,
+} from './OKLABProcessorFactory';
+import { GenreType } from '@/types/genre';
 
 export interface MusicAnalysisData {
   energy?: number; // 0-1
@@ -19,7 +24,7 @@ export interface MusicAnalysisData {
   speechiness?: number; // 0-1
   mode?: number; // 0 = minor, 1 = major
   key?: number; // 0-11 pitch class
-  genre?: string;
+  genre?: GenreType;
 }
 
 export interface EmotionalTemperatureResult {
@@ -238,16 +243,78 @@ const EMOTIONAL_TEMPERATURE_MAP: Record<EmotionalState, {
 export class EmotionalTemperatureMapper {
   private enableDebug: boolean;
   private oklabProcessor: OKLABColorProcessor;
+  
+  // Caching system to prevent duplicate OKLAB calculations
+  private calculationCache = new Map<string, { value: EmotionalTemperatureResult; expiresAt: number }>();
+  private cacheTimeout = 30 * 1000; // 30 seconds for music responsiveness
+  private cacheHits = 0;
+  private cacheMisses = 0;
 
   constructor(enableDebug: boolean = false) {
     this.enableDebug = enableDebug;
-    this.oklabProcessor = new OKLABColorProcessor(enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "EmotionalTemperatureMapper",
+      enableDebug,
+      reason: "constructor",
+    });
+  }
+
+  /**
+   * Generate cache key from music metrics (rounded to prevent precision issues)
+   */
+  private generateCacheKey(musicData: MusicAnalysisData, includeOKLAB: boolean = true): string {
+    // Round values to 2 decimal places to prevent cache thrashing from precision differences
+    const energy = Math.round((musicData.energy ?? 0.5) * 100) / 100;
+    const valence = Math.round((musicData.valence ?? 0.5) * 100) / 100;
+    const danceability = Math.round((musicData.danceability ?? 0.5) * 100) / 100;
+    const tempo = Math.round((musicData.tempo ?? 120) / 5) * 5; // Round to nearest 5 BPM
+    const mode = musicData.mode ?? 1;
+    const genre = musicData.genre ?? 'default';
+    
+    return `${energy}:${valence}:${danceability}:${tempo}:${mode}:${genre}:${includeOKLAB ? 'oklab' : 'no-oklab'}`;
+  }
+
+  /**
+   * Get cached result or calculate new one
+   */
+  private getCachedResult(key: string, calculator: () => EmotionalTemperatureResult): EmotionalTemperatureResult {
+    const now = Date.now();
+    const cached = this.calculationCache.get(key);
+    
+    if (cached && cached.expiresAt > now) {
+      this.cacheHits++;
+      if (this.enableDebug) {
+        console.log('🌡️ [EmotionalTemperatureMapper] Cache hit for key:', key);
+      }
+      return cached.value;
+    }
+    
+    this.cacheMisses++;
+    const value = calculator();
+    this.calculationCache.set(key, { value, expiresAt: now + this.cacheTimeout });
+    
+    if (this.enableDebug) {
+      console.log('🌡️ [EmotionalTemperatureMapper] Cache miss, calculated new result for key:', key);
+    }
+    
+    return value;
   }
 
   /**
    * Analyzes music data and returns the appropriate emotional temperature configuration
    */
-  public mapMusicToEmotionalTemperature(musicData: MusicAnalysisData): EmotionalTemperatureResult {
+  public mapMusicToEmotionalTemperature(musicData: MusicAnalysisData, includeOKLAB: boolean = true): EmotionalTemperatureResult {
+    const cacheKey = this.generateCacheKey(musicData, includeOKLAB);
+    
+    return this.getCachedResult(cacheKey, () => {
+      return this.calculateEmotionalTemperature(musicData, includeOKLAB);
+    });
+  }
+
+  /**
+   * Internal calculation method (separated from caching logic)
+   */
+  private calculateEmotionalTemperature(musicData: MusicAnalysisData, includeOKLAB: boolean): EmotionalTemperatureResult {
     const { energy = 0.5, valence = 0.5, danceability = 0.5, tempo = 120, mode = 1 } = musicData;
 
     // Calculate emotional state based on energy-valence quadrants
@@ -316,42 +383,49 @@ export class EmotionalTemperatureMapper {
     const temperaturePosition = energy * 0.6 + valence * 0.4; // Weighted combination
     const temperature = minTemp + (maxTemp - minTemp) * temperaturePosition;
 
-    // OKLAB processing for perceptual color accuracy
+    // OKLAB processing for perceptual color accuracy (optional)
     const oklabPreset = OKLABColorProcessor.getPreset(emotionData.oklabPreset);
     let oklabResult: OKLABProcessingResult | undefined;
     let perceptualColorHex: string | undefined;
 
-    try {
-      // Process the emotional base color through OKLAB with context-aware adjustments
-      const customPreset = this.createContextualOKLABPreset(
-        emotionData, 
-        finalIntensity, 
-        energy, 
-        valence
-      );
-      
-      oklabResult = this.oklabProcessor.processColor(
-        emotionData.oklabBaseColor, 
-        customPreset
-      );
-      
-      perceptualColorHex = oklabResult.enhancedHex;
-      
-      if (this.enableDebug) {
-        console.log('🌡️ [EmotionalTemperatureMapper] OKLAB processing:', {
-          emotion: primaryEmotion,
-          baseColor: emotionData.oklabBaseColor,
-          preset: customPreset.name,
-          enhanced: perceptualColorHex,
-          oklabCoords: oklabResult.oklabEnhanced
-        });
+    if (includeOKLAB) {
+      try {
+        // Process the emotional base color through OKLAB with context-aware adjustments
+        const customPreset = this.createContextualOKLABPreset(
+          emotionData, 
+          finalIntensity, 
+          energy, 
+          valence
+        );
+        
+        oklabResult = this.oklabProcessor.processColor(
+          emotionData.oklabBaseColor, 
+          customPreset
+        );
+        
+        perceptualColorHex = oklabResult.enhancedHex;
+        
+        if (this.enableDebug) {
+          console.log('🌡️ [EmotionalTemperatureMapper] OKLAB processing:', {
+            emotion: primaryEmotion,
+            baseColor: emotionData.oklabBaseColor,
+            preset: customPreset.name,
+            enhanced: perceptualColorHex,
+            oklabCoords: oklabResult.oklabEnhanced
+          });
+        }
+      } catch (error) {
+        if (this.enableDebug) {
+          console.warn('🌡️ [EmotionalTemperatureMapper] OKLAB processing failed:', error);
+        }
+        // Fallback to base color
+        perceptualColorHex = emotionData.oklabBaseColor;
       }
-    } catch (error) {
+    } else {
+      // Skip OKLAB processing when includeOKLAB is false
       if (this.enableDebug) {
-        console.warn('🌡️ [EmotionalTemperatureMapper] OKLAB processing failed:', error);
+        console.log('🌡️ [EmotionalTemperatureMapper] Skipping OKLAB processing (includeOKLAB=false)');
       }
-      // Fallback to base color
-      perceptualColorHex = emotionData.oklabBaseColor;
     }
 
     // Generate CSS variables for the emotional temperature system with OKLAB integration
@@ -428,7 +502,10 @@ export class EmotionalTemperatureMapper {
   /**
    * Get genre-specific emotional adjustments
    */
-  private getGenreEmotionalAdjustment(genre: string, currentEmotion: EmotionalState): {
+  private getGenreEmotionalAdjustment(
+    genre: GenreType | string,
+    currentEmotion: EmotionalState
+  ): {
     override?: EmotionalState;
     secondary?: EmotionalState;
     blendRatio?: number;
@@ -696,5 +773,54 @@ export class EmotionalTemperatureMapper {
    */
   public static getEmotionCharacteristics(emotion: EmotionalState) {
     return EMOTIONAL_TEMPERATURE_MAP[emotion];
+  }
+
+  /**
+   * Cache management methods
+   */
+  public clearCache(): void {
+    this.calculationCache.clear();
+    if (this.enableDebug) {
+      console.log('🌡️ [EmotionalTemperatureMapper] Cache cleared');
+    }
+  }
+
+  public setCacheTimeout(ms: number): void {
+    this.cacheTimeout = Math.max(1000, ms); // Minimum 1 second
+    if (this.enableDebug) {
+      console.log('🌡️ [EmotionalTemperatureMapper] Cache timeout set to', ms, 'ms');
+    }
+  }
+
+  public getCacheMetrics(): { size: number; hits: number; misses: number; hitRate: number } {
+    const total = this.cacheHits + this.cacheMisses;
+    return {
+      size: this.calculationCache.size,
+      hits: this.cacheHits,
+      misses: this.cacheMisses,
+      hitRate: total > 0 ? this.cacheHits / total : 0
+    };
+  }
+
+  /**
+   * Health check with cache diagnostics
+   */
+  public healthCheck(): {
+    healthy: boolean;
+    details: string;
+    cacheMetrics: { size: number; hits: number; misses: number; hitRate: number };
+    oklabProcessor: { initialized: boolean };
+  } {
+    const cacheMetrics = this.getCacheMetrics();
+    const healthy = this.oklabProcessor !== null;
+    
+    return {
+      healthy,
+      details: healthy 
+        ? `Operational with ${cacheMetrics.size} cached entries (${(cacheMetrics.hitRate * 100).toFixed(1)}% hit rate)`
+        : 'OKLAB processor not initialized',
+      cacheMetrics,
+      oklabProcessor: { initialized: healthy }
+    };
   }
 }

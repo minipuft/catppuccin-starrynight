@@ -10,6 +10,7 @@
 
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import { VisualEffectsState } from "@/types/colorTypes";
+import type { GenreType } from "@/types/genre";
 
 // ============================================================================
 // Event Type Definitions with Unified Naming Convention
@@ -25,7 +26,7 @@ export interface UnifiedEventMap {
       energy?: number;
       valence?: number;
       tempo?: number;
-      genre?: string;
+      genre?: GenreType;
     };
   };
 
@@ -40,7 +41,7 @@ export interface UnifiedEventMap {
     timestamp?: number; // 🔧 PHASE 2: Event timestamp for tracking (optional for backward compat)
     processingMode?: string;
     coordinationMetrics?: {
-      detectedGenre?: string;
+      detectedGenre?: GenreType;
       emotionalState?: string;
       oklabPreset?: string;
       coordinationStrategy?: string;
@@ -179,6 +180,29 @@ export interface UnifiedEventMap {
   "performance:tier-changed": {
     tier: "excellent" | "good" | "degraded" | "critical";
     previousTier: "excellent" | "good" | "degraded" | "critical";
+    timestamp: number;
+    energyBoost?: boolean;
+  };
+
+  // Performance Mode Events (from PerformanceModeService)
+  "performance:mode-changed": {
+    mode: import('@/config/settingsSchema').PerformanceMode;
+    preset: any; // PerformancePreset from PerformanceModeService
+    hasOverrides: boolean;
+    timestamp: number;
+  };
+
+  "performance:override-changed": {
+    key: string;
+    value: any;
+    isOverride: boolean;
+    hasOverrides: boolean;
+    timestamp: number;
+  };
+
+  "performance:reset-to-preset": {
+    mode: import('@/config/settingsSchema').PerformanceMode;
+    preset: any; // PerformancePreset from PerformanceModeService
     timestamp: number;
   };
 

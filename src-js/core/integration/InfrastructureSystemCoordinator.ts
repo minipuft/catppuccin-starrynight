@@ -70,13 +70,13 @@ import { PerformanceBudgetManager } from "@/core/performance/PerformanceBudgetMa
 // Core Services imports
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
 import { MusicSyncService } from "@/audio/MusicSyncService";
+import { EmotionalGradientService } from "@/audio/EmotionalGradientService";
 import UnifiedDebugManager from "@/debug/DebugCoordinator";
 // NOTE: SettingsManager import removed - using TypedSettingsManager singleton via typed settings
 import { LoadingStateService } from "@/core/services/LoadingStateService";
 
 // Consciousness Systems imports
 import { VisualEffectsCoordinator } from "@/visual/effects/VisualEffectsCoordinator";
-import { MusicEmotionAnalyzer } from "@/visual/music/integration/MusicEmotionAnalyzer";
 
 // Color Strategy imports
 import { ColorProcessor, globalColorProcessor, globalUnifiedColorProcessingEngine } from "@/core/color/ColorProcessor";
@@ -123,9 +123,9 @@ export type InfrastructureSystemKey =
   | "ColorProcessor"
   | "UnifiedColorProcessingEngine" // Legacy alias for ColorProcessor
   | "LoadingStateService"
+  | "EmotionalGradientService" // Phase 2: Unified emotion-driven gradient service
 
   // Consciousness Systems
-  | "MusicEmotionAnalyzer"
   | "VisualEffectsCoordinator"
 
   // UI Managers
@@ -347,11 +347,7 @@ export class InfrastructureSystemCoordinator {
       "performanceCoordinator",
     ]);
 
-    this.systemRegistry.set(
-      "PerformanceAnalyzer",
-      PerformanceAnalyzer
-    );
-    this.systemDependencies.set("PerformanceAnalyzer", []);
+    // NOTE: Legacy PerformanceAnalyzer key is kept as an alias below to SimplePerformanceCoordinator
 
     this.systemRegistry.set(
       "DeviceCapabilityDetector",
@@ -387,13 +383,7 @@ export class InfrastructureSystemCoordinator {
     this.systemRegistry.set("UnifiedPerformanceCoordinator", SimplePerformanceCoordinator);
     this.systemDependencies.set("UnifiedPerformanceCoordinator", []);
 
-    this.systemRegistry.set("SimplePerformanceCoordinator", SimplePerformanceCoordinator);
-    this.systemDependencies.set("SimplePerformanceCoordinator", [
-      "performanceAnalyzer",
-      "performanceCoordinator",
-      "deviceCapabilityDetector",
-      "performanceBudgetManager",
-    ]);
+    // SimplePerformanceCoordinator is self-contained; no DI required for construction
 
     // QualityScalingManager functionality absorbed into SimplePerformanceCoordinator (Phase 3 consolidation)
     // this.systemRegistry.set('QualityScalingManager', QualityScalingManager);
@@ -433,6 +423,13 @@ export class InfrastructureSystemCoordinator {
     this.systemRegistry.set("LoadingStateService", LoadingStateService);
     this.systemDependencies.set("LoadingStateService", ["performanceAnalyzer"]); // NOTE: settingsManager dependency removed
 
+    // EmotionalGradientService - Phase 2: Unified emotion-driven gradient service
+    this.systemRegistry.set("EmotionalGradientService", EmotionalGradientService);
+    this.systemDependencies.set("EmotionalGradientService", [
+      "cssVariableManager",
+      "musicSyncService"
+    ]);
+
     // 🔧 ColorProcessor - Enhanced consolidated color processor (renamed from UnifiedColorProcessingEngine)
     this.systemRegistry.set(
       "ColorProcessor",
@@ -458,12 +455,7 @@ export class InfrastructureSystemCoordinator {
 
     // Consciousness Systems
     // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
-
-    this.systemRegistry.set("MusicEmotionAnalyzer", MusicEmotionAnalyzer);
-    this.systemDependencies.set("MusicEmotionAnalyzer", [
-      "musicSyncService",
-      // NOTE: settingsManager dependency removed - using TypedSettingsManager singleton
-    ]);
+    // MusicEmotionAnalyzer removed (Phase 4) — unified emotion handled by GenreService/ColorHarmonyEngine
 
     // 🔧 PHASE 4: VisualEffectsCoordinator - Consolidates ColorConsciousnessState and DynamicCatppuccinBridge
     this.systemRegistry.set(
@@ -574,6 +566,7 @@ export class InfrastructureSystemCoordinator {
       // NOTE: SettingsManager REMOVED - using TypedSettingsManager singleton via typed settings
       "UnifiedDebugManager",
       "MusicSyncService",
+      "EmotionalGradientService", // Phase 2: Unified emotion-driven gradient service (depends on cssVariableManager, musicSyncService)
       "LoadingStateService", // Phase 8.5: Active loading state management (depends on performanceAnalyzer)
     ];
 
@@ -620,6 +613,10 @@ export class InfrastructureSystemCoordinator {
             break;
           case "MusicSyncService":
             this.musicSyncService = system;
+            break;
+          case "EmotionalGradientService":
+            // Store reference for later access
+            // Note: This is a managed infrastructure service, not a visual system
             break;
           case "LoadingStateService":
             this.loadingStateService = system;
@@ -1036,6 +1033,15 @@ export class InfrastructureSystemCoordinator {
       case "SimplePerformanceCoordinator":
       case "UnifiedPerformanceCoordinator":
         return new SystemClass() as T;
+
+      // EmotionalGradientService - Phase 2: Unified emotion-driven gradient service
+      // Phase 3: Now accepts GenreService for unified profile integration (optional, falls back if not available)
+      case "EmotionalGradientService":
+        return new SystemClass(
+          dependencies.cssConsciousnessController || dependencies.cssVariableManager,
+          dependencies.musicSyncService,
+          dependencies.genreService || null // Phase 3: GenreService for unified profile (optional)
+        ) as T;
 
       // Default: try no-args constructor, then fall back to common pattern
       default:

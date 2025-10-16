@@ -54,3 +54,4 @@ logs/
 /logs
 tsconfig.tsbuildinfo
 # /.github
+.env

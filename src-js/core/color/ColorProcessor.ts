@@ -32,15 +32,20 @@ import type {
   StrategySelectionCriteria,
 } from "@/types/colorStrategy";
 import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
-import {
+import type {
   MusicalOKLABProcessor,
-  type MusicalColorContext,
-  type MusicalOKLABResult,
+  MusicalColorContext,
+  MusicalOKLABResult,
 } from "@/utils/color/MusicalOKLABCoordinator";
 import {
   OKLABColorProcessor,
   type OKLABProcessingResult,
 } from "@/utils/color/OKLABColorProcessor";
+import {
+  getStandardOKLABProcessor,
+  getMusicalOKLABProcessor,
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 import { ColorStrategyRegistry } from "@/visual/strategies/ColorStrategyRegistry";
 import { ColorStrategySelector } from "@/visual/strategies/ColorStrategySelector";
@@ -52,6 +57,7 @@ import { paletteSystemManager } from "@/utils/color/PaletteSystemManager";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
 import { PaletteTransform, type PaletteTransformConfig } from "@/utils/color/PaletteTransform";
 import { AESTHETIC_PROFILES } from "@/utils/color/PaletteConstants";
+import { GenreType } from "@/types/genre";
 
 // ============================================================================
 // Unified Processing Interfaces (Enhanced with ColorCoordinator features)
@@ -118,7 +124,7 @@ interface UnifiedProcessingResult extends ColorResult {
   error?: string;
   timestamp: number;
   coordinationMetrics: {
-    detectedGenre: string;
+    detectedGenre: GenreType;
     emotionalState: string;
     oklabPreset: string;
     coordinationStrategy: string;
@@ -238,8 +244,16 @@ export class ColorProcessor
     this.strategySelector = new ColorStrategySelector();
 
     // Initialize color processing systems
-    this.oklabProcessor = new OKLABColorProcessor();
-    this.musicalOKLABProcessor = new MusicalOKLABProcessor(true);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "ColorProcessor",
+      enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
+      reason: "constructor",
+    });
+    this.musicalOKLABProcessor = getMusicalOKLABProcessor({
+      requester: "ColorProcessor",
+      enableDebug: ADVANCED_SYSTEM_CONFIG.enableDebug,
+      reason: "constructor",
+    });
 
     // PHASE 4A: Initialize dynamic palette integration if feature flag enabled
     if (ADVANCED_SYSTEM_CONFIG.useDynamicPalettes) {
@@ -352,6 +366,17 @@ export class ColorProcessor
     // Clear processing queue and cache
     this.processingState.processingQueue = [];
     this.processingCache.clear();
+    this.resultCache.clear();
+    OKLABProcessorFactory.reportCacheFootprint(
+      "ColorProcessor.processingCache",
+      0,
+      { reason: "destroy" }
+    );
+    OKLABProcessorFactory.reportCacheFootprint(
+      "ColorProcessor.resultCache",
+      0,
+      { reason: "destroy" }
+    );
 
     // Unsubscribe from events
     this.settingsUnsubscribe?.();
@@ -464,7 +489,7 @@ export class ColorProcessor
         success: true,
         timestamp: Date.now(),
         coordinationMetrics: {
-          detectedGenre: context.musicData?.genre || "unknown",
+          detectedGenre: context.musicData?.genre ?? GenreType.UNKNOWN,
           emotionalState: context.musicData?.energy
             ? this.classifyEmotionalState(context.musicData.energy)
             : "neutral",
@@ -1154,25 +1179,52 @@ export class ColorProcessor
 
   private cacheResult(key: string, result: UnifiedProcessingResult): void {
     this.processingCache.set(key, { ...result, timestamp: Date.now() });
-    
+    OKLABProcessorFactory.reportCacheFootprint(
+      "ColorProcessor.processingCache",
+      this.processingCache.size,
+      { key, type: "processing" }
+    );
+
     // Also cache in the enhanced resultCache with TTL management
     this.resultCache.set(key, result);
-    
+    OKLABProcessorFactory.reportCacheFootprint(
+      "ColorProcessor.resultCache",
+      this.resultCache.size,
+      { key, type: "result" }
+    );
+
     // Enforce cache size limits
     if (this.resultCache.size > this.cacheMaxSize) {
       // Remove oldest entries
       const entries = Array.from(this.resultCache.entries());
       const toRemove = entries.slice(0, entries.length - this.cacheMaxSize);
       toRemove.forEach(([cacheKey]) => this.resultCache.delete(cacheKey));
+      if (toRemove.length > 0) {
+        OKLABProcessorFactory.reportCacheFootprint(
+          "ColorProcessor.resultCache",
+          this.resultCache.size,
+          { type: "result", reason: "size-limit" }
+        );
+      }
     }
   }
 
   private cleanupCache(): void {
     const now = Date.now();
+    let removed = false;
     for (const [key, result] of this.processingCache.entries()) {
       if (now - result.timestamp > this.CACHE_TTL_MS) {
         this.processingCache.delete(key);
+        removed = true;
       }
+    }
+
+    if (removed) {
+      OKLABProcessorFactory.reportCacheFootprint(
+        "ColorProcessor.processingCache",
+        this.processingCache.size,
+        { reason: "ttl" }
+      );
     }
   }
 
@@ -1720,6 +1772,11 @@ export class ColorProcessor
       ].includes(data.settingKey)
     ) {
       this.processingCache.clear();
+      OKLABProcessorFactory.reportCacheFootprint(
+        "ColorProcessor.processingCache",
+        this.processingCache.size,
+        { reason: "settings" }
+      );
       Y3KDebug?.debug?.log(
         "UnifiedColorProcessingEngine",
         "Cache cleared due to settings change:",
@@ -1733,6 +1790,11 @@ export class ColorProcessor
     if (data.memoryUsage > 50) {
       // MB
       this.processingCache.clear();
+      OKLABProcessorFactory.reportCacheFootprint(
+        "ColorProcessor.processingCache",
+        this.processingCache.size,
+        { reason: "memory" }
+      );
       Y3KDebug?.debug?.log(
         "UnifiedColorProcessingEngine",
         "Cache cleared due to memory pressure"
@@ -1756,6 +1818,11 @@ export class ColorProcessor
    */
   public async forceReprocessColors(): Promise<void> {
     this.processingCache.clear();
+    OKLABProcessorFactory.reportCacheFootprint(
+      "ColorProcessor.processingCache",
+      this.processingCache.size,
+      { reason: "force-reprocess" }
+    );
     if (this.processingState.lastExtractedColors) {
       const context: ColorContext = {
         rawColors: this.processingState.lastExtractedColors,

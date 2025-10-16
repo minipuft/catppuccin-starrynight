@@ -11,6 +11,7 @@
  */
 
 import type { MusicMetrics } from './systems';
+import type { GenreDetectionResult } from '@/types/genre';
 
 /**
  * Music synchronization interface for audio-responsive visual systems
@@ -77,7 +78,7 @@ export interface MusicSynchronized {
    * 
    * @param genre - Detected music genre and style information
    */
-  onMusicGenreChange?(genre: MusicGenre): void;
+  onMusicGenreChange?(genre: GenreDetectionResult): void;
 }
 
 /**
@@ -214,35 +215,6 @@ export interface RhythmPattern {
 /**
  * Music genre and style information
  */
-export interface MusicGenre {
-  /** Primary genre */
-  primary: string;
-  
-  /** Secondary genre (if applicable) */
-  secondary?: string;
-  
-  /** Genre confidence (0.0-1.0) */
-  confidence: number;
-  
-  /** Musical era or time period */
-  era?: string;
-  
-  /** Cultural origin */
-  origin?: string;
-  
-  /** Instrumental characteristics */
-  instruments?: string[];
-  
-  /** Style characteristics */
-  characteristics?: {
-    acoustic: boolean;
-    electronic: boolean;
-    vocal: boolean;
-    instrumental: boolean;
-    live: boolean;
-    studio: boolean;
-  };
-}
 
 /**
  * Advanced music synchronization for systems with comprehensive audio analysis

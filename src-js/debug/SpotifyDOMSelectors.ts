@@ -17,6 +17,7 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
   nowPlayingBar: ".Root__now-playing-bar",
   leftSidebar: ".Root__nav-bar",
   mainView: ".Root__main-view",
+  mainViewContainer: ".main-view-container",
   rightSidebar: ".Root__right-sidebar",
 
   // Now Playing Components
@@ -29,6 +30,7 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
 
   // Navigation & Library
   navMain: "nav[aria-label='Main']",
+  navBarLink: ".main-navBar-navBarLink",
   yourLibrary: ".main-yourLibraryX-libraryContainer",
   libraryItems: ".main-yourLibraryX-listItem",
   libraryHeader: ".main-yourLibraryX-header",
@@ -41,12 +43,18 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
   trackNumber: ".main-trackList-rowSectionIndex",
   trackTitle: ".main-trackList-rowTitle",
   trackArtist: ".main-trackList-rowSubTitle",
+  trackName: "[data-testid='track-name']",
+  artistName: "[data-testid='artist-name']",
+  trackListTrackName: ".main-trackList-trackName",
+  trackListArtistName: ".main-trackList-artistName",
 
   // Entity Headers (Playlist/Album/Artist Pages)
   entityHeader: ".main-entityHeader-container",
   entityTitle: ".main-entityHeader-title",
   entityMetadata: ".main-entityHeader-metaData",
   entityImage: ".main-entityHeader-imageContainer",
+  entityHeaderTitleText: ".main-entityHeader-titleText",
+  entityCard: ".main-entityCard-container",
 
   // Action Bar & Controls
   actionBar: ".main-actionBar-ActionBarRow",
@@ -55,6 +63,14 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
   pauseButton: "[data-testid='pause-button']",
   shuffleButton: "[data-testid='shuffle-button']",
   likeButton: ".control-button-heart",
+  controlButton: "[data-testid='control-button']",
+  playPauseButton: ".main-playPauseButton-button",
+  playerControlsButtons: ".player-controls__buttons",
+
+  // Buttons & Interactive Elements
+  buttonGeneric: 'button[class*="Button"]',
+  buttonRole: '[role="button"]',
+  playButtonLegacy: ".main-playButton-PlayButton",
 
   // Queue & Right Sidebar
   queue: ".main-queue-trackList",
@@ -73,6 +89,11 @@ export const MODERN_SELECTORS: { [key: string]: string } = {
   card: ".sn-card, .main-card-card",
   cardImage: ".main-cardImage-image",
   albumArt: ".main-trackList-albumArt",
+
+  // Icons
+  iconGeneric: 'svg[class*="Icon"]',
+  iconTestId: '[data-testid*="icon"]',
+  iconLegacy: ".Svg-sc-ytk21e-0",
 
   // Modal & Overlay
   modal: ".main-modal-container",
@@ -104,6 +125,57 @@ export const SELECTOR_MAPPINGS: { [key: string]: string } = Object.entries({
   }
   return acc;
 }, {} as { [key: string]: string });
+
+// Grouped selectors for easy consumption by systems that need multiple fallbacks
+export const SELECTOR_GROUPS: { [key: string]: string[] } = {
+  nowPlaying: [
+    MODERN_SELECTORS.nowPlayingWidget as string,
+    LEGACY_SELECTORS.nowPlayingWidget as string,
+    MODERN_SELECTORS.nowPlayingBar as string,
+  ],
+  sidebar: [
+    MODERN_SELECTORS.leftSidebar as string,
+    LEGACY_SELECTORS.navBar as string,
+  ],
+  mainContent: [
+    MODERN_SELECTORS.mainView as string,
+    MODERN_SELECTORS.mainViewContainer as string,
+  ],
+  buttons: [
+    MODERN_SELECTORS.buttonGeneric as string,
+    MODERN_SELECTORS.buttonRole as string,
+    MODERN_SELECTORS.playButtonLegacy as string,
+  ],
+  cards: [
+    MODERN_SELECTORS.card as string, // Already includes ".sn-card, .main-card-card"
+    MODERN_SELECTORS.entityCard as string,
+  ],
+  headers: [
+    "h1, h2, h3, h4, h5, h6",
+    MODERN_SELECTORS.entityHeaderTitleText as string,
+    MODERN_SELECTORS.entityHeader as string,
+  ],
+  textElements: [
+    MODERN_SELECTORS.trackName as string,
+    MODERN_SELECTORS.artistName as string,
+    MODERN_SELECTORS.trackListTrackName as string,
+    MODERN_SELECTORS.trackListArtistName as string,
+  ],
+  iconElements: [
+    MODERN_SELECTORS.iconGeneric as string,
+    MODERN_SELECTORS.iconTestId as string,
+    MODERN_SELECTORS.iconLegacy as string,
+  ],
+  playbackControls: [
+    MODERN_SELECTORS.controlButton as string,
+    MODERN_SELECTORS.playPauseButton as string,
+    MODERN_SELECTORS.playerControlsButtons as string,
+  ],
+  trackRows: [
+    MODERN_SELECTORS.trackRow as string,
+    LEGACY_SELECTORS.trackList as string,
+  ],
+};
 
 export const ORBITAL_ELEMENTS: { [key: string]: string } = {
   // Elements that can have orbital gravity effects

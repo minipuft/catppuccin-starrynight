@@ -15,12 +15,21 @@ import type {
   PerformanceProfile
 } from "@/types/models";
 import type { CanvasResult, CanvasContextType } from "@/utils/graphics/VisualCanvasFactory";
-import type { PerformanceMode } from "@/core/performance/PerformanceMonitor";
+import type { PerformanceModeConfig } from "@/core/performance/PerformanceMonitor";
 import type {
   TypedSettings,
   SettingsChangeEvent,
   TypedSettingsManager
 } from "@/config";
+import type {
+  AudioFeatures,
+  GenreDetectionResult,
+  GenreType,
+  GenreCharacteristics,
+  GenreVisualStyle,
+  GenreColorCharacteristics
+} from "@/types/genre";
+import type { MusicAnalysisProfile } from "@/types/genre";
 import type { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordinator";
 import type { SystemIntegrationCoordinator } from "@/core/integration/SystemIntegrationCoordinator";
 import type { CSSVariableWriter } from "@/core/css/CSSVariableWriter";
@@ -267,7 +276,7 @@ export interface CanvasManagementService {
 export interface PerformanceProfileSnapshot {
   quality: "low" | "balanced" | "high" | "auto";
   profile: PerformanceProfile | null;
-  performanceMode: PerformanceMode | null;
+  performanceMode: PerformanceModeConfig | null;
   timestamp: number;
 }
 
@@ -317,6 +326,32 @@ export interface MusicSyncLifecycleService {
    * Get the current beat vector used for motion coupling.
    */
   getCurrentBeatVector(): { x: number; y: number } | null;
+}
+
+// =============================================================================
+// GENRE SYSTEM SERVICE
+// =============================================================================
+
+export interface GenreSystemService {
+  getCurrentGenre(): GenreType;
+  getGenreConfidence(): number;
+  getGenreHistory(): Array<{
+    genre: GenreType;
+    confidence: number;
+    timestamp: number;
+  }>;
+  detectGenre(features?: AudioFeatures): GenreDetectionResult;
+  // Phase 3: getProfileForTrack() removed - use getMusicAnalysisProfile() instead
+  getColorCharacteristicsForGenre(
+    genre: GenreType
+  ): GenreColorCharacteristics;
+  getCharacteristics(genre: GenreType): GenreCharacteristics;
+  getVisualStyle(genre: GenreType): GenreVisualStyle;
+  getLastDetection(): GenreDetectionResult | null;
+  getMusicAnalysisProfile(features?: AudioFeatures): MusicAnalysisProfile;
+  subscribe(
+    listener: (result: GenreDetectionResult) => void
+  ): () => void;
 }
 
 // =============================================================================
@@ -496,6 +531,7 @@ export interface ServiceContainer {
   settings?: SettingsService;
   themeLifecycle?: ThemeLifecycleService;
   visualCoordinator?: VisualCoordinatorService;
+  genre?: GenreSystemService;
 }
 
 // =============================================================================

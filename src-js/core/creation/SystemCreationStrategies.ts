@@ -508,37 +508,7 @@ export class StandardConstructorStrategy extends BaseCreationStrategy {
     // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
     // Genre detection now handled by GenreProfileManager (stateless, used via ColorHarmonyEngine)
 
-    // MusicEmotionAnalyzer - requires config, utils, simplePerformanceCoordinator, settingsManager
-    this.registerSystemConfig({
-      systemKey: "MusicEmotionAnalyzer",
-      requiredDependencies: [
-        "config",
-        "utils",
-        "simplePerformanceCoordinator",
-        "settingsManager",
-      ],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: [
-          "config",
-          "utils",
-          "simplePerformanceCoordinator",
-          "settingsManager",
-        ],
-        dependencyMapping: {
-          config: "config",
-          utils: "utils",
-          simplePerformanceCoordinator: "simplePerformanceCoordinator",
-          settingsManager: "settingsManager",
-        },
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: true,
-        builderPattern: false,
-      },
-    });
+    // MusicEmotionAnalyzer removed (Phase 4). Unified emotion handled by GenreService/ColorHarmonyEngine.
     
     // New simplified performance systems
     this.registerNewSimplifiedSystems();
@@ -724,7 +694,6 @@ export class EventDrivenCreationStrategy
   getEventSubscriptions(systemKey: string): string[] {
     const eventSubscriptions: Record<string, string[]> = {
       ColorHarmonyEngine: ["colors:extracted", "music:track-changed"],
-      MusicEmotionAnalyzer: ["music:beat", "music:energy", "music:track-changed"],
     };
     
     return eventSubscriptions[systemKey] || [];
@@ -768,37 +737,7 @@ export class EventDrivenCreationStrategy
 
     // GenreGradientEvolution removed - functionality consolidated into GenreProfileManager
 
-    // MusicEmotionAnalyzer - event-driven system with music events
-    this.registerSystemConfig({
-      systemKey: "MusicEmotionAnalyzer",
-      requiredDependencies: [
-        "config",
-        "utils",
-        "simplePerformanceCoordinator",
-        "settingsManager",
-      ],
-      optionalDependencies: [],
-      constructorMapping: {
-        parameterNames: [
-          "config",
-          "utils",
-          "simplePerformanceCoordinator",
-          "settingsManager",
-        ],
-        dependencyMapping: {
-          config: "config",
-          utils: "utils",
-          simplePerformanceCoordinator: "simplePerformanceCoordinator",
-          settingsManager: "settingsManager",
-        },
-      },
-      creationPreferences: {
-        useSingleton: false,
-        lazyInit: false,
-        eventDriven: true,
-        builderPattern: false,
-      },
-    });
+    // MusicEmotionAnalyzer removed (Phase 4)
   }
 }
 

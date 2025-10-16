@@ -26,7 +26,7 @@
  */
 
 import { ColorHarmonyEngine } from "@/audio/ColorHarmonyEngine";
-import { EmotionalGradientMapper } from "@/audio/EmotionalGradientMapper";
+import { EmotionalGradientService } from "@/audio/EmotionalGradientService";
 import { GradientDirectionalFlowSystem } from "@/audio/GradientDirectionalFlowSystem";
 import { MusicSyncService } from "@/audio/MusicSyncService";
 import { MusicBeatSynchronizer } from "@/visual/music/MusicSyncVisualEffects";
@@ -37,7 +37,7 @@ import {
   UnifiedPerformanceCoordinator,
   PerformanceAnalyzer,
   type DeviceCapabilities,
-  type PerformanceMode,
+  type PerformanceModeConfig,
 } from "@/core/performance/PerformanceMonitor";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
@@ -174,7 +174,7 @@ export interface VisualEffectState {
 
   // === PERFORMANCE AWARENESS ===
   deviceCapabilities: DeviceCapabilities;
-  performanceMode: PerformanceMode;
+  performanceMode: PerformanceModeConfig;
   adaptiveQuality: number; // 0-1 current quality level
 
   // === TEMPORAL TRACKING ===
@@ -484,7 +484,7 @@ export class VisualEffectsCoordinator implements IManagedSystem {
   private musicSyncService: MusicSyncService | null = null;
   private colorHarmonyEngine: ColorHarmonyEngine | null = null;
   private colorProcessor: any | null = null; // 🔧 PHASE 7: ColorProcessor integration
-  private emotionalGradientMapper: EmotionalGradientMapper | null = null;
+  private emotionalGradientMapper: EmotionalGradientService | null = null;
 
   // Visual effect state management
   private currentVisualState: VisualEffectState | null = null;
@@ -587,7 +587,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     // 🔧 PHASE 2.2: Additional parameters for VisualSystemCoordinator compatibility
     utils?: any,
     year3000System?: any,
-    animationCoordinator?: any
+    animationCoordinator?: any,
+    // Phase 2: EmotionalGradientService shared singleton
+    emotionalGradientService?: any
   ) {
     this.config = config;
     this.eventBus = unifiedEventBus;
@@ -600,13 +602,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     this.year3000System = year3000System || null;
     this.animationCoordinator = animationCoordinator || null;
 
-    // Initialize emotional gradient mapper if we have the required dependencies
-    if (this.cssController && this.musicSyncService) {
-      this.emotionalGradientMapper = new EmotionalGradientMapper(
-        this.cssController,
-        this.musicSyncService
-      );
-    }
+    // Phase 2: Use shared EmotionalGradientService instance if provided
+    // This ensures single-writer rule for emotional CSS variables
+    this.emotionalGradientMapper = emotionalGradientService || null;
 
     // 🔧 PHASE 2.2: Initialize consolidated systems
     this.initializeFactoryRegistry();
@@ -668,10 +666,8 @@ export class VisualEffectsCoordinator implements IManagedSystem {
         this.setConfiguration(config);
       }
 
-      // Initialize emotional gradient mapper if available
-      if (this.emotionalGradientMapper) {
-        await this.emotionalGradientMapper.initialize();
-      }
+      // Phase 2: EmotionalGradientService is already initialized by InfrastructureSystemCoordinator
+      // No need to call initialize() again - that would duplicate subscriptions
 
       // Create initial visual effects state
       this.currentVisualState = this.createInitialVisualState();
@@ -745,11 +741,9 @@ export class VisualEffectsCoordinator implements IManagedSystem {
     // Unsubscribe from events
     this.unsubscribeFromEvents();
 
-    // Destroy emotional gradient mapper
-    if (this.emotionalGradientMapper) {
-      this.emotionalGradientMapper.destroy();
-      this.emotionalGradientMapper = null;
-    }
+    // Phase 2: Don't destroy EmotionalGradientService - it's a shared singleton managed by InfrastructureSystemCoordinator
+    // Just release the reference
+    this.emotionalGradientMapper = null;
 
     // Clear participants
     this.registeredParticipants.clear();

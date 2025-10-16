@@ -17,6 +17,9 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import type { AdvancedSystemConfig } from "@/types/models";
 import { ADVANCED_SYSTEM_CONFIG } from "@/config/globalConfig";
+import { GenreType } from "@/types/genre";
+import type { GenreSystemService } from "@/core/services/SystemServices";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
 
 export class GenreUIBridge implements IManagedSystem {
   public initialized = false;
@@ -24,8 +27,9 @@ export class GenreUIBridge implements IManagedSystem {
   private config: AdvancedSystemConfig;
   private genreProfileManager: GenreProfileManager;
   private musicSyncService: MusicSyncService | null = null;
+  private genreService: GenreSystemService | null = null;
 
-  private currentGenre: string | null = null;
+  private currentGenre: GenreType | null = null;
   private lastUpdateTime: number = 0;
   private readonly throttleMs = 300; // Throttle DOM updates to 300ms
 
@@ -50,6 +54,11 @@ export class GenreUIBridge implements IManagedSystem {
     this.genreProfileManager = genreProfileManager;
     this.musicSyncService = musicSyncService || null;
     this.config = config || ADVANCED_SYSTEM_CONFIG;
+    try {
+      this.genreService = DefaultServiceFactory.getServices()?.genre ?? null;
+    } catch {
+      this.genreService = null;
+    }
   }
 
   public async initialize(): Promise<void> {
@@ -105,13 +114,17 @@ export class GenreUIBridge implements IManagedSystem {
     const audioFeatures = data.audioFeatures;
 
     if (audioFeatures) {
-      const detectedGenre = this.genreProfileManager.detectGenre(audioFeatures);
+      const provider: any = this.genreService ?? this.genreProfileManager;
+      const detectedGenre: GenreType =
+        typeof provider.detectGenre === 'function'
+          ? provider.detectGenre(audioFeatures)?.genre ?? this.genreProfileManager.detectGenre(audioFeatures)
+          : this.genreProfileManager.detectGenre(audioFeatures);
       this.updateGenreUI(detectedGenre);
     }
   }
 
 
-  private updateGenreUI(genre: string): void {
+  private updateGenreUI(genre: GenreType): void {
     // Throttle updates
     const now = Date.now();
     if (now - this.lastUpdateTime < this.throttleMs) {
@@ -134,12 +147,12 @@ export class GenreUIBridge implements IManagedSystem {
     this.updateGenreVisualVariables(genre);
 
     if (this.config.enableDebug) {
-      const confidence = this.genreProfileManager.getGenreConfidence();
+      const confidence = this.genreService?.getGenreConfidence?.() ?? this.genreProfileManager.getGenreConfidence();
       console.log(`🎨 [GenreUIBridge] Applied genre '${genre}' to UI (confidence: ${(confidence * 100).toFixed(0)}%)`);
     }
   }
 
-  private applyGenreAttributes(genre: string): void {
+  private applyGenreAttributes(genre: GenreType): void {
     this.genreAwareSelectors.forEach(selector => {
       const elements = document.querySelectorAll(selector);
       elements.forEach(element => {
@@ -163,10 +176,11 @@ export class GenreUIBridge implements IManagedSystem {
     });
   }
 
-  private updateGenreVisualVariables(genre: string): void {
-    // Get visual style from GenreProfileManager
-    const visualStyle = this.genreProfileManager.getVisualStyle(genre);
-    const characteristics = this.genreProfileManager.getCharacteristics(genre);
+  private updateGenreVisualVariables(genre: GenreType): void {
+    // Get visual style from GenreService if available (fallback to manager)
+    const provider: any = this.genreService ?? this.genreProfileManager;
+    const visualStyle = typeof provider.getVisualStyle === 'function' ? provider.getVisualStyle(genre) : this.genreProfileManager.getVisualStyle(genre);
+    const characteristics = typeof provider.getCharacteristics === 'function' ? provider.getCharacteristics(genre) : this.genreProfileManager.getCharacteristics(genre);
 
     // Apply CSS variables for genre-specific styling
     const root = document.documentElement;
@@ -197,14 +211,14 @@ export class GenreUIBridge implements IManagedSystem {
   /**
    * Manually trigger genre UI update (for testing or manual control)
    */
-  public forceGenreUpdate(genre: string): void {
+  public forceGenreUpdate(genre: GenreType): void {
     this.updateGenreUI(genre);
   }
 
   /**
    * Get current genre applied to UI
    */
-  public getCurrentGenre(): string | null {
+  public getCurrentGenre(): GenreType | null {
     return this.currentGenre;
   }
 }

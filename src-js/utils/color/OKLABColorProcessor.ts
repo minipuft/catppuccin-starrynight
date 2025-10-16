@@ -111,8 +111,9 @@ export class OKLABColorProcessor {
    */
   public processColor(
     hexColor: string,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
+    preset: EnhancementPreset | string = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult {
+    const resolvedPreset = this.resolvePreset(preset);
     const startTime = performance.now();
     let originalRgb: { r: number; g: number; b: number } | null = null;
 
@@ -131,11 +132,11 @@ export class OKLABColorProcessor {
       );
 
       // Apply enhancement in OKLAB space
-      const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, preset);
+      const oklabEnhanced = this.enhanceOKLABColor(oklabOriginal, resolvedPreset);
 
       // Generate shadow and highlight variants
-      const oklabShadow = this.generateShadowColor(oklabOriginal, preset);
-      const oklabHighlight = this.generateHighlightColor(oklabOriginal, preset);
+      const oklabShadow = this.generateShadowColor(oklabOriginal, resolvedPreset);
+      const oklabHighlight = this.generateHighlightColor(oklabOriginal, resolvedPreset);
 
       // Convert back to RGB
       const enhancedRgb = this.utils.oklabToRgb(
@@ -199,7 +200,7 @@ export class OKLABColorProcessor {
           enhanced: enhancedHex,
           shadow: shadowHex,
           highlight: highlightHex,
-          preset: preset.name,
+          preset: resolvedPreset.name,
           processingTime: `${processingTime.toFixed(2)}ms`,
         });
       }
@@ -220,12 +221,30 @@ export class OKLABColorProcessor {
     }
   }
 
+  private resolvePreset(preset: EnhancementPreset | string): EnhancementPreset {
+    if (typeof preset === "string") {
+      return OKLABColorProcessor.getPreset(preset);
+    }
+
+    if (
+      preset &&
+      typeof preset.lightnessBoost === "number" &&
+      typeof preset.chromaBoost === "number" &&
+      typeof preset.shadowReduction === "number" &&
+      typeof preset.vibrantThreshold === "number"
+    ) {
+      return preset;
+    }
+
+    return OKLABColorProcessor.PRESETS.STANDARD;
+  }
+
   /**
    * Process multiple colors with consistent enhancement
    */
   public processColorPalette(
     colors: Record<string, string>,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
+    preset: EnhancementPreset | string = OKLABColorProcessor.PRESETS.STANDARD
   ): Record<string, OKLABProcessingResult> {
     const results: Record<string, OKLABProcessingResult> = {};
 
@@ -288,7 +307,7 @@ export class OKLABColorProcessor {
     color1Hex: string,
     color2Hex: string,
     factor: number,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
+    preset: EnhancementPreset | string = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult {
     const rgb1 = this.utils.hexToRgb(color1Hex);
     const rgb2 = this.utils.hexToRgb(color2Hex);
@@ -330,7 +349,7 @@ export class OKLABColorProcessor {
     startHex: string,
     endHex: string,
     stopCount: number = 5,
-    preset: EnhancementPreset = OKLABColorProcessor.PRESETS.STANDARD
+    preset: EnhancementPreset | string = OKLABColorProcessor.PRESETS.STANDARD
   ): OKLABProcessingResult[] {
     const gradientStops: OKLABProcessingResult[] = [];
 
@@ -370,6 +389,29 @@ export class OKLABColorProcessor {
     return { L: enhancedL, a: enhancedA, b: enhancedB };
   }
 
+  private calculateBalancedLightness(
+    oklab: OKLABColor,
+    preset: EnhancementPreset
+  ): { shadowL: number; highlightL: number } {
+    const minLightness = 0.02;
+    const maxLightness = 1;
+
+    const baseShadowL = Math.max(minLightness, oklab.L * preset.shadowReduction);
+    const baseHighlightL = Math.min(
+      maxLightness,
+      oklab.L * (2.0 - preset.shadowReduction)
+    );
+
+    const shadowDelta = oklab.L - baseShadowL;
+    const highlightDelta = baseHighlightL - oklab.L;
+    const balancedDelta = Math.max(0, Math.min(shadowDelta, highlightDelta));
+
+    return {
+      shadowL: Math.max(minLightness, oklab.L - balancedDelta),
+      highlightL: Math.min(maxLightness, oklab.L + balancedDelta),
+    };
+  }
+
   /**
    * Generate shadow color by reducing lightness while preserving hue
    *
@@ -398,8 +440,9 @@ export class OKLABColorProcessor {
     oklab: OKLABColor,
     preset: EnhancementPreset
   ): OKLABColor {
+    const { shadowL } = this.calculateBalancedLightness(oklab, preset);
     return {
-      L: Math.max(0.02, oklab.L * preset.shadowReduction),
+      L: shadowL,
       a: oklab.a * 0.8, // Slightly desaturate shadows
       b: oklab.b * 0.8,
     };
@@ -437,9 +480,9 @@ export class OKLABColorProcessor {
     oklab: OKLABColor,
     preset: EnhancementPreset
   ): OKLABColor {
-    const highlightBoost = 2.0 - preset.shadowReduction;
+    const { highlightL } = this.calculateBalancedLightness(oklab, preset);
     return {
-      L: Math.min(1.0, oklab.L * highlightBoost),
+      L: highlightL,
       a: oklab.a * 0.9,
       b: oklab.b * 0.9,
     };

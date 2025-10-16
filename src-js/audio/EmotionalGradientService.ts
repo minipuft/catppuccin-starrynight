@@ -1,6 +1,9 @@
 /**
- * EmotionalGradientMapper - Musical Emotion to Visual Gradient Translation
+ * EmotionalGradientService - Musical Emotion to Visual Gradient Translation
  * Part of the Year 3000 Flux Visual Effects System
+ *
+ * Unified service for emotion-driven gradient behavior, implementing IManagedSystem.
+ * Consolidates emotional gradient mapping to prevent duplicate subscriptions and CSS writes.
  *
  * Maps musical emotional content to gradient behaviors:
  * - Valence (sad ↔ happy) affects color warmth and brightness
@@ -17,13 +20,15 @@ import { unifiedEventBus } from "@/core/events/EventBus";
 import { settings } from "@/config";
 import type { SettingsChangeEvent } from "@/config";
 import { Y3KDebug } from "@/debug/DebugCoordinator";
-// NOTE: SettingsManager import removed - was dead code, never used
+import type { IManagedSystem, HealthCheckResult } from "@/types/systems";
 import {
   EmotionalTemperatureMapper,
   type EmotionalState,
   type EmotionalTemperatureResult,
   type MusicAnalysisData,
 } from "@/utils/color/EmotionalTemperatureMapper";
+import { GenreType, type MusicAnalysisProfile } from "@/types/genre";
+import type { GenreService } from "@/audio/GenreService";
 
 export interface EmotionalProfile {
   // Core emotional dimensions (0-1 range)
@@ -84,10 +89,12 @@ export interface EmotionalGradientState {
   responsiveness: number; // 0-1 how quickly to adapt
 }
 
-export class EmotionalGradientMapper {
+export class EmotionalGradientService implements IManagedSystem {
+  public initialized = false;
+
   private cssController!: CSSVariableWriter;
   private musicSyncService: MusicSyncService | null = null;
-  // NOTE: settingsManager field removed - was dead code, never used
+  private genreService: GenreService | null = null; // Phase 3: Unified profile integration
 
   private currentEmotionalProfile: EmotionalProfile | null = null;
   private currentGradientState: EmotionalGradientState;
@@ -98,8 +105,10 @@ export class EmotionalGradientMapper {
   // UnifiedEventBus subscription IDs for cleanup
   private emotionAnalysisSubscriptionId: string | null = null;
   private settingsUnsubscribe: (() => void) | null = null;
+  private genreServiceUnsubscribe: (() => void) | null = null; // Phase 3: GenreService subscription cleanup
 
   // 🌡️ EMOTIONAL TEMPERATURE INTEGRATION
+  // Phase 3: EmotionalTemperatureMapper now used as fallback only
   private emotionalTemperatureMapper: EmotionalTemperatureMapper;
   private currentEmotionalTemperature: EmotionalTemperatureResult | null = null;
   private moodToEmotionMap: Record<MoodType, EmotionalState>;
@@ -254,12 +263,13 @@ export class EmotionalGradientMapper {
 
   constructor(
     cssController?: CSSVariableWriter,
-    musicSyncService: MusicSyncService | null = null
+    musicSyncService: MusicSyncService | null = null,
+    genreService?: GenreService // Phase 3: Optional GenreService for unified profile integration
     // NOTE: settingsManager parameter removed - was dead code, never used
   ) {
     this.cssController = cssController || getGlobalCSSVariableWriter();
     this.musicSyncService = musicSyncService;
-    // NOTE: settingsManager assignment removed - was dead code, never used
+    this.genreService = genreService || null; // Phase 3: Store GenreService reference
 
     // Initialize with neutral gradient state
     this.currentGradientState = this.createNeutralGradientState();
@@ -287,13 +297,44 @@ export class EmotionalGradientMapper {
   }
 
   public async initialize(): Promise<void> {
+    // Idempotent initialization guard - prevent duplicate subscriptions
+    if (this.initialized) {
+      Y3KDebug?.debug?.warn(
+        "EmotionalGradientService",
+        "Already initialized, skipping duplicate initialization"
+      );
+      return;
+    }
+
     // CSS controller is already initialized in constructor
 
-    // Subscribe to unified music emotion analysis events
+    // Phase 3: Subscribe to GenreService for unified profile updates (preferred)
+    if (this.genreService) {
+      this.genreServiceUnsubscribe = this.genreService.subscribe((detection) => {
+        // Phase 2: detection.profile is now MusicAnalysisProfile (unified)
+        try {
+          // Directly use the unified profile from GenreDetectionResult
+          this.handleUnifiedProfile(detection.profile);
+        } catch (error) {
+          Y3KDebug?.debug?.warn(
+            "EmotionalGradientService",
+            "Failed to process unified profile from GenreService:",
+            error
+          );
+        }
+      });
+
+      Y3KDebug?.debug?.log(
+        "EmotionalGradientService",
+        "Phase 3: Subscribed to GenreService for unified profile updates"
+      );
+    }
+
+    // Subscribe to unified music emotion analysis events (fallback for legacy compatibility)
     this.emotionAnalysisSubscriptionId = unifiedEventBus.subscribe(
       'music:emotion-analyzed',
       this.handleEmotionAnalysis.bind(this),
-      'EmotionalGradientMapper'
+      'EmotionalGradientService'
     );
 
     this.settingsUnsubscribe?.();
@@ -302,9 +343,12 @@ export class EmotionalGradientMapper {
     );
 
     this.isActive = true;
+    this.initialized = true;
     Y3KDebug?.debug?.log(
-      "EmotionalGradientMapper",
-      "Emotional mapping system initialized with UnifiedEventBus"
+      "EmotionalGradientService",
+      this.genreService
+        ? "Emotional gradient service initialized with GenreService unified profile (Phase 3)"
+        : "Emotional gradient service initialized with legacy UnifiedEventBus (fallback mode)"
     );
   }
 
@@ -327,7 +371,162 @@ export class EmotionalGradientMapper {
   }
 
   /**
-   * Handle emotion analysis events from UnifiedEventBus
+   * Phase 3: Handle unified MusicAnalysisProfile from GenreService (preferred path)
+   * This is the primary data source for emotional gradient processing
+   */
+  private handleUnifiedProfile(profile: MusicAnalysisProfile): void {
+    if (!this.isActive) return;
+
+    try {
+      // Map unified profile to EmotionalProfile
+      const emotionalProfile = this.mapUnifiedProfileToEmotionalProfile(profile);
+
+      // Store in history for temporal analysis
+      this.storeEmotionalHistory(emotionalProfile);
+
+      // Map emotion to gradient state
+      const newGradientState = this.mapEmotionToGradient(emotionalProfile);
+
+      // Apply temporal smoothing
+      this.currentGradientState = this.smoothGradientTransition(
+        this.currentGradientState,
+        newGradientState,
+        emotionalProfile.stability
+      );
+
+      // Update CSS variables
+      this.updateGradientVariables();
+
+      this.currentEmotionalProfile = emotionalProfile;
+
+      Y3KDebug?.debug?.log(
+        "EmotionalGradientService",
+        "Phase 3: Processed unified profile from GenreService",
+        {
+          genre: profile.genre,
+          emotion: profile.emotion.primary,
+          mood: emotionalProfile.mood,
+          confidence: profile.confidence
+        }
+      );
+    } catch (error) {
+      Y3KDebug?.debug?.error(
+        "EmotionalGradientService",
+        "Phase 3: Failed to process unified profile:",
+        error
+      );
+    }
+  }
+
+  /**
+   * Phase 3: Map unified MusicAnalysisProfile to EmotionalProfile
+   * This consolidates the emotion analysis from GenreService's unified data
+   */
+  private mapUnifiedProfileToEmotionalProfile(profile: MusicAnalysisProfile): EmotionalProfile {
+    const { emotion, visualMetrics, characteristics } = profile;
+
+    // Use unified profile data directly (no re-derivation via EmotionalTemperatureMapper)
+    const valence = emotion.valence;
+    const energy = visualMetrics.energy;
+    const arousal = emotion.arousal;
+    const tension = this.calculateTensionFromProfile(profile);
+
+    // Determine musical characteristics from unified data
+    const mode = this.detectModeFromProfile(profile);
+    const dynamics = this.calculateDynamicsFromProfile(profile);
+    const complexity = characteristics.musicalComplexity || 0.5;
+
+    // Calculate temporal characteristics
+    const stability = this.calculateStability();
+    const predictability = this.calculatePredictability();
+
+    // Classify mood using unified emotion data
+    const mood = this.classifyMoodFromUnifiedProfile(profile);
+    const confidence = profile.confidence;
+
+    return {
+      valence,
+      energy,
+      arousal,
+      tension,
+      mode,
+      dynamics,
+      complexity,
+      stability,
+      predictability,
+      mood,
+      confidence,
+    };
+  }
+
+  /**
+   * Phase 3: Calculate tension from unified profile characteristics
+   */
+  private calculateTensionFromProfile(profile: MusicAnalysisProfile): number {
+    const { characteristics, rawFeatures } = profile;
+
+    const dissonance = characteristics.dissonanceTolerance || 0;
+    const rhythmComplexity = characteristics.rhythmComplexity || 0;
+    const compression = characteristics.compression || 0;
+    const loudness = rawFeatures.loudness ? Math.min(1, Math.abs(rawFeatures.loudness / 60)) : 0.5;
+
+    return Math.max(
+      0,
+      Math.min(
+        1,
+        (dissonance * 0.3 + rhythmComplexity * 0.3 + compression * 0.2 + loudness * 0.2)
+      )
+    );
+  }
+
+  /**
+   * Phase 3: Determine mode from unified profile
+   */
+  private detectModeFromProfile(profile: MusicAnalysisProfile): "major" | "minor" | "neutral" {
+    const { rawFeatures, emotion } = profile;
+
+    // Use rawFeatures.mode if available (1 = major, 0 = minor)
+    if (typeof rawFeatures.mode === 'number') {
+      return rawFeatures.mode === 1 ? "major" : "minor";
+    }
+
+    // Fallback to emotion valence
+    if (emotion.valence > 0.6) return "major";
+    if (emotion.valence < 0.4) return "minor";
+    return "neutral";
+  }
+
+  /**
+   * Phase 3: Calculate dynamics from unified profile
+   */
+  private calculateDynamicsFromProfile(profile: MusicAnalysisProfile): number {
+    const { rawFeatures, visualMetrics } = profile;
+
+    const loudness = rawFeatures.loudness ? Math.abs(rawFeatures.loudness / 60) : 0.5;
+    const energy = visualMetrics.energy;
+
+    return Math.max(0, Math.min(1, (loudness + energy) / 2));
+  }
+
+  /**
+   * Phase 3: Classify mood from unified profile (uses integrated emotion + genre data)
+   */
+  private classifyMoodFromUnifiedProfile(profile: MusicAnalysisProfile): MoodType {
+    const { emotion, visualMetrics, characteristics } = profile;
+
+    const valence = emotion.valence;
+    const energy = visualMetrics.energy;
+    const arousal = emotion.arousal;
+    const tension = this.calculateTensionFromProfile(profile);
+    const mode = this.detectModeFromProfile(profile);
+
+    // Use the existing mood classification logic with unified data
+    return this.classifyMood(valence, energy, arousal, tension, mode);
+  }
+
+  /**
+   * Handle emotion analysis events from UnifiedEventBus (fallback for legacy compatibility)
+   * Phase 3: This path now uses EmotionalTemperatureMapper as fallback only
    */
   private handleEmotionAnalysis(data: {
     emotion: {
@@ -361,7 +560,7 @@ export class EmotionalGradientMapper {
       speechiness: data.emotion.musicalCharacteristics.speechiness,
       mode: 1, // Default major, could be enhanced
       key: 0, // Default
-      genre: data.emotion.primary, // Use primary emotion as genre hint
+      genre: GenreType.DEFAULT,
     };
 
     // Process the music data using existing logic
@@ -402,7 +601,7 @@ export class EmotionalGradientMapper {
       );
 
       Y3KDebug?.debug?.log(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "🌡️ Applied emotional temperature:",
         {
           mood: emotionalProfile.mood,
@@ -413,7 +612,7 @@ export class EmotionalGradientMapper {
       );
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "🌡️ Failed to apply emotional temperature:",
         error
       );
@@ -749,7 +948,7 @@ export class EmotionalGradientMapper {
     };
 
     this.cssController.batchSetVariables(
-      "EmotionalGradientMapper",
+      "EmotionalGradientService",
       emotionalVariables,
       "normal", // Normal priority for emotional gradient updates
       "emotional-gradient-mapping"
@@ -767,14 +966,14 @@ export class EmotionalGradientMapper {
       };
 
       this.cssController.batchSetVariables(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         temperatureVariables,
         "high", // High priority for emotional temperature (affects perception)
         "emotional-temperature-mapping"
       );
 
       Y3KDebug?.debug?.log(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "🌡️ Applied temperature CSS variables:",
         {
           temperature: this.currentEmotionalTemperature.temperature,
@@ -801,7 +1000,7 @@ export class EmotionalGradientMapper {
       };
 
       this.cssController.batchSetVariables(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         moodVariables,
         "normal", // Normal priority for mood information
         "mood-state-tracking"
@@ -841,14 +1040,14 @@ export class EmotionalGradientMapper {
       };
 
       this.cssController.batchSetVariables(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         backgroundGradientVariables,
         "normal", // Normal priority for background gradient coordination
         "bg-gradient-coordination"
       );
 
       Y3KDebug?.debug?.log(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         `Coordinated emotional modifications with gradient system: flow=${
           state.flowDirection
         }°, opacity=${0.8 * state.layerHarmony!}`
@@ -870,7 +1069,7 @@ export class EmotionalGradientMapper {
     if (settingKey.startsWith("sn-emotional-") || settingKey.startsWith("sn-gradient-")) {
       // Reload emotional mapping sensitivity based on settings
       Y3KDebug?.debug?.log(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "Settings changed via UnifiedEventBus, updating emotional sensitivity",
         { settingKey, newValue }
       );
@@ -902,7 +1101,7 @@ export class EmotionalGradientMapper {
       // Reset after duration
       setTimeout(() => {
         Y3KDebug?.debug?.log(
-          "EmotionalGradientMapper",
+          "EmotionalGradientService",
           "Mood override expired, returning to automatic detection"
         );
       }, duration);
@@ -933,14 +1132,14 @@ export class EmotionalGradientMapper {
 
     // Apply CSS variables to document root using coordination
     this.cssController.batchSetVariables(
-      "EmotionalGradientMapper",
+      "EmotionalGradientService",
       emotionalTemperature.cssVariables,
       "high", // High priority for emotional temperature document updates
       "emotional-temperature-document"
     );
 
     Y3KDebug?.debug?.log(
-      "EmotionalGradientMapper",
+      "EmotionalGradientService",
       "🌡️ Applied emotional temperature to document:",
       {
         primaryClass: emotionalTemperature.cssClass,
@@ -953,40 +1152,40 @@ export class EmotionalGradientMapper {
   /**
    * 🌡️ Infer genre from emotional profile for temperature mapping
    */
-  private inferGenreFromProfile(profile: EmotionalProfile): string {
+  private inferGenreFromProfile(profile: EmotionalProfile): GenreType {
     const { mood, energy, valence, tension, arousal, mode } = profile;
 
     // Map mood and characteristics to likely genre
     if (mood === "aggressive" || (energy > 0.8 && valence < 0.4)) {
-      return tension > 0.7 ? "metal" : "hard-rock";
+      return tension > 0.7 ? GenreType.METAL : GenreType.ROCK;
     }
 
     if (mood === "euphoric" || (energy > 0.7 && valence > 0.7)) {
-      return arousal > 0.8 ? "edm" : "pop";
+      return arousal > 0.8 ? GenreType.ELECTRONIC : GenreType.POP;
     }
 
     if (mood === "melancholic" || (energy < 0.4 && valence < 0.4)) {
-      return mode === "minor" ? "blues" : "folk";
+      return mode === "minor" ? GenreType.BLUES : GenreType.FOLK;
     }
 
     if (mood === "peaceful" || (energy < 0.3 && valence > 0.6)) {
-      return "ambient";
+      return GenreType.AMBIENT;
     }
 
     if (mood === "dramatic" || (tension > 0.6 && energy > 0.5)) {
-      return "classical";
+      return GenreType.CLASSICAL;
     }
 
     if (mood === "mysterious" || (valence < 0.5 && tension > 0.5)) {
-      return "jazz";
+      return GenreType.JAZZ;
     }
 
     if (mood === "heroic" || (mode === "major" && energy > 0.6)) {
-      return "soundtrack";
+      return GenreType.CLASSICAL;
     }
 
     // Default to indie for neutral/contemplative moods
-    return "indie-pop";
+    return GenreType.INDIE;
   }
 
   /**
@@ -1008,7 +1207,7 @@ export class EmotionalGradientMapper {
       const mockMusicData: MusicAnalysisData = {
         energy: intensity,
         valence: intensity > 0.5 ? 0.7 : 0.3, // High intensity usually positive
-        genre: "override",
+        genre: GenreType.DEFAULT,
       };
 
       const overrideTemperature =
@@ -1025,7 +1224,7 @@ export class EmotionalGradientMapper {
       this.applyEmotionalTemperatureToDocument(overrideTemperature);
 
       Y3KDebug?.debug?.log(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "🌡️ Applied emotional temperature override:",
         {
           emotion: emotionalState,
@@ -1037,14 +1236,14 @@ export class EmotionalGradientMapper {
       // Reset after duration
       setTimeout(() => {
         Y3KDebug?.debug?.log(
-          "EmotionalGradientMapper",
+          "EmotionalGradientService",
           "🌡️ Emotional temperature override expired"
         );
         // The next spectral data event will restore automatic detection
       }, duration);
     } catch (error) {
       Y3KDebug?.debug?.warn(
-        "EmotionalGradientMapper",
+        "EmotionalGradientService",
         "🌡️ Failed to apply emotional temperature override:",
         error
       );
@@ -1053,6 +1252,17 @@ export class EmotionalGradientMapper {
 
   public destroy(): void {
     this.isActive = false;
+    this.initialized = false;
+
+    // Phase 3: Unsubscribe from GenreService
+    if (this.genreServiceUnsubscribe) {
+      this.genreServiceUnsubscribe();
+      this.genreServiceUnsubscribe = null;
+      Y3KDebug?.debug?.log(
+        'EmotionalGradientService',
+        'Phase 3: Unsubscribed from GenreService'
+      );
+    }
 
     // Unsubscribe from UnifiedEventBus events
     if (this.emotionAnalysisSubscriptionId) {
@@ -1064,8 +1274,8 @@ export class EmotionalGradientMapper {
     this.settingsUnsubscribe = null;
 
     Y3KDebug?.debug?.log(
-      'EmotionalGradientMapper',
-      'Unsubscribed from UnifiedEventBus events'
+      'EmotionalGradientService',
+      'Unsubscribed from all event sources'
     );
 
     // Clean up emotional temperature classes from document
@@ -1081,8 +1291,83 @@ export class EmotionalGradientMapper {
     this.currentEmotionalTemperature = null;
 
     Y3KDebug?.debug?.log(
-      "EmotionalGradientMapper",
-      "Emotional mapping system destroyed"
+      "EmotionalGradientService",
+      "Emotional gradient service destroyed"
     );
+  }
+
+  /**
+   * IManagedSystem: Update animation frame (no-op for this service)
+   */
+  public updateAnimation(_deltaTime: number): void {
+    // EmotionalGradientService processes events reactively, not per-frame
+    // No animation update needed
+  }
+
+  /**
+   * IManagedSystem: Health check for system diagnostics
+   */
+  public async healthCheck(): Promise<HealthCheckResult> {
+    const issues: string[] = [];
+
+    if (!this.initialized) {
+      issues.push("Service not initialized");
+    }
+
+    if (!this.isActive) {
+      issues.push("Service not active");
+    }
+
+    if (!this.emotionAnalysisSubscriptionId) {
+      issues.push("Not subscribed to emotion analysis events");
+    }
+
+    if (!this.cssController) {
+      issues.push("CSS controller not available");
+    }
+
+    const isHealthy = issues.length === 0;
+
+    const result: HealthCheckResult = {
+      system: "EmotionalGradientService",
+      healthy: isHealthy,
+      ok: isHealthy,
+      details: isHealthy ? "Service operational" : `Found ${issues.length} issue(s)`,
+      metrics: {
+        initialized: this.initialized,
+        active: this.isActive,
+        emotionalHistorySize: this.emotionalHistory.length,
+        hasCurrentProfile: this.currentEmotionalProfile !== null,
+        hasCurrentTemperature: this.currentEmotionalTemperature !== null,
+      }
+    };
+
+    // Only add issues array if there are issues (to satisfy exactOptionalPropertyTypes)
+    if (issues.length > 0) {
+      result.issues = issues;
+    }
+
+    return result;
+  }
+
+  /**
+   * IManagedSystem: Force visual repaint (optional, applies current gradient state)
+   */
+  public forceRepaint(reason?: string): void {
+    if (!this.initialized || !this.isActive) {
+      Y3KDebug?.debug?.warn(
+        "EmotionalGradientService",
+        "Cannot force repaint: service not ready"
+      );
+      return;
+    }
+
+    Y3KDebug?.debug?.log(
+      "EmotionalGradientService",
+      `Force repaint requested${reason ? `: ${reason}` : ""}`
+    );
+
+    // Reapply current gradient variables
+    this.updateGradientVariables();
   }
 }

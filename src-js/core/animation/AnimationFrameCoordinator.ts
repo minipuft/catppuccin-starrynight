@@ -2,9 +2,7 @@ import { PerformanceAnalyzer } from '@/core/performance/PerformanceMonitor';
 import { CSSVariableWriter } from '@/core/css/CSSVariableWriter';
 import { unifiedEventBus } from '@/core/events/EventBus';
 import { ADVANCED_SYSTEM_CONFIG } from '@/config/globalConfig';
-import { temporalMemoryService } from "@/audio/TemporalMemoryService";
-import type { AdvancedSystemConfig, Year3000Config, MultiplierProfile } from '@/types/models';
-import type { PersonalAestheticSignature } from "@/types/signature";
+import type { AdvancedSystemConfig, Year3000Config } from '@/types/models';
 // CSSAnimationManager consolidated into this class
 
 /**
@@ -363,17 +361,9 @@ export class AnimationFrameCoordinator {
     this.currentBpm = tempo;
   }
 
-  // ===================================================================
-  // EMERGENT CHOREOGRAPHY ENGINE INTEGRATION (from consolidation)
-  // ===================================================================
-  
-  // Emergent choreography state
-  private signature: PersonalAestheticSignature | null = null;
-  private saveInterval: NodeJS.Timeout | null = null;
-  private currentMultipliers: MultiplierProfile;
+  // Beat synchronization state for visual effects coordination
   private currentBpm: number = 120;
   private currentIntensity: number = 0.5;
-  private emergentEventSubscriptions: string[] = [];
   
   constructor(config: AdvancedSystemConfig | Year3000Config, performanceCoordinator?: PerformanceAnalyzer, cssAnimationManager?: CSSAnimationManagerInterface, cssVariableManager?: CSSVariableWriter) {
     this.config = config;
@@ -385,18 +375,12 @@ export class AnimationFrameCoordinator {
     // Initialize timing
     this.startTime = performance.now();
     this.lastTimestamp = this.startTime;
-    
-    // Initialize adaptive choreography state
-    this.currentMultipliers = this.config.cosmicMultipliers; // Start with defaults
-    
+
     // 🔧 PHASE 3.1: Initialize consolidated animation features
     this.initializeConsolidatedSystems();
-    
+
     // Subscribe to performance events
     this.subscribeToEvents();
-    
-    // Initialize adaptive choreography (from EmergentChoreographyEngine)
-    this.initializeAdaptiveSystem();
     
     // Set up performance-aware frame budget
     this.updateFrameBudget();
@@ -748,32 +732,16 @@ export class AnimationFrameCoordinator {
     return false;
   }
   
-  /**
-   * Get current multipliers for adaptive choreography
-   */
-  public getCurrentMultipliers(): MultiplierProfile {
-    return this.currentMultipliers;
-  }
-  
-  /**
-   * Force update evolutionary trajectory
-   */
-  public async updateEvolutionaryTrajectory(): Promise<void> {
-    await this._updateEvolutionaryTrajectory();
-  }
   
   /**
    * Destroy the coordinator and clean up resources
    */
   public destroy(): void {
     this.stopMasterAnimationLoop();
-    
+
     // 🔧 PHASE 3.1: Clean up consolidated systems
     this.destroyConsolidatedSystems();
-    
-    // Clean up adaptive choreography
-    this.destroyAdaptiveSystem();
-    
+
     // Destroy all visual systems
     for (const registration of this.animations.values()) {
       if (registration.type === 'visual' && 'destroy' in registration.system) {
@@ -845,13 +813,8 @@ export class AnimationFrameCoordinator {
     
     // 🔧 PHASE 3.1: Process consolidated animation systems
     const midFrameTime = performance.now() - frameStartTime;
-    if (midFrameTime < FRAME_BUDGET * 0.7) { // Reserve 30% for adaptive choreography and cleanup
-      this.updateConsolidatedAnimations(currentTime, deltaTime);
-    }
-    
-    // Process adaptive choreography only if we have budget remaining
     if (midFrameTime < FRAME_BUDGET * 0.8) { // Reserve 20% for cleanup
-      this.updateAdaptiveAnimations(deltaTime);
+      this.updateConsolidatedAnimations(currentTime, deltaTime);
     }
     
     // Update performance metrics
@@ -1141,226 +1104,6 @@ export class AnimationFrameCoordinator {
     }, 'AnimationFrameCoordinator');
   }
   
-  // =========================================================================
-  // EMERGENT CHOREOGRAPHY ENGINE METHODS (from consolidation)
-  // =========================================================================
-  
-  /**
-   * Initialize adaptive choreography functionality
-   */
-  private async initializeAdaptiveSystem(): Promise<void> {
-    try {
-      this.signature = await temporalMemoryService.getSignature();
-      this.registerEmergentEventListeners();
-
-      // Save signature every 30 seconds
-      this.saveInterval = setInterval(() => {
-        if (this.signature) {
-          temporalMemoryService.saveSignature(this.signature);
-        }
-      }, 30000);
-      
-      if (this.config.enableDebug) {
-        console.log('[AnimationFrameCoordinator] Emergent choreography initialized');
-      }
-    } catch (error) {
-      console.error('[AnimationFrameCoordinator] Failed to initialize adaptive choreography:', error);
-    }
-  }
-  
-  /**
-   * Register adaptive choreography event listeners
-   */
-  private registerEmergentEventListeners(): void {
-    const beatFrameSub = this.eventBus.subscribe("music:beat", (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) =>
-      this.handleBeatFrame(payload), 'AnimationFrameCoordinator'
-    );
-    const harmonyFrameSub = this.eventBus.subscribe(
-      "colors:harmonized",
-      (payload: any) => this.handleHarmonyFrame(payload), 'AnimationFrameCoordinator'
-    );
-    const bpmSub = this.eventBus.subscribe(
-      "music:energy",
-      (payload: { energy: number; valence: number; tempo: number; timestamp: number }) => {
-        this.currentBpm = payload.tempo;
-      }, 'AnimationFrameCoordinator'
-    );
-    const intensitySub = this.eventBus.subscribe(
-      "music:beat",
-      (payload: { bpm: number; intensity: number; timestamp: number; confidence: number }) => {
-        this.currentIntensity = payload.intensity;
-      }, 'AnimationFrameCoordinator'
-    );
-
-    this.emergentEventSubscriptions.push(
-      beatFrameSub,
-      harmonyFrameSub,
-      bpmSub,
-      intensitySub
-    );
-  }
-  
-  /**
-   * Handle beat frame events for adaptive adaptation
-   */
-  private handleBeatFrame(payload: any): void {
-    if (!this.signature) return;
-    // TODO: Process beat data and update signature in Phase 3
-    this.signature.lastModified = Date.now();
-    
-    // Coordinate visual effects pulsing with adaptive choreography
-    this.updateVisualPulseEffects({
-      intensity: payload.intensity || this.currentIntensity,
-      energy: payload.energy || this.currentIntensity,
-      bpm: this.currentBpm,
-    });
-  }
-
-  /**
-   * Handle harmony frame events for adaptive adaptation
-   */
-  private handleHarmonyFrame(payload: any): void {
-    if (!this.signature) return;
-    // TODO: Process color data and update signature in Phase 3
-    const { kineticState } = payload;
-    // Example of a simple update:
-    // this.signature.colorMemories.set(...)
-    this.signature.lastModified = Date.now();
-  }
-  
-  /**
-   * Update evolutionary trajectory based on signature trends
-   */
-  private async _updateEvolutionaryTrajectory(): Promise<void> {
-    if (!this.signature) return;
-
-    const trends = await temporalMemoryService.getSignatureTrends(
-      this.signature
-    );
-    if (!trends) return;
-
-    const { avgEnergy, avgValence } = trends;
-
-    // Example logic: Higher average energy might increase exploration
-    const explorationFactor = 0.5 + (avgEnergy - 0.5) * 0.2; // modest influence
-    this.signature.evolutionaryTrajectory.explorationFactor = Math.max(
-      0.1,
-      Math.min(0.9, explorationFactor)
-    );
-
-    // Example logic: More extreme valence (positive or negative) might increase adaptability
-    const adaptability = 0.5 + (Math.abs(avgValence) - 0.2) * 0.3;
-    this.signature.evolutionaryTrajectory.adaptability = Math.max(
-      0.1,
-      Math.min(0.9, adaptability)
-    );
-
-    this.signature.evolutionaryTrajectory.lastUpdate = Date.now();
-  }
-  
-  /**
-   * Calculate visual pulse based on current BPM and intensity
-   */
-  private _calculateVisualPulse(deltaMs: number) {
-    const beatInterval = 60000 / this.currentBpm; // ms per beat
-    const phase = (performance.now() % beatInterval) / beatInterval; // 0-1 cycle
-
-    // Example: Hue shift anticipates the beat. Peaks just before the beat hits.
-    const hueShift =
-      Math.sin(phase * 2 * Math.PI + Math.PI / 2) * 15 * this.currentIntensity;
-
-    return {
-      timestamp: performance.now(),
-      bpm: this.currentBpm,
-      intensity: this.currentIntensity,
-      phase,
-      hueShift,
-    };
-  }
-  
-  /**
-   * Calculate adaptive coefficients based on signature
-   */
-  private _calculateAdaptiveCoefficients(): void {
-    if (!this.signature) return;
-
-    // TODO: Implement more sophisticated logic based on signature history
-    const { adaptability, explorationFactor } =
-      this.signature.evolutionaryTrajectory;
-
-    // Example: Adaptability influences how quickly kinetic intensity responds
-    const kineticIntensity = 0.5 + adaptability * 0.5; // Range [0.5, 1.0]
-
-    // Example: Exploration factor influences the visual intensity
-    const visualIntensityBase = 0.8 + explorationFactor * 0.4; // Range [0.8, 1.2]
-
-    this.currentMultipliers = {
-      ...this.config.cosmicMultipliers,
-      kineticIntensity,
-      visualIntensityBase,
-    };
-
-    // TODO: Add adaptive events to UnifiedEventBus when needed
-    // this.eventBus.emit(
-    //   "adaptive/multipliersUpdated",
-    //   this.currentMultipliers
-    // );
-  }
-  
-  /**
-   * Process adaptive choreography tick within animation loop
-   */
-  private updateAdaptiveAnimations(deltaMs: number): void {
-    if (!this.signature) return;
-
-    // The main loop for the choreography engine
-    this._calculateAdaptiveCoefficients(); // Update multipliers each frame
-
-    // Periodically update the core learning parameters
-    if (
-      this.signature &&
-      Date.now() - this.signature.evolutionaryTrajectory.lastUpdate > 60000
-    ) {
-      // Every minute
-      this._updateEvolutionaryTrajectory();
-    }
-
-    const visualPulse = this._calculateVisualPulse(deltaMs);
-    if (visualPulse) {
-      // TODO: Add visual events to UnifiedEventBus when needed
-      // this.eventBus.emit("visual/pulse", visualPulse);
-    }
-
-    const emergentPayload = {
-      timestamp: performance.now(),
-      deltaMs,
-      // ...other adaptive data to be calculated in later phases
-    };
-    // TODO: Add adaptive events to UnifiedEventBus when needed
-    // this.eventBus.emit("adaptive/frame", emergentPayload);
-  }
-  
-  /**
-   * Clean up adaptive choreography resources
-   */
-  private destroyAdaptiveSystem(): void {
-    // Save signature one last time on destroy
-    if (this.signature) {
-      temporalMemoryService.saveSignature(this.signature);
-    }
-    if (this.saveInterval) {
-      clearInterval(this.saveInterval);
-      this.saveInterval = null;
-    }
-
-    this.emergentEventSubscriptions.forEach((subscriptionId) => this.eventBus.unsubscribe(subscriptionId));
-    this.emergentEventSubscriptions = [];
-    
-    if (this.config.enableDebug) {
-      console.log('[AnimationFrameCoordinator] Emergent choreography destroyed');
-    }
-  }
-
   // ===================================================================
   // 🔧 PHASE 3.1: CONSOLIDATED ANIMATION SYSTEM METHODS
   // ===================================================================

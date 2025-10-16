@@ -1,16 +1,15 @@
 /**
  * Spicetify Theme Architecture Types - Clean Service Organization
- * 
+ *
  * Defines the core services that coordinate Spicetify theme functionality,
  * based on real theme responsibilities and industry best practices.
- * 
- * Philosophy: "Clean organization that reflects what the system actually does -
+ *
  * music integration, theme aesthetics, visual effects, Spotify UI adaptation,
- * and system coordination for a beautiful, performant theme experience."
+ * and system coordination for a performant theme experience."
  */
 
-import type { IManagedSystem, HealthCheckResult } from '@/types/systems';
-import type { UnifiedColor, PaletteSystem } from '@/utils/color/PaletteSystemManager';
+import type { HealthCheckResult, IManagedSystem } from "@/types/systems";
+import type { PaletteSystem } from "@/utils/color/PaletteSystemManager";
 
 // ============================================================================
 // Core Service Interfaces
@@ -88,16 +87,16 @@ export interface MusicIntegration extends ThemeService {
   // Core components managed by this service
   musicSyncService: any; // MusicSyncService
   colorHarmonyEngine: any; // ColorHarmonyEngine
-  emotionalGradientMapper: any; // EmotionalGradientMapper
+  emotionalGradientMapper: any; // EmotionalGradientService
   genreProfileManager: any; // GenreProfileManager
   musicalOKLABCoordinator: any; // MusicalOKLABCoordinator
-  
+
   // Service-specific coordination methods
   processMusicData(musicData: MusicData): Promise<MusicAnalysisResult>;
   updateVisualSystemsFromMusic(result: MusicAnalysisResult): Promise<void>;
-  handleTrackChange(newTrack: MusicData['track']): Promise<void>;
+  handleTrackChange(newTrack: MusicData["track"]): Promise<void>;
   handlePlayStateChange(isPlaying: boolean): Promise<void>;
-  
+
   // Spotify integration
   getSpicetifyPlayerState(): Promise<MusicData>;
   subscribeToPlayerEvents(): void;
@@ -111,7 +110,7 @@ export interface MusicIntegration extends ThemeService {
 export interface ThemeAppearanceConfig {
   paletteSystem: PaletteSystem;
   catppuccinFlavor: string;
-  brightnessMode: 'bright' | 'balanced' | 'dark';
+  brightnessMode: "bright" | "balanced" | "dark";
   accentColor: string;
   dynamicAccentEnabled: boolean;
   userCustomizations: Record<string, any>;
@@ -133,13 +132,15 @@ export interface ThemeAppearance extends ThemeService {
   cssColorController: any; // CSSColorController
   settingsManager: any; // SettingsManager
   oklabColorProcessor: any; // OKLABColorProcessor
-  
+
   // Service-specific coordination methods
-  applyThemeConfiguration(config: ThemeAppearanceConfig): Promise<ColorApplicationResult>;
+  applyThemeConfiguration(
+    config: ThemeAppearanceConfig
+  ): Promise<ColorApplicationResult>;
   switchPaletteSystem(newSystem: PaletteSystem): Promise<void>;
   updateUserSettings(settings: Record<string, any>): Promise<void>;
   handleDynamicColorChange(colors: Record<string, string>): Promise<void>;
-  
+
   // Theme management
   getCurrentThemeState(): ThemeAppearanceConfig;
   validateThemeIntegrity(): Promise<HealthCheckResult>;
@@ -154,7 +155,7 @@ export interface VisualEffectConfig {
   webglEnabled: boolean;
   visualEffectsLevel: number;
   visualIntensity: number;
-  effectQuality: 'low' | 'medium' | 'high';
+  effectQuality: "low" | "medium" | "high";
   enabledEffects: string[];
   deviceCapabilities: {
     hasWebGL: boolean;
@@ -165,7 +166,7 @@ export interface VisualEffectConfig {
 
 export interface VisualRenderingResult {
   activeEffects: string[];
-  renderingMode: 'webgl' | 'css' | 'hybrid';
+  renderingMode: "webgl" | "css" | "hybrid";
   performanceMetrics: {
     fps: number;
     memoryUsage: number;
@@ -180,16 +181,18 @@ export interface VisualEffects extends ThemeService {
   depthLayeredSystem: any; // DepthLayeredGradientSystem
   visualEffectsChoreographer: any; // BackgroundAnimationCoordinator
   backgroundStrategySelector: any; // ColorStrategySelector
-  
+
   // Service-specific coordination methods
-  configureVisualEffects(config: VisualEffectConfig): Promise<VisualRenderingResult>;
+  configureVisualEffects(
+    config: VisualEffectConfig
+  ): Promise<VisualRenderingResult>;
   updateEffectsFromMusic(musicAnalysis: MusicAnalysisResult): Promise<void>;
   optimizeForDevice(deviceCapabilities: any): Promise<void>;
   handlePerformanceConstraints(constraints: any): Promise<void>;
-  
+
   // Rendering coordination
   selectOptimalRenderingStrategy(): Promise<string>;
-  switchRenderingMode(mode: 'webgl' | 'css' | 'hybrid'): Promise<void>;
+  switchRenderingMode(mode: "webgl" | "css" | "hybrid"): Promise<void>;
   validateVisualIntegrity(): Promise<HealthCheckResult>;
 }
 
@@ -199,10 +202,10 @@ export interface VisualEffects extends ThemeService {
 
 export interface SpotifyUIState {
   currentView: string;
-  sidebarState: 'expanded' | 'collapsed' | 'hidden';
-  nowPlayingState: 'expanded' | 'collapsed' | 'hidden';
+  sidebarState: "expanded" | "collapsed" | "hidden";
+  nowPlayingState: "expanded" | "collapsed" | "hidden";
   focusedElement: string | null;
-  interactionMode: 'mouse' | 'keyboard' | 'touch';
+  interactionMode: "mouse" | "keyboard" | "touch";
 }
 
 export interface UIEnhancementResult {
@@ -222,13 +225,13 @@ export interface SpotifyUI extends ThemeService {
   interactionTracker: any; // InteractionTrackingSystem
   card3DManager: any; // Card3DManager
   glassmorphismManager: any; // GlassmorphismManager
-  
+
   // Service-specific coordination methods
   adaptToSpotifyUI(uiState: SpotifyUIState): Promise<UIEnhancementResult>;
   handleSpotifyUIChange(change: any): Promise<void>;
   enhanceUserInteractions(interactions: any): Promise<void>;
   monitorSpotifyDOM(): void;
-  
+
   // Platform integration
   injectThemeEnhancements(): Promise<void>;
   cleanupThemeEnhancements(): Promise<void>;
@@ -240,11 +243,11 @@ export interface SpotifyUI extends ThemeService {
 // ============================================================================
 
 export interface SystemArchitectureConfig {
-  performanceProfile: 'low' | 'balanced' | 'high' | 'ultra';
+  performanceProfile: "low" | "balanced" | "high" | "ultra";
   enableAdvancedFeatures: boolean;
   debugMode: boolean;
   healthCheckInterval: number;
-  coordinationStrategy: 'reactive' | 'proactive' | 'adaptive';
+  coordinationStrategy: "reactive" | "proactive" | "adaptive";
 }
 
 export interface SystemCoordinationResult {
@@ -265,15 +268,21 @@ export interface SystemArchitecture extends ThemeService {
   eventBus: any; // UnifiedEventBus
   cssController: any; // CSSVariableWriter
   year3000System: any; // year3000System
-  
+
   // Service-specific coordination methods
   configureSystemArchitecture(config: SystemArchitectureConfig): Promise<void>;
-  coordinateAllDomains(change: CrossDomainChange): Promise<SystemCoordinationResult>;
+  coordinateAllDomains(
+    change: CrossDomainChange
+  ): Promise<SystemCoordinationResult>;
   optimizeSystemPerformance(): Promise<void>;
   handleSystemHealthIssues(issues: HealthCheckResult[]): Promise<void>;
-  
+
   // Cross-domain coordination
-  facilitateDomainCommunication(from: string, to: string, message: any): Promise<void>;
+  facilitateDomainCommunication(
+    from: string,
+    to: string,
+    message: any
+  ): Promise<void>;
   validateOverallSystemIntegrity(): Promise<HealthCheckResult>;
   emergencySystemRecovery(): Promise<void>;
 }
@@ -285,9 +294,14 @@ export interface SystemArchitecture extends ThemeService {
 export interface CrossServiceChange {
   originService: string;
   targetServices: string[];
-  changeType: 'configuration' | 'state' | 'performance' | 'error' | 'user-action';
+  changeType:
+    | "configuration"
+    | "state"
+    | "performance"
+    | "error"
+    | "user-action";
   data: any;
-  priority: 'low' | 'normal' | 'high' | 'critical';
+  priority: "low" | "normal" | "high" | "critical";
   requiresCoordination: boolean;
 }
 
@@ -301,14 +315,14 @@ export interface ThemeServiceRegistry {
 
 export interface SpicetifyThemeCoordinator {
   services: ThemeServiceRegistry;
-  
+
   // Global coordination methods
   initializeAllServices(): Promise<void>;
   coordinateChange(change: CrossServiceChange): Promise<void>;
   validateThemeIntegrity(): Promise<HealthCheckResult>;
   getThemeMetrics(): Record<string, ServiceMetrics>;
   shutdownTheme(): Promise<void>;
-  
+
   // Theme-specific methods
   handleUserSettingChange(setting: string, value: any): Promise<void>;
   handleSpotifyTrackChange(trackData: MusicData): Promise<void>;
@@ -322,32 +336,53 @@ export interface SpicetifyThemeCoordinator {
 
 export interface ThemeServiceEvents {
   // Music Integration Domain Events
-  'music:track-changed': { musicData: MusicData; analysis: MusicAnalysisResult };
-  'music:analysis-complete': { analysis: MusicAnalysisResult };
-  'music:player-state-changed': { isPlaying: boolean; position: number };
-  
+  "music:track-changed": {
+    musicData: MusicData;
+    analysis: MusicAnalysisResult;
+  };
+  "music:analysis-complete": { analysis: MusicAnalysisResult };
+  "music:player-state-changed": { isPlaying: boolean; position: number };
+
   // Theme Appearance Domain Events
-  'theme:configuration-changed': { config: ThemeAppearanceConfig; result: ColorApplicationResult };
-  'theme:palette-switched': { oldSystem: PaletteSystem; newSystem: PaletteSystem };
-  'theme:colors-applied': { colors: Record<string, string> };
-  
+  "theme:configuration-changed": {
+    config: ThemeAppearanceConfig;
+    result: ColorApplicationResult;
+  };
+  "theme:palette-switched": {
+    oldSystem: PaletteSystem;
+    newSystem: PaletteSystem;
+  };
+  "theme:colors-applied": { colors: Record<string, string> };
+
   // Visual Effects Domain Events
-  'visual:effects-configured': { config: VisualEffectConfig; result: VisualRenderingResult };
-  'visual:rendering-mode-changed': { oldMode: string; newMode: string };
-  'visual:performance-optimized': { optimizations: string[] };
-  
+  "visual:effects-configured": {
+    config: VisualEffectConfig;
+    result: VisualRenderingResult;
+  };
+  "visual:rendering-mode-changed": { oldMode: string; newMode: string };
+  "visual:performance-optimized": { optimizations: string[] };
+
   // Spotify UI Integration Domain Events
-  'spotify:ui-state-changed': { uiState: SpotifyUIState; enhancements: UIEnhancementResult };
-  'spotify:dom-modified': { modifications: string[] };
-  'spotify:interaction-enhanced': { enhancements: string[] };
-  
+  "spotify:ui-state-changed": {
+    uiState: SpotifyUIState;
+    enhancements: UIEnhancementResult;
+  };
+  "spotify:dom-modified": { modifications: string[] };
+  "spotify:interaction-enhanced": { enhancements: string[] };
+
   // System Architecture Domain Events
-  'system:coordination-complete': { result: SystemCoordinationResult };
-  'system:health-check': { health: Record<string, HealthCheckResult> };
-  'system:performance-optimized': { metrics: any };
-  
+  "system:coordination-complete": { result: SystemCoordinationResult };
+  "system:health-check": { health: Record<string, HealthCheckResult> };
+  "system:performance-optimized": { metrics: any };
+
   // Cross-Service Events
-  'service:coordination-requested': { change: CrossServiceChange };
-  'service:coordination-complete': { change: CrossServiceChange; results: any[] };
-  'theme:integrity-validated': { health: HealthCheckResult; services: string[] };
+  "service:coordination-requested": { change: CrossServiceChange };
+  "service:coordination-complete": {
+    change: CrossServiceChange;
+    results: any[];
+  };
+  "theme:integrity-validated": {
+    health: HealthCheckResult;
+    services: string[];
+  };
 }

@@ -4,6 +4,7 @@ import { ThemeLifecycleCoordinator } from "@/core/lifecycle/ThemeLifecycleCoordi
 import type { ColorContext } from "@/types/colorStrategy";
 import type { AdvancedSystemConfig, Year3000Config } from "@/types/models";
 import type { SpicetifyAudioFeatures, SpicetifyPlayerData } from "@/types/systems";
+import { GenreType } from "@/types/genre";
 
 // Runtime utilities for safe Spicetify access
 function safeGetSpicetify(): typeof Spicetify | null {
@@ -19,13 +20,20 @@ import * as Utils from "@/utils/core/ThemeUtilities";
 import { SpicetifyCompat } from "@/utils/platform/SpicetifyCompat";
 import { settings } from "@/config";
 import { GenreProfileManager } from "./GenreProfileManager";
-import { 
-  OKLABColorProcessor, 
-  type EnhancementPreset 
+import type { GenreSystemService } from "@/core/services/SystemServices";
+import { DefaultServiceFactory } from "@/core/services/CoreServiceProviders";
+import {
+  OKLABColorProcessor,
+  type EnhancementPreset
 } from "@/utils/color/OKLABColorProcessor";
-import { 
-  EmotionalTemperatureMapper 
+import {
+  EmotionalTemperatureMapper
 } from "@/utils/color/EmotionalTemperatureMapper";
+import {
+  getMusicalOKLABProcessor,
+  getStandardOKLABProcessor,
+  OKLABProcessorFactory,
+} from "@/utils/color/OKLABProcessorFactory";
 
 // Interfaces
 interface GenreProfile {
@@ -161,7 +169,7 @@ interface SpicetifyAudioTatum {
 
 interface ProcessedMusicData {
   enhancedBPM: number;
-  genre: string;
+  genre: GenreType;
   mood?: string;
   energy: number;
   valence: number;
@@ -316,6 +324,7 @@ export class MusicSyncService {
   // NOTE: settingsManager field removed - was dead code, never used
   private year3000System?: ThemeLifecycleCoordinator | null;
   private genreProfileManager: GenreProfileManager;
+  private genreService: GenreSystemService | null = null;
   
   // OKLAB integration for perceptually uniform color processing
   private oklabProcessor: OKLABColorProcessor;
@@ -390,9 +399,24 @@ export class MusicSyncService {
     this.genreProfileManager =
       dependencies.genreProfileManager ||
       new GenreProfileManager({ ADVANCED_SYSTEM_CONFIG: this.config });
+    // Phase 3.2: Prefer GenreService via DI factory if available
+    try {
+      this.genreService = DefaultServiceFactory.getServices()?.genre ?? null;
+    } catch {
+      this.genreService = null;
+    }
 
     // Initialize OKLAB integration for perceptually uniform color processing
-    this.oklabProcessor = new OKLABColorProcessor(this.config.enableDebug);
+    this.oklabProcessor = getStandardOKLABProcessor({
+      requester: "MusicSyncService",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor",
+    });
+    getMusicalOKLABProcessor({
+      requester: "MusicSyncService",
+      enableDebug: this.config.enableDebug,
+      reason: "constructor-prewarm",
+    });
     this.emotionalTemperatureMapper = new EmotionalTemperatureMapper(this.config.enableDebug);
 
     this.cacheTTL = MUSIC_SYNC_CONFIG.performance.cacheTTL;
@@ -701,6 +725,11 @@ export class MusicSyncService {
     }
     if (cached) {
       this.unifiedCache.delete(key); // Remove expired entry
+      OKLABProcessorFactory.reportCacheFootprint(
+        "MusicSyncService.unifiedCache",
+        this.unifiedCache.size,
+        { reason: "expired", key }
+      );
     }
     return null;
   }
@@ -710,6 +739,11 @@ export class MusicSyncService {
       data,
       timestamp: Date.now(),
     });
+    OKLABProcessorFactory.reportCacheFootprint(
+      "MusicSyncService.unifiedCache",
+      this.unifiedCache.size,
+      { key }
+    );
   }
 
   // === ENHANCED BPM CALCULATION ===
@@ -751,13 +785,28 @@ export class MusicSyncService {
         );
       }
 
-      const profile = this.genreProfileManager.getProfileForTrack(
-        audioFeatures || undefined
-      );
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const detectedGenre = this.genreProfileManager.detectGenre(
-        audioFeatures || undefined
-      );
+      // Phase 3: Simplified genre detection - detection.profile is now MusicAnalysisProfile
+      const genreProvider = this.genreService ?? this.genreProfileManager as any;
+      const detection = typeof genreProvider.detectGenre === "function"
+        ? genreProvider.detectGenre(audioFeatures || undefined)
+        : {
+            genre: this.genreProfileManager.detectGenre(audioFeatures || undefined),
+            confidence: this.genreProfileManager.getGenreConfidence(),
+            profile: this.genreService?.getMusicAnalysisProfile(audioFeatures) ?? null,
+            timestamp: Date.now()
+          };
+      const profile = detection?.profile; // Already MusicAnalysisProfile from Phase 2
+      const detectedGenre = detection?.genre;
+
+      // Emit unified genre-detected event for interested systems
+      try {
+        unifiedEventBus.emit("audio:genre-detected" as any, {
+          detectedGenre,
+          confidence: detection?.confidence ?? 0,
+          audioFeatures,
+          timestamp: Date.now(),
+        });
+      } catch {}
 
       const enhancedBPM = this.computeAdvancedBPM({
         trackBPM,
@@ -1270,6 +1319,28 @@ export class MusicSyncService {
         animationSpeedFactor,
         genre: genreTag,
       };
+
+      // Phase 4: Attach unified MusicAnalysisProfile for consolidated consumers
+      try {
+        const unifiedProfile = this.genreService?.getMusicAnalysisProfile({
+          danceability: estimatedDanceability,
+          energy: estimatedEnergy,
+          valence: estimatedValence,
+          tempo,
+          key,
+          mode: trackData.mode ?? 1,
+        } as any);
+        if (unifiedProfile) {
+          (processedData as any).unifiedProfile = unifiedProfile;
+          (processedData as any).primaryEmotion = unifiedProfile.emotion.primary;
+          (processedData as any).emotionIntensity = unifiedProfile.emotion.intensity;
+          (processedData as any).colorTemperature = unifiedProfile.emotion.temperatureK;
+        }
+      } catch (e) {
+        if (this.config.enableDebug) {
+          console.warn("[MusicSyncService] Failed to attach unified music profile", e);
+        }
+      }
 
       this.setInCache(cacheKey, { processedData });
       this.latestProcessedData = processedData;
@@ -1791,6 +1862,11 @@ export class MusicSyncService {
     if (this.cacheCleanupInterval) clearInterval(this.cacheCleanupInterval);
     this.subscribers.clear();
     this.unifiedCache.clear();
+    OKLABProcessorFactory.reportCacheFootprint(
+      "MusicSyncService.unifiedCache",
+      0,
+      { reason: "destroy" }
+    );
     this.isInitialized = false;
     this.latestProcessedData = null;
 
